@@ -1,0 +1,2 @@
+# Preserve original bytes: baseline checks and provenance hashes include newlines.
+* -text

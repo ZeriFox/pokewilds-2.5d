@@ -1,0 +1,99 @@
+VERIFICA PC, MONDO 2.5D E ATTORI 3D - 5 OTTOBRE 2026
+
+ESITO: build e test finali superati su Windows x64, GPU RTX 4060.
+
+BUILD CONSEGNATA
+201 sorgenti del gioco compilati con JDK Temurin 17 incluso; 423 classi prodotte.
+SHA-256 dist/pokewilds-rebuilt.jar:
+a19212adb10f303a24765341a45b423778d0ea10864f24d9ad54a562a2c2f725
+Dimensione: 665821115 byte. Integrita' ZIP/CRC e classi compilate verificate.
+Il runtime originale contiene zero classi precompilate com/pkmngen.
+La libreria gdx-gltf 2.1.0 aggiunta include una correzione locale verificata:
+SHA-256 774ae6ac5f3bfd5894cbe8b3e82f3558b65e7a09f0359ee124a55e4ae27afdf7.
+Restano soltanto avvisi javac relativi alle API e ai generici decompilati.
+
+AMBITO DELLE MODIFICHE
+- tools/verify_visual_scope.py: PASS. 197 sorgenti della base PC hanno hash
+  identico; Game.java aggiunge soltanto campo, inizializzazione, render e dispose.
+- Tre nuove classi: JohtoRenderer, ActorModelRenderer, TrainerModel3D.
+- Generatore, RNG, collisioni, azioni e formato dei salvataggi restano originali.
+- I modelli GLB non sono stati modificati; normalizzazione e correzione dei nomi
+  duplicati degli scheletri avvengono sulle risorse grafiche caricate in memoria.
+
+CATALOGO 3D
+- 462 modelli installati su 502 nomi specie/forme del gioco.
+- 151 dalla fonte 06wj, 311 dalla fonte legacy Pokemon-3D-api.
+- 173 file contengono clip animate, 289 sono statici. Il renderer riconosce
+  clip di riposo per 156 modelli e di movimento per 155.
+- 40 nomi non hanno un modello compatibile. Anche shiny, uova e fantasmi
+  mantengono gli sprite. Dettagli: MODELS-PROVENANCE.json e MODELLI-3D.txt.
+- tools/model_catalog_smoke_test.py: PASS 462/462, 924 rendering GPU,
+  2373 parti di primitive, massimo 128 ossa; nessun errore GL o stack trace.
+- Ogni campione deve contenere geometria visibile nel framebuffer, non basta
+  che il caricatore dichiari successo. Minimo osservato: 1050 pixel foreground.
+- Compilazione e avvio del test usano soltanto il fat JAR finale nel classpath.
+- Tutti i 462 asset testati sono confrontati per byte/SHA-256 con il manifest
+  e con le rispettive entry nel JAR consegnato.
+- Ispezione visiva su Machop, Pikachu, Charizard, Gyarados, Pidgey e Chimecho.
+  Non tutte le pose di tutte le specie sono state ispezionate manualmente.
+
+PERSONAGGIO, MACHOP E CONTROLLI
+- tools/actor_model_smoke_test.py: PASS, fixture isolata di 1681 tile.
+- Quattro direzioni da fermo e quattro direzioni in camminata; nove screenshot.
+- 422 frame di gioco e quattro confronti aggiuntivi con/senza Machop verificano
+  i pixel del modello sopra l'ombra, escludendo un falso positivo dei contatori.
+- Contatori finali: player 430, Pokemon 426, animazione 426 render attivi.
+- Otto passi con InputProcessor originale; Machop usa il Follow originale.
+- Save/load conserva 1681 tile, posizione (-32,0), direzione down, Machop
+  livello 6 e HP 24, inventario con sleeping bag=1 ed escape rope=1, follower.
+- Ispezionate tutte le schermate: modelli visibili e orientati correttamente,
+  camminata, viso dell'allenatore e posizione dopo caricamento coerenti.
+
+MONDO PROCEDURALE
+- tools/world_smoke_test.py: PASS sulla stessa build finale.
+- Mondo S generato dal codice originale: 161090 tile.
+- Movimento (2352,-1808) -> (2352,-1792), una casella da 16 unita'.
+- Emote controllata per i 61 frame originali, movimento, salvataggio e load.
+- 232/232 frame Johto attivi, zero fallback; nessuna eccezione o errore GL.
+- Dopo load conservati conteggio tile, posizione, nome Smoke e un Machop.
+- Il confronto verifica questi campi, non ogni singolo dato della mappa.
+
+MENU E LAUNCHER
+- tools/smoke_test.py: PASS, avvio nativo, 120 frame del menu e chiusura.
+- Menu identico alla release originale, PNG SHA-256:
+  f352884e8dcc7531ab4043b1c6ff5d406d4bf61ff580ad74c6d69e8baee4139a
+- run-johto.cmd testdirs: PASS; JDK incluso e directory run-johto corretti.
+- L'avviso SLF4J relativo al logger assente proviene dal runtime originale.
+
+CORREZIONE MESH GRANDI
+- tools/patch_gltf_loader.py: 11 test invarianti superati e ricostruzione
+  ripetibile dello stesso JAR modificato. La libreria originale fallisce
+  correttamente il controllo negativo sul confine degli indici.
+- Tutti i 290374 triangoli di Chimecho sono preservati nello stesso ordine,
+  con gli stessi attributi dei vertici; nessuna semplificazione della geometria.
+- Chimecho verificato anche sulla GPU dopo il caricamento tramite JAR finale.
+- Fonte, backup originale, hash e risultati: third_party/gdx-gltf/.
+
+EVIDENZE
+build/build-report.json                    Hash, classi, risorse e dipendenze.
+build/visual-scope.json                    Sorgenti invariati rispetto alla base.
+build/visual-hooks.patch                   Le quattro modifiche a Game.java.
+build/model-catalog-smoke/catalog-inputs.json  Hash del catalogo e del JAR testato.
+build/model-catalog-smoke/catalog-results.tsv  Esito di ogni modello e posa.
+build/model-catalog-smoke/model-catalog-smoke.log  Verifica catalogo completa.
+build/actor-model-smoke/actor-model-smoke.log  Direzioni, movimento e save/load.
+build/world-smoke/johto/world-smoke.log     Generatore originale e salvataggio.
+build/smoke/smoke.log                      Menu della build finale.
+anteprima-personaggi-3d.png                Schermata nativa allenatore/Machop.
+anteprima-25d.png                          Schermata del mondo procedurale finale.
+
+LIMITI
+Questi sono test funzionali brevi. Catalogo, fixture e mondo sono stati eseguiti
+anche in parallelo: i contatori FPS nei log includono caricamenti e carico
+concorrente e non costituiscono un benchmark del gioco. Il primo caricamento
+di una specie puo' causare una pausa; le cache sono limitate.
+Non sono state provate tutte le battaglie, costruzioni, interni, biomi, partite
+lunghe, multiplayer o altre GPU. Le scene classiche del prototipo rimangono
+classiche, incluse battaglie e notte. La base e' una ricostruzione da bytecode;
+non si dichiara equivalenza totale con ogni comportamento del gioco ufficiale.
+Questa versione e' per PC Windows; non e' un port Nintendo 3DS.

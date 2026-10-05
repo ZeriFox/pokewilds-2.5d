@@ -1,0 +1,9 @@
+Built-in image_gen used on 2026-10-05. New asset, no reference images.
+Saved asset: resources/visual/johto/terrain-atlas.png
+
+Use case: stylized-concept. Asset type: a production-ready flat terrain texture atlas for a 2.5D handheld monster-collecting RPG inspired by the colorful Nintendo DS era and HeartGold/SoulSilver. Generate ONE square 1024x1024 image divided into an EXACT 4-column by 4-row grid, each cell exactly 256x256 pixels, no margins, no gaps, no separator lines, no text. Every cell is an opaque top-down SEAMLESS surface texture that covers its entire square. Visually each cell must have the detail of a 32x32 pixel-art tile upscaled 8x using nearest-neighbor: crisp square pixel blocks, restrained harmonious palette, subtle irregular details, no blur, no gradients, no high-frequency photo noise, no outlines around the squares. 16 materials in strict row-major order:
+Row 1: lush spring green short grass with few tiny light tufts; darker woodland mossy grass; warm cream beach sand with sparse grains; rich ochre brown soil.
+Row 2: tranquil medium cobalt-blue water with small cyan horizontal ripple dashes; pale turquoise shallow water with delicate ripples; pale blue-white snow with subtle blue indentations; cool grey slate rock texture.
+Row 3: golden sage dry savanna grass; pale warm compacted gravel footpath; charcoal-purple volcanic stone; vivid orange molten lava with dark scattered crust.
+Row 4: warm honey wooden floor planks running horizontally; pale cream stone courtyard paving; dense emerald leafy canopy texture; terracotta-red small roof shingles.
+Aesthetic: elegant vivid pixel art terrain from a polished 2009 handheld RPG, not photorealistic, not voxel blocks. Surfaces only, absolutely no trees, buildings, characters, objects, borders, labels or UI. Exact alignment matters because code samples each of the 16 equal squares independently.

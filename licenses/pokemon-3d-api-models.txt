@@ -1,0 +1,29 @@
+Additional Pokemon actor model provenance
+
+Repository: https://github.com/Sudhanshu-Ambastha/Pokemon-3D-api
+Pinned commit: eaccd7e5e9522623d6d41249131a0aeb676388da
+Model source pattern: https://raw.githubusercontent.com/Sudhanshu-Ambastha/Pokemon-3D-api/eaccd7e5e9522623d6d41249131a0aeb676388da/models/glb/CATEGORY/DEX.glb
+Exact URLs, byte-for-byte source hashes, animation/static status and any
+embedded artist/source/license credits are recorded per model in MODELS-PROVENANCE.json.
+docs/CREDITS.md points to Sketchfab collections rather than a complete per-model
+attribution list. Embedded asset.extras credits are retained when supplied.
+docs/COPYRIGHT.md explicitly limits the repository's MIT license to code,
+excluding rights to Pokemon intellectual property. Any embedded model license
+is recorded as an upstream claim, not a grant of underlying Pokemon rights.
+Models are unmodified; regular forms are not substituted for regional variants.
+
+Credits: https://raw.githubusercontent.com/Sudhanshu-Ambastha/Pokemon-3D-api/eaccd7e5e9522623d6d41249131a0aeb676388da/docs/CREDITS.md
+Copyright notice: https://raw.githubusercontent.com/Sudhanshu-Ambastha/Pokemon-3D-api/eaccd7e5e9522623d6d41249131a0aeb676388da/docs/COPYRIGHT.md
+Software license: https://raw.githubusercontent.com/Sudhanshu-Ambastha/Pokemon-3D-api/eaccd7e5e9522623d6d41249131a0aeb676388da/docs/LICENSE
+
+Upstream software license text (distinct from model rights):
+
+MIT License
+
+Copyright (c) 2024 Sudhanshu Ambastha
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

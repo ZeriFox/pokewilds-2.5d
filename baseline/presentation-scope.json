@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "purpose": "Explicit source review snapshot for the 2.5D presentation change. Never auto-updated by the verifier. Digests freeze the included diff, not semantic equivalence.",
+  "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
+  "added_sources": [
+    "src/com/pkmngen/game/ActorModelRenderer.java",
+    "src/com/pkmngen/game/JohtoBattleRenderer.java",
+    "src/com/pkmngen/game/JohtoRenderer.java",
+    "src/com/pkmngen/game/ModernBatch.java",
+    "src/com/pkmngen/game/ModernInventoryUi.java",
+    "src/com/pkmngen/game/ModernPartyUi.java",
+    "src/com/pkmngen/game/ModernUi.java",
+    "src/com/pkmngen/game/TrainerModel3D.java"
+  ],
+  "presentation_actions": {
+    "src/com/pkmngen/game/BattleFadeOut.java": {
+      "baseline_sha256": "77b94f82ae0ba6ec50802da93eddb94c1e9929b1f930694d9e8e27c1b437a16b",
+      "presentation_sha256": "e8a50b58879f20bd79bb01730a0c7f4dbd25c2d90784a0f74832a81df1565f6c",
+      "scope": "Replace frame drawing only; retain frame removal and transition actions"
+    },
+    "src/com/pkmngen/game/BattleIntro.java": {
+      "baseline_sha256": "fc6c74b8ad1719849acb2d4a54ee6fe385a7009a4357bfac113fae919ac1ed8d",
+      "presentation_sha256": "f73edfe2f4aacdc119dd9d3feba2bf907aebad481721bb429a260edd2e76dcd1",
+      "scope": "Replace frame drawing only; retain intro frames and timing"
+    },
+    "src/com/pkmngen/game/BattleIntroAnim1.java": {
+      "baseline_sha256": "4640b01c28805f25aacdcb1a6c8bbb8685017e3213824b0cb49c90e44fc19e10",
+      "presentation_sha256": "c9fbfaba79f3764ffe76e050ec7a714d6c8e14c65e5fe711ba862918bbd565bc",
+      "scope": "Replace frame and border drawing only; retain frame removal and nextAction execution"
+    },
+    "src/com/pkmngen/game/DrawAttacksMenu.java": {
+      "baseline_sha256": "603c8251573d2cd2d9198a573d38683006f3899625f1db00b7303b9daefd53cf",
+      "presentation_sha256": "57d53d06fd572290305d2ecd8a740c60107cc7b71ad4ab09832f1e507df83ae9",
+      "scope": "Replace menu drawing; retain cursorDelay progression and arrow coordinates before presentation return"
+    },
+    "src/com/pkmngen/game/DrawBattle.java": {
+      "baseline_sha256": "06217a8f0d064e0d09567620f0b2cc73cc6248536ad1a2eabb01aca47d1eea1e",
+      "presentation_sha256": "89b1a7e59217608ed00b764ae8442b9214ce95ac474f27e725f8f66e6339be20",
+      "scope": "Replace background, masks and night tint; retain original combat sprite drawing"
+    },
+    "src/com/pkmngen/game/DrawBattleMenuNormal.java": {
+      "baseline_sha256": "877cbce41350740b7a543207a77468e35e2ff36cbfe8b23bbd249af06e901209",
+      "presentation_sha256": "79fcc96800ba62eae7560342142a76efee2a48b86bb75dcf118d4513b994287b",
+      "scope": "Replace command panel and cursor drawing; retain selection and input logic"
+    },
+    "src/com/pkmngen/game/DrawBattleMenuSafariZone.java": {
+      "baseline_sha256": "8c307a3d09b0235dcf7a5bb1f906f10655871e3b9018753e4b72541b601f3fd8",
+      "presentation_sha256": "01092eceba1e423ddf338b6e8703be7f8ebd8a0872a799b0da649f78cad7b8f2",
+      "scope": "Replace safari command panel and cursor drawing; retain selection and input logic"
+    },
+    "src/com/pkmngen/game/DrawEnemyHealthGen2.java": {
+      "baseline_sha256": "b2050ab5a6da9b33b5ceeda16d11e1c4ea5b3023b2a7049f618219992fbfd0da",
+      "presentation_sha256": "05956c02b87a3f56cccd15e08420a75525acd07a61b9fcdfc6339c82697bd923",
+      "scope": "Replace health panel drawing; retain health calculation and animation updates"
+    },
+    "src/com/pkmngen/game/DrawFriendlyHealthGen2.java": {
+      "baseline_sha256": "60d218d1a0e020b97ea58abc2d1f568e37db8e463d87f230f1f57dbd3ceb94b6",
+      "presentation_sha256": "772559e0eb83639c1efc0f364e4b5e086304c1378e98e7156612c768f07db7aa",
+      "scope": "Replace health/experience panel drawing; retain health and experience calculation/updates"
+    },
+    "src/com/pkmngen/game/EggHatchAnim.java": {
+      "baseline_sha256": "af5acd790ef524f88bdf1b52d60ff11853dd6c229c820d1d03e5db715b3d263f",
+      "presentation_sha256": "909d315f3b43a6ef84055688e280b42fec1999726107fd65b1950daf5ef9a2e5",
+      "scope": "Replace only the background draw with shared event backdrop"
+    },
+    "src/com/pkmngen/game/EvolutionAnim.java": {
+      "baseline_sha256": "bad0e41ff446d10bdacb3275436d091c1495fe0c7968651059781daff92a6d74",
+      "presentation_sha256": "d66a94f7789f0016c8d80ba88cea83920fe3cbd2496332fbc18e74dcb979147f",
+      "scope": "Replace only the background draw with shared event backdrop"
+    },
+    "src/com/pkmngen/game/FadeAnim.java": {
+      "baseline_sha256": "92ba5b2c1746ca616c82b5a5645c5a42c0a4079d3716e129b73f86bb83f1caff",
+      "presentation_sha256": "e41ff35fde393d37a7453c2020a564dd1751367ee18da0b7bf22a6b89c42ae52",
+      "scope": "Replace fade drawing; retain original timer and transition condition"
+    },
+    "src/com/pkmngen/game/RegigigasBattle.java": {
+      "baseline_sha256": "e3791d4f9fe697426806de3b5bb8aaa0bcc5222c4e76f17464bfec8e238a9ba6",
+      "presentation_sha256": "05a606ce7b50596ac059fd5b9a115eab43c5f5c6a9a635c8ce576a891185d532",
+      "scope": "Replace nested transition frame and border drawing; retain frame and action progression"
+    },
+    "src/com/pkmngen/game/SpecialBattleMegaGengar.java": {
+      "baseline_sha256": "1c649b6ab296e03938c184c97503497c66e5b9917081fd40742d7936e60fc58a",
+      "presentation_sha256": "ae271496750bab2973a4de58132193c0230ca14bc7ae6dc3e733da059ff087f1",
+      "scope": "Replace nested transition frame drawing only"
+    },
+    "src/com/pkmngen/game/SpecialBattleMewtwo.java": {
+      "baseline_sha256": "a7e2ffd0509f8adde7045e8278d529ae385cab69db599cda0ce6688ef4357a3b",
+      "presentation_sha256": "3c18b3b689645ed3af3b1920e000770cb1f840b1ebd9a4cc67fa513ee2828a9b",
+      "scope": "Replace nested transition frame drawing only"
+    }
+  }
+}

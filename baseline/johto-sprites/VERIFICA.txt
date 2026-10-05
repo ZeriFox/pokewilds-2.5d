@@ -1,0 +1,77 @@
+VERIFICA PC E PROTOTIPO 2.5D - 5 OTTOBRE 2026
+
+ESITO: compilazione, menu e prova di un mondo procedurale riusciti su Windows x64.
+
+BUILD FINALE
+- 199 sorgenti Java compilati con Temurin 17 incluso; 418 classi prodotte.
+- Il runtime di supporto contiene zero classi precompilate com/pkmngen.
+- Verificati ZIP/CRC e corrispondenza delle classi con gli output javac.
+- SHA-256 dist/pokewilds-rebuilt.jar:
+  92ca7b191f00a39668025392045ecadfc7d3cf691e52a60ef2e246a968512ebc
+- Dimensione: 148701276 byte.
+- Avvisi sulle API deprecate e sui tipi generici originali; nessun errore.
+
+AMBITO DELLE MODIFICHE
+- tools/verify_visual_scope.py: PASS.
+- Rispetto alla base PC, 197 sorgenti originali hanno lo stesso SHA-256.
+- Game.java differisce esclusivamente per campo, creazione opzionale, chiamata
+  render e dispose di JohtoRenderer. Diff: build/visual-hooks.patch.
+- Il renderer e' un file nuovo e usa una risorsa grafica nuova in resources.
+- La revisione statica non ha trovato scritture del renderer su mappa, RNG,
+  azioni o sprite originali. La simulazione originale resta eseguita una volta.
+- Questo delimita le modifiche ma non dimostra ogni comportamento del gioco.
+
+MENU E LAUNCHER
+- python tools/smoke_test.py: PASS sulla build finale.
+- Inizializzazione nativa libGDX/LWJGL, 120 frame del menu, chiusura e dispose.
+- Nessuna eccezione o errore OpenGL. Menu identico alla release originale:
+  SHA-256 PNG f352884e8dcc7531ab4043b1c6ff5d406d4bf61ff580ad74c6d69e8baee4139a
+- run-johto.cmd testdirs: PASS; Java incluso e cartella run-johto corretti.
+- Il messaggio SLF4J relativo al logger assente e' un avviso della base originale.
+
+MONDO PROCEDURALE E GRAFICA 2.5D
+- python tools/world_smoke_test.py: PASS sulla build finale.
+- Generatore originale dimensione S (parametro 30000), 217801 tile effettivi;
+  generazione in 25,754 secondi. Dimensione reale variabile per ogni mondo.
+- Verifica esplicita del renderer attivo: 232 frame Johto su 232, zero fallback.
+- Emote controllata del giocatore: icona ! visibile, 61 frame originali,
+  nessun cambio di prospettiva e nessun movimento durante l'emote.
+- Movimento tramite InputProcessor originale, esattamente una casella:
+  (480,2256) -> (480,2272).
+- Salvataggio e caricamento tramite codice originale: conservati 217801 tile,
+  posizione, nome Smoke e squadra di un Machop.
+- Schermate 640x576 ispezionate: terreno, coste, sprite e segnale ! presenti.
+- Nessuno stack trace (anche eccezioni intercettate dal gioco), nessun errore GL.
+- Test eseguito in build/world-smoke/johto, finestra invisibile; nessuna partita
+  personale in run o run-johto modificata.
+
+PRESTAZIONI OSSERVATE
+- PC con RTX 4060, finestra test 640x576, limite configurato 60 FPS.
+- Contatore 61 FPS nelle schermate iniziale ed emote; 48 subito dopo il
+  caricamento, con la pausa di caricamento compresa nella finestra del contatore.
+- Tempo CPU medio di Game.render 3,866 ms, massimo iniziale 138,712 ms su
+  232 frame. Salvataggio/caricamento sono fuori da questa misura.
+- Prova breve: non e' un benchmark prolungato ne' una stima per Nintendo 3DS.
+
+EVIDENZE
+build/build-report.json                    Strumenti, hash, conteggi e risorse.
+build/build.log                            Output del compilatore.
+build/visual-scope.json                    Confronto con la base PC.
+build/visual-hooks.patch                   Uniche modifiche a Game.java.
+build/launcher-johto-check.log             Launcher e directory.
+build/smoke/smoke.log                      Avvio e menu della build finale.
+build/world-smoke/johto/world-smoke.log     Generazione, emote, movimento e save.
+build/world-smoke/johto/world-generated.png Mondo appena generato.
+build/world-smoke/johto/world-emote.png     Emote attiva in 2.5D.
+build/world-smoke/johto/world-loaded.png    Mondo dopo caricamento.
+anteprima-25d.png                          Copia della schermata con emote.
+baseline/VERIFICA-CLASSICA.txt              Verifiche storiche della base PC.
+
+LIMITI DELLA VERIFICA
+Non sono state provate tutte le meccaniche, battaglie, costruzioni, biomi,
+interni, ciclo completo giorno/notte, multiplayer, partite prolungate, altre GPU
+o altri sistemi operativi. Il confronto di salvataggio verifica i campi sopra
+elencati, non ogni dato della mappa. La base e' decompilata e non costituisce una
+garanzia di equivalenza con il sorgente ufficiale.
+GRAFICA-25D.txt elenca le scene che mantengono intenzionalmente la vista classica.
+Non e' una versione Nintendo 3DS ne' un rifacimento grafico completo.

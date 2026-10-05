@@ -1,0 +1,60 @@
+POKEWILDS - PRIMO PROTOTIPO 2.5D
+
+AVVIO
+Doppio clic su run-johto.cmd. Il gioco usa Java 17 incluso nel progetto.
+Genera una nuova isola dal menu: la nuova vista appare durante l'esplorazione
+all'aperto di giorno. Il menu iniziale mantiene la grafica originale.
+Per la vista classica usa run.cmd.
+
+COSA CAMBIA
+La direzione scelta e' un mondo 2.5D ispirato a HeartGold e SoulSilver:
+camera prospettica inclinata, terreno su piano tridimensionale, alberi e rocce
+con volume, personaggi e Pokemon tridimensionali dove disponibili, ombre sul
+terreno. MODELLI-3D.txt descrive il nuovo sistema e i limiti di copertura.
+Un nuovo atlas introduce materiali per erba, foresta, sabbia, terra, acqua,
+neve e altri terreni. Uno shader armonizza i colori delle transizioni originali.
+La texture raster e' stata generata con imagegen; non e' estratta da HGSS.
+Prompt: ART_PROMPT.txt. Immagine: resources/visual/johto/terrain-atlas.png.
+
+MAPPA E SISTEMI
+La mappa rimane procedurale: generatore, tile, biomi e casualita' sono gli stessi
+della base PC. La nuova vista interpreta le stesse coordinate e gli stessi
+oggetti, senza riscrivere collisioni, incontri, inventario, costruzione o save.
+La simulazione e le sue azioni vengono eseguite una sola volta dal codice
+originale. Il renderer legge lo stato dopo il disegno originale e prima della
+GUI. L'interfaccia conserva il proprio sistema di coordinate.
+Non e' stata creata una mappa fissa: tutte le nuove isole usano questa vista.
+
+AMBITO DI QUESTA VERSIONE
+E' una base giocabile per sviluppare lo stile, non un rifacimento completo.
+Edifici, molte decorazioni e interfaccia conservano le risorse originali.
+Personaggi e Pokemon sono stati estesi con modelli 3D; gli asset mancanti e
+alcune varianti conservano gli sprite. Alberi e rocce sono forme provvisorie.
+La camera torna automaticamente alla vista classica nelle scene per le quali
+gli effetti o le selezioni richiedono ancora il disegno originale: battaglie,
+interni, notte e transizioni giorno/notte, minimappa, editor, mosse sul campo,
+costruzione/semina, pesca, sonno e altre animazioni speciali.
+Le emote (!, cuori e altri simboli) sono invece ridisegnate sopra gli attori
+nella vista 2.5D, con le immagini e i tempi originali.
+Questi passaggi possono essere visibili; la conversione grafica di tali scene
+richiede un ulteriore lavoro dedicato. Non tutti i biomi e i casi di gioco sono
+stati provati. VERIFICA.txt elenca i controlli realmente eseguiti.
+
+SALVATAGGI
+La modalita' 2.5D lavora in run-johto; quella classica in run.
+Il formato del salvataggio resta originale. Le cartelle sono separate per
+permettere prove del prototipo senza scrivere sulle partite classiche.
+I test automatici usano soltanto build/world-smoke e non le partite personali.
+
+SORGENTI E RICOMPILAZIONE
+build.cmd ricompila sia il gioco sia il renderer e include resources nel JAR.
+La selezione grafica e' la proprieta' JVM -Dpokewilds.visual=johto.
+src/com/pkmngen/game/JohtoRenderer.java contiene la nuova presentazione.
+ActorModelRenderer.java gestisce i modelli e TrainerModel3D.java crea l'avatar.
+Game.java aggiunge soltanto campo, creazione opzionale, render e dispose.
+tools/verify_visual_scope.py verifica l'invarianza degli altri 197 sorgenti
+rispetto a baseline/classic-build-report.json. Questo controllo delimita le
+modifiche, ma non sostituisce prove approfondite di tutte le meccaniche.
+
+La destinazione verificata e' Windows PC x64. Questo prototipo non e' un port
+Nintendo 3DS e non implica che il motore Java sia eseguibile su quella console.

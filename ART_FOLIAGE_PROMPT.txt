@@ -1,0 +1,10 @@
+FOLIAGE SPRITES — 2026-10-05
+
+Asset: resources/visual/johto/foliage-sprites.png
+Created with the built-in image_gen tool. No reference image or extracted HGSS art.
+Original generated RGBA PNG is retained unchanged. JohtoRenderer finds the alpha
+bounds inside four source rectangles and packs small regions in memory for the GPU.
+This is texture preparation; the original PNG remains unchanged.
+
+Prompt:
+Use case: stylized-concept. Asset type: production pixel-art sprite atlas for a 2.5D top-down creature adventure inspired by the charming Nintendo DS HeartGold/SoulSilver era. Create ONE square transparent PNG spritesheet, exact 2 columns by 2 rows with four separate sprites and generous transparent margins inside each quarter. Top left: lush round deciduous green tree with clear brown trunk visible below leaves. Top right: conical evergreen tree with snow-covered branches and visible trunk. Bottom left: broad flat-canopy savanna tree with warm olive leaves and visible trunk. Bottom right: low rounded gray boulder with a couple of light highlights. All objects centered in their respective equal square cells, bottoms aligned 90 percent down each cell. Front-facing top-down RPG perspective, see top and front surfaces, no isometric sideways tilt. Authentic detailed pixel art with deliberate crisp pixel clusters, rich but restrained leafy greens, warm highlights, dark teal shadows, friendly soft silhouettes. Trees should each be about 64x80 logical pixels shown enlarged with nearest-neighbor appearance. No ground patch, no grass underneath, no cast shadow, no backdrop, no labels, no grid lines, no text, no border, no extra objects. Actual transparent background. No 3D-rendered polygonal faceting, no photorealism, no blurry painting. Sprite parts must not cross between the four cells.

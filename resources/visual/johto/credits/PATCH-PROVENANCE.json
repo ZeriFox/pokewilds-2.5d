@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "upstream_repository": "https://github.com/mgsx-dev/gdx-gltf",
+  "upstream_tag": "2.1.0",
+  "upstream_sha256": "c728f2009ad916c9a3ad882e41f9e7e505d7ff78f36201ccd04c3aca4f3a1809",
+  "original_jar": "third_party/gdx-gltf/gltf-2.1.0-original.jar",
+  "patched_jar": "lib/gltf-2.1.0.jar",
+  "patched_jar_sha256": "774ae6ac5f3bfd5894cbe8b3e82f3558b65e7a09f0359ee124a55e4ae27afdf7",
+  "patch_source": "third_party/gdx-gltf/src/net/mgsx/gltf/loaders/shared/geometry/MeshSpliter.java",
+  "patch_source_sha256": "167fa6c7de672d5b7260a695177f5c2ebcb3471f2a593d5ec5a5e754feb352d8",
+  "patch_tool_sha256": "0c5c5769744cb14f715b6929c238cc07090a576d2aa2b1f0a02b8dfbf482a640",
+  "compiler": "javac 17.0.20.1",
+  "release": 17,
+  "replaced_classes": {
+    "net/mgsx/gltf/loaders/shared/geometry/MeshSpliter.class": "0d7ebb9b0464122492360d7ab57c0fb275bfcafa2e4ccda75bd315a3a26a0341"
+  },
+  "other_entries_byte_identical_to_upstream": true,
+  "test_source": "tools/MeshSplitterInvariantTest.java",
+  "test_source_sha256": "7cee4719d34ff76beec3534948540deeb7c2db634a6707e59ee5d296e87dd215",
+  "invariant_test_output": [
+    "PASS triangles-boundary: 21846 primitives, 2 batches",
+    "PASS repeated-degenerate-cross-boundary: 21848 primitives, 2 batches",
+    "PASS lines-boundary: 35000 primitives, 2 batches",
+    "PASS sparse-indices: 2 primitives, 1 batches",
+    "PASS empty: 0 primitives, 0 batches",
+    "PASS chimecho-mesh0-primitive0: 168701 primitives, 8 batches",
+    "PASS chimecho-mesh0-primitive1: 57447 primitives, 3 batches",
+    "PASS chimecho-mesh0-primitive2: 64226 primitives, 3 batches",
+    "INVARIANTS PASS: 11 cases; primitive order, vertex bits, index ranges, capacity and counts preserved."
+  ]
+}

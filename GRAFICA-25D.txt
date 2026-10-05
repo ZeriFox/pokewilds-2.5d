@@ -1,0 +1,60 @@
+POKEWILDS - 2.5D, MENU E LOTTE - 5 OTTOBRE 2026
+
+AVVIO
+Doppio clic su run-johto.cmd, oppure run-johto-sprites.cmd.
+Entrambi usano Java 17 incluso e salvataggi nella cartella run-johto.
+run.cmd conserva la presentazione classica e la cartella run.
+
+MONDO
+Personaggi e Pokemon sono sprite 2D rivolti verso la camera inclinata.
+Alberi e rocce usano nuovi sprite pixel art; le forme sfaccettate del precedente
+esperimento 3D sono disattivate. Il terreno mantiene profondita' e prospettiva.
+La mappa rimane procedurale: generatore, biomi, collisioni, incontri, inventario,
+crafting e formato di salvataggio usano il codice originale della base PC.
+Nuove isole e partite esistenti utilizzano le stesse coordinate di gioco.
+
+INTERFACCIA
+Tema comune con pannelli chiari, bordi sottili, accenti verde petrolio e oro.
+Nuovi layout per avvio/caricamento, comandi, menu giocatore, squadra/deposito,
+azioni Pokemon, riepilogo su tre pagine, cinque tasche della borsa, guida,
+crafting, quantita', conferme, dialoghi, soprannome e aumento di livello.
+Anche minimappa, notifiche e requisiti di costruzione ricevono la nuova cornice.
+Evoluzione e schiusa condividono il nuovo sfondo, mantenendo le animazioni.
+I comandi originali da tastiera/gamepad continuano a gestire le selezioni.
+Le azioni continuano a eseguire la propria logica; ModernBatch sopprime solo
+le vecchie istruzioni di disegno delle schermate sostituite. I renderer non
+richiamano step(), non consumano RNG e non cambiano i dati della partita.
+
+LOTTE
+Arena con palette del bioma, nuove piattaforme, pannelli HP/EXP e comandi.
+La lista mosse mantiene visibili gli HP e mostra tipo, categoria, potenza e
+precisione esistenti. Non vengono aggiunti PP o regole assenti nel gioco base.
+Gli HP visualizzati seguono i valori interpolati dalle animazioni originali.
+Un'immagine GPU dell'ultimo mondo 2.5D copre la vecchia mappa per tutta la
+transizione: fascia incontro, chiusura e ingresso nell'arena. Il ritorno usa
+la stessa presentazione. Timer, attacchi, catture, danni e ricompense sono originali.
+Le introduzioni degli incontri speciali condividono i nuovi passaggi grafici.
+
+RISORSE E SORGENTI
+resources/visual/johto/terrain-atlas.png: materiali del terreno, generati prima.
+resources/visual/johto/foliage-sprites.png: nuovi alberi/rocce RGBA, Imagegen.
+I PNG originali generati restano invariati; il motore prepara gli atlas in memoria.
+Prompt e provenienza: ART_PROMPT.txt e ART_FOLIAGE_PROMPT.txt.
+Questi elementi sono originali generati, non texture estratte da HGSS.
+Personaggi/Pokemon e le animazioni di attacco conservano le risorse PokeWilds.
+I vecchi modelli 3D restano disponibili come esperimento, disattivato di default.
+
+Il codice nuovo e' in src/com/pkmngen/game: ModernUi, ModernBatch,
+ModernPartyUi, ModernInventoryUi, JohtoBattleRenderer e JohtoRenderer.
+build.cmd ricompila tutto e include le risorse nel JAR.
+tools/verify_visual_scope.py elenca e confronta le modifiche originali.
+VERIFICA.txt documenta le prove native effettivamente concluse sulla build finale.
+
+AMBITO
+La destinazione e' Windows PC x64. Questa build non e' un port Nintendo 3DS.
+Molte decorazioni, edifici e sprite provengono ancora dal gioco originale.
+Interni, notte, mosse sul campo, costruzione, pesca e alcune scene speciali
+mantengono il renderer del mondo originale; la nuova skin dei menu resta attiva.
+La minimappa conserva i dati e il disegno funzionale originali con nuovi bordi.
+Non tutte le specie, mosse, scene speciali e configurazioni multigiocatore sono
+coperte dai test. Le prove dei flussi principali non equivalgono a un playthrough.

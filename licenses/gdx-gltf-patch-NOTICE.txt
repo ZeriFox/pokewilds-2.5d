@@ -1,0 +1,12 @@
+gdx-gltf 2.1.0 - local PokeWilds PC compatibility patch, 2026-10-05
+
+The bundled library contains a replacement of MeshSpliter that partitions
+unsigned-index geometry at complete primitive boundaries, preserving vertex
+records and primitive order. It fixes out-of-range indices and broken triangles
+in large GLB meshes. The rest of the upstream JAR entries are unchanged.
+
+Upstream: https://github.com/mgsx-dev/gdx-gltf (Apache License 2.0).
+License: gdx-gltf-2.1.0.txt.
+Patch source: third_party/gdx-gltf/src/net/mgsx/gltf/loaders/shared/geometry/MeshSpliter.java
+Reproducible patch builder: tools/patch_gltf_loader.py.
+Verification and hashes: third_party/gdx-gltf/PATCH-PROVENANCE.json.

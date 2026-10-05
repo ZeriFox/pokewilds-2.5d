@@ -1,0 +1,69 @@
+ESPERIMENTO PRECEDENTE: PERSONAGGI E POKEMON TRIDIMENSIONALI
+
+AVVIO
+La versione corrente usa sprite 2D: run-johto.cmd e run-johto-sprites.cmd.
+Questa pagina conserva la documentazione del precedente esperimento 3D.
+Per riattivarlo esplicitamente, imposta POKEWILDS_VISUAL=johto e
+POKEWILDS_MODELS=on nell'ambiente, poi avvia run.cmd.
+run.cmd: presentazione classica del gioco.
+Le modalita' Johto usano la stessa cartella run-johto per le partite.
+Per confrontarle chiudi una sessione prima di aprire l'altra.
+
+PERSONAGGIO
+Il nuovo allenatore e' una mesh originale costruita da volumi: corpo, testa,
+cappello, viso, zaino, braccia, gambe e scarpe. Le articolazioni si muovono in
+base allo spostamento del giocatore. I colori scelti nel gioco vengono letti
+dal modello. E' un avatar stilizzato di base, non una ricostruzione identica
+di tutti i personaggi selezionabili del gioco originale.
+Sorgente modificabile: src/com/pkmngen/game/TrainerModel3D.java.
+
+POKEMON
+I modelli sono vere mesh GLB con materiali e, quando disponibili, scheletri e
+clip animate. La rotazione segue la direzione del Pokemon; la traslazione segue
+la posizione della simulazione. Le clip idle/walk riconosciute vengono usate
+per riposo e camminata. Un file senza animazioni resta un modello statico che
+si sposta e ruota nel mondo; non gli viene inventato uno scheletro.
+Ogni specie viene associata al proprio nome esatto. Nessuna forma speciale
+viene sostituita automaticamente dal modello della forma base.
+Gli shiny, le uova, i fantasmi e i modelli non disponibili mantengono lo sprite
+originale, per conservarne l'identita' visiva.
+Copertura installata: 462 modelli su 502 nomi specie/forme del runtime; 40 nomi
+restano senza un modello compatibile. 173 file contengono clip, 289 sono statici.
+Le clip con nomi non classificati come riposo/cammino non vengono riprodotte
+automaticamente, per evitare di usare per esempio un attacco mentre si cammina.
+Elenco esatto, fonti, hash, animazioni e copertura: MODELS-PROVENANCE.json.
+File: resources/visual/johto/models/pokemon/<nome-specie>.glb.
+
+INTEGRAZIONE
+Il renderer usa il caricatore gdx-gltf 2.1.0 e il disegno 3D di libGDX.
+Una correzione locale al caricatore divide le mesh grandi mantenendo intatti
+tutti i triangoli: serve per Chimecho. Fonte e test riproducibili sono in
+third_party/gdx-gltf/ e tools/patch_gltf_loader.py.
+Solo gli attori visibili vengono caricati; le istanze e le risorse hanno cache
+limitate e vengono rilasciate quando non servono. Un asset mancante conserva
+lo sprite. Posizioni, collisioni, generatori casuali, salvataggi e regole di
+gioco continuano a essere gestiti dai sorgenti della base PC.
+Il renderer distingue i nodi con nomi duplicati, misura i volumi considerando
+lo scheletro e allinea l'origine di ogni clip alla casella dell'attore, mantenendo
+le oscillazioni animate. Queste correzioni non modificano i file GLB originali.
+Le scene che gia' usavano la vista classica (battaglie, interni, notte e altre
+scene speciali) continuano a farlo: GRAFICA-25D.txt ne descrive l'ambito.
+Non e' stata convertita la presentazione delle battaglie in 3D.
+
+RICOMPILAZIONE E MODELLI
+build.cmd include i sorgenti, tutte le risorse e lib/gltf-2.1.0.jar nel JAR finale.
+Le compilazioni normali non richiedono download. Il primo avvio di una specie
+puo' avere una breve pausa per il caricamento del modello.
+tools/prepare_actor_models.py documenta e verifica l'importazione degli asset.
+Licenze e attribuzioni delle dipendenze sono in licenses/; gli asset Pokemon
+mantengono le attribuzioni dei rispettivi proprietari, distinte dalle licenze
+software dei repository che li ospitano.
+
+VERIFICHE
+tools/actor_model_smoke_test.py: allenatore e Machop, quattro direzioni,
+movimento e follower originali, salvataggio e caricamento in cartella isolata.
+tools/model_catalog_smoke_test.py: caricamento e disegno GPU del catalogo GLB.
+tools/world_smoke_test.py: generazione procedurale reale, emote, movimento e save.
+tools/verify_visual_scope.py: 197 sorgenti della base PC invariati, soltanto
+quattro collegamenti grafici aggiunti a Game.java e tre nuove classi grafiche.
+Leggi VERIFICA.txt per gli esiti effettivi della build consegnata.

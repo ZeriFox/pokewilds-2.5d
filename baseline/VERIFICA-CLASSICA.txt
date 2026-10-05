@@ -1,0 +1,46 @@
+VERIFICA DELLA BASE PC - 5 OTTOBRE 2026
+
+ESITO: compilazione completa e avvio del menu riusciti su questo PC Windows x64.
+
+COMPILAZIONE
+- Tutti i 198 sorgenti com/pkmngen sono compilati con il JDK Temurin 17 incluso.
+- Prodotte 416 classi, inclusi launcher, gioco, updater e diagnostica.
+- Le librerie di supporto contengono zero classi precompilate com/pkmngen.
+- Le classi nel JAR finale sono state confrontate con gli output del compilatore.
+- Verificata integrita' ZIP/CRC del JAR.
+- Due compilazioni pulite consecutive, una tramite build.cmd, hanno prodotto
+  esattamente lo stesso SHA-256:
+  a564a71517a85a131c9b2e13275ade8be272277606f047e38f360770e47a1020
+- Dimensione JAR: 146791127 byte.
+- Restano avvisi del compilatore su API deprecate e tipi generici non verificati;
+  nessun errore di compilazione.
+
+AVVIO GRAFICO
+- Test eseguito prima sul JAR originale e poi sul JAR ricompilato.
+- Inizializzazione libGDX/LWJGL, audio/controller, 120 frame del menu e dispose.
+- Nessun errore OpenGL o stack trace nei test riusciti.
+- Menu verificato visivamente; framebuffer 320x288, quattro colori.
+- PNG originale e ricompilato identici byte per byte:
+  f352884e8dcc7531ab4043b1c6ff5d406d4bf61ff580ad74c6d69e8baee4139a
+- I test non simulano input e non aprono una finestra visibile.
+
+DIAGNOSTICA MEMORIA
+- Le cinque classi sono state compilate anche separatamente.
+- Verificati logger, watcher, controlli null/no-op e inizializzazione del bean
+  HotSpot. Non e' stato creato o analizzato un dump heap completo.
+
+EVIDENZE
+build/build-report.json             Hash, strumenti e conteggi della build.
+build/build.log                     Output della compilazione.
+build/launcher-check.log            Verifica launcher run.cmd in modalita' testdirs.
+build/smoke/smoke.log               Test grafico del JAR ricompilato.
+build/smoke/smoke-menu.png          Menu ricompilato.
+build/baseline/smoke.log            Test della release originale.
+build/baseline/smoke-menu.png       Menu originale di confronto.
+
+NON ANCORA VERIFICATO
+Generazione del mondo, movimento, combattimenti, costruzioni, salvataggi e
+caricamenti, partite prolungate, altre GPU/sistemi operativi e Nintendo 3DS.
+Il prossimo controllo utile e' generare un mondo piccolo, salvarlo, ricaricarlo
+e confrontare posizione, squadra e dati della mappa. Il test menu non copre
+queste funzionalita' e la decompilazione potrebbe averne alterato il comportamento.

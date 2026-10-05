@@ -1,0 +1,83 @@
+VERIFICA PC, PRESENTAZIONE 2.5D, MENU E LOTTE - 5 OTTOBRE 2026
+
+STATO: PASS sul JAR consegnato per build, avvio, mondo procedurale, menu e lotte.
+
+BUILD
+206 sorgenti Java compilati con JDK Temurin 17 incluso; 429 classi del gioco.
+SHA-256 dist/pokewilds-rebuilt.jar:
+0a121c7981ee6db93da5f025ef83d411861027a8645c47b4bfbd995e34be2582
+Dimensione: 666814365 byte. 471 risorse aggiunte, inclusi gli asset della
+precedente prova 3D, ora disattivata per impostazione predefinita.
+ZIP/CRC e corrispondenza fra classi compilate e classi impacchettate: PASS.
+Nessuna classe com/pkmngen precompilata nel runtime originale usato come libreria.
+Avvisi javac: API deprecate e generici dei sorgenti decompilati; nessun errore.
+Report: build/build-report.json. Log: build/build.log.
+Ricontrollati tutti gli hash dei sorgenti rispetto al report della build: PASS.
+run-johto.cmd e run-johto-sprites.cmd impostano entrambi MODELS=off.
+Avvio run-johto.cmd testdirs sul JAR finale: PASS; build/launcher-25d-check.log.
+
+PERIMETRO DEL CODICE
+tools/verify_visual_scope.py: PASS.
+182 dei 198 sorgenti originali hanno SHA-256 identico alla base PC.
+Game.java aggiunge sette collegamenti reversibili alla presentazione.
+Altri 15 file originali contengono sostituzioni esplicite delle sole operazioni
+grafiche: arena, HUD, comandi, transizioni, evoluzione e schiusa.
+I loro hash sono congelati in baseline/presentation-scope.json; le copie di base
+sono in baseline/presentation-actions. Diff completo: build/visual-hooks.patch.
+I sorgenti di Battle, Attack, Pokemon, Player, InputProcessor, PkmnMap,
+GenIsland1, Network, CheckMovesLearned e DrawSetupMenu sono invariati.
+Review del diff: timer, nextAction, input, danni, catture e cleanup conservati.
+Sei mutazioni intenzionali di prova sono state rifiutate dal verificatore.
+Questa verifica delimita i cambiamenti; non prova da sola l'equivalenza del gioco.
+
+AVVIO CLASSICO SUL JAR CONSEGNATO
+python tools/smoke_test.py: PASS, 120 frame, avvio/menu/chiusura corretti.
+Screenshot identico per byte a quello della base classica:
+SHA-256 f352884e8dcc7531ab4043b1c6ff5d406d4bf61ff580ad74c6d69e8baee4139a.
+Log e screenshot: build/smoke.
+
+MONDO PROCEDURALE SUL JAR CONSEGNATO
+python tools/world_smoke_test.py: PASS.
+Generatore originale S: 179250 tile, circa 30.6 secondi in questo test.
+Vista 2.5D attiva per 232 frame controllati; zero ritorni al renderer classico
+durante la sequenza provata. Verificata anche l'emote sopra il giocatore.
+Movimento tramite InputProcessor: (-176,2016) -> (-176,2032).
+Salvataggio/caricamento: tile, posizione, nome e squadra corrispondono.
+Log e tre screenshot nativi: build/world-smoke/johto.
+I tempi osservati non costituiscono un benchmark; i test sono eseguiti anche
+in parallelo e il salvataggio introduce pause. Nessuna misura riguarda il 3DS.
+
+MENU E LOTTE
+python tools/modern_ui_smoke_test.py: PASS, 6851 frame, 20 tipi UI, 70 PNG nativi.
+4113 frame di battaglia, 461 di transizione, 690 con snapshot del mondo.
+Zero frame di modelli 3D del giocatore/Pokemon; zero specie modello caricate.
+Usa esclusivamente il JAR consegnato e classi del test, senza sorgenti o override.
+Input originali da tastiera; fixture e salvataggi isolati in build/ui-battle-smoke.
+Copertura: setup/new/load, controlli, menu giocatore, squadra e azioni,
+tre pagine statistiche, cinque tasche della borsa, azioni oggetti, minimappa,
+guida e cambio pagina, crafting, quantita', conferma, deposito di otto Pokemon,
+scorrimento, soprannome e dialogo lungo con scorrimento del testo.
+Due incontri avviati dall'IA originale: scelta mosse, turno Leer, turno Low Kick
+con danni/animazione HP, cambio menu squadra/borsa, fuga, cattura con Master Ball,
+esperienza e aumento di livello. Confronto dati dopo salvataggio/caricamento.
+Contatori verificano la presentazione moderna e la riproduzione dello snapshot
+durante le transizioni; i contatori dei modelli 3D e delle specie caricate sono zero.
+Screenshot GPU nativi e registro delle schermate: build/ui-battle-smoke.
+
+RISORSE NUOVE
+resources/visual/johto/foliage-sprites.png: PNG RGBA originale generato con
+Imagegen integrato, senza immagini di riferimento o estrazioni di asset HGSS.
+SHA-256: 2bbf4f39c194d1d0a71526fd2c31ccac70a1efbbe183f3170cb46729237f155d.
+Prompt completo e preparazione tecnica dell'atlas: ART_FOLIAGE_PROMPT.txt.
+Il terreno generato in precedenza e' documentato in ART_PROMPT.txt.
+I modelli GLB e le attribuzioni restano disponibili per l'esperimento precedente;
+le sue prove sono conservate in baseline/models-3d, non sono attive in questa UI.
+
+LIMITI DELLA VERIFICA
+Testati Windows x64 e GPU RTX 4060. Tutti i test usano cartelle build isolate,
+senza modificare le partite in run o run-johto. Nessuna pubblicazione online.
+Evoluzione, schiusa, variante Safari e intro dei boss hanno hook grafici compilati e revisionati,
+ma non sono stati eseguiti integralmente in questa sequenza automatica.
+Non sono coperti tutti gli attacchi, le specie, il multiplayer o lunghe partite.
+Interni, notte, mosse sul campo e alcune scene continuano a usare la vista del
+mondo originale; il tema dei menu resta attivo. Dettagli in GRAFICA-25D.txt.

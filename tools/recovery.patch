@@ -1,0 +1,314 @@
+--- a/src/com/pkmngen/game/Battle.java
++++ b/src/com/pkmngen/game/Battle.java
+@@ -439,7 +439,7 @@
+       int power = 40;
+       int accuracy = 100;
+       byte var35;
+-      byte var36;
++      int var36;
+       if (attack.name.equals("Aurora Beam")) {
+          var35 = 65;
+          var36 = 100;
+--- a/src/com/pkmngen/game/PlayerStanding.java
++++ b/src/com/pkmngen/game/PlayerStanding.java
+@@ -167,8 +167,8 @@
+                   } while (!isBaseSpecies && !hasEvo);
+ 
+                   try {
+-                     isBaseSpecies = (boolean)Integer.valueOf(evo);
+-                     if (isBaseSpecies <= pokemon.level + extraLevel && Game.rand.nextInt(256) >= 128) {
++                     int evoLevel = Integer.valueOf(evo);
++                     if (evoLevel <= pokemon.level + extraLevel && Game.rand.nextInt(256) >= 128) {
+                         evolveTo = evos.get(evo);
+                         pokemon.evolveTo(evolveTo);
+                         timesEvolved++;
+--- a/src/com/pkmngen/game/util/texture/DynamicTextures.java
++++ b/src/com/pkmngen/game/util/texture/DynamicTextures.java
+@@ -285,7 +285,7 @@
+                } else if (color2 == greyColor) {
+                   color2 = Color.rgba8888(tempSprite.color1);
+                } else if (color2 == blueColor) {
+-                  int var27 = false;
++                  color2 = 0;
+                   Color tempColor = new Color(basePixmap.getPixel(i, j));
+                   tempColor.a = 0.25F;
+                   color2 = Color.rgba8888(tempColor);
+--- a/src/com/pkmngen/leaks/HotSpotHeapDumper.java
++++ b/src/com/pkmngen/leaks/HotSpotHeapDumper.java
+@@ -1,55 +1,45 @@
+ package com.pkmngen.leaks;
+ 
+ import com.sun.management.HotSpotDiagnosticMXBean;
++import java.io.IOException;
++import java.lang.management.ManagementFactory;
+ import kotlin.Lazy;
+ import kotlin.LazyKt;
+-import kotlin.Metadata;
+ import kotlin.jvm.internal.Intrinsics;
+ import org.jetbrains.annotations.NotNull;
+ 
+-@Metadata(
+-   mv = {1, 9, 0},
+-   k = 1,
+-   xi = 48,
+-   d1 = "\u0000&\n\u0002\u0018\u0002\n\u0002\u0010\u0000\n\u0002\b\u0002\n\u0002\u0010\u000b\n\u0000\n\u0002\u0018\u0002\n\u0002\b\u0005\n\u0002\u0010\u0002\n\u0000\n\u0002\u0010\u000e\n\u0000\bÆ\u0002\u0018\u00002\u00020\u0001B\u0007\b\u0002¢\u0006\u0002\u0010\u0002J\u000e\u0010\u000b\u001a\u00020\f2\u0006\u0010\r\u001a\u00020\u000eR\u000e\u0010\u0003\u001a\u00020\u0004X\u0082T¢\u0006\u0002\n\u0000R\u001b\u0010\u0005\u001a\u00020\u00068BX\u0082\u0084\u0002¢\u0006\f\n\u0004\b\t\u0010\n\u001a\u0004\b\u0007\u0010\b¨\u0006\u000f",
+-   d2 = {
+-         "Lcom/pkmngen/leaks/HotSpotHeapDumper;",
+-         "",
+-         "()V",
+-         "LIVE",
+-         "",
+-         "mBean",
+-         "Lcom/sun/management/HotSpotDiagnosticMXBean;",
+-         "getMBean",
+-         "()Lcom/sun/management/HotSpotDiagnosticMXBean;",
+-         "mBean$delegate",
+-         "Lkotlin/Lazy;",
+-         "dumpHeap",
+-         "",
+-         "fileName",
+-         "",
+-         "jvm-leaks"
+-   }
+-)
+ public final class HotSpotHeapDumper {
+    @NotNull
+    public static final HotSpotHeapDumper INSTANCE = new HotSpotHeapDumper();
+-   @NotNull
+-   private static final Lazy mBean$delegate = LazyKt.lazy(<unrepresentable>.INSTANCE);
+-   private static final boolean LIVE = true;
++
++   private static final Lazy<HotSpotDiagnosticMXBean> mBean$delegate = LazyKt.lazy(() -> {
++      try {
++         return ManagementFactory.newPlatformMXBeanProxy(
++            ManagementFactory.getPlatformMBeanServer(),
++            "com.sun.management:type=HotSpotDiagnostic",
++            HotSpotDiagnosticMXBean.class
++         );
++      } catch (IOException exception) {
++         throw HotSpotHeapDumper.<RuntimeException>propagate(exception);
++      }
++   });
+ 
+    private HotSpotHeapDumper() {
+    }
+ 
+-   private final HotSpotDiagnosticMXBean getMBean() {
+-      Lazy var1 = mBean$delegate;
+-      Object var10000 = var1.getValue();
+-      Intrinsics.checkNotNullExpressionValue(var10000, "getValue(...)");
+-      return (HotSpotDiagnosticMXBean)var10000;
++   public final void dumpHeap(@NotNull String fileName) {
++      Intrinsics.checkNotNullParameter(fileName, "fileName");
++      try {
++         mBean$delegate.getValue().dumpHeap(fileName, true);
++      } catch (IOException exception) {
++         throw HotSpotHeapDumper.<RuntimeException>propagate(exception);
++      }
+    }
+ 
+-   public final void dumpHeap(@NotNull String fileName) {
+-      Intrinsics.checkNotNullParameter(fileName, "fileName");
+-      this.getMBean().dumpHeap(fileName, true);
++   // Kotlin propagates checked exceptions without a throws declaration. Keep the
++   // original public Java signature and original exception type on failure.
++   @SuppressWarnings("unchecked")
++   private static <E extends Throwable> RuntimeException propagate(Throwable exception) throws E {
++      throw (E) exception;
+    }
+ }
+--- a/src/com/pkmngen/leaks/JvmHeapAnalyzer.java
++++ b/src/com/pkmngen/leaks/JvmHeapAnalyzer.java
+@@ -2,89 +2,64 @@
+ 
+ import java.io.File;
+ import java.text.SimpleDateFormat;
++import java.util.Collections;
+ import java.util.Date;
+ import java.util.Locale;
+-import kotlin.Metadata;
++import kotlin.jvm.internal.DefaultConstructorMarker;
+ import kotlin.jvm.internal.Intrinsics;
++import leakcanary.GcTrigger.Default;
+ import leakcanary.ObjectWatcher;
+ import leakcanary.OnObjectRetainedListener;
+-import leakcanary.GcTrigger.Default;
+ import org.jetbrains.annotations.NotNull;
+ import shark.HeapAnalysis;
+ import shark.HeapAnalyzer;
+ import shark.KeyedWeakReferenceFinder;
++import shark.MetadataExtractor;
+ import shark.ObjectInspectors;
+-import shark.OnAnalysisProgressListener.Step;
+ 
+-@Metadata(
+-   mv = {1, 9, 0},
+-   k = 1,
+-   xi = 48,
+-   d1 = "\u0000 \n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0002\b\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0010\u0002\n\u0002\b\u0002\u0018\u0000 \t2\u00020\u0001:\u0001\tB\r\u0012\u0006\u0010\u0002\u001a\u00020\u0003¢\u0006\u0002\u0010\u0004J\b\u0010\u0007\u001a\u00020\bH\u0016R\u000e\u0010\u0005\u001a\u00020\u0006X\u0082\u0004¢\u0006\u0002\n\u0000R\u000e\u0010\u0002\u001a\u00020\u0003X\u0082\u0004¢\u0006\u0002\n\u0000¨\u0006\n",
+-   d2 = {
+-         "Lcom/pkmngen/leaks/JvmHeapAnalyzer;",
+-         "Lleakcanary/OnObjectRetainedListener;",
+-         "objectWatcher",
+-         "Lleakcanary/ObjectWatcher;",
+-         "(Lleakcanary/ObjectWatcher;)V",
+-         "fileNameFormat",
+-         "Ljava/text/SimpleDateFormat;",
+-         "onObjectRetained",
+-         "",
+-         "Companion",
+-         "jvm-leaks"
+-   }
+-)
+ public final class JvmHeapAnalyzer implements OnObjectRetainedListener {
+    @NotNull
+-   public static final JvmHeapAnalyzer.Companion Companion = new JvmHeapAnalyzer.Companion(null);
+-   @NotNull
++   public static final Companion Companion = new Companion();
++
++   private static final String DATE_PATTERN = "yyyy-MM-dd_HH-mm-ss_SSS'.hprof'";
+    private final ObjectWatcher objectWatcher;
+-   @NotNull
+-   private final SimpleDateFormat fileNameFormat;
+-   @NotNull
+-   private static final String DATE_PATTERN = "yyyy-MM-dd_HH-mm-ss_SSS'.hprof'";
++   private final SimpleDateFormat fileNameFormat = new SimpleDateFormat(DATE_PATTERN, Locale.US);
+ 
+    public JvmHeapAnalyzer(@NotNull ObjectWatcher objectWatcher) {
+       Intrinsics.checkNotNullParameter(objectWatcher, "objectWatcher");
+-      super();
+       this.objectWatcher = objectWatcher;
+-      this.fileNameFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS'.hprof'", Locale.US);
+    }
+ 
+    @Override
+    public void onObjectRetained() {
+       Default.INSTANCE.runGc();
+-      if (this.objectWatcher.getRetainedObjectCount() != 0) {
+-         String fileName = this.fileNameFormat.format(new Date());
+-         File hprofFile = new File(fileName);
+-         System.out.println((Object)("Dumping the heap to " + hprofFile.getAbsolutePath()));
+-         HotSpotHeapDumper var10000 = HotSpotHeapDumper.INSTANCE;
+-         String var10001 = hprofFile.getAbsolutePath();
+-         Intrinsics.checkNotNullExpressionValue(var10001, "getAbsolutePath(...)");
+-         var10000.dumpHeap(var10001);
+-         HeapAnalyzer analyzer = new HeapAnalyzer(JvmHeapAnalyzer::onObjectRetained$lambda$0);
+-         HeapAnalysis heapDumpAnalysis = HeapAnalyzer.analyze$default(
+-            analyzer, hprofFile, KeyedWeakReferenceFinder.INSTANCE, null, true, ObjectInspectors.Companion.getJdkDefaults(), null, null, 100, null
+-         );
+-         System.out.println(heapDumpAnalysis);
++      if (objectWatcher.getRetainedObjectCount() == 0) {
++         return;
+       }
++
++      File hprofFile = new File(fileNameFormat.format(new Date()));
++      System.out.println("Dumping the heap to " + hprofFile.getAbsolutePath());
++      HotSpotHeapDumper.INSTANCE.dumpHeap(hprofFile.getAbsolutePath());
++      HeapAnalyzer analyzer = new HeapAnalyzer(step -> {
++         Intrinsics.checkNotNullParameter(step, "step");
++         System.out.println("Analysis in progress, working on: " + step.name());
++      });
++      // Explicit equivalents of the original Kotlin defaults (mask 100): empty
++      // reference matchers, no metadata extractor, and no Proguard mapping.
++      HeapAnalysis heapDumpAnalysis = analyzer.analyze(
++         hprofFile, KeyedWeakReferenceFinder.INSTANCE, Collections.emptyList(), true,
++         ObjectInspectors.Companion.getJdkDefaults(), MetadataExtractor.Companion.getNO_OP(), null
++      );
++      System.out.println(heapDumpAnalysis);
+    }
+ 
+-   private static final void onObjectRetained$lambda$0(Step step) {
+-      Intrinsics.checkNotNullParameter(step, "step");
+-      System.out.println((Object)("Analysis in progress, working on: " + step.name()));
+-   }
+-
+-   @Metadata(
+-      mv = {1, 9, 0},
+-      k = 1,
+-      xi = 48,
+-      d1 = "\u0000\u0012\n\u0002\u0018\u0002\n\u0002\u0010\u0000\n\u0002\b\u0002\n\u0002\u0010\u000e\n\u0000\b\u0086\u0003\u0018\u00002\u00020\u0001B\u0007\b\u0002¢\u0006\u0002\u0010\u0002R\u000e\u0010\u0003\u001a\u00020\u0004X\u0082T¢\u0006\u0002\n\u0000¨\u0006\u0005",
+-      d2 = {"Lcom/pkmngen/leaks/JvmHeapAnalyzer$Companion;", "", "()V", "DATE_PATTERN", "", "jvm-leaks"}
+-   )
+    public static final class Companion {
+       private Companion() {
+       }
++
++      // Preserve the public constructor generated by the Kotlin compiler.
++      public Companion(DefaultConstructorMarker ignored) {
++         this();
++      }
+    }
+ }
+--- a/src/com/pkmngen/leaks/JvmLeakTracer.java
++++ b/src/com/pkmngen/leaks/JvmLeakTracer.java
+@@ -3,61 +3,29 @@
+ import java.util.concurrent.Executors;
+ import java.util.concurrent.ScheduledExecutorService;
+ import java.util.concurrent.TimeUnit;
+-import kotlin.Metadata;
+ import kotlin.jvm.internal.Intrinsics;
+ import leakcanary.ObjectWatcher;
+ import org.jetbrains.annotations.NotNull;
+ 
+-@Metadata(
+-   mv = {1, 9, 0},
+-   k = 1,
+-   xi = 48,
+-   d1 = "\u0000,\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0002\b\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0002\b\u0002\n\u0002\u0010\u0002\n\u0000\n\u0002\u0010\u0000\n\u0000\n\u0002\u0010\u000e\n\u0000\u0018\u00002\u00020\u0001B\u0005¢\u0006\u0002\u0010\u0002J\u0018\u0010\b\u001a\u00020\t2\u0006\u0010\n\u001a\u00020\u000b2\u0006\u0010\f\u001a\u00020\rH\u0016R\u000e\u0010\u0003\u001a\u00020\u0004X\u0082\u0004¢\u0006\u0002\n\u0000R\u0016\u0010\u0005\u001a\n \u0007*\u0004\u0018\u00010\u00060\u0006X\u0082\u0004¢\u0006\u0002\n\u0000¨\u0006\u000e",
+-   d2 = {
+-         "Lcom/pkmngen/leaks/JvmLeakTracer;",
+-         "Lcom/pkmngen/leaks/LeakTracer;",
+-         "()V",
+-         "objectWatcher",
+-         "Lleakcanary/ObjectWatcher;",
+-         "scheduledExecutor",
+-         "Ljava/util/concurrent/ScheduledExecutorService;",
+-         "kotlin.jvm.PlatformType",
+-         "expectWeaklyReachable",
+-         "",
+-         "watchedObject",
+-         "",
+-         "description",
+-         "",
+-         "jvm-leaks"
+-   }
+-)
+ public final class JvmLeakTracer implements LeakTracer {
+    private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+-   @NotNull
+    private final ObjectWatcher objectWatcher;
+ 
+    public JvmLeakTracer() {
+-      ObjectWatcher var1 = new ObjectWatcher(JvmLeakTracer::objectWatcher$lambda$0, JvmLeakTracer::objectWatcher$lambda$1, null, 4, null);
+-      ObjectWatcher $this$objectWatcher_u24lambda_u242 = var1;
+-      JvmLeakTracer var4 = this;
+-      int var3/* $VF was: $i$a$-apply-JvmLeakTracer$objectWatcher$3 */ = 0;
+-      $this$objectWatcher_u24lambda_u242.addOnObjectRetainedListener(new JvmHeapAnalyzer($this$objectWatcher_u24lambda_u242));
+-      var4.objectWatcher = var1;
++      // The original Kotlin constructor defaults isEnabled to true and schedules
++      // retention checks five seconds after an object is watched.
++      objectWatcher = new ObjectWatcher(
++         System::currentTimeMillis,
++         command -> scheduledExecutor.schedule(command, 5L, TimeUnit.SECONDS),
++         () -> true
++      );
++      objectWatcher.addOnObjectRetainedListener(new JvmHeapAnalyzer(objectWatcher));
+    }
+ 
+    @Override
+    public void expectWeaklyReachable(@NotNull Object watchedObject, @NotNull String description) {
+       Intrinsics.checkNotNullParameter(watchedObject, "watchedObject");
+       Intrinsics.checkNotNullParameter(description, "description");
+-      this.objectWatcher.expectWeaklyReachable(watchedObject, description);
+-   }
+-
+-   private static final long objectWatcher$lambda$0() {
+-      return System.currentTimeMillis();
+-   }
+-
+-   private static final void objectWatcher$lambda$1(JvmLeakTracer this$0, Runnable command) {
+-      Intrinsics.checkNotNullParameter(this$0, "this$0");
+-      this$0.scheduledExecutor.schedule(command, 5L, TimeUnit.SECONDS);
++      objectWatcher.expectWeaklyReachable(watchedObject, description);
+    }
+ }
