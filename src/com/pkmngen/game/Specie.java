@@ -106,6 +106,7 @@ public class Specie {
    }
 
    public void init(String n, Pokemon.Generation generation) {
+      if (ExpansionDex.initialize(this, n, generation)) return;
       this.name = n.toLowerCase(Locale.ROOT);
       this.generation = generation;
       this.types = new ArrayList<>();

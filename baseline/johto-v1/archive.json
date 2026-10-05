@@ -1,0 +1,8 @@
+{
+  "purpose": "Preserved Johto v1 verifier and manifest; classic-sources are the exact 198 original source files, verified against classic-build-report.json, not current modified files.",
+  "v1_git_reference": "abc05f3b67be7986d8c62875c8c7f40de02a81e2",
+  "classic_source_count": 198,
+  "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
+  "verifier_sha256": "f7776b958973e6f20d89beea1b59d2ff9da8fdd7f4afa04852c3a71d66be2983",
+  "manifest_sha256": "11bf0fae9fc0406c07a72b856432307e88df05ca6983449cb0d543c2872d57fd"
+}

@@ -456,6 +456,7 @@ public class Route {
             allowedPokemon.add("araichu");
          }
 
+         ExpansionDex.appendSpawns(this.name, allowedPokemon);
          Route.allowedPokemon.put(this.name, allowedPokemon);
       }
 

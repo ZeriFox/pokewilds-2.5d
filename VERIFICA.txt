@@ -1,83 +1,75 @@
-VERIFICA PC, PRESENTAZIONE 2.5D, MENU E LOTTE - 5 OTTOBRE 2026
+VERIFICA — PokeWilds v0.8.11-johto.2 — 5 ottobre 2026
 
-STATO: PASS sul JAR consegnato per build, avvio, mondo procedurale, menu e lotte.
+BUILD E AMBITO
+PASS sul JAR distribuito: 211 sorgenti Java, 441 classi,
+36745 risorse aggiunte, 297412191 byte.
+SHA-256: da8987ed8d2eb274050f3254db11096c6c4d59b5286e2074fb3f82de47882122
+JDK Temurin 17.0.20.1 Windows x64; javac --release 17.
+CRC ZIP, classi compilate/impacchettate e hash sorgenti: PASS.
+Nessun GLB nella build predefinita. I launcher 2.5D impostano MODELS=off.
+Il codice precedente e i crediti 3D restano disponibili come esperimento storico.
+Report completo: build/build-report.json. Avvisi javac: deprecazioni/generici.
 
-BUILD
-206 sorgenti Java compilati con JDK Temurin 17 incluso; 429 classi del gioco.
-SHA-256 dist/pokewilds-rebuilt.jar:
-0a121c7981ee6db93da5f025ef83d411861027a8645c47b4bfbd995e34be2582
-Dimensione: 666814365 byte. 471 risorse aggiunte, inclusi gli asset della
-precedente prova 3D, ora disattivata per impostazione predefinita.
-ZIP/CRC e corrispondenza fra classi compilate e classi impacchettate: PASS.
-Nessuna classe com/pkmngen precompilata nel runtime originale usato come libreria.
-Avvisi javac: API deprecate e generici dei sorgenti decompilati; nessun errore.
-Report: build/build-report.json. Log: build/build.log.
-Ricontrollati tutti gli hash dei sorgenti rispetto al report della build: PASS.
-run-johto.cmd e run-johto-sprites.cmd impostano entrambi MODELS=off.
-Avvio run-johto.cmd testdirs sul JAR finale: PASS; build/launcher-25d-check.log.
+Scope schema2: 169 dei 198 sorgenti originali invariati; 29 modificati
+esplicitamente; 13 sorgenti aggiunti. Tutti i 211 hash corrispondono alla build.
+Battle, Attack, Player, InputProcessor, Network e util/Save sono protetti e
+byte-identici alla base. Generatore e roster sono modifiche volute e dichiarate.
+Manifest congelato: baseline/modernization-scope.json; audit precedente archiviato
+in baseline/johto-v1/. 10 test negativi respingono modifiche non approvate.
+Questa delimitazione non e' una prova di equivalenza completa del gameplay.
 
-PERIMETRO DEL CODICE
-tools/verify_visual_scope.py: PASS.
-182 dei 198 sorgenti originali hanno SHA-256 identico alla base PC.
-Game.java aggiunge sette collegamenti reversibili alla presentazione.
-Altri 15 file originali contengono sostituzioni esplicite delle sole operazioni
-grafiche: arena, HUD, comandi, transizioni, evoluzione e schiusa.
-I loro hash sono congelati in baseline/presentation-scope.json; le copie di base
-sono in baseline/presentation-actions. Diff completo: build/visual-hooks.patch.
-I sorgenti di Battle, Attack, Pokemon, Player, InputProcessor, PkmnMap,
-GenIsland1, Network, CheckMovesLearned e DrawSetupMenu sono invariati.
-Review del diff: timer, nextAction, input, danni, catture e cleanup conservati.
-Sei mutazioni intenzionali di prova sono state rifiutate dal verificatore.
-Questa verifica delimita i cambiamenti; non prova da sola l'equivalenza del gioco.
+TEST NATIVI SUL SOLO JAR
+Tutti i test sotto usano solo il JAR e classi dei test, senza classi di produzione
+sovrapposte o risorse sciolte. Ogni log contiene il medesimo SHA-256 riportato sopra.
 
-AVVIO CLASSICO SUL JAR CONSEGNATO
-python tools/smoke_test.py: PASS, 120 frame, avvio/menu/chiusura corretti.
-Screenshot identico per byte a quello della base classica:
-SHA-256 f352884e8dcc7531ab4043b1c6ff5d406d4bf61ff580ad74c6d69e8baee4139a.
-Log e screenshot: build/smoke.
+python tools/smoke_test.py: PASS.
+Avvio/menu/120 frame/chiusura. Menu classico identico per byte alla baseline:
+f352884e8dcc7531ab4043b1c6ff5d406d4bf61ff580ad74c6d69e8baee4139a
 
-MONDO PROCEDURALE SUL JAR CONSEGNATO
-python tools/world_smoke_test.py: PASS.
-Generatore originale S: 179250 tile, circa 30.6 secondi in questo test.
-Vista 2.5D attiva per 232 frame controllati; zero ritorni al renderer classico
-durante la sequenza provata. Verificata anche l'emote sopra il giocatore.
-Movimento tramite InputProcessor: (-176,2016) -> (-176,2032).
-Salvataggio/caricamento: tile, posizione, nome e squadra corrispondono.
-Log e tre screenshot nativi: build/world-smoke/johto.
-I tempi osservati non costituiscono un benchmark; i test sono eseguiti anche
-in parallelo e il salvataggio introduce pause. Nessuna misura riguarda il 3DS.
+python tools/modern_world_test.py: PASS.
+8 fixture da 16641 celle: overlay deterministico dato stesso terreno/seed,
+indipendenza dall'ordine di inserimento, terrazze accessibili, lava solida,
+landmark protetti, collisioni e conversione TileData. Inoltre vera isola con
+movimento tramite input originale, salvataggio e ricaricamento riusciti.
+Ultimo campione reale: WORLDGEN v1 seed=2591355162068421230 tiles=255510->255510 coast=52 ramps=411 dryComponents=1208->1062 volcanic=1448 lava=88 newLava=66 outcrops=0 center=0,-112
+L'intero generatore originale non e' riproducibile da un singolo seed.
 
-MENU E LOTTE
-python tools/modern_ui_smoke_test.py: PASS, 6851 frame, 20 tipi UI, 70 PNG nativi.
-4113 frame di battaglia, 461 di transizione, 690 con snapshot del mondo.
-Zero frame di modelli 3D del giocatore/Pokemon; zero specie modello caricate.
-Usa esclusivamente il JAR consegnato e classi del test, senza sorgenti o override.
-Input originali da tastiera; fixture e salvataggi isolati in build/ui-battle-smoke.
-Copertura: setup/new/load, controlli, menu giocatore, squadra e azioni,
-tre pagine statistiche, cinque tasche della borsa, azioni oggetti, minimappa,
-guida e cambio pagina, crafting, quantita', conferma, deposito di otto Pokemon,
-scorrimento, soprannome e dialogo lungo con scorrimento del testo.
-Due incontri avviati dall'IA originale: scelta mosse, turno Leer, turno Low Kick
-con danni/animazione HP, cambio menu squadra/borsa, fuga, cattura con Master Ball,
-esperienza e aumento di livello. Confronto dati dopo salvataggio/caricamento.
-Contatori verificano la presentazione moderna e la riproduzione dello snapshot
-durante le transizioni; i contatori dei modelli 3D e delle specie caricate sono zero.
-Screenshot GPU nativi e registro delle schermate: build/ui-battle-smoke.
+python tools/landscape_smoke_test.py: PASS, 335 frame e 8 PNG.
+Giorno/notte, pareti e rampe, caldera, interni, vere azioni EnterBuilding/uscita;
+nessun errore GL o fallback nelle scene del test. La fixture e' distinta dalle
+schermate del mondo generato in build/modern-world.
 
-RISORSE NUOVE
-resources/visual/johto/foliage-sprites.png: PNG RGBA originale generato con
-Imagegen integrato, senza immagini di riferimento o estrazioni di asset HGSS.
-SHA-256: 2bbf4f39c194d1d0a71526fd2c31ccac70a1efbbe183f3170cb46729237f155d.
-Prompt completo e preparazione tecnica dell'atlas: ART_FOLIAGE_PROMPT.txt.
-Il terreno generato in precedenza e' documentato in ART_PROMPT.txt.
-I modelli GLB e le attribuzioni restano disponibili per l'esperimento precedente;
-le sue prove sono conservate in baseline/models-3d, non sono attive in questa UI.
+python tools/modern_ui_smoke_test.py: PASS.
+UI: frames=6803, screens=[DrawSetupMenu, DrawControls, DrawPlayerMenu, DrawPokemonMenu, SelectedMenu, DrawStatsScreen, DrawItemMenuGen2, DrawUseTossMenu, DrawMiniMap, DrawItemMenu, DrawGuideText, DrawCraftsMenu, SelectAmount, Selected, DrawBattleMenuNormal, DrawAttacksMenu, ShowLevelUpStats, SetNickname, DrawYesNoMenu, DisplayText], battleFrames=4065, transitionFrames=461, snapshotFrames=690, PNGs=70
+PMD: battle=5957, portraits=2227, sheets=19, textureBytes=4763904
+Input originali, 20 tipi di menu, crafting, borsa/deposito/statistiche,
+nickname/dialoghi, mosse Leer e Low Kick con danni/HP, fuga e cattura reale
+di Sprigatito con Master Ball, crescita e confronto dopo save/load.
+Zero frame di attori 3D e zero modelli caricati; 70 catture native.
 
-LIMITI DELLA VERIFICA
-Testati Windows x64 e GPU RTX 4060. Tutti i test usano cartelle build isolate,
-senza modificare le partite in run o run-johto. Nessuna pubblicazione online.
-Evoluzione, schiusa, variante Safari e intro dei boss hanno hook grafici compilati e revisionati,
-ma non sono stati eseguiti integralmente in questa sequenza automatica.
-Non sono coperti tutti gli attacchi, le specie, il multiplayer o lunghe partite.
-Interni, notte, mosse sul campo e alcune scene continuano a usare la vista del
-mondo originale; il tema dei menu resta attivo. Dettagli in GRAFICA-25D.txt.
+python tools/expansion_dex_test.py: PASS.
+Tutte le 552 specie nuove create con contesto GL; statistiche/mosse canoniche,
+sprite, conversione PokemonData, cattura/Heavy Ball, crescita, Torchic->Combusken,
+uovo/schiusa Sprigatito e grida. Vero save/load di Combusken16/Sprigatito5/
+Fuecoco8 shiny. 227 inserimenti verificati sulle sette route del test.
+
+python tools/pmd_asset_smoke_test.py --bundled: PASS.
+PMD PASS variants=2126 portraits=2125 animations=10024 directionChecks=80192 timingChecks=9988 missingPortraits=1 missingSprites=101 maxTextures=160 maxTextureBytes=67108864
+Il catalogo include forme/varianti: non tutti questi numeri sono specie giocabili.
+Limite cache effettivo 160 texture/64 MiB, espulsione verificata.
+python tools/pmd_battle_visual_test.py: PASS, 16 PNG.
+Sconfitta amico/nemico, invio Pokemon, evoluzione, schiusa, shiny e trasparenza:
+azioni originali e nuovi corpi PMD, ritaglio verticale della sconfitta verificato.
+
+COPERTURA E LIMITI
+Windows x64, OpenGL NVIDIA RTX4060. Prove isolate sotto build/: nessuna partita
+personale in run/ o run-johto/ modificata. Questi tempi non sono benchmark.
+962 specie nazionali distinte, 552 aggiunte; 63 candidate rinviate.
+Portrait base di 1025 specie e sprite base di 980 nel catalogo grafico. Pokedex,
+forme, varianti ed evoluzioni ammesse sono descritti in POKEDEX-ESPANSO.txt.
+Alcuni effetti di mosse, uova, ghost, cue speciali ed emote restano originali;
+certe azioni sul campo conservano il renderer normale per targeting/feedback.
+Non sono coperti ogni attacco/incontro speciale, multiplayer o lunghe partite.
+Dettagli: GRAFICA-25D.txt, GENERAZIONE-MODERNA.txt e manifest di provenienza.
+Le anteprime 25d/vulcano vengono da mondi procedurali reali; anteprima-alture
+illustra la fixture controllata. Le altre anteprime provengono dalla prova UI.

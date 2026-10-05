@@ -34,6 +34,14 @@ class EscapeRope extends Action {
       return this.layer;
    }
 
+   private void drawTravelFade(Game game, float alpha) {
+      if (game.johtoBattleRenderer != null) game.johtoBattleRenderer.drawTravelFade(game, alpha);
+      else {
+         this.sprite.draw(game.uiBatch, alpha);
+         this.sprite2.draw(game.uiBatch, alpha);
+      }
+   }
+
    @Override
    public void step(Game game) {
       if (this.timer < 2 * this.slow) {
@@ -41,11 +49,9 @@ class EscapeRope extends Action {
             game.insertAction(new PlayMusic("enter1", null));
          }
       } else if (this.timer < 4 * this.slow) {
-         this.sprite.draw(game.uiBatch, 0.25F);
-         this.sprite2.draw(game.uiBatch, 0.25F);
+         drawTravelFade(game, 0.25F);
       } else if (this.timer < 6 * this.slow) {
-         this.sprite.draw(game.uiBatch, 0.5F);
-         this.sprite2.draw(game.uiBatch, 0.5F);
+         drawTravelFade(game, 0.5F);
       } else if (this.timer < 22 * this.slow) {
          if (this.timer == 6 * this.slow) {
             game.map.interiorTilesIndex = 100;
@@ -60,21 +66,17 @@ class EscapeRope extends Action {
             }
          }
 
-         this.sprite.draw(game.uiBatch, 1.0F);
-         this.sprite2.draw(game.uiBatch, 1.0F);
+         drawTravelFade(game, 1.0F);
       } else if (this.timer < 24 * this.slow) {
          if (this.timer == 22 * this.slow) {
             game.insertAction(new PlayMusic("exit1", null));
          }
 
-         this.sprite.draw(game.uiBatch, 0.75F);
-         this.sprite2.draw(game.uiBatch, 0.75F);
+         drawTravelFade(game, 0.75F);
       } else if (this.timer < 26 * this.slow) {
-         this.sprite.draw(game.uiBatch, 0.5F);
-         this.sprite2.draw(game.uiBatch, 0.5F);
+         drawTravelFade(game, 0.5F);
       } else if (this.timer < 28 * this.slow) {
-         this.sprite.draw(game.uiBatch, 0.25F);
-         this.sprite2.draw(game.uiBatch, 0.25F);
+         drawTravelFade(game, 0.25F);
       } else {
          game.actionStack.remove(this);
          game.insertAction(this.nextAction);

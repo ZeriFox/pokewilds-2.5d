@@ -38,9 +38,11 @@ class PokemonFrame extends Action {
 
    @Override
    public void step(Game game) {
-      game.uiBatch.draw(this.bg, 0.0F, 0.0F);
+      if (game.modernUi != null) game.modernUi.eventBackdrop(game, "POKéMON", this);
+      else game.uiBatch.draw(this.bg, 0.0F, 0.0F);
       Sprite sprite = new Sprite(this.pokemon.sprite);
-      game.uiBatch.draw(sprite, 84 - (int)(this.pokemon.sprite.getWidth() / 2.0F), 48.0F);
+      if (!PmdBattleSprites.event(game, this.pokemon, this.pokemon.specie.name, 56, 48, 56, 56))
+         game.uiBatch.draw(sprite, 84 - (int)(this.pokemon.sprite.getWidth() / 2.0F), 48.0F);
       if (this.isDone) {
          game.actionStack.remove(this);
          game.insertAction(this.nextAction);

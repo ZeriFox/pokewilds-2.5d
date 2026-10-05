@@ -67,6 +67,13 @@ class EnterBuilding extends Action {
       }
    }
 
+   private void drawTravelFade(Game game, float alpha) {
+      if (game.johtoBattleRenderer != null) game.johtoBattleRenderer.drawTravelFade(game, alpha);
+      else {
+         this.sprite.draw(game.uiBatch, alpha);
+      }
+   }
+
    @Override
    public void step(Game game) {
       if (this.timer < 2 * this.slow) {
@@ -74,9 +81,9 @@ class EnterBuilding extends Action {
             game.insertAction(new PlayMusic(this.action + "1", null));
          }
       } else if (this.timer < 4 * this.slow) {
-         this.sprite.draw(game.uiBatch, 0.25F);
+         drawTravelFade(game, 0.25F);
       } else if (this.timer < 6 * this.slow) {
-         this.sprite.draw(game.uiBatch, 0.5F);
+         drawTravelFade(game, 0.5F);
       } else if (this.timer < 12 * this.slow) {
          if (this.timer == 6 * this.slow) {
             Tile tile = game.map.overworldTiles.get(game.player.position);
@@ -156,13 +163,13 @@ class EnterBuilding extends Action {
             }
          }
 
-         this.sprite.draw(game.uiBatch, 1.0F);
+         drawTravelFade(game, 1.0F);
       } else if (this.timer < 14 * this.slow) {
-         this.sprite.draw(game.uiBatch, 0.75F);
+         drawTravelFade(game, 0.75F);
       } else if (this.timer < 16 * this.slow) {
-         this.sprite.draw(game.uiBatch, 0.5F);
+         drawTravelFade(game, 0.5F);
       } else if (this.timer < 18 * this.slow) {
-         this.sprite.draw(game.uiBatch, 0.25F);
+         drawTravelFade(game, 0.25F);
       } else {
          game.actionStack.remove(this);
          game.insertAction(this.nextAction);

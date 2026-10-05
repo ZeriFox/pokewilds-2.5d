@@ -142,9 +142,11 @@ def build() -> int:
                         raise RuntimeError(f"Collisione tra dipendenze: {name}")
                     addon_entries[name] = library
     source_hashes = {path.relative_to(ROOT).as_posix(): digest_file(path) for path in sources}
+    include_3d = "--include-3d" in sys.argv[1:]
     resource_entries = {
         path.relative_to(RESOURCE_ROOT).as_posix(): path
         for path in sorted(RESOURCE_ROOT.rglob("*")) if path.is_file()
+        and (include_3d or path.suffix.lower() != ".glb")
     }
     resource_hashes = {name: digest_file(path) for name, path in resource_entries.items()}
     if set(resource_entries).intersection(set(runtime_entries) | set(addon_entries)):
@@ -160,6 +162,7 @@ def build() -> int:
         "versions": versions,
         "executables": executables,
         "source_count": len(sources),
+        "include_optional_3d_models": include_3d,
         "sources_sha256": combined_sources_hash,
         "source_files_sha256": source_hashes,
         "resource_files_sha256": resource_hashes,

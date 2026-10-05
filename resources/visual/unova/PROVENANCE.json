@@ -1,0 +1,1758 @@
+{
+  "schema": 1,
+  "source_game": "Pokemon Black / White, Nintendo DS",
+  "rights": "Original game artwork: Nintendo / Game Freak / The Pokemon Company. Public extraction catalog, not an assertion of an open-source artwork license. Preserve uploader credits; do not claim authorship.",
+  "sources": {
+    "battle-stages.png": {
+      "url": "https://textures.spriters-resource.com/media/assets/366/368759.png?updated=1755520282",
+      "page": "https://textures.spriters-resource.com/ds_dsi/pokemonblackwhite/asset/368759/",
+      "uploader": "tsuka",
+      "sha256": "d0988fb559d00e4be6c10ee93891798ae40718872b14c8b286c5466b7e3d1d27"
+    },
+    "heroes.png": {
+      "url": "https://www.spriters-resource.com/media/assets/31/34024.png?updated=1755472687",
+      "page": "https://www.spriters-resource.com/ds_dsi/pokemonblackwhite/asset/34024/",
+      "uploader": "Barubary",
+      "sha256": "2c13ddba92ac514d0cb08d70ae556d47d034d95e1659ce9f3227db5d409cae0d"
+    },
+    "environment.zip": {
+      "url": "https://textures.spriters-resource.com/media/assets/372/375513.zip?updated=1755522024",
+      "page": "https://textures.spriters-resource.com/ds_dsi/pokemonblackwhite/asset/375513/",
+      "uploader": "Brom",
+      "submitted": "2018-11-05",
+      "sha256": "0a224ec81da7bc2382e56f6edfda96ca96220cdc067c4818944ec18a6c3b44b8"
+    }
+  },
+  "preparation": "Exact PNG copies / crops and background-key transparency for hero cells; no generated replacement art. Runtime lava coloration and geometric architecture are presentation adaptations.",
+  "regions": {
+    "grass": {
+      "source": "environment.zip",
+      "member": "sourceimages/summer/grass01ax.png",
+      "member_sha256": "cbb7b5493fc5f4ef6402154288fe75fc2e4e8c0e0becff07d63f44979270ffa7",
+      "source_size": [
+        64,
+        64
+      ]
+    },
+    "grass_light": {
+      "source": "environment.zip",
+      "member": "sourceimages/spring/grass01ax.png",
+      "member_sha256": "ab4003af0658d67bca6711a0e4e9dff7b87307e5350b09eb14abe49cda713223",
+      "source_size": [
+        64,
+        64
+      ]
+    },
+    "grass_dry": {
+      "source": "environment.zip",
+      "member": "sourceimages/autumn/grass01ax.png",
+      "member_sha256": "974399e740a3ad37ee3ef42dc84f51a6b14d520db6a51931b3d3267ddf3e025f",
+      "source_size": [
+        64,
+        64
+      ]
+    },
+    "snow": {
+      "source": "environment.zip",
+      "member": "sourceimages/winter/snow/grass01ax.png",
+      "member_sha256": "165f316c99ab1fdff72d6cfd57659c117d648a52fdd2e5a3bd900461d47411b5",
+      "source_size": [
+        64,
+        64
+      ]
+    },
+    "path": {
+      "source": "environment.zip",
+      "member": "sourceimages/summer/michi01b.png",
+      "member_sha256": "555fd0419d263c925a9597b1b9fc7a9cccfd7398d99aef17045bf492e5927292",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "path_dry": {
+      "source": "environment.zip",
+      "member": "sourceimages/autumn/michi01b.png",
+      "member_sha256": "c20a672f658b4f1f0fbf9b587891d7a79492a0cbe7042f8cdcae3a08d0c3e3c7",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "sand": {
+      "source": "environment.zip",
+      "member": "sourceimages/sabaku01.png",
+      "member_sha256": "67348bc6499c2ed87c406353104fb309d86f03a7f7f635ef9938e25d2b83b9ab",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "sand_shore": {
+      "source": "environment.zip",
+      "member": "sourceimages/sea_jimen.png",
+      "member_sha256": "0207856637370be5c62954d813c84a27e8f44be23fa525ade2ac1d25695fbb2d",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "stone_floor": {
+      "source": "environment.zip",
+      "member": "sourceimages/grass_ishi.png",
+      "member_sha256": "ada306cf704b5dd9485b654ec328389088b4183d169715fc93a2d6d400cd0597",
+      "source_size": [
+        64,
+        64
+      ]
+    },
+    "mountain": {
+      "source": "environment.zip",
+      "member": "sourceimages/gake_michi.png",
+      "member_sha256": "6477f5efc374563206c435b2d56ba340446155aa8e4b292d932de97f50b2a6ef",
+      "source_size": [
+        64,
+        64
+      ]
+    },
+    "basalt": {
+      "source": "environment.zip",
+      "member": "sourceimages/d0iwa_01.png",
+      "member_sha256": "b0b171d6aecd469b08c1f4febe2c6d33f28ebb90d09340ed2830ecb9f2e23cb8",
+      "source_size": [
+        64,
+        64
+      ]
+    },
+    "volcano": {
+      "source": "environment.zip",
+      "member": "sourceimages/out57_yuka02.png",
+      "member_sha256": "71e170244afc30d4fb8f8ceff2c5992a33e59135e8fd9d8959923fe43dac8b17",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "volcano_path": {
+      "source": "environment.zip",
+      "member": "sourceimages/out57_yuka01.png",
+      "member_sha256": "ba2bf11149fbdf4e68fe70d4b05f2e458e396b4e9bada8325e47ffd84debad4b",
+      "source_size": [
+        64,
+        64
+      ]
+    },
+    "water": {
+      "source": "environment.zip",
+      "member": "sourceimages/sea_mizu1.png",
+      "member_sha256": "21fa14793fbc0d7e677bed97b47882e80352926268a04c85994bc3e8c2179436",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "water_shallow": {
+      "source": "environment.zip",
+      "member": "sourceimages/sea_mizu1_1.png",
+      "member_sha256": "49539a2d8dcd6a2c5826fd5944a616942fd0060df98c714126c7098f89a9de8b",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "river": {
+      "source": "environment.zip",
+      "member": "sourceimages/kawa_soko.png",
+      "member_sha256": "606ddd340dcc85a3091715eff428168244b145d47853b4b2ffa2c3626d36c6d3",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "water_ripple": {
+      "source": "environment.zip",
+      "member": "sourceimages/kawa01b.png",
+      "member_sha256": "0f17e2b17cf0165cd564dd3710f7df05f53b43a33de1ec76f280be0f7d18a59e",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "cliff": {
+      "source": "environment.zip",
+      "member": "sourceimages/yamagake01.png",
+      "member_sha256": "0715a57098a1eec33361f6b87492b15fb7b553f4a3eaaad96cc2e5630afb0fa6",
+      "source_size": [
+        16,
+        32
+      ]
+    },
+    "cliff_cap": {
+      "source": "environment.zip",
+      "member": "sourceimages/gake_futa.png",
+      "member_sha256": "7811191235d4858e140907cca5d36446a778ee7c649ecf332be76d4aea906d03",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "cliff_grass": {
+      "source": "environment.zip",
+      "member": "sourceimages/summer/gake1_1.png",
+      "member_sha256": "54db5fa28b1bedc4ffe5c8f9ca4aaf1674a41fb85ff2825173b60d0e01c888c9",
+      "source_size": [
+        16,
+        8
+      ]
+    },
+    "cliff_volcano": {
+      "source": "environment.zip",
+      "member": "sourceimages/out57_gake01a.png",
+      "member_sha256": "66c286c055290aac859caf395366c9ea0dd0099412196d714294e70ff106907d",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "cliff_dark": {
+      "source": "environment.zip",
+      "member": "sourceimages/d0gake_001.png",
+      "member_sha256": "a26c977f622c69b24f1d44687907f15916d7797debbec31cf358859654146e08",
+      "source_size": [
+        32,
+        16
+      ]
+    },
+    "steps": {
+      "source": "environment.zip",
+      "member": "sourceimages/kaidan01a.png",
+      "member_sha256": "5368ac2c5c008a6019384f69d6ea0536292fd778c8c533f4f415dcf19cd1d792",
+      "source_size": [
+        32,
+        16
+      ]
+    },
+    "wood_floor": {
+      "source": "environment.zip",
+      "member": "sourceimages/cafe_tile03.png",
+      "member_sha256": "1584e2406b6cc1d4cc821abc30ddcbc76a7dd2beeb281fd894ec278de857ac3b",
+      "source_size": [
+        16,
+        32
+      ]
+    },
+    "tile_floor": {
+      "source": "environment.zip",
+      "member": "sourceimages/cafe_tile01.png",
+      "member_sha256": "04278e1ead66d6f4a9a72d34bfaa80898afe1bca9ac218c2693791d848a105f4",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "tile_pale": {
+      "source": "environment.zip",
+      "member": "sourceimages/cafe_tile02.png",
+      "member_sha256": "1cb31cf98412cc8f72f999e4ae8663e5de80f6a67b1af18e59c1e3fe03db9cc3",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "brick_floor": {
+      "source": "environment.zip",
+      "member": "sourceimages/yuka.png",
+      "member_sha256": "d4c4f4da66d4fc4b11a41af5dc358332f385b69692f5b8e28f4ad270f2e844ce",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "wall": {
+      "source": "environment.zip",
+      "member": "sourceimages/cafe_kabe02.png",
+      "member_sha256": "d0915a483cdc789a1df846e3ab86fb464bea0b777b16173b89c77fb6114a105e",
+      "source_size": [
+        16,
+        32
+      ]
+    },
+    "wall_wood": {
+      "source": "environment.zip",
+      "member": "sourceimages/cafe_kabe01.png",
+      "member_sha256": "fa06d9461197a7cf25649d9ad1ed4f0feeef916a20fe584d5bd55889672d1d5e",
+      "source_size": [
+        8,
+        32
+      ]
+    },
+    "door": {
+      "source": "environment.zip",
+      "member": "sourceimages/cabin_door.png",
+      "member_sha256": "504d684ca9c272701e358d26b6a3e5d45c711616156bfd437813b7aff3fe255a",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "door_red": {
+      "source": "environment.zip",
+      "member": "sourceimages/door_c14_1.png",
+      "member_sha256": "f83f2d8194c72efeef7ec06dc6e5153ff5068a6394c988cceecc35774d4eae5f",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "fence": {
+      "source": "environment.zip",
+      "member": "sourceimages/c13_saku01.png",
+      "member_sha256": "3fbbf722101b6c8db6e222ba96ae3690a0d33b721e9e1470b2ce9c5565b31516",
+      "source_size": [
+        32,
+        16
+      ]
+    },
+    "fence_wood": {
+      "source": "environment.zip",
+      "member": "sourceimages/fence_01.png",
+      "member_sha256": "c53644fc5e5cddca888be876f8bef14fc199753c7af7bd9bedebe3d5847a1502",
+      "source_size": [
+        16,
+        32
+      ]
+    },
+    "tree": {
+      "source": "environment.zip",
+      "member": "sourceimages/summer/54ki02ax.png",
+      "member_sha256": "a2841de09427e2617bf04011a78776b739613fea1d7d3351c5dd9d1a1a6bbdfd",
+      "source_size": [
+        64,
+        64
+      ]
+    },
+    "tree_pine": {
+      "source": "environment.zip",
+      "member": "sourceimages/summer/ki02ax.png",
+      "member_sha256": "4d9f1b72702065cb2425588a7afa08fa3f7778233e97e3548a10c484c20936d6",
+      "source_size": [
+        32,
+        64
+      ]
+    },
+    "tree_dry": {
+      "source": "environment.zip",
+      "member": "sourceimages/autumn/ki02ax1.png",
+      "member_sha256": "0401a5501d715294d4eab17d4dce5c27162ddea450d762b66202ba0a9b460398",
+      "source_size": [
+        64,
+        64
+      ]
+    },
+    "tree_snow": {
+      "source": "environment.zip",
+      "member": "sourceimages/winter/snow/ki03ax.png",
+      "member_sha256": "db0a786da579fdc43b053dffd38eef1cc716f5f86954c6bd5137af9d044f26af",
+      "source_size": [
+        32,
+        64
+      ]
+    },
+    "tree_small": {
+      "source": "environment.zip",
+      "member": "sourceimages/summer/ki03ax.png",
+      "member_sha256": "afc1821c14bdcc6cbbe148a9e2ec8d71e6db9a2574fa90dd041c1cf36c61904a",
+      "source_size": [
+        32,
+        64
+      ]
+    },
+    "tree_top": {
+      "source": "environment.zip",
+      "member": "sourceimages/summer/54ki02bx.png",
+      "member_sha256": "0f5d6ec8ebd4017f7cb4619d70eded8c37b869121938a23adedcdb0447dbb831",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "palm_trunk": {
+      "source": "environment.zip",
+      "member": "sourceimages/ki04ax.png",
+      "member_sha256": "7553b915c56afe2b7bb68462b3649a27d360018ee6dae9b917b97a222308af07",
+      "source_size": [
+        16,
+        64
+      ]
+    },
+    "palm_top": {
+      "source": "environment.zip",
+      "member": "sourceimages/ki04dx.png",
+      "member_sha256": "7836b7fc71ebe80617a7d862702a6a49bc7ac28e881288645a70214860200809",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "rock": {
+      "source": "environment.zip",
+      "member": "sourceimages/rock01.png",
+      "member_sha256": "3ad22babe0bf988d98f72a4bff6665e3fe54dc17d8bc857e6b2e76efd52a7195",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "rock_small": {
+      "source": "environment.zip",
+      "member": "sourceimages/rock02.png",
+      "member_sha256": "ffc8e8155a6a46c6738e8832812526f8cb2d66e48068679907b063e47168ee05",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "rock_ice": {
+      "source": "environment.zip",
+      "member": "sourceimages/in30_rock01.png",
+      "member_sha256": "a53e2bf166169e4c1d20ae39144ecaf63d34a06ee2f9d6e017a1f7abe8ef3488",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "grass_tuft": {
+      "source": "environment.zip",
+      "member": "sourceimages/summer/ue_grass01.png",
+      "member_sha256": "1945ded6969ecf39187afa220370abd70296e698fc8dac179015266065fbf0a4",
+      "source_size": [
+        16,
+        32
+      ]
+    },
+    "grass_dry_tuft": {
+      "source": "environment.zip",
+      "member": "sourceimages/autumn/ue_grass01.png",
+      "member_sha256": "4a24cb0b4af9a4742d6eec171046da82452e4a944f94bf164b6c236956338ca5",
+      "source_size": [
+        16,
+        32
+      ]
+    },
+    "flowers": {
+      "source": "environment.zip",
+      "member": "sourceimages/summer/hana01.2.png",
+      "member_sha256": "bb2fc096642939c8959d072ebfedec6055281072f96149a16f41e2c9b8760787",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "flowers_fairy": {
+      "source": "environment.zip",
+      "member": "sourceimages/spring/kisetu_hana.png",
+      "member_sha256": "ec1ffa8e2f193a45d197f03af5eb3780c173f71fcbb579b989120de3de82ee3f",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "plant": {
+      "source": "environment.zip",
+      "member": "sourceimages/plant_tex4_lm1.png",
+      "member_sha256": "5c6ae5a1f246981b43aadce6725405367f0e3cf5d10a9583f353b63cbd12e3c3",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "bench": {
+      "source": "environment.zip",
+      "member": "sourceimages/bench.png",
+      "member_sha256": "cbd178cc6289cc40a9ee52c22c912ed43e0115a1ff6a4c9ad6d7df86734d3fb6",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "chair": {
+      "source": "environment.zip",
+      "member": "sourceimages/isu.png",
+      "member_sha256": "b6963047df60523a9c745a214ff38acaf7e9f569e095c40e4b2154b8a59a323f",
+      "source_size": [
+        16,
+        32
+      ]
+    },
+    "desk": {
+      "source": "environment.zip",
+      "member": "sourceimages/desk01.png",
+      "member_sha256": "3c48af94025b2cb9718a666f8d1e97c1749ea694c829476e11c492d1a4e6fa71",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "pot": {
+      "source": "environment.zip",
+      "member": "sourceimages/in66_plant.png",
+      "member_sha256": "72eadfbac4bfee992cec657dd625bfc1fd9be7ddeb4a3ecf329dfb7f86d64f6e",
+      "source_size": [
+        16,
+        32
+      ]
+    },
+    "lamp": {
+      "source": "environment.zip",
+      "member": "sourceimages/in66_light02.png",
+      "member_sha256": "1ff16092c11016166a14fb8cf22e20b2a66851435a57e9238c44479fc3c2e71d",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "couch": {
+      "source": "environment.zip",
+      "member": "sourceimages/chushion01a_1.png",
+      "member_sha256": "c2cce6131b352df28b50240c15e26ad2ed201a723cb4d2c76a5c0ffd512f913f",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "cushion": {
+      "source": "environment.zip",
+      "member": "sourceimages/chushion01a_2.png",
+      "member_sha256": "0f11bd7aa5ddb095cc95791934c311ccb7c59ed5c04d03d3f1e043eee7d17441",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "bridge": {
+      "source": "environment.zip",
+      "member": "sourceimages/hashi01a.png",
+      "member_sha256": "6e60b81c43a478612fe42527614bc5f96a13e68b123729a5ce28efeee2a18d77",
+      "source_size": [
+        32,
+        16
+      ]
+    },
+    "hole": {
+      "source": "environment.zip",
+      "member": "sourceimages/mori01s.png",
+      "member_sha256": "ec65f556702fe3793a7c90953f7b6f789a7c56bffbaaf1348258806eaf0dac98",
+      "source_size": [
+        32,
+        16
+      ]
+    },
+    "ruin_wall": {
+      "source": "environment.zip",
+      "member": "sourceimages/sio_fe01.png",
+      "member_sha256": "37c41bc170144aa9f7580683bfb0e816ac664976f2e4d64f71b3a74a6b4cd645",
+      "source_size": [
+        32,
+        64
+      ]
+    },
+    "ruin_floor": {
+      "source": "environment.zip",
+      "member": "sourceimages/out18_tile03.png",
+      "member_sha256": "9b235acb693a7ef349b33d274d57f5d3c79d4852cd1ef679857d89595cf7f373",
+      "source_size": [
+        32,
+        32
+      ]
+    },
+    "rug": {
+      "source": "environment.zip",
+      "member": "sourceimages/cafe_mat01.png",
+      "member_sha256": "0abecd6ed3487683fa54def9f05085a72ff8b0cf51e75a85b70d4be0706a38e8",
+      "source_size": [
+        16,
+        16
+      ]
+    },
+    "battle_0_0": {
+      "source": "battle-stages.png",
+      "crop": [
+        8,
+        8,
+        32,
+        32
+      ]
+    },
+    "battle_0_1": {
+      "source": "battle-stages.png",
+      "crop": [
+        48,
+        8,
+        32,
+        32
+      ]
+    },
+    "battle_0_2": {
+      "source": "battle-stages.png",
+      "crop": [
+        88,
+        8,
+        32,
+        32
+      ]
+    },
+    "battle_0_3": {
+      "source": "battle-stages.png",
+      "crop": [
+        128,
+        8,
+        32,
+        32
+      ]
+    },
+    "battle_0_4": {
+      "source": "battle-stages.png",
+      "crop": [
+        168,
+        8,
+        32,
+        32
+      ]
+    },
+    "battle_0_5": {
+      "source": "battle-stages.png",
+      "crop": [
+        208,
+        8,
+        32,
+        32
+      ]
+    },
+    "battle_1_0": {
+      "source": "battle-stages.png",
+      "crop": [
+        8,
+        48,
+        32,
+        32
+      ]
+    },
+    "battle_1_1": {
+      "source": "battle-stages.png",
+      "crop": [
+        48,
+        48,
+        32,
+        32
+      ]
+    },
+    "battle_1_2": {
+      "source": "battle-stages.png",
+      "crop": [
+        88,
+        48,
+        32,
+        32
+      ]
+    },
+    "battle_1_3": {
+      "source": "battle-stages.png",
+      "crop": [
+        128,
+        48,
+        32,
+        32
+      ]
+    },
+    "battle_1_4": {
+      "source": "battle-stages.png",
+      "crop": [
+        168,
+        48,
+        32,
+        32
+      ]
+    },
+    "battle_1_5": {
+      "source": "battle-stages.png",
+      "crop": [
+        208,
+        48,
+        32,
+        32
+      ]
+    },
+    "battle_2_0": {
+      "source": "battle-stages.png",
+      "crop": [
+        8,
+        88,
+        32,
+        32
+      ]
+    },
+    "battle_2_1": {
+      "source": "battle-stages.png",
+      "crop": [
+        48,
+        88,
+        32,
+        32
+      ]
+    },
+    "battle_2_2": {
+      "source": "battle-stages.png",
+      "crop": [
+        88,
+        88,
+        32,
+        32
+      ]
+    },
+    "battle_2_3": {
+      "source": "battle-stages.png",
+      "crop": [
+        128,
+        88,
+        32,
+        32
+      ]
+    },
+    "battle_2_4": {
+      "source": "battle-stages.png",
+      "crop": [
+        168,
+        88,
+        32,
+        32
+      ]
+    },
+    "battle_2_5": {
+      "source": "battle-stages.png",
+      "crop": [
+        208,
+        88,
+        32,
+        32
+      ]
+    },
+    "battle_3_0": {
+      "source": "battle-stages.png",
+      "crop": [
+        8,
+        128,
+        32,
+        32
+      ]
+    },
+    "battle_3_1": {
+      "source": "battle-stages.png",
+      "crop": [
+        48,
+        128,
+        32,
+        32
+      ]
+    },
+    "battle_3_2": {
+      "source": "battle-stages.png",
+      "crop": [
+        88,
+        128,
+        32,
+        32
+      ]
+    },
+    "battle_3_3": {
+      "source": "battle-stages.png",
+      "crop": [
+        128,
+        128,
+        32,
+        32
+      ]
+    },
+    "battle_3_4": {
+      "source": "battle-stages.png",
+      "crop": [
+        168,
+        128,
+        32,
+        32
+      ]
+    },
+    "battle_3_5": {
+      "source": "battle-stages.png",
+      "crop": [
+        208,
+        128,
+        32,
+        32
+      ]
+    },
+    "battle_4_0": {
+      "source": "battle-stages.png",
+      "crop": [
+        8,
+        168,
+        32,
+        32
+      ]
+    },
+    "battle_4_1": {
+      "source": "battle-stages.png",
+      "crop": [
+        48,
+        168,
+        32,
+        32
+      ]
+    },
+    "battle_4_2": {
+      "source": "battle-stages.png",
+      "crop": [
+        88,
+        168,
+        32,
+        32
+      ]
+    },
+    "battle_4_3": {
+      "source": "battle-stages.png",
+      "crop": [
+        128,
+        168,
+        32,
+        32
+      ]
+    },
+    "battle_4_4": {
+      "source": "battle-stages.png",
+      "crop": [
+        168,
+        168,
+        32,
+        32
+      ]
+    },
+    "battle_4_5": {
+      "source": "battle-stages.png",
+      "crop": [
+        208,
+        168,
+        32,
+        32
+      ]
+    },
+    "battle_5_0": {
+      "source": "battle-stages.png",
+      "crop": [
+        8,
+        208,
+        32,
+        32
+      ]
+    },
+    "battle_5_1": {
+      "source": "battle-stages.png",
+      "crop": [
+        48,
+        208,
+        32,
+        32
+      ]
+    },
+    "battle_5_2": {
+      "source": "battle-stages.png",
+      "crop": [
+        88,
+        208,
+        32,
+        32
+      ]
+    },
+    "battle_5_3": {
+      "source": "battle-stages.png",
+      "crop": [
+        128,
+        208,
+        32,
+        32
+      ]
+    },
+    "trainer_male_walk_up_0": {
+      "source": "heroes.png",
+      "crop": [
+        4,
+        4,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_walk_up_1": {
+      "source": "heroes.png",
+      "crop": [
+        36,
+        4,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_walk_up_2": {
+      "source": "heroes.png",
+      "crop": [
+        68,
+        4,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_walk_down_0": {
+      "source": "heroes.png",
+      "crop": [
+        4,
+        36,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_walk_down_1": {
+      "source": "heroes.png",
+      "crop": [
+        36,
+        36,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_walk_down_2": {
+      "source": "heroes.png",
+      "crop": [
+        68,
+        36,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_walk_left_0": {
+      "source": "heroes.png",
+      "crop": [
+        4,
+        68,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_walk_left_1": {
+      "source": "heroes.png",
+      "crop": [
+        36,
+        68,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_walk_left_2": {
+      "source": "heroes.png",
+      "crop": [
+        68,
+        68,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_walk_right_0": {
+      "source": "heroes.png",
+      "crop": [
+        4,
+        100,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_walk_right_1": {
+      "source": "heroes.png",
+      "crop": [
+        36,
+        100,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_walk_right_2": {
+      "source": "heroes.png",
+      "crop": [
+        68,
+        100,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_up_0": {
+      "source": "heroes.png",
+      "crop": [
+        112,
+        4,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_up_1": {
+      "source": "heroes.png",
+      "crop": [
+        144,
+        4,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_up_2": {
+      "source": "heroes.png",
+      "crop": [
+        176,
+        4,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_down_0": {
+      "source": "heroes.png",
+      "crop": [
+        112,
+        36,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_down_1": {
+      "source": "heroes.png",
+      "crop": [
+        144,
+        36,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_down_2": {
+      "source": "heroes.png",
+      "crop": [
+        176,
+        36,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_left_0": {
+      "source": "heroes.png",
+      "crop": [
+        112,
+        68,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_left_1": {
+      "source": "heroes.png",
+      "crop": [
+        144,
+        68,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_left_2": {
+      "source": "heroes.png",
+      "crop": [
+        176,
+        68,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_right_0": {
+      "source": "heroes.png",
+      "crop": [
+        112,
+        100,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_right_1": {
+      "source": "heroes.png",
+      "crop": [
+        144,
+        100,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_male_run_right_2": {
+      "source": "heroes.png",
+      "crop": [
+        176,
+        100,
+        32,
+        32
+      ],
+      "transparent_color": [
+        88,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_up_0": {
+      "source": "heroes.png",
+      "crop": [
+        4,
+        144,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_up_1": {
+      "source": "heroes.png",
+      "crop": [
+        36,
+        144,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_up_2": {
+      "source": "heroes.png",
+      "crop": [
+        68,
+        144,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_down_0": {
+      "source": "heroes.png",
+      "crop": [
+        4,
+        176,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_down_1": {
+      "source": "heroes.png",
+      "crop": [
+        36,
+        176,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_down_2": {
+      "source": "heroes.png",
+      "crop": [
+        68,
+        176,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_left_0": {
+      "source": "heroes.png",
+      "crop": [
+        4,
+        208,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_left_1": {
+      "source": "heroes.png",
+      "crop": [
+        36,
+        208,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_left_2": {
+      "source": "heroes.png",
+      "crop": [
+        68,
+        208,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_right_0": {
+      "source": "heroes.png",
+      "crop": [
+        4,
+        240,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_right_1": {
+      "source": "heroes.png",
+      "crop": [
+        36,
+        240,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_walk_right_2": {
+      "source": "heroes.png",
+      "crop": [
+        68,
+        240,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_up_0": {
+      "source": "heroes.png",
+      "crop": [
+        112,
+        144,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_up_1": {
+      "source": "heroes.png",
+      "crop": [
+        144,
+        144,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_up_2": {
+      "source": "heroes.png",
+      "crop": [
+        176,
+        144,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_down_0": {
+      "source": "heroes.png",
+      "crop": [
+        112,
+        176,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_down_1": {
+      "source": "heroes.png",
+      "crop": [
+        144,
+        176,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_down_2": {
+      "source": "heroes.png",
+      "crop": [
+        176,
+        176,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_left_0": {
+      "source": "heroes.png",
+      "crop": [
+        112,
+        208,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_left_1": {
+      "source": "heroes.png",
+      "crop": [
+        144,
+        208,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_left_2": {
+      "source": "heroes.png",
+      "crop": [
+        176,
+        208,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_right_0": {
+      "source": "heroes.png",
+      "crop": [
+        112,
+        240,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_right_1": {
+      "source": "heroes.png",
+      "crop": [
+        144,
+        240,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "trainer_female_run_right_2": {
+      "source": "heroes.png",
+      "crop": [
+        176,
+        240,
+        32,
+        32
+      ],
+      "transparent_color": [
+        56,
+        144,
+        88
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    }
+  },
+  "outputs": {
+    "world-atlas.png": {
+      "sha256": "44aa2e517e1247950cbf3609cca780ab7f107d44f5a5909d9e8b266870812f96",
+      "bytes": 85169
+    },
+    "world-atlas.json": {
+      "sha256": "aee59928b9cdde1dfcf34cb8fdddc1a77253b9d4e98239b3a5479d4106780456",
+      "bytes": 13492
+    }
+  }
+}

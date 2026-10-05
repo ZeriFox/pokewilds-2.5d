@@ -1,0 +1,61 @@
+GENERAZIONE PROCEDURALE MODERNA — versione 1
+
+GenIsland1 conserva la generazione dell'isola, delle strutture e dei dungeon.
+Prima degli spawn ordinari e della costruzione delle coste viene applicato
+ModernWorldGenerator: un passaggio topologico che modifica vere celle Tile,
+collisioni e route. Non si tratta di una decorazione applicata dal renderer.
+
+Novità:
+- Le piccole rientranze d'acqua interna circondate da almeno tre celle asciutte
+  diventano sponde sabbiose. Oceano, spiagge soggette a marea e cascate restano.
+- La regione vulcanica originaria diventa EMBER CALDERA: margine irregolare,
+  sentieri sinuosi, percorso anulare, tasche e canali di lava, rocce basaltiche.
+- La lava utilizza il vero tile lava1, solido e non attraversabile a piedi.
+  Le rocce usano rock_volcano1, con le regole originali di Smash e raccolta.
+- Ogni nuovo ostacolo mantiene connesse le sue celle asciutte adiacenti:
+  una verifica locale precede la collocazione della lava e delle rocce.
+- Le terrazze montane separate da pareti nord/sud ricevono rampe reali quando
+  il passaggio collega due componenti asciutte precedentemente distinte.
+  Il tile della rampa è ledge_grass_ramp, attraversabile in entrambe le direzioni.
+  Gli altri dirupi conservano le collisioni e i salti direzionali originali.
+- Oggetti, edifici, accessi ai dungeon, cartelli e celle con dati speciali sono
+  protetti. Il numero di celle e i limiti dell'isola rimangono invariati.
+- La caldera usa la route volcano1: spawn Fuoco/Roccia originari, senza Pokémon
+  appoggiati sulla lava. Le aggiunte al Pokédex sono gestite separatamente.
+
+Compatibilità:
+Il passaggio gira soltanto durante una NUOVA generazione. Non viene richiamato
+dal caricamento dei salvataggi. Non aggiunge campi a TileData/RouteData e salva
+i nomi dei tile, il bioma e la route con il formato originale. Anche le nuove
+aree generate oltre i bordi ricevono il passaggio. -Dpokewilds.worldgen=classic
+disabilita il passaggio per confronti; è indipendente dall'opzione grafica.
+
+Determinismo:
+L'overlay è deterministico per lo stesso terreno iniziale e lo stesso seed;
+il seed predefinito deriva da un fingerprint senza dipendenza dall'ordine delle
+HashMap. GenIsland1 resta il generatore originale e usa altre sorgenti casuali:
+non viene promessa una riproduzione dell'intera isola con un singolo world seed.
+
+Limiti:
+Non è un motore voxel e non aggiunge un asse verticale alle regole del gioco.
+Le alture sono terrazze con bordi e rampe. Il generatore conserva isole, laghi,
+aree dense e ostacoli di progressione originali; non rende tutta la mappa un'unica
+regione attraversabile senza mosse sul campo. Non modifica salvataggi esistenti.
+
+API per la presentazione:
+ModernWorldGenerator.isVolcanic(Tile), isRamp(Tile), biomeLabel(Tile).
+Tile.biome resta "volcano"; volcano2 identifica i sentieri della caldera;
+volcano1 il terreno vulcanico; lava1 le celle di lava; rock_volcano1 i massi.
+Non ricavare un'altezza arbitraria dai nomi mountain*: disegnare soltanto le
+pareti ledges3_* realmente presenti e lasciare visivamente aperte le rampe.
+
+Verifica:
+python tools/modern_world_test.py
+Il test usa un contesto OpenGL invisibile e i Tile originali. Otto seed su
+fixture da 16.641 celle verificano determinismo anche invertendo l'inserimento,
+tre terrazze tutte raggiungibili (4 componenti -> 1), lava solida, protezione
+oggetti, coste, footprint e round-trip TileData. Segue una vera generazione S,
+rendering, movimento, salvataggio/caricamento e chiusura ordinata.
+Per sviluppo prima della build: aggiungere --sources. L'opzione compila soltanto
+i sorgenti del generatore sopra il JAR e viene dichiarata nel log.
+Evidenze: build/modern-world/modern-world.log e relativi PNG nativi.

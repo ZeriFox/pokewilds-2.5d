@@ -3,6 +3,7 @@ package com.pkmngen.game;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -117,7 +118,9 @@ public final class ModernPartyUi {
             if (selected && menu.playerColorIndex == 1) ui.rect(game, 118, y + 1, 10, 10, ModernUi.GOLD);
             ui.rect(game, 120, y + 3, 6, 6, swatch);
             if (selected && menu.playerColorIndex == 2) ui.rect(game, 133, y + 1, 17, 1, ModernUi.GOLD);
-            if (!menu.avatarSprites.isEmpty()) sprite(game, menu.avatarSprites.get(avatarFrame(menu.avatarSprites.size(), DrawSetupMenu.avatarAnimCounter)), 136, y + 1, 10, 12, false);
+            TextureRegion trainer = BwAssets.get().trainer(value,"down",DrawSetupMenu.avatarAnimCounter/24f,false);
+            if (trainer != null) region(game,trainer,134,y,14,14);
+            else if (!menu.avatarSprites.isEmpty()) sprite(game, menu.avatarSprites.get(avatarFrame(menu.avatarSprites.size(), DrawSetupMenu.avatarAnimCounter)), 136, y + 1, 10, 12, false);
          } else ui.fitText(game, (selected && row.kind == 0 ? "← " : "") + value + (selected && row.kind == 0 ? " →" : ""), 62, y + 9.5f, 5.8f, 86, ModernUi.INK);
       }
       String help = "↑↓ Select   ←→ Change   " + key(InputProcessor.keyboardA) + " Start";
@@ -139,7 +142,9 @@ public final class ModernPartyUi {
       }
       ui.panel(game, 7, 91, 63, 47);
       Sprite trainer = game.player.standingSprites.get("down");
-      sprite(game, trainer, 11, 103, 20, 26, false);
+      TextureRegion modernTrainer = BwAssets.get().trainer(game.player.character,"down",0,false);
+      if (modernTrainer != null) region(game,modernTrainer,9,100,26,32);
+      else sprite(game, trainer, 11, 103, 20, 26, false);
       ui.fitText(game, "FIELD JOURNAL", 34, 129, 4.1f, 32, ModernUi.MUTED);
       ui.text(game, "Party", 35, 117, 5.5f, ModernUi.INK);
       ui.text(game, game.player.pokemon.size() + " / 6", 35, 106, 7, ModernUi.ACCENT);
@@ -162,7 +167,9 @@ public final class ModernPartyUi {
          boolean chosen = i == selected;
          if (chosen) ui.rect(game, 7, y + 1, 146, 13, SOFT);
          if (chosen || moving == index) ui.rect(game, 6, y, 2, 15, moving == index ? ModernUi.GOLD : ModernUi.ACCENT);
-         if (!p.isEgg && p.sprite != null) {
+         if (PmdBattleSprites.portrait(game, p, 9, y, 17, 15)) {
+            // PMDCollab portrait, independent of battle/overworld sprite transforms.
+         } else if (!p.isEgg && p.sprite != null) {
             // Use the same original portrait as the summary: some upstream overworld frames
             // contain placeholder art, while battle portraits consistently identify the species.
             sprite(game, p.sprite, 9, y, 17, 15, true);
@@ -191,7 +198,7 @@ public final class ModernPartyUi {
       String[] pages = {"Overview", "Moves", "Stats"};
       ui.fullScreen(game, displayName(p), pages[Math.max(0, Math.min(2, menu.currIndex))] + "  /  " + (menu.currIndex + 1) + " of 3");
       ui.panel(game, 6, 77, 148, 40);
-      sprite(game, p.sprite, 10, 81, 41, 32, true);
+      if (!PmdBattleSprites.portrait(game, p, 10, 81, 41, 32)) sprite(game, p.sprite, 10, 81, 41, 32, true);
       ui.text(game, "Lv " + p.level, 59, 111, 8, ModernUi.ACCENT);
       ui.text(game, p.gender == null ? "" : p.gender.equals("male") ? "♂" : p.gender.equals("female") ? "♀" : "", 94, 111, 7, ModernUi.MUTED);
       if (p.isShiny) ui.text(game, "SHINY", 114, 110, 5.2f, ModernUi.GOLD);
@@ -312,6 +319,11 @@ public final class ModernPartyUi {
       copy.setBounds(x + (maxWidth - width) / 2, y + (maxHeight - height) / 2, width, height);
       copy.setOriginCenter();
       copy.draw(game.uiBatch);
+   }
+
+   private static void region(Game game, TextureRegion source, float x,float y,float w,float h) {
+      float scale = Math.min(w/source.getRegionWidth(),h/source.getRegionHeight());
+      game.uiBatch.draw(source,x+(w-source.getRegionWidth()*scale)/2,y,source.getRegionWidth()*scale,source.getRegionHeight()*scale);
    }
 
    private static int avatarFrame(int count, int timer) { return Math.floorMod((24 - timer) / 6, Math.max(1, count)); }

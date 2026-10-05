@@ -1,0 +1,9 @@
+Pokemon Black / White original graphics: Nintendo, Game Freak, The Pokemon Company.
+Hero (M/F) Overworld extraction: Barubary, The Spriters Resource, asset 34024.
+Main Environment extraction: Brom, The Textures Resource, asset 375513 (2018-11-05).
+Source pages and file SHA-256 values are recorded in PROVENANCE.json.
+Original ripped artwork is not described as MIT, CC0 or freely licensed.
+Original sheets/ZIP are preserved with their embedded credits in sources/.
+Atlas preparation: deterministic packing, source crops, hero background transparency.
+Lava colors, cliff geometry and modular architectural composition are renderer adaptations, not original B/W screenshots.
+Battle Stages extraction: tsuka, The Textures Resource, asset 368759. Credit appreciated in source sheet.

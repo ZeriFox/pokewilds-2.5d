@@ -1,0 +1,860 @@
+{
+  "grass": {
+    "x": 2,
+    "y": 2,
+    "width": 64,
+    "height": 64
+  },
+  "grass_light": {
+    "x": 70,
+    "y": 2,
+    "width": 64,
+    "height": 64
+  },
+  "grass_dry": {
+    "x": 138,
+    "y": 2,
+    "width": 64,
+    "height": 64
+  },
+  "snow": {
+    "x": 206,
+    "y": 2,
+    "width": 64,
+    "height": 64
+  },
+  "path": {
+    "x": 274,
+    "y": 2,
+    "width": 16,
+    "height": 16
+  },
+  "path_dry": {
+    "x": 342,
+    "y": 2,
+    "width": 16,
+    "height": 16
+  },
+  "sand": {
+    "x": 410,
+    "y": 2,
+    "width": 16,
+    "height": 16
+  },
+  "sand_shore": {
+    "x": 478,
+    "y": 2,
+    "width": 16,
+    "height": 16
+  },
+  "stone_floor": {
+    "x": 546,
+    "y": 2,
+    "width": 64,
+    "height": 64
+  },
+  "mountain": {
+    "x": 614,
+    "y": 2,
+    "width": 64,
+    "height": 64
+  },
+  "basalt": {
+    "x": 682,
+    "y": 2,
+    "width": 64,
+    "height": 64
+  },
+  "volcano": {
+    "x": 750,
+    "y": 2,
+    "width": 32,
+    "height": 32
+  },
+  "volcano_path": {
+    "x": 818,
+    "y": 2,
+    "width": 64,
+    "height": 64
+  },
+  "water": {
+    "x": 886,
+    "y": 2,
+    "width": 32,
+    "height": 32
+  },
+  "water_shallow": {
+    "x": 954,
+    "y": 2,
+    "width": 32,
+    "height": 32
+  },
+  "river": {
+    "x": 1022,
+    "y": 2,
+    "width": 16,
+    "height": 16
+  },
+  "water_ripple": {
+    "x": 2,
+    "y": 70,
+    "width": 16,
+    "height": 16
+  },
+  "cliff": {
+    "x": 70,
+    "y": 70,
+    "width": 16,
+    "height": 32
+  },
+  "cliff_cap": {
+    "x": 138,
+    "y": 70,
+    "width": 16,
+    "height": 16
+  },
+  "cliff_grass": {
+    "x": 206,
+    "y": 70,
+    "width": 16,
+    "height": 8
+  },
+  "cliff_volcano": {
+    "x": 274,
+    "y": 70,
+    "width": 16,
+    "height": 16
+  },
+  "cliff_dark": {
+    "x": 342,
+    "y": 70,
+    "width": 32,
+    "height": 16
+  },
+  "steps": {
+    "x": 410,
+    "y": 70,
+    "width": 32,
+    "height": 16
+  },
+  "wood_floor": {
+    "x": 478,
+    "y": 70,
+    "width": 16,
+    "height": 32
+  },
+  "tile_floor": {
+    "x": 546,
+    "y": 70,
+    "width": 32,
+    "height": 32
+  },
+  "tile_pale": {
+    "x": 614,
+    "y": 70,
+    "width": 16,
+    "height": 16
+  },
+  "brick_floor": {
+    "x": 682,
+    "y": 70,
+    "width": 16,
+    "height": 16
+  },
+  "wall": {
+    "x": 750,
+    "y": 70,
+    "width": 16,
+    "height": 32
+  },
+  "wall_wood": {
+    "x": 818,
+    "y": 70,
+    "width": 8,
+    "height": 32
+  },
+  "door": {
+    "x": 886,
+    "y": 70,
+    "width": 32,
+    "height": 32
+  },
+  "door_red": {
+    "x": 954,
+    "y": 70,
+    "width": 32,
+    "height": 32
+  },
+  "fence": {
+    "x": 1022,
+    "y": 70,
+    "width": 32,
+    "height": 16
+  },
+  "fence_wood": {
+    "x": 2,
+    "y": 138,
+    "width": 16,
+    "height": 32
+  },
+  "tree": {
+    "x": 70,
+    "y": 138,
+    "width": 64,
+    "height": 64
+  },
+  "tree_pine": {
+    "x": 138,
+    "y": 138,
+    "width": 32,
+    "height": 64
+  },
+  "tree_dry": {
+    "x": 206,
+    "y": 138,
+    "width": 64,
+    "height": 64
+  },
+  "tree_snow": {
+    "x": 274,
+    "y": 138,
+    "width": 32,
+    "height": 64
+  },
+  "tree_small": {
+    "x": 342,
+    "y": 138,
+    "width": 32,
+    "height": 64
+  },
+  "tree_top": {
+    "x": 410,
+    "y": 138,
+    "width": 32,
+    "height": 32
+  },
+  "palm_trunk": {
+    "x": 478,
+    "y": 138,
+    "width": 16,
+    "height": 64
+  },
+  "palm_top": {
+    "x": 546,
+    "y": 138,
+    "width": 32,
+    "height": 32
+  },
+  "rock": {
+    "x": 614,
+    "y": 138,
+    "width": 32,
+    "height": 32
+  },
+  "rock_small": {
+    "x": 682,
+    "y": 138,
+    "width": 16,
+    "height": 16
+  },
+  "rock_ice": {
+    "x": 750,
+    "y": 138,
+    "width": 32,
+    "height": 32
+  },
+  "grass_tuft": {
+    "x": 818,
+    "y": 138,
+    "width": 16,
+    "height": 32
+  },
+  "grass_dry_tuft": {
+    "x": 886,
+    "y": 138,
+    "width": 16,
+    "height": 32
+  },
+  "flowers": {
+    "x": 954,
+    "y": 138,
+    "width": 32,
+    "height": 32
+  },
+  "flowers_fairy": {
+    "x": 1022,
+    "y": 138,
+    "width": 32,
+    "height": 32
+  },
+  "plant": {
+    "x": 2,
+    "y": 206,
+    "width": 32,
+    "height": 32
+  },
+  "bench": {
+    "x": 70,
+    "y": 206,
+    "width": 16,
+    "height": 16
+  },
+  "chair": {
+    "x": 138,
+    "y": 206,
+    "width": 16,
+    "height": 32
+  },
+  "desk": {
+    "x": 206,
+    "y": 206,
+    "width": 32,
+    "height": 32
+  },
+  "pot": {
+    "x": 274,
+    "y": 206,
+    "width": 16,
+    "height": 32
+  },
+  "lamp": {
+    "x": 342,
+    "y": 206,
+    "width": 16,
+    "height": 16
+  },
+  "couch": {
+    "x": 410,
+    "y": 206,
+    "width": 16,
+    "height": 16
+  },
+  "cushion": {
+    "x": 478,
+    "y": 206,
+    "width": 16,
+    "height": 16
+  },
+  "bridge": {
+    "x": 546,
+    "y": 206,
+    "width": 32,
+    "height": 16
+  },
+  "hole": {
+    "x": 614,
+    "y": 206,
+    "width": 32,
+    "height": 16
+  },
+  "ruin_wall": {
+    "x": 682,
+    "y": 206,
+    "width": 32,
+    "height": 64
+  },
+  "ruin_floor": {
+    "x": 750,
+    "y": 206,
+    "width": 32,
+    "height": 32
+  },
+  "rug": {
+    "x": 818,
+    "y": 206,
+    "width": 16,
+    "height": 16
+  },
+  "battle_0_0": {
+    "x": 886,
+    "y": 206,
+    "width": 32,
+    "height": 32
+  },
+  "battle_0_1": {
+    "x": 954,
+    "y": 206,
+    "width": 32,
+    "height": 32
+  },
+  "battle_0_2": {
+    "x": 1022,
+    "y": 206,
+    "width": 32,
+    "height": 32
+  },
+  "battle_0_3": {
+    "x": 2,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_0_4": {
+    "x": 70,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_0_5": {
+    "x": 138,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_1_0": {
+    "x": 206,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_1_1": {
+    "x": 274,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_1_2": {
+    "x": 342,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_1_3": {
+    "x": 410,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_1_4": {
+    "x": 478,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_1_5": {
+    "x": 546,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_2_0": {
+    "x": 614,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_2_1": {
+    "x": 682,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_2_2": {
+    "x": 750,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_2_3": {
+    "x": 818,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_2_4": {
+    "x": 886,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_2_5": {
+    "x": 954,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_3_0": {
+    "x": 1022,
+    "y": 274,
+    "width": 32,
+    "height": 32
+  },
+  "battle_3_1": {
+    "x": 2,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_3_2": {
+    "x": 70,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_3_3": {
+    "x": 138,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_3_4": {
+    "x": 206,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_3_5": {
+    "x": 274,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_4_0": {
+    "x": 342,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_4_1": {
+    "x": 410,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_4_2": {
+    "x": 478,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_4_3": {
+    "x": 546,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_4_4": {
+    "x": 614,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_4_5": {
+    "x": 682,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_5_0": {
+    "x": 750,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_5_1": {
+    "x": 818,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_5_2": {
+    "x": 886,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "battle_5_3": {
+    "x": 954,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_up_0": {
+    "x": 1022,
+    "y": 342,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_up_1": {
+    "x": 2,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_up_2": {
+    "x": 70,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_down_0": {
+    "x": 138,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_down_1": {
+    "x": 206,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_down_2": {
+    "x": 274,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_left_0": {
+    "x": 342,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_left_1": {
+    "x": 410,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_left_2": {
+    "x": 478,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_right_0": {
+    "x": 546,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_right_1": {
+    "x": 614,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_walk_right_2": {
+    "x": 682,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_up_0": {
+    "x": 750,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_up_1": {
+    "x": 818,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_up_2": {
+    "x": 886,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_down_0": {
+    "x": 954,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_down_1": {
+    "x": 1022,
+    "y": 410,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_down_2": {
+    "x": 2,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_left_0": {
+    "x": 70,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_left_1": {
+    "x": 138,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_left_2": {
+    "x": 206,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_right_0": {
+    "x": 274,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_right_1": {
+    "x": 342,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_male_run_right_2": {
+    "x": 410,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_up_0": {
+    "x": 478,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_up_1": {
+    "x": 546,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_up_2": {
+    "x": 614,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_down_0": {
+    "x": 682,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_down_1": {
+    "x": 750,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_down_2": {
+    "x": 818,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_left_0": {
+    "x": 886,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_left_1": {
+    "x": 954,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_left_2": {
+    "x": 1022,
+    "y": 478,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_right_0": {
+    "x": 2,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_right_1": {
+    "x": 70,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_walk_right_2": {
+    "x": 138,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_up_0": {
+    "x": 206,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_up_1": {
+    "x": 274,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_up_2": {
+    "x": 342,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_down_0": {
+    "x": 410,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_down_1": {
+    "x": 478,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_down_2": {
+    "x": 546,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_left_0": {
+    "x": 614,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_left_1": {
+    "x": 682,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_left_2": {
+    "x": 750,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_right_0": {
+    "x": 818,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_right_1": {
+    "x": 886,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  },
+  "trainer_female_run_right_2": {
+    "x": 954,
+    "y": 546,
+    "width": 32,
+    "height": 32
+  }
+}

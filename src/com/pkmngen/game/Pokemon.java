@@ -134,6 +134,8 @@ public class Pokemon extends OverworldThing {
 
    public static String nameToIndex(String name) {
       name = name.toLowerCase(Locale.ROOT);
+      String expansionIndex = ExpansionDex.dexNumber(name);
+      if (expansionIndex != null) return expansionIndex;
       if (name.contains("unown")) {
          name = "unown";
       }
@@ -505,6 +507,8 @@ public class Pokemon extends OverworldThing {
             percentFemale = 500;
          } else if (this.specie.genderRatio.equals("GENDER_F75")) {
             percentFemale = 750;
+         } else if (this.specie.genderRatio.equals("GENDER_F87_5")) {
+            percentFemale = 875;
          } else if (this.specie.genderRatio.equals("GENDER_F100")) {
             percentFemale = 1000;
          }
@@ -889,6 +893,8 @@ public class Pokemon extends OverworldThing {
    }
 
    int calcExpForLevel(int level) {
+      int expansionExperience = ExpansionDex.experience(this.specie.name, level);
+      if (expansionExperience >= 0) return expansionExperience;
       if (this.growthRateGroup.contains("FAST")) {
          return 4 * level * level * level / 5;
       }

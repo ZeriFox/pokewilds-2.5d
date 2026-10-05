@@ -166,8 +166,10 @@ class ThrowOutPokemonCrystal extends Action {
             game.actionStack.remove(this);
          }
       } else {
+         boolean modernActor = PmdBattleSprites.sendOut(game, this.position.x, this.position.y, this.sprites.size());
          if (this.sprite != null) {
             for (int k = 0; k < this.sprite.length; k++) {
+               if (modernActor && k == 0) continue;
                if (this.sprite[k] != null) {
                   for (int i = 0; i < this.sprite[k].length; i++) {
                      for (int j = 0; j < this.sprite[k][i].length; j++) {

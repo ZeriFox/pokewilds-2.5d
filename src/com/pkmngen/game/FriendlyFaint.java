@@ -69,7 +69,7 @@ class FriendlyFaint extends Action {
       }
 
       if (!this.positions.isEmpty() && !this.repeats.isEmpty()) {
-         this.sprite.draw(game.uiBatch);
+         if (!PmdBattleSprites.draw(game, game.player.currPokemon, this.sprite, true, "Hurt")) this.sprite.draw(game.uiBatch);
          if (this.repeats.get(0) > 1) {
             this.repeats.set(0, this.repeats.get(0) - 1);
          } else {

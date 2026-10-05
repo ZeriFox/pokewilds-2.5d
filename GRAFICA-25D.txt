@@ -1,60 +1,101 @@
-POKEWILDS - 2.5D, MENU E LOTTE - 5 OTTOBRE 2026
+POKEWILDS — PMD + BLACK/WHITE, 2.5D — v0.8.11-johto.2
 
 AVVIO
-Doppio clic su run-johto.cmd, oppure run-johto-sprites.cmd.
-Entrambi usano Java 17 incluso e salvataggi nella cartella run-johto.
-run.cmd conserva la presentazione classica e la cartella run.
+run-johto.cmd e run-johto-sprites.cmd: stessa presentazione 2.5D, cartella
+run-johto per impostazioni/salvataggi. Java 17 e' incluso nel pacchetto Windows.
+run.cmd: grafica classica e cartella run separata.
+"johto" resta nel nome dei launcher; le nuove risorse provengono da PMDCollab
+e Black/White, non da estrazioni HeartGold/SoulSilver.
 
 MONDO
-Personaggi e Pokemon sono sprite 2D rivolti verso la camera inclinata.
-Alberi e rocce usano nuovi sprite pixel art; le forme sfaccettate del precedente
-esperimento 3D sono disattivate. Il terreno mantiene profondita' e prospettiva.
-La mappa rimane procedurale: generatore, biomi, collisioni, incontri, inventario,
-crafting e formato di salvataggio usano il codice originale della base PC.
-Nuove isole e partite esistenti utilizzano le stesse coordinate di gioco.
+La camera prospettica guarda sprite 2D ancorati al terreno. I Pokemon usano
+animazioni PMD per specie/forma/direzione, con scala stabile e ancoraggio ai piedi.
+I due protagonisti B/W sostituiscono visivamente le skin maschili/femminili;
+la scelta memorizzata nei dati del player rimane intatta.
+Giorno, notte e interni condividono renderer e tinte del mondo.
 
-INTERFACCIA
-Tema comune con pannelli chiari, bordi sottili, accenti verde petrolio e oro.
-Nuovi layout per avvio/caricamento, comandi, menu giocatore, squadra/deposito,
-azioni Pokemon, riepilogo su tre pagine, cinque tasche della borsa, guida,
-crafting, quantita', conferme, dialoghi, soprannome e aumento di livello.
-Anche minimappa, notifiche e requisiti di costruzione ricevono la nuova cornice.
-Evoluzione e schiusa condividono il nuovo sfondo, mantenendo le animazioni.
-I comandi originali da tastiera/gamepad continuano a gestire le selezioni.
-Le azioni continuano a eseguire la propria logica; ModernBatch sopprime solo
-le vecchie istruzioni di disegno delle schermate sostituite. I renderer non
-richiamano step(), non consumano RNG e non cambiano i dati della partita.
+Erba, acqua, alberi, rocce, pareti e materiali degli edifici provengono da B/W.
+Arredi e architetture sono composizioni del renderer con tali materiali.
+Le pareti seguono i dirupi effettivi e lasciano aperte le rampe. Non viene
+inventata un'altitudine globale dai nomi dei tile. La lava usa una colorazione
+luminosa adattata dal renderer.
 
-LOTTE
-Arena con palette del bioma, nuove piattaforme, pannelli HP/EXP e comandi.
-La lista mosse mantiene visibili gli HP e mostra tipo, categoria, potenza e
-precisione esistenti. Non vengono aggiunti PP o regole assenti nel gioco base.
-Gli HP visualizzati seguono i valori interpolati dalle animazioni originali.
-Un'immagine GPU dell'ultimo mondo 2.5D copre la vecchia mappa per tutta la
-transizione: fascia incontro, chiusura e ingresso nell'arena. Il ritorno usa
-la stessa presentazione. Timer, attacchi, catture, danni e ricompense sono originali.
-Le introduzioni degli incontri speciali condividono i nuovi passaggi grafici.
+GENERAZIONE E POKEDEX
+ModernWorldGenerator modifica vere celle, ostacoli e passaggi prima degli
+spawn: EMBER CALDERA, sentieri, lava, rocce e rampe tra alcune terrazze.
+Si applica a nuove isole e nuove aree oltre i bordi; non riscrive i terreni dei
+salvataggi caricati. Regole e limiti: GENERAZIONE-MODERNA.txt.
 
-RISORSE E SORGENTI
-resources/visual/johto/terrain-atlas.png: materiali del terreno, generati prima.
-resources/visual/johto/foliage-sprites.png: nuovi alberi/rocce RGBA, Imagegen.
-I PNG originali generati restano invariati; il motore prepara gli atlas in memoria.
-Prompt e provenienza: ART_PROMPT.txt e ART_FOLIAGE_PROMPT.txt.
-Questi elementi sono originali generati, non texture estratte da HGSS.
-Personaggi/Pokemon e le animazioni di attacco conservano le risorse PokeWilds.
-I vecchi modelli 3D restano disponibili come esperimento, disattivato di default.
+552 specie aggiuntive alle 410 della base portano il totale a 962 e hanno
+dati, grida e risorse PMD da versioni registrate.
+Mosse ed evoluzioni restano limitate alle meccaniche supportate. Leggi
+POKEDEX-ESPANSO.txt per specie giocabili, portrait, forme, shiny e condizioni escluse.
 
-Il codice nuovo e' in src/com/pkmngen/game: ModernUi, ModernBatch,
-ModernPartyUi, ModernInventoryUi, JohtoBattleRenderer e JohtoRenderer.
-build.cmd ricompila tutto e include le risorse nel JAR.
-tools/verify_visual_scope.py elenca e confronta le modifiche originali.
-VERIFICA.txt documenta le prove native effettivamente concluse sulla build finale.
+INTERFACCIA E LOTTE
+Pannelli chiari, bordi sottili, accenti verde petrolio/oro per setup,
+caricamento, comandi, giocatore, squadra/deposito, riepilogo, borsa, guida,
+crafting, quantita', conferme, dialoghi, soprannome e livello. Anche minimappa,
+notifiche, requisiti di costruzione, evoluzione e schiusa condividono il tema.
+Portrait e attori PMD sono usati dove disponibili.
 
-AMBITO
-La destinazione e' Windows PC x64. Questa build non e' un port Nintendo 3DS.
-Molte decorazioni, edifici e sprite provengono ancora dal gioco originale.
-Interni, notte, mosse sul campo, costruzione, pesca e alcune scene speciali
-mantengono il renderer del mondo originale; la nuova skin dei menu resta attiva.
-La minimappa conserva i dati e il disegno funzionale originali con nuovi bordi.
-Non tutte le specie, mosse, scene speciali e configurazioni multigiocatore sono
-coperte dai test. Le prove dei flussi principali non equivalgono a un playthrough.
+Arene composte con materiali B/W, sprite PMD, pannelli HP/EXP e comandi coordinati. La lista mosse
+mostra dati gia' implementati, senza aggiungere PP o nuove regole. Gli HP
+seguono le animazioni originali. Un'immagine GPU del mondo moderno mantiene
+coerenti introduzione e transizioni; anche incontri speciali e viaggi ricevono
+i nuovi passaggi grafici.
+I renderer leggono lo stato senza richiamare step() o consumare RNG.
+La release comprende anche modifiche non grafiche al generatore e al Pokedex,
+documentate separatamente: non e' una patch esclusivamente visiva.
+
+FONTI
+PMD: https://sprites.pmdcollab.org/
+https://github.com/PMDCollab/SpriteCollab
+Commit 78a49e8afde071fd7585831b145fb1b189e71288.
+PNG/XML originali: resources/visual/pmd/. Tempi/ancoraggi dai metadati.
+Autori, hash e copertura: PMD-PROVENANCE.json. Crediti: licenses/PMD-*.
+Artwork personalizzati CC BY-NC 4.0; originali Chunsoft e altri materiali
+mantengono i rispettivi diritti.
+
+B/W trainer, Barubary:
+https://www.spriters-resource.com/ds_dsi/pokemonblackwhite/asset/34024/
+B/W ambiente, Brom:
+https://textures.spriters-resource.com/ds_dsi/pokemonblackwhite/asset/375513/
+B/W arene, tsuka:
+https://textures.spriters-resource.com/ds_dsi/pokemonblackwhite/asset/368759/
+resources/visual/unova/world-atlas.png contiene 143 regioni da queste fonti.
+world-atlas.json registra i rettangoli; sources/ conserva fogli e ZIP originali.
+PROVENANCE.json e CREDITS.txt nella stessa cartella descrivono hash e derivazioni.
+Preparazione: ritagli, trasparenza del colore di sfondo dei trainer, packing.
+Lava, rilievi e composizione degli arredi sono adattamenti del renderer.
+I materiali B/W non sono presentati come MIT, CC0 o artwork originale del progetto.
+
+Le texture generate della prima prova restano archiviate in visual/johto/,
+con ART_PROMPT.txt e ART_FOLIAGE_PROMPT.txt; il renderer corrente usa B/W.
+I vecchi modelli GLB sono esclusi dalla build normale. build.py --include-3d
+include i file opzionali presenti senza riattivare da sola gli attori 3D.
+
+CODICE E VERIFICHE
+JohtoRenderer/BwAssets: mondo e atlante B/W.
+PmdPokemonSprites/PmdBattleSprites: animazioni e portrait.
+ModernUi, ModernBatch, ModernPartyUi, ModernInventoryUi e JohtoBattleRenderer:
+schermate e lotte. build.cmd ricompila; README.md descrive le dipendenze.
+
+landscape_smoke_test.py verifica fixture native giorno/notte, rilievi, caldera,
+interni e viaggio. Altri test coprono generazione reale, Pokedex, menu, crafting,
+lotte, cattura e save/load. verify_visual_scope.py confronta con la base PC
+l'ambito approvato delle modifiche grafiche, del generatore e del catalogo.
+VERIFICA.txt riporta gli esiti conclusi e l'hash testato. Le prove con classi
+di sviluppo sovrapposte non equivalgono alla verifica del solo JAR finale.
+
+LIMITI
+Alcuni simboli di puzzle/macchinari, strutture come la Pokemon Mansion,
+oggetti speciali, emote e pickup conservano
+le risorse originali per mantenerne riconoscibile la funzione.
+Mosse sul campo, costruzione, pesca, riposo, minimappa e scene particolari
+possono usare il renderer normale del mondo; i menu sostituiti mantengono il tema.
+La minimappa conserva il disegno funzionale originale con una nuova cornice.
+Specie/forme PMD assenti usano i fallback dichiarati; le nuove specie giocabili
+sono selezionate secondo la copertura documentata nel Pokedex.
+Non tutte le mosse, gli incontri speciali e il multiplayer sono coperti dai test.
+Non viene aggiunto un asse verticale alle regole. Destinazione: Windows PC x64,
+non Nintendo 3DS.

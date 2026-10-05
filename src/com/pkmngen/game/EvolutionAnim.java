@@ -115,7 +115,12 @@ class EvolutionAnim extends Action {
             game.uiBatch.setShader(this.grayscaleShader);
          }
 
-         if (drawPostEvo) {
+         boolean modernActor = PmdBattleSprites.event(game, this.targetPokemon,
+            drawPostEvo ? this.targetPokemon.specie.name : drawPostEvoTop ? this.targetName : this.targetPokemon.specie.name,
+            52, 72, 56, 56);
+         if (modernActor) {
+            // Original flash/greyscale timing above is kept; use the PMD actor for both forms.
+         } else if (drawPostEvo) {
             this.spritePart.set(this.targetPokemon.sprite);
             this.spritePart.flip(true, false);
             game.uiBatch.draw(this.spritePart, 80 - (int)this.spritePart.getWidth() / 2 + 4, 72.0F);

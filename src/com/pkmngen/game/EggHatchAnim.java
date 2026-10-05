@@ -104,7 +104,8 @@ class EggHatchAnim extends Action {
          }
 
          if (drawSprite) {
-            game.uiBatch.draw(this.pokemon.sprite, 80 - (int)this.pokemon.sprite.getWidth() / 2 + 4, 64.0F);
+            if (!PmdBattleSprites.event(game, this.pokemon, this.pokemon.specie.name, 56, 64, 56, 56))
+               game.uiBatch.draw(this.pokemon.sprite, 80 - (int)this.pokemon.sprite.getWidth() / 2 + 4, 64.0F);
          }
       }
    }

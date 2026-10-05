@@ -37,6 +37,7 @@ class GenIsland1 extends Action {
    public ArrayList<Vector2> trapinchSpawns;
    public Vector2 randOffset;
    public static int numSandPits = 0;
+   public ModernWorldGenerator.Report modernReport;
 
    public GenIsland1(final Game game, Vector2 origin, int radius) {
       super();
@@ -744,6 +745,10 @@ class GenIsland1 extends Action {
          @Override
          public void run() {
             try {
+               if (ModernWorldGenerator.enabled()) {
+                  GenIsland1.this.modernReport = ModernWorldGenerator.apply(finalTiles, GenIsland1.this.pokemonToAdd);
+                  System.out.println(GenIsland1.this.modernReport);
+               }
                for (Tile tile : finalTiles.values()) {
                   boolean coastified = game.map.coastify(tile, finalTiles, true);
                   if (tile.name.contains("_puddle1")) {

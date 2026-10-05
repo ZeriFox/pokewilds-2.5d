@@ -37,6 +37,7 @@ public class SpriteProxy extends Sprite {
 
    @Override
    public void draw(Batch batch) {
+      if (com.pkmngen.game.PmdBattleSprites.drawKnown(this, batch)) return;
       Texture texture = this.getTexture();
       if (inverseColors) {
          this.setTexture(this.inverseTexture);

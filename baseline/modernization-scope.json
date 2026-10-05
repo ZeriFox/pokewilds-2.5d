@@ -1,0 +1,229 @@
+{
+  "schema": 2,
+  "status": "frozen",
+  "purpose": "Reviewed modernization source scope: presentation, new procedural topology/biomes and authorized additional Pokemon. Never auto-updated by the verifier; not proof of total gameplay equivalence.",
+  "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
+  "classic_source_snapshot": "baseline/johto-v1/classic-sources",
+  "historical_v1": "baseline/johto-v1/archive.json",
+  "reviewed_patch_sha256": "0c0e8a0074b8667e593705bd21982540190c363b488f8db3828c92d02ee1ba12",
+  "protected_original_sources": [
+    "src/com/pkmngen/game/Attack.java",
+    "src/com/pkmngen/game/Battle.java",
+    "src/com/pkmngen/game/CheckEndOfBattle.java",
+    "src/com/pkmngen/game/CheckMovesLearned.java",
+    "src/com/pkmngen/game/DrawSetupMenu.java",
+    "src/com/pkmngen/game/InputProcessor.java",
+    "src/com/pkmngen/game/Network.java",
+    "src/com/pkmngen/game/PkmnMap.java",
+    "src/com/pkmngen/game/Player.java",
+    "src/com/pkmngen/game/util/Save.java"
+  ],
+  "modified_original_sources": {
+    "src/com/pkmngen/game/BattleFadeOut.java": {
+      "baseline_sha256": "77b94f82ae0ba6ec50802da93eddb94c1e9929b1f930694d9e8e27c1b437a16b",
+      "reviewed_sha256": "e8a50b58879f20bd79bb01730a0c7f4dbd25c2d90784a0f74832a81df1565f6c",
+      "scope": "Presentation: replace fade drawing while retaining action timing and dispatch."
+    },
+    "src/com/pkmngen/game/BattleIntro.java": {
+      "baseline_sha256": "fc6c74b8ad1719849acb2d4a54ee6fe385a7009a4357bfac113fae919ac1ed8d",
+      "reviewed_sha256": "f73edfe2f4aacdc119dd9d3feba2bf907aebad481721bb429a260edd2e76dcd1",
+      "scope": "Presentation: preserve the modern world image during the original battle intro."
+    },
+    "src/com/pkmngen/game/BattleIntroAnim1.java": {
+      "baseline_sha256": "4640b01c28805f25aacdcb1a6c8bbb8685017e3213824b0cb49c90e44fc19e10",
+      "reviewed_sha256": "c9fbfaba79f3764ffe76e050ec7a714d6c8e14c65e5fe711ba862918bbd565bc",
+      "scope": "Presentation: replace intro frame and border drawing, retain frame progression."
+    },
+    "src/com/pkmngen/game/DrawAttacksMenu.java": {
+      "baseline_sha256": "603c8251573d2cd2d9198a573d38683006f3899625f1db00b7303b9daefd53cf",
+      "reviewed_sha256": "57d53d06fd572290305d2ecd8a740c60107cc7b71ad4ab09832f1e507df83ae9",
+      "scope": "Presentation: modern move panel; retain cursor state progression and original input."
+    },
+    "src/com/pkmngen/game/DrawBattle.java": {
+      "baseline_sha256": "06217a8f0d064e0d09567620f0b2cc73cc6248536ad1a2eabb01aca47d1eea1e",
+      "reviewed_sha256": "89b1a7e59217608ed00b764ae8442b9214ce95ac474f27e725f8f66e6339be20",
+      "scope": "Presentation: arena, actor drawing hooks, masks and night tint."
+    },
+    "src/com/pkmngen/game/DrawBattleMenuNormal.java": {
+      "baseline_sha256": "877cbce41350740b7a543207a77468e35e2ff36cbfe8b23bbd249af06e901209",
+      "reviewed_sha256": "79fcc96800ba62eae7560342142a76efee2a48b86bb75dcf118d4513b994287b",
+      "scope": "Presentation: modern battle commands; retain selection and input logic."
+    },
+    "src/com/pkmngen/game/DrawBattleMenuSafariZone.java": {
+      "baseline_sha256": "8c307a3d09b0235dcf7a5bb1f906f10655871e3b9018753e4b72541b601f3fd8",
+      "reviewed_sha256": "01092eceba1e423ddf338b6e8703be7f8ebd8a0872a799b0da649f78cad7b8f2",
+      "scope": "Presentation: modern safari commands; retain selection and input logic."
+    },
+    "src/com/pkmngen/game/DrawEnemyHealthGen2.java": {
+      "baseline_sha256": "b2050ab5a6da9b33b5ceeda16d11e1c4ea5b3023b2a7049f618219992fbfd0da",
+      "reviewed_sha256": "05956c02b87a3f56cccd15e08420a75525acd07a61b9fcdfc6339c82697bd923",
+      "scope": "Presentation: modern enemy HP panel; retain health updates."
+    },
+    "src/com/pkmngen/game/DrawFriendlyHealthGen2.java": {
+      "baseline_sha256": "60d218d1a0e020b97ea58abc2d1f568e37db8e463d87f230f1f57dbd3ceb94b6",
+      "reviewed_sha256": "772559e0eb83639c1efc0f364e4b5e086304c1378e98e7156612c768f07db7aa",
+      "scope": "Presentation: modern party HP/EXP panel; retain health updates."
+    },
+    "src/com/pkmngen/game/EggHatchAnim.java": {
+      "baseline_sha256": "af5acd790ef524f88bdf1b52d60ff11853dd6c229c820d1d03e5db715b3d263f",
+      "reviewed_sha256": "b377e768aa0f9035ab7a0ae89cf7fc533599a3d23e0433b2c6db7963f25c40f7",
+      "scope": "Presentation: modern event background and exact PMD actor/shiny appearance."
+    },
+    "src/com/pkmngen/game/EnemyFaint.java": {
+      "baseline_sha256": "82da311cd72411d70fb187f3bcb58e010980191bda31a32dbb2bc975ad1c7c5b",
+      "reviewed_sha256": "374950e7a209f2d159a15e87f83bd006964c4cd6854b26cb1eee0fc34a45c7a5",
+      "scope": "Presentation: PMD actor during original enemy faint action; retain removal and victory flow."
+    },
+    "src/com/pkmngen/game/EnterBuilding.java": {
+      "baseline_sha256": "6778e3dee1640dd7b6654151356c552aaf844dc36bcef3288e5ff485ebb3b0be",
+      "reviewed_sha256": "9b245ae7d74e6d87b0bf811d5f080ec27a76c238347a5346a02eaf220e4c15d5",
+      "scope": "Presentation: replace travel fade drawing; retain interior selection, timers and actions."
+    },
+    "src/com/pkmngen/game/EscapeRope.java": {
+      "baseline_sha256": "d992110c3d6d376958eabfe6f8653fb9d20d92fa7550c4e8d29224625845bb0c",
+      "reviewed_sha256": "d5b92c8e104dfaa17ab1eafdb02821a4858618f91b1cd0e9075578c05a76f0eb",
+      "scope": "Presentation: replace travel fade drawing; retain travel destination and action timing."
+    },
+    "src/com/pkmngen/game/EvolutionAnim.java": {
+      "baseline_sha256": "bad0e41ff446d10bdacb3275436d091c1495fe0c7968651059781daff92a6d74",
+      "reviewed_sha256": "c93b8036e959a30391e9815fd2c1cc4c0b1a8155b63d15ca6ff184595b8c7390",
+      "scope": "Presentation: modern event background and PMD pre/post-evolution actor, preserving shiny identity."
+    },
+    "src/com/pkmngen/game/FadeAnim.java": {
+      "baseline_sha256": "92ba5b2c1746ca616c82b5a5645c5a42c0a4079d3716e129b73f86bb83f1caff",
+      "reviewed_sha256": "e41ff35fde393d37a7453c2020a564dd1751367ee18da0b7bf22a6b89c42ae52",
+      "scope": "Presentation: replace fade drawing; retain original timer and transition condition."
+    },
+    "src/com/pkmngen/game/FriendlyFaint.java": {
+      "baseline_sha256": "c27627e42478891d3d98be0b30f8f4629750e66e62365dbfff12ef1073f3faf1",
+      "reviewed_sha256": "8a0604298a8952a3db5d74d40b573f0053263bfa1af29ad0454edc9f65388df8",
+      "scope": "Presentation: PMD actor during original friendly faint action; retain status/action flow."
+    },
+    "src/com/pkmngen/game/Game.java": {
+      "baseline_sha256": "b2e7c404c3a06923632d6cf2490a71ac8e0b16588290a930ae48a9ad9401afdb",
+      "reviewed_sha256": "d5bac268e8d80c7842039535d7d02a0206edd0b2dd132b7b90d18ffe77b62485",
+      "scope": "Integration: visual allocation/disposal, world/UI dispatch, PMD/BW/expanded-dex resource cleanup."
+    },
+    "src/com/pkmngen/game/GenIsland1.java": {
+      "baseline_sha256": "be2c0d51ed41558b70fec8455b1144f091989411b5f77dea35a1588251b2d105",
+      "reviewed_sha256": "e45db8ad690eaac1f8c8d253098bb5724bcba59b9a6b974261d09f84c7318e8c",
+      "scope": "Generation: authorized modern terrain/biome pass before original coastification."
+    },
+    "src/com/pkmngen/game/PlayMusic.java": {
+      "baseline_sha256": "cf5ed190985fb35bf86e25162e73d43401cb51bdf61f653c0d287b1e4a55cba1",
+      "reviewed_sha256": "27320286616c7af21f384afe839178a1621f6c4d6b4f1e3b4afa33d9c1243d34",
+      "scope": "Expanded roster initialization: resolve exact imported Pokemon cry paths."
+    },
+    "src/com/pkmngen/game/PlaySound.java": {
+      "baseline_sha256": "997357be926863b8c5b5d97a2a52acf015d75a6537e28d47c21f5706c7d3fa26",
+      "reviewed_sha256": "639c7007ee3b450c43cb4354848303e9059185478dea0945485e89731e22a1e8",
+      "scope": "Expanded roster initialization: resolve exact imported Pokemon cry paths."
+    },
+    "src/com/pkmngen/game/Pokemon.java": {
+      "baseline_sha256": "5f43cf6453fac92b067819824bc925b0c63115b4a27cdc8aad54149c17fa4265",
+      "reviewed_sha256": "f9452558248a16733d62b103d641ef3e52375b750571710dd0bced4c057cee26",
+      "scope": "Expanded roster initialization: National Dex lookup, imported growth data and 87.5 percent female ratio."
+    },
+    "src/com/pkmngen/game/PokemonFrame.java": {
+      "baseline_sha256": "b85d254f66ed6b44b08519dc72a6e694ad6c2be9be9606e30007134b26fa18ae",
+      "reviewed_sha256": "e41461908f93c78fa44008cb1012896d80bb26b0f9f02f9d738c9371a9750235",
+      "scope": "Presentation: modern reveal background and exact PMD actor/shiny appearance."
+    },
+    "src/com/pkmngen/game/RegigigasBattle.java": {
+      "baseline_sha256": "e3791d4f9fe697426806de3b5bb8aaa0bcc5222c4e76f17464bfec8e238a9ba6",
+      "reviewed_sha256": "05a606ce7b50596ac059fd5b9a115eab43c5f5c6a9a635c8ce576a891185d532",
+      "scope": "Presentation: modern nested intro and arena drawing; retain battle action progression."
+    },
+    "src/com/pkmngen/game/Route.java": {
+      "baseline_sha256": "8be4a06530f8d01d12e572ea537c49500ff39d2e4e44c09d3b46f6a5320c3a30",
+      "reviewed_sha256": "76bbc3e0667344064dbbe7e53c8bd0a4e21bb08c62357cb8695fb3936a6e2673",
+      "scope": "Expanded roster generation: append verified additional species to biome spawn candidates."
+    },
+    "src/com/pkmngen/game/SpecialBattleMegaGengar.java": {
+      "baseline_sha256": "1c649b6ab296e03938c184c97503497c66e5b9917081fd40742d7936e60fc58a",
+      "reviewed_sha256": "ae271496750bab2973a4de58132193c0230ca14bc7ae6dc3e733da059ff087f1",
+      "scope": "Presentation: modern special intro frame drawing."
+    },
+    "src/com/pkmngen/game/SpecialBattleMewtwo.java": {
+      "baseline_sha256": "a7e2ffd0509f8adde7045e8278d529ae385cab69db599cda0ce6688ef4357a3b",
+      "reviewed_sha256": "3c18b3b689645ed3af3b1920e000770cb1f840b1ebd9a4cc67fa513ee2828a9b",
+      "scope": "Presentation: modern special intro frame drawing."
+    },
+    "src/com/pkmngen/game/Specie.java": {
+      "baseline_sha256": "960e334339c6b093d11596e5aa96cb00fce3194536c495cc3481e0cad4575fd6",
+      "reviewed_sha256": "d99e2d2b3041af44b1b22e292e8711ec6bfd267e118ee24435dc95f11cb22df8",
+      "scope": "Expanded roster initialization: verified additional species before legacy initialization."
+    },
+    "src/com/pkmngen/game/ThrowOutPokemonCrystal.java": {
+      "baseline_sha256": "68d34b9b53a10f66eb2c06f944d9bae948e2fff4214c657480b4083a95c65893",
+      "reviewed_sha256": "43c5a65ee54c9ec87fb42b3e1fe93b45afa9d2cf924e52e9247e708e56862149",
+      "scope": "Presentation: replace sliced actor art in send-out; retain poof and action schedule."
+    },
+    "src/com/pkmngen/game/util/SpriteProxy.java": {
+      "baseline_sha256": "f8368e334e08cc6e2141376f47fa8a3dd327eb068c27ac6935258e3436eecde4",
+      "reviewed_sha256": "466a7b7d4b0236e76e534e91cffce5da196d7a8c4752cba130df24480f024169",
+      "scope": "Presentation: intercept known battle actors for PMD rendering; legacy fallback retained."
+    }
+  },
+  "added_sources": {
+    "src/com/pkmngen/game/ActorModelRenderer.java": {
+      "reviewed_sha256": "291b5d03603fdc0cd10e90f698de946d8db89e5270de4a68807883b4232f7907",
+      "scope": "Existing optional 3D helper, disabled by the modern sprite launcher."
+    },
+    "src/com/pkmngen/game/BwAssets.java": {
+      "reviewed_sha256": "04d3994dd1fca63239310585c6300ba51d308b5bc9f5738cb92a684b9526de02",
+      "scope": "Lazy, disposable Black/White environmental asset access."
+    },
+    "src/com/pkmngen/game/ExpansionDex.java": {
+      "reviewed_sha256": "8f29cdc12fa4a9ea3f842681160b01845084dc3d1ea2bfc4e519315c9abf4141",
+      "scope": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration."
+    },
+    "src/com/pkmngen/game/JohtoBattleRenderer.java": {
+      "reviewed_sha256": "e8c054252a9070c2d541f990fd2ce7943555ae4aec821c97266457fbf05f8f2a",
+      "scope": "Modern battle arena, HUD and preserved-world transition rendering."
+    },
+    "src/com/pkmngen/game/JohtoRenderer.java": {
+      "reviewed_sha256": "03d0f2143857dbb1656a7d92cdaef95ddcbdea6d0fbbf695fb9ccfddf89dcd78",
+      "scope": "Perspective terrain, cliffs, vegetation, modern actor sprites and scene lighting."
+    },
+    "src/com/pkmngen/game/ModernBatch.java": {
+      "reviewed_sha256": "f02a0d0fd3f6e2e2a38a975c2a1a0ada4197770a5371c1d73d08e06474d44cd4",
+      "scope": "Suppress legacy draw submissions while original menu actions advance."
+    },
+    "src/com/pkmngen/game/ModernInventoryUi.java": {
+      "reviewed_sha256": "7dae5a03edcb1b8f5e2385f47c4fdb93ea459f275f815a9b7371730706aef09d",
+      "scope": "Modern inventory, item actions, crafting, quantities and guide presentation."
+    },
+    "src/com/pkmngen/game/ModernPartyUi.java": {
+      "reviewed_sha256": "3f806700f4e67d69b9868c4b811837e2fe52b548dccc88ee24466af790ab72e9",
+      "scope": "Modern setup, party, storage, portraits, statistics and nickname menus."
+    },
+    "src/com/pkmngen/game/ModernUi.java": {
+      "reviewed_sha256": "b4f4ca7d50fe3f3d62df96a20548a94d8556ae60b09afe649852d314c121f946",
+      "scope": "Modern typography, panels, dialogs, event backgrounds and menu rendering dispatch."
+    },
+    "src/com/pkmngen/game/ModernWorldGenerator.java": {
+      "reviewed_sha256": "8154e84b81847c3ebeba5f536fcfa1d03d2eb3fcfc83256b47ed17e5521bff3d",
+      "scope": "Authorized deterministic procedural landforms, biome distribution and volcanic terrain."
+    },
+    "src/com/pkmngen/game/PmdBattleSprites.java": {
+      "reviewed_sha256": "376dba0fa6ec53b37f0429edcceb86456073a8847e16e1771bf047e443f70b65",
+      "scope": "Exact PMD battle/event actors, portraits, transforms and visual effects."
+    },
+    "src/com/pkmngen/game/PmdPokemonSprites.java": {
+      "reviewed_sha256": "206f1fbad872a5207249ddbe940aa8dada4f9c1288b2c73accada898b38942ca",
+      "scope": "Pinned PMD portrait/animation loading, original timing/directions and bounded texture cache."
+    },
+    "src/com/pkmngen/game/TrainerModel3D.java": {
+      "reviewed_sha256": "ec80bc26b0410598ef1a23248ae4cfb58b9391a435de879a28dec6215d0611b3",
+      "scope": "Existing optional experimental trainer model helper."
+    }
+  },
+  "review_notes": [
+    "Original Game integration was independently reversed to the exact classic Game.java after removing only four additional disposal calls.",
+    "Original data initialization changes reviewed: additional dex/cry/experience lookup, additional 87.5-percent female ratio, species bootstrap and biome spawn append.",
+    "Generator changes are intentional and authorized; immutable battle/input/save sources are verified separately.",
+    "Native integration and GPU visual tests are separate evidence; source hashes cannot prove semantic equivalence.",
+    "Second renderer-only review: JohtoRenderer handles composite/inner ledges using Tile direction conventions and matching basalt/snow/mountain cells; BwAssets keeps planted/berry states on their exact fallback and uses the tree-top region for decorative shrubs. Only these two sources changed from the prior freeze."
+  ]
+}

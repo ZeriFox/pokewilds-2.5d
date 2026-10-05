@@ -41,7 +41,8 @@ class PlayMusic extends Action {
                volume = 1.0F;
             }
 
-            file = Gdx.files.internal("pokemon/cries/" + dexNumber + ".ogg");
+            String expansionCry = ExpansionDex.cryPath(pokemon.specie.name);
+            file = Gdx.files.internal(expansionCry == null ? "pokemon/cries/" + dexNumber + ".ogg" : expansionCry);
          }
 
          if (cached) {

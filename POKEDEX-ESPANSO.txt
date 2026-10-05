@@ -1,0 +1,80 @@
+POKEDEX ESPANSO — dati e copertura
+
+Il totale giocabile è di 962 specie nazionali distinte: 410 già presenti più
+552 specie aggiuntive con dati reali, portrait e animazioni PMDCollab esatti.
+Non vengono sostituiti i dati delle specie già giocabili. Gli identificatori
+runtime comprendono anche forme, uova e alias: non vanno contati come specie
+nazionali aggiuntive. Restano 63 specie nazionali candidate differite.
+Distribuzione: Gen III 67, IV 58, V 124, VI 61, VII 73, VIII 76, IX 93.
+Esempi: Treecko, Torchic, Mudkip, Grookey, Sprigatito, Fuecoco e relative famiglie.
+
+Dati:
+Statistiche base, tipi, peso, cattura, esperienza base, crescita, generi, gruppi
+uova e mosse provengono dai CSV PokeAPI al commit:
+bc92d3b6029ef1abe9e7ad424c400b338f3c11fe
+https://github.com/PokeAPI/pokeapi/tree/bc92d3b6029ef1abe9e7ad424c400b338f3c11fe/data/v2/csv
+Il file visual/dex/expansion-dex.json contiene i dati importati, il version group
+di ogni learnset e gli elenchi espliciti di esclusioni e condizioni non supportate.
+
+Compatibilità con le meccaniche attuali:
+- Sono utilizzate solo mosse già implementate dal gioco, mantenendo i livelli
+  del learnset canonico. Per ogni specie è scelto il version group più recente
+  che contiene una mossa implementata disponibile al livello 1 (o 0).
+- Sono state aggiunte 155 evoluzioni con requisito di livello incondizionato.
+  86 coppie evolutive con condizioni speciali o destinazioni non disponibili
+  restano escluse (213 righe del dataset). Non vengono inventati livelli per
+  sostituire scambi, amicizia, oggetti, orari o altre condizioni.
+- Le nuove specie adottano le stesse associazioni tipo/mossa sul campo e habitat
+  delle specie originali. Nuove mosse di lotta, abilità e meccaniche non vengono
+  introdotte in questa fase.
+- Gli spawn aggiuntivi dipendono dal bioma e riguardano specie base: Fuoco nella
+  caldera, Ghiaccio nella tundra, Spettro nei cimiteri, ecc. Le normali evoluzioni
+  di popolamento del generatore rimangono attive. Leggendari, misteriosi,
+  Ultracreature e Pokémon Paradosso non vengono aggiunti agli spawn casuali.
+- La crescita delle nuove specie segue le formule canoniche. L'implementazione
+  storica delle specie originali viene conservata, incluso il suo trattamento
+  precedente della crescita Medium Fast.
+- I nuovi dati usano il formato originale dei salvataggi; nessuna migrazione.
+
+Copertura e limiti (63 specie nazionali differite):
+51 specie aggiuntive candidate sono rinviate perché mancano portrait/Idle/Walk
+completi nello snapshot PMD. Altre 12 non possiedono una mossa di livello 1
+implementata nel gioco: Bonsly, Uxie, Mesprit, Azelf, Hoopa, Fomantis, Drampa,
+Hatenna, Hattrem, Impidimp, Indeedee, Koraidon.
+Otto specie già comprese nelle 552 aggiunte e nelle 962 totali non vengono
+proposte come spawn casuali perché
+non è disponibile il loro antenato riproduttivo: Jellicent, Accelgor, Lurantis,
+Hatterene, Morgrem, Grimmsnarl, Copperajah, Gholdengo.
+Il catalogo dei portrait PMD rimane più ampio del Pokédex attualmente giocabile.
+Le forme base sono supportate; non vengono aggiunte automaticamente tutte le
+forme regionali o alternative come specie di gioco. Se una nuova specie non ha
+artwork shiny esatto, si conserva temporaneamente il suo artwork normale.
+
+Audio:
+Le grida sono le registrazioni del repository PokeAPI/cries, scaricate al commit
+ef687b18f0ce17169b4b4c09175819f7ade92f0f e conservate con SHA-256 nel dataset.
+https://github.com/PokeAPI/cries/tree/ef687b18f0ce17169b4b4c09175819f7ade92f0f
+I file sorgenti 808.ogg/809.ogg contengono effettivamente audio MP3: vengono
+salvati byte-identici come 808.mp3/809.mp3 perché LibGDX li decodifichi correttamente.
+La durata viene letta dai metadati audio, senza una durata inventata.
+
+Sprite di compatibilità:
+ExpansionDex copia i veri frame PMD in texture proprie per i percorsi grafici
+originali (56 px fronte, 48 px retro, 16 px mondo). Le copie mantengono proporzioni
+e possono sopravvivere all'espulsione dei fogli animati dalla cache LRU. Il nuovo
+renderer usa direttamente le animazioni PMD; queste copie proteggono anche menu,
+scene e rendering classico. Le uova usano l'uovo generico originale.
+
+Riproduzione e verifica:
+python tools/prepare_expansion_dex.py
+Scarica i CSV mancanti al commit fissato e legge il catalogo PMD già importato.
+python tools/expansion_dex_test.py
+Verifica tutte le 552 specie in un contesto GL nativo, mosse, dati, conversione
+PokemonData, calcolo cattura e Heavy Ball, crescita, evoluzione Torchic->Combusken,
+uovo/schiusa Sprigatito e grida (incluse quelle MP3). Salva e ricarica realmente
+una squadra Combusken16/Sprigatito5/Fuecoco8 shiny nel percorso di test isolato.
+L'opzione --sources serve esclusivamente allo sviluppo prima della build e viene
+indicata nel log. Evidenze: build/expansion-dex-test/expansion-dex-test.log.
+
+Crediti degli sprite: PMD-PROVENANCE.json e licenses/PMD-*.
+I dati e gli asset Pokémon mantengono i rispettivi autori e titolari.

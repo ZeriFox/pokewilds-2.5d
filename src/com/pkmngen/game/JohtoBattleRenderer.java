@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import java.util.IdentityHashMap;
 import java.util.Locale;
 
@@ -32,17 +34,19 @@ public final class JohtoBattleRenderer {
 
    /** Called after the world pass, before the existing UI SpriteBatch begins. */
    public void prepareFrame(Game game, boolean worldRendered) {
+      PmdBattleSprites.beginFrame();
       frame++;
       phase = "none";
       for (Action action : game.actionStack) {
          if (action instanceof BattleIntro) phase = "intro";
+         else if (action instanceof EnterBuilding || action instanceof EscapeRope) phase = "travel";
          else if (action instanceof BattleIntroAnim1 || isSpecialIntro(action)) phase = "wipe";
          else if (action instanceof BattleFadeOut) phase = "out";
          else if (action instanceof FadeAnim && phase.equals("none")) phase = "fade";
          else if ((action instanceof DrawWhiteScreen || action instanceof DrawItemMenu.Intro
             || action instanceof DrawPokemonMenu.Intro) && phase.equals("none")) phase = "menu-fade";
       }
-      if (worldRendered && phase.equals("none")) captureWorld();
+      if (worldRendered && (phase.equals("none") || phase.equals("travel"))) captureWorld();
       // The original simulation still renders its map before this point. Cover
       // that image throughout transitions, including their final action frame.
       if (!phase.equals("none")) {
@@ -274,6 +278,11 @@ public final class JohtoBattleRenderer {
       countTransition();
    }
 
+   public void drawTravelFade(Game game, float alpha) {
+      ModernUi.get(game).rect(game, -320, -288, 800, 720, tint.set(ModernUi.INK).mul(1f,1f,1f,alpha));
+      countTransition();
+   }
+
    private float progress(Action action, int remaining) { return 1f - remaining / (float)total(action, remaining); }
    private int total(Action action, int remaining) {
       Integer total = transitionLengths.get(action);
@@ -294,7 +303,9 @@ public final class JohtoBattleRenderer {
       boolean sand = biome.contains("desert") || biome.contains("beach");
       boolean snow = biome.contains("tundra") || biome.contains("snow");
       boolean cave = biome.contains("cave") || biome.contains("volcan");
+      boolean volcano = biome.contains("volcan");
       Color sky = new Color(cave ? 0.39f : 0.77f, cave ? 0.48f : 0.89f, cave ? 0.53f : 0.88f, 1f);
+      if (volcano) sky.set(.24f,.12f,.19f,1);
       Color ground = sand ? new Color(0.84f,0.78f,0.57f,1f) : snow ? new Color(0.87f,0.92f,0.90f,1f)
          : cave ? new Color(0.55f,0.59f,0.56f,1f) : new Color(0.65f,0.76f,0.55f,1f);
       for (int y = 0; y < 288; y++) {
@@ -313,6 +324,14 @@ public final class JohtoBattleRenderer {
          p.setColor(tint.set(ground).mul(i % 2 == 0 ? 0.97f : 1.04f, i % 2 == 0 ? 0.98f : 1.03f, 1f, 1f));
          p.drawLine(x,y,Math.min(319,x+3),y);
       }
+      paintBwGround(p, volcano ? "basalt" : cave ? "mountain" : snow ? "snow" : sand ? "sand" : "grass_light", sky);
+      if (volcano) {
+         p.setColor(.92f,.28f,.08f,1);
+         for (int i=0;i<15;i++) {
+            int x=(i*67+13)%320, y=90+(i*47)%95;
+            p.drawLine(x,y,x+9,y+2); p.drawLine(x+9,y+2,x+13,y-1);
+         }
+      }
       ellipse(p, 190, 105, 117, 25, new Color(0.37f,0.49f,0.36f,1f));
       ellipse(p, 190, 101, 117, 23, snow ? new Color(0.94f,0.97f,0.94f,1f) : new Color(0.86f,0.84f,0.65f,1f));
       ellipse(p, -8, 181, 168, 36, new Color(0.40f,0.49f,0.35f,1f));
@@ -320,6 +339,29 @@ public final class JohtoBattleRenderer {
       arena = new Texture(p);
       arena.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
       p.dispose();
+   }
+
+   /** Tile only the verified environmental material, projected towards the horizon. */
+   private void paintBwGround(Pixmap destination, String material, Color haze) {
+      if (!Gdx.files.internal("visual/unova/world-atlas.png").exists()) return;
+      JsonValue entry = new JsonReader().parse(Gdx.files.internal("visual/unova/world-atlas.json")).get(material);
+      if (entry == null) return;
+      Pixmap atlas = new Pixmap(Gdx.files.internal("visual/unova/world-atlas.png"));
+      int ox=entry.getInt("x"), oy=entry.getInt("y"), width=entry.getInt("width"), height=entry.getInt("height");
+      Color pixel = new Color();
+      for (int y=73;y<288;y++) {
+         float depth=(y-73)/215f, perspective=.35f+depth*.8f;
+         int ty=Math.floorMod((int)(90f/perspective),height);
+         for (int x=0;x<320;x++) {
+            int tx=Math.floorMod((int)((x-160)/perspective),width);
+            int rgba=atlas.getPixel(ox+tx,oy+ty);
+            if ((rgba&255)<128) continue;
+            Color.rgba8888ToColor(pixel,rgba);
+            pixel.lerp(haze,(1-depth)*.27f);
+            destination.drawPixel(x,y,Color.rgba8888(pixel));
+         }
+      }
+      atlas.dispose();
    }
 
    private static void ellipse(Pixmap p, int x, int y, int width, int height, Color color) {

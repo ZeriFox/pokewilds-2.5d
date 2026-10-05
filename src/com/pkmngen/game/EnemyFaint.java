@@ -71,8 +71,9 @@ class EnemyFaint extends Action {
       }
 
       if (!this.positions.isEmpty() && !this.repeats.isEmpty()) {
-         this.sprite.draw(game.uiBatch);
-         if (this.breathingSprite != null) {
+         boolean modern = PmdBattleSprites.draw(game, game.battle.oppPokemon, this.sprite, false, "Hurt");
+         if (!modern) this.sprite.draw(game.uiBatch);
+         if (!modern && this.breathingSprite != null) {
             this.breathingSprite.draw(game.uiBatch);
          }
 

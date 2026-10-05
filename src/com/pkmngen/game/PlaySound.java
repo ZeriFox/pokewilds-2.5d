@@ -30,6 +30,8 @@ class PlaySound extends Action {
          }
 
          fileName = "pokemon/cries/" + dexNumber + ".ogg";
+         String expansionCry = ExpansionDex.cryPath(pokemon.specie.name);
+         if (expansionCry != null) fileName = expansionCry;
          file = Gdx.files.internal(fileName);
       }
 

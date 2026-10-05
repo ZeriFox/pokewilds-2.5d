@@ -291,7 +291,7 @@ public final class ModernUiSmokeTest {
 
         void spawnEncounter() {
             if(wild!=null){wild.aggroPlayer=false;wild.removeDrawActions(this);if(wild.standingAction!=null)actionStack.remove(wild.standingAction);map.pokemon.values().removeIf(p->p==wild);}
-            wild=new Pokemon("caterpie",4);wild.position.set(player.position.cpy().add(32,0));wild.mapTiles=map.tiles;
+            wild=new Pokemon(encounter==0 ? "caterpie" : "sprigatito",4);wild.position.set(player.position.cpy().add(32,0));wild.mapTiles=map.tiles;
             wild.aggroPlayer=true;wild.dirFacing="left";insertAction(wild.new Standing());
             encounter++;trackBattle=true;stageFrame=0;
             System.out.println("UI: NPC "+encounter+" placed two tiles away; original aggressive AI starts encounter");
@@ -371,10 +371,15 @@ public final class ModernUiSmokeTest {
             saveGame();Vector2 saved=player.position.cpy();int tiles=map.tiles.size();Pixmap old=map.minimap;
             actionStack.clear();insertAction(new InputProcessor());map=new PkmnMap("ui-fixture");player=new Player();start();map.loadFromFile(this);old.dispose();
             require(map.tiles.size()==tiles && player.position.equals(saved),"UI fixture world failed save/load");
-            require(player.pokemon.size()==2 && player.pokemon.get(1).specie.name.equals("caterpie"),"Captured party failed save/load");
+            require(player.pokemon.size()==2 && player.pokemon.get(1).specie.name.equals("sprigatito"),"Captured Gen IX party failed save/load");
             trackBattle=false;
         }
         void finish() {
+            require(PmdPokemonSprites.get().isAvailable(), "PMD catalog was not packaged");
+            require(PmdBattleSprites.getActorDraws()>100, "PMD battle actors were not rendered");
+            require(PmdBattleSprites.getPortraitDraws()>20, "PMD party portraits were not rendered");
+            System.out.println("PMD: battle="+PmdBattleSprites.getActorDraws()+", portraits="+PmdBattleSprites.getPortraitDraws()
+                +", sheets="+PmdPokemonSprites.get().getLoadedTextureCount()+", textureBytes="+PmdPokemonSprites.get().getLoadedTextureBytes());
             require(transitionRendered>60 && battleRendered>100,"Modern battle renderer was not exercised");
             long snapshotFrames=number(field("johtoBattleRenderer"),"getSnapshotFrames");
             require(snapshotFrames>60,"Transitions never drew the preserved 2.5D world snapshot");

@@ -1,119 +1,139 @@
-POKEWILDS 0.8.11 - BASE PC E PROTOTIPO GRAFICO 2.5D
-
-NOTA PER IL REPOSITORY GITHUB
-Le istruzioni aggiornate per download e compilazione sono in README.md.
-Il pacchetto pokewilds-2.5d-windows-x64.zip della release include gioco e Java.
-Il clone Git contiene i sorgenti: Java e dipendenze binarie non sono inclusi.
-Per compilarlo servono JDK 17, Python 3.10+ e l'archivio
-pokewilds-2.5d-build-inputs.zip estratto nella root, accanto a build.py.
-I riferimenti a Java/dipendenze "inclusi" qui sotto riguardano la distribuzione
-completa, non il solo clone. Download ZIP di GitHub non e' il gioco pronto.
-Release privata: https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.1
+POKEWILDS 0.8.11 — PC 2.5D, RELEASE v0.8.11-johto.2
 
 AVVIO SU WINDOWS
-Apri run-johto.cmd per il prototipo 2.5D ispirato a HeartGold/SoulSilver.
-Ora usa sprite 2D nel mondo prospettico, nuovi alberi/rocce in pixel art,
-menu ridisegnati e una nuova presentazione delle lotte con transizione coerente.
-run-johto-sprites.cmd avvia la stessa versione 2.5D.
-Apri run.cmd per la grafica classica.
-Il launcher usa il Java 17 incluso in toolchain/jdk-17 e mantiene impostazioni
-e salvataggi in run-johto (2.5D) o run (classica). Le due cartelle sono separate.
-Conserva insieme tutte le cartelle del progetto.
-Non occorre installare Java o modificare il Java di sistema.
-Leggi GRAFICA-25D.txt per contenuto e limiti del primo prototipo.
+Scarica ed estrai completamente pokewilds-2.5d-windows-x64.zip:
+https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.2
+Repository e release privati: serve un account GitHub con accesso.
+Code > Download ZIP contiene i sorgenti, non il gioco pronto.
 
-COMANDI DEL GIOCO
-Frecce: movimento e selezione. Z: conferma/A. X: indietro/B e corsa.
-Invio: Start. F11: schermo intero.
+Apri run-johto.cmd oppure run-johto-sprites.cmd. Java 17 Windows x64 e' incluso
+nel pacchetto pronto; non serve cambiare il Java di sistema.
+Salvataggi/impostazioni: run-johto/. run.cmd sceglie la presentazione classica
+e usa run/, separata. La scelta grafica non disattiva il Pokedex ampliato o
+la generazione moderna. Conserva insieme le cartelle distribuite.
+Comandi: frecce, Z conferma, X indietro/corsa, Invio Start, F11 schermo intero.
 
-RICOMPILAZIONE
-Apri build.cmd, oppure esegui: python build.py
-Richiede Python 3.10 o successivo; il JDK 17 e le dipendenze sono inclusi.
-La build compila tutti i sorgenti Java in src/com/pkmngen e produce
-dist/pokewilds-rebuilt.jar. Non scarica nulla dalla rete.
-build/build-report.json registra versioni, hash, conteggi e verifica del JAR.
-Usando gli stessi sorgenti, runtime e strumenti si deve ottenere lo stesso JAR.
+NOVITA' E COMPATIBILITA'
+Sprite e portrait PMDCollab; trainer, terreno, vegetazione e materiali B/W;
+menu coordinati, arene composte con materiali B/W e transizioni. Giorno, notte e interni condividono
+la vista prospettica. La build normale esclude GLB e usa sprite 2D.
 
-TEST DI AVVIO
-Esegui: python tools/smoke_test.py
-Apre una finestra grafica invisibile, verifica 120 frame del menu e si chiude.
-Richiede una sessione desktop con OpenGL. Log e immagine sono in build/smoke.
+552 specie aggiuntive, oltre alle 410 della base, portano il totale a 962.
+Le aggiunte hanno dati reali e risorse compatibili. Le mosse sono
+limitate a quelle implementate; condizioni evolutive, forme e artwork mancanti
+sono documentati in POKEDEX-ESPANSO.txt. Il catalogo dei portrait PMD e' piu'
+ampio del Pokedex effettivamente giocabile.
 
-TEST DEL MONDO E AMBITO DELLE MODIFICHE
+EMBER CALDERA aggiunge sentieri, rocce e lava solida. Rampe reali collegano
+alcune terrazze. Il passaggio riguarda nuove isole e nuove aree oltre i bordi;
+non riscrive i terreni dei salvataggi caricati. Il formato resta originale.
+Leggi GENERAZIONE-MODERNA.txt. La proprieta' JVM -Dpokewilds.worldgen=classic
+disabilita il passaggio per confronti, indipendentemente dalla grafica.
+
+RICOMPILAZIONE DAL REPOSITORY
+Servono Python 3.10+, JDK 17 e un clone completo. Configura JAVA_HOME oppure
+java/javac/jar nel PATH. Il JDK incluso nel pacchetto pronto viene usato se
+presente; non e' incluso nel clone Git.
+
+Scarica pokewilds-2.5d-build-inputs.zip dalla release johto.2 ed estrailo nella
+root del clone, accanto a build.py. Contiene soltanto:
+  lib/upstream-runtime.jar
+  lib/gltf-2.1.0.jar
+Le risorse PMD, B/W e del Pokedex sono nel repository, in resources/visual/.
+Non servono Git LFS o GLB per compilare la versione corrente.
+
+Esegui build.cmd oppure:
+  python build.py
+Non scarica nulla. Produce dist/pokewilds-rebuilt.jar e verifica che le classi
+incluse coincidano con quelle compilate. Versioni/hash: build/build-report.json.
+
+Opzionale: recupera solo i GLB dal build-inputs della release johto.1 nella
+cartella resources/visual/johto/models/pokemon/ ed esegui:
+  python build.py --include-3d
+L'opzione include i file disponibili; non riattiva da sola gli attori 3D
+nel renderer corrente. MODELLI-3D.txt documenta l'esperimento precedente.
+
+prepare_pmd_assets.py, prepare_unova_assets.py e prepare_expansion_dex.py
+ricostruiscono risorse/dati dalle fonti registrate. Sono in tools/ e non
+servono per compilare un clone completo. L'importazione PMD richiede Pillow
+e requests; B/W richiede Pillow e sorgenti verificati. I dati del Pokedex
+possono essere scaricati dagli snapshot fissati.
+
+VERIFICHE DISPONIBILI
+python tools/smoke_test.py
+  Avvio e menu; evidenze in build/smoke.
 python tools/world_smoke_test.py
-Genera un mondo piccolo con il generatore reale, verifica che la vista 2.5D sia
-attiva, prova un'emote, simula un movimento e confronta i dati dopo salvataggio
-e ricaricamento.
-Log e schermate: build/world-smoke/johto. Dura circa un minuto su questo PC.
-Con --classic verifica invece il rendering originale in una cartella separata.
+  Generazione S reale, rendering, emote, movimento e salvataggio/caricamento.
+  Evidenze in build/world-smoke/johto. --classic sceglie il renderer classico.
+python tools/modern_world_test.py
+  Determinismo del passaggio, rampe, lava, celle protette, TileData e generazione.
+python tools/landscape_smoke_test.py
+  Fixture giorno/notte, rilievi, caldera, interni e viaggio; build/landscape-smoke.
 python tools/modern_ui_smoke_test.py
-Verifica menu, crafting, incontri reali avviati dall'IA originale, turni di
-lotta, fuga, cattura, aumento di livello e salvataggio/caricamento.
-Screenshot e log: build/ui-battle-smoke. Usa soltanto partite di prova.
+  Menu, crafting, incontri IA, lotte, fuga, cattura, livello e save/load.
+  Evidenze in build/ui-battle-smoke.
+python tools/expansion_dex_test.py
+  Le 552 aggiunte, dati/mosse, evoluzione, crescita, uovo/schiusa, audio e save/load.
+python tools/pmd_asset_smoke_test.py --bundled
+  Verifica gli asset PMD incorporati nel JAR.
+python tools/pmd_battle_visual_test.py
+  Campioni nativi di portrait e animazioni PMD in lotta.
 python tools/verify_visual_scope.py
-Confronta gli hash con la base PC e controlla che le modifiche ai sorgenti
-originali siano limitate ai collegamenti grafici e alle azioni di presentazione
-elencate. Generatore, logica Battle, Pokemon/Player, input e save restano invariati.
-Il diff completo dei collegamenti e' prodotto in build/visual-hooks.patch.
+  Confronta ambito e hash delle modifiche grafiche, del generatore e del Pokedex
+  con la base PC. Non prova equivalenza del gameplay.
+
+I test grafici richiedono desktop/OpenGL e partite isolate in build/.
+--sources/--classes-override indicano prove di sviluppo, non il solo JAR.
+VERIFICA.txt riporta controlli effettivamente conclusi, versione e hash testati.
 
 STRUTTURA
-src/                       Sorgenti Java modificabili del gioco e diagnostica.
-resources/                 Nuove texture del prototipo 2.5D.
-lib/upstream-runtime.jar   Librerie binarie e risorse originali del gioco.
-lib/gltf-2.1.0.jar         Caricamento dei modelli glTF/GLB animati.
-dist/pokewilds-rebuilt.jar Gioco PC ricompilato, con dipendenze e risorse incluse.
-toolchain/jdk-17/          JDK Temurin 17 portatile per Windows x64.
-tools/                     Preparazione runtime e verifiche di avvio.
-build/                     Classi, log, schermate e salvataggi isolati dei test.
-run/                       Directory di lavoro del gioco e futuri salvataggi.
-run-johto/                 Impostazioni e salvataggi della modalita' 2.5D.
-baseline/                  Game.java, report e JAR della base PC classica.
-PROVENANCE.json            Provenienza, versioni e hash dei materiali di partenza.
-ART_PROMPT.txt             Prompt e provenienza della nuova texture generata.
-ART_FOLIAGE_PROMPT.txt     Prompt Imagegen dei nuovi alberi e rocce in pixel art.
-MODELS-PROVENANCE.json     Catalogo, hash e fonti dei modelli 3D Pokemon.
-licenses/                 Licenze delle nuove dipendenze e attribuzioni asset.
+src/                       Sorgenti Java.
+resources/visual/pmd/       PNG/XML PMD, catalogo e metadati.
+resources/visual/unova/     Atlante B/W, originali e provenienza.
+resources/visual/dex/       Dati e grida del Pokedex aggiuntivo.
+lib/                       Dipendenze binarie di compilazione.
+dist/pokewilds-rebuilt.jar  Gioco con librerie e risorse.
+toolchain/jdk-17/           JDK del pacchetto Windows.
+tools/                     Preparazione e test.
+build/                     Classi, log, immagini e partite isolate.
+baseline/                  Base PC e manifest per il confronto.
+licenses/                  Licenze e attribuzioni.
 
-COME E' STATO RICOSTRUITO
-Il repository pubblico ufficiale non fornisce il progetto Java completo.
-L'archivio non ufficiale CFR e' stato scaricato e ne e' stato verificato SHA-256.
-I sorgenti CFR non compilavano. Dal JAR originale verificato sono stati quindi
-rigenerati i 198 sorgenti com/pkmngen con Vineflower 1.12.0, usando le dipendenze
-originali per risolvere i tipi. Le cinque classi nate in Kotlin sono state
-ricostruite in Java; tre di queste hanno richiesto correzioni manuali.
+RICOSTRUZIONE DEL CODICE
+Il repository ufficiale non fornisce il progetto Java completo. L'archivio
+non ufficiale CFR e' stato verificato SHA-256, ma non compilava. I 198 sorgenti
+di base sono stati recuperati dal JAR verificato con Vineflower 1.12.0.
+Le cinque classi nate in Kotlin sono state ricostruite in Java, con tre
+correzioni manuali. Altre correzioni: Battle.java (byte/int), PlayerStanding.java
+(booleano/livello), DynamicTextures.java (color2=0). tools/recovery.patch registra
+le correzioni rispetto alla decompilazione.
 
-Le altre correzioni necessarie riguardano tre file:
-- Battle.java: variabile numerica ricostruita come byte invece di int.
-- PlayerStanding.java: separazione tra booleano e livello di evoluzione intero.
-- DynamicTextures.java: ripristino dell'assegnazione numerica color2 = 0.
-Le correzioni sono state confrontate con l'altra decompilazione o il bytecode.
-tools/recovery.patch registra le modifiche rispetto all'output Vineflower.
+lib/upstream-runtime.jar esclude tutte le classi com/pkmngen originali:
+nessuna classe precompilata del gioco viene usata come ripiego. Le librerie
+esterne restano binarie. gdx-gltf 2.1.0 e la patch locale rimangono dipendenze
+dei sorgenti dell'esperimento 3D.
+Per ricreare il runtime da una copia verificata del JAR 0.8.11:
+  python tools/prepare_runtime.py "percorso/pokewilds.jar"
 
-Il runtime e' stato ottenuto rimuovendo TUTTE le entry com/pkmngen/ dal JAR
-originale: nessuna classe precompilata del gioco e' usata come ripiego.
-La build ricrea da sorgente l'intero namespace del gioco e controlla che le
-classi del JAR finale coincidano con quelle appena compilate.
-Le librerie esterne originali rimangono binarie, senza cambi di versione.
-Per il renderer e' stata aggiunta gdx-gltf 2.1.0 come dipendenza separata.
-Il precedente esperimento con attori 3D resta nei sorgenti e negli asset ma e'
-disattivato per impostazione predefinita. MODELLI-3D.txt documenta quella prova;
-per riattivarla esplicitamente occorre -Dpokewilds.models=on.
+LIMITI E FONTI
+Simboli di puzzle, strutture speciali come la Pokemon Mansion, oggetti,
+emote e pickup possono restare originali.
+Mosse sul campo, costruzione, pesca, riposo e scene con indicatori particolari
+usano il renderer normale del mondo; i menu sostituiti mantengono il tema.
+I test dei flussi principali non verificano ogni contenuto o il multigiocatore.
+Questa versione PC non e' un port Nintendo 3DS.
 
-Per rigenerare lib/upstream-runtime.jar da una copia del JAR ufficiale:
-python tools/prepare_runtime.py "percorso/pokewilds.jar"
-Lo script controlla prima l'hash della versione 0.8.11.
-
-LIMITI
-Questa e' una ricostruzione da bytecode, non il progetto sorgente originale.
-La compilazione e un test di avvio non garantiscono l'equivalenza di ogni
-meccanica del gioco. Leggere VERIFICA.txt per i controlli effettivamente eseguiti.
-Non e' una versione Nintendo 3DS: serve da base PC per il lavoro successivo.
-
-PROVENIENZA E ATTRIBUZIONI
-Gioco originale: https://github.com/SheerSt/pokewilds
-Release originale: https://github.com/SheerSt/pokewilds/releases/tag/v0.8.11
+Gioco: https://github.com/SheerSt/pokewilds
+Originale: https://github.com/SheerSt/pokewilds/releases/tag/v0.8.11
 Archivio: https://github.com/TryTheSauceBoss/pokewilds-v0.8.11-decompiled-archive
 Decompilatore: https://github.com/Vineflower/vineflower/releases/tag/1.12.0
-JDK: Eclipse Temurin 17, distribuzione originale con i suoi file di licenza.
-Gioco, risorse e dipendenze mantengono attribuzioni e condizioni dei rispettivi
-autori. Questo progetto non assegna una nuova licenza a tali materiali.
+PMD: https://sprites.pmdcollab.org/ e https://github.com/PMDCollab/SpriteCollab
+B/W: https://www.spriters-resource.com/ds_dsi/pokemonblackwhite/
+Dati: https://github.com/PokeAPI/pokeapi
+Grida: https://github.com/PokeAPI/cries
+
+Leggi PROVENANCE.json, PMD-PROVENANCE.json, resources/visual/unova/PROVENANCE.json,
+resources/visual/unova/CREDITS.txt, POKEDEX-ESPANSO.txt e licenses/.
+PMDCollab personalizzati: CC BY-NC 4.0; artwork originali: rispettivi titolari.
+B/W: Barubary (trainer), Brom (ambiente), tsuka (arene), Nintendo/Game Freak/
+The Pokemon Company. Questo progetto non assegna nuove licenze ad asset altrui.

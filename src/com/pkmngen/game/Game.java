@@ -312,6 +312,10 @@ public class Game extends ApplicationAdapter {
       }
       if (this.modernUi != null) this.modernUi.dispose();
       if (this.johtoBattleRenderer != null) this.johtoBattleRenderer.dispose();
+      PmdPokemonSprites.disposeShared();
+      BwAssets.disposeShared();
+      PmdBattleSprites.dispose();
+      ExpansionDex.dispose();
       this.mapBatch.dispose();
       this.uiBatch.dispose();
 
