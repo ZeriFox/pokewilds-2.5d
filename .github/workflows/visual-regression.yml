@@ -1,0 +1,64 @@
+name: Visual regression
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tools/**'
+      - 'resources/visual/custom/**'
+      - '.github/workflows/visual-regression.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tools/**'
+      - 'resources/visual/custom/**'
+      - '.github/workflows/visual-regression.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Sampling regression
+        run: python tools/test_flexible_sampling.py
+      - name: Restore pinned build inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v0.8.11-johto.2 --repo ZeriFox/pokewilds-2.5d --pattern pokewilds-2.5d-build-inputs.zip --dir "$RUNNER_TEMP"
+          echo "5692696180a62dc1c8822e2a2d2a324f60647535a821865d7fb556e109b3883f  $RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" -d .
+      - name: Compile the complete game
+        run: python build.py
+      - name: Collect reproducible diagnostic inputs
+        if: always()
+        run: |
+          mkdir -p build/diagnostics
+          git archive --format=tar.gz HEAD -o build/diagnostics/source.tar.gz
+          if [ -d lib ]; then tar -czf build/diagnostics/build-inputs.tar.gz lib; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-build-${{ github.sha }}
+          path: |
+            build/build-report.json
+            build/diagnostics/
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
