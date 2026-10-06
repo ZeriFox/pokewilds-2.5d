@@ -73,7 +73,10 @@ public final class PmdBattleSprites {
 
    public static boolean draw(Game game, Pokemon pokemon, Sprite source, boolean back, String animation) {
       if (game.modernUi == null || pokemon == null || pokemon.isEgg || pokemon.isGhost || source == null) return false;
-      PmdPokemonSprites.Frame frame = PmdPokemonSprites.get().frame(pokemon, back ? "up" : "down", animation, seconds);
+      // The arena slots are diagonal. North/south frames made both actors look
+      // past each other. Use real NE/SW art for idle, attacks, hurt and sleep.
+      String facing = VisualGeometry.battleFacing(back);
+      PmdPokemonSprites.Frame frame = PmdPokemonSprites.get().frame(pokemon, facing, animation, seconds);
       if (frame == null) return false;
       float originalHeight = back ? 48f : pokemon.specie.sprite.getWidth();
       float widthRatio = source.getWidth() / (back ? 48f : pokemon.specie.sprite.getWidth());
@@ -82,7 +85,7 @@ public final class PmdBattleSprites {
       String key = pokemon.specie.name + pokemon.isShiny + back;
       Float baseScale = scales.get(key);
       if (baseScale == null) {
-         PmdPokemonSprites.Frame idle = PmdPokemonSprites.get().frame(pokemon, back ? "up" : "down", "Idle", 0);
+         PmdPokemonSprites.Frame idle = PmdPokemonSprites.get().frame(pokemon, facing, "Idle", 0);
          if (idle == null) idle = frame;
          baseScale = Math.min(1.5f, Math.min(48f / Math.max(1,idle.width), 44f / Math.max(1,idle.height)));
          scales.put(key, baseScale);
@@ -100,6 +103,7 @@ public final class PmdBattleSprites {
       float width = frame.width * scale, height = visible.getRegionHeight() * scale;
       draw.setBounds(source.getX() + source.getWidth()*.5f - frame.anchorX*scale,
          source.getY() - frame.anchorY*scale*fraction, width, height);
+      // Preserve rotations belonging to move effects, not as a facing correction.
       draw.setOriginCenter(); draw.setRotation(source.getRotation());
       draw.setScale(source.getScaleX(), source.getScaleY());
       Color tint = new Color(source.getColor());
@@ -128,7 +132,7 @@ public final class PmdBattleSprites {
    public static boolean sendOut(Game game, float x, float y, int remaining) {
       if (game.modernUi == null || game.player.currPokemon == null) return false;
       Pokemon pokemon = game.player.currPokemon;
-      if (PmdPokemonSprites.get().frame(pokemon,"up","Idle",seconds) == null) return false;
+      if (PmdPokemonSprites.get().frame(pokemon,VisualGeometry.battleFacing(true),"Idle",seconds) == null) return false;
       // Keep the original ball/poof schedule, replacing only its sliced actor art.
       if (remaining <= 7) {
          Sprite proxy = new Sprite(pokemon.backSprite);
