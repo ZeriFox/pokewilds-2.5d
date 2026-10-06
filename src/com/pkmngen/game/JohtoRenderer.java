@@ -50,6 +50,7 @@ public final class JohtoRenderer {
    private BwAssets assets;
    private float seconds;
    private final TextureRegion spritePart = new TextureRegion();
+   private final TextureRegion cliffPart = new TextureRegion();
    private final FloatBuffer originalClearColor = BufferUtils.newFloatBuffer(4);
    private TextureRegion pickupSprite;
    private TextureRegion fossilSprite;
@@ -332,7 +333,7 @@ public final class JohtoRenderer {
          return;
       }
       if (tile.isLedge && (tile.ledgeDir != null || upper.startsWith("ledges3"))) {
-         cliff(tile, x, y);
+         cliff(game, tile, x, y);
          return;
       }
       if (tree) { tree(tile, x + 8f, y + 8f, names); return; }
@@ -340,10 +341,10 @@ public final class JohtoRenderer {
       TextureRegion object = assets.object(tile);
       if (object != null) {
          boolean plant = names.contains("grass") || names.contains("flower");
-         float width = names.contains("rock") ? 17f : plant ? 16f : 18f;
-         float height = Math.min(25f, width * object.getRegionHeight() / Math.max(1f, object.getRegionWidth()));
-         width = assets.worldWidth(object, width);
-         height = assets.worldHeight(object, height);
+         float maxWidth = names.contains("rock") ? 17f : plant ? 16f : 18f;
+         float scale = VisualGeometry.fitScale(object.getRegionWidth(), object.getRegionHeight(), maxWidth, 25f);
+         float width = assets.worldWidth(object, object.getRegionWidth() * scale);
+         float height = assets.worldHeight(object, object.getRegionHeight() * scale);
          if (!plant) assetShadow(object, x + 8, y + 7, width * .3f, 2.4f);
          upright(object, x + 8 - width/2, y + 7, .15f, width, height, WHITE);
       } else if (tile.overSprite != null && tile.overSprite != tile.sprite) {
@@ -370,49 +371,62 @@ public final class JohtoRenderer {
       }
    }
 
-   /** Only real ledges receive relief. No inferred global height or new barriers. */
-   private void cliff(Tile tile, float x, float y) {
-      boolean volcano = ModernWorldGenerator.isVolcanic(tile);
+   private static int cliffMask(Tile tile) {
+      if (tile == null || tile.sprite == null || !tile.isLedge || ModernWorldGenerator.isRamp(tile)) return 0;
       String upper = tile.nameUpper == null ? "" : tile.nameUpper;
-      volcano |= upper.startsWith("ledges3volcano");
+      if (tile.ledgeDir == null && !upper.startsWith("ledges3")) return 0;
+      return VisualGeometry.cliffMask(upper, tile.ledgeDir, tile.isSolid);
+   }
+
+   /** Only real ledges receive relief. Closed rims, no overlapping cap quads.
+    * The playable ground stays at its original height; no synthetic altitude is
+    * inferred from biome names and no collision or ramp is changed. */
+   private void cliff(Game game, Tile tile, float x, float y) {
+      int mask = cliffMask(tile);
+      if (mask == 0) return;
+      String upper = tile.nameUpper == null ? "" : tile.nameUpper;
+      boolean volcano = ModernWorldGenerator.isVolcanic(tile) || upper.startsWith("ledges3volcano");
       boolean snow = upper.startsWith("ledges3snow");
-      TextureRegion face = assets.cell(volcano ? "basalt" : "cliff", x, y);
+      // A vertical face is a COMPLETE image, not a ground cell. Splitting the
+      // 16x32 cliff sheet into 16x16 cells made its height alternate with map Y.
+      TextureRegion face = assets.named(volcano ? "basalt" : "cliff");
       TextureRegion cap = assets.cell(volcano ? "basalt" : snow ? "snow" : "mountain", x, y);
       Geometry mesh = batch(geometry, face.getTexture());
       float h = 8f, z = -y;
-      String direction = tile.ledgeDir;
-      int edges=0; // N=front/down, S=back/up, E=left, W=right: original Tile convention.
-      if(upper.startsWith("ledges3")) {
-         String[] parts=upper.split("_");
-         if(parts.length>1)for(char c:parts[1].toCharArray())edges|=c=='N'?1:c=='S'?2:c=='E'?4:c=='W'?8:0;
-      } else edges="down".equals(direction)?1:"up".equals(direction)?2:"left".equals(direction)?4:"right".equals(direction)?8:0;
-      if(edges==0) {
-         // The original ledges3_none cell is solid, with no singled-out edge.
-         // Preserve its visible blocked footprint rather than dropping its art.
-         if(tile.isSolid)prism(x,y,0,16,16,h,face,WHITE);
-         return;
+      int front = cliffMask(game.map.tiles.get(lookup.set(x, y - TILE)));
+      int back = cliffMask(game.map.tiles.get(lookup.set(x, y + TILE)));
+      int left = cliffMask(game.map.tiles.get(lookup.set(x - TILE, y)));
+      int right = cliffMask(game.map.tiles.get(lookup.set(x + TILE, y)));
+      for (int row = 0; row < 3; row++) for (int col = 0; col < 3; col++) {
+         if (!VisualGeometry.occupied(mask, col, row)) continue;
+         float a = VisualGeometry.boundary(col), b = VisualGeometry.boundary(col + 1);
+         float c = VisualGeometry.boundary(row), d = VisualGeometry.boundary(row + 1);
+         // Crop UVs proportionally to world area, at any source resolution.
+         // Each point on the cap is emitted once, including inner/outer corners.
+         floor(cliffSlice(cap, a/TILE, 1-d/TILE, b/TILE, 1-c/TILE),
+            x+a, y+c, b-a, d-c, h, WHITE, geometry);
+         boolean hasFront = row > 0 ? VisualGeometry.occupied(mask,col,row-1) : VisualGeometry.occupied(front,col,2);
+         boolean hasBack = row < 2 ? VisualGeometry.occupied(mask,col,row+1) : VisualGeometry.occupied(back,col,0);
+         boolean hasLeft = col > 0 ? VisualGeometry.occupied(mask,col-1,row) : VisualGeometry.occupied(left,2,row);
+         boolean hasRight = col < 2 ? VisualGeometry.occupied(mask,col+1,row) : VisualGeometry.occupied(right,0,row);
+         if (!hasFront) quad(mesh,x+a,0,z-c,x+b,0,z-c,x+b,h,z-c,x+a,h,z-c,
+            cliffSlice(face,a/TILE,0,b/TILE,1),WHITE);
+         if (!hasBack) quad(mesh,x+b,0,z-d,x+a,0,z-d,x+a,h,z-d,x+b,h,z-d,
+            cliffSlice(face,1-b/TILE,0,1-a/TILE,1),color(.77f,.78f,.80f));
+         if (!hasLeft) quad(mesh,x+a,0,z-d,x+a,0,z-c,x+a,h,z-c,x+a,h,z-d,
+            cliffSlice(face,1-d/TILE,0,1-c/TILE,1),color(.82f,.83f,.84f));
+         if (!hasRight) quad(mesh,x+b,0,z-c,x+b,0,z-d,x+b,h,z-d,x+b,h,z-c,
+            cliffSlice(face,c/TILE,0,d/TILE,1),color(.70f,.72f,.75f));
       }
-      // Inner corners only touch a lower diagonal neighbour. A short corner
-      // return preserves that cue while keeping the walkable centre unobscured.
-      boolean inner=upper.contains("_inner");
-      float a=inner?((edges&4)!=0?0:13):0, b=inner?a+3:16;
-      float c=inner?((edges&1)!=0?0:13):0, d=inner?c+3:16;
-      if((edges&1)!=0){
-         quad(mesh,x+a,0,z,x+b,0,z,x+b,h,z,x+a,h,z,face,WHITE);
-         floor(cap,x+a,y,b-a,3,h,WHITE,geometry);
-      }
-      if((edges&2)!=0){
-         quad(mesh,x+b,0,z-16,x+a,0,z-16,x+a,h,z-16,x+b,h,z-16,face,color(.77f,.78f,.80f));
-         floor(cap,x+a,y+13,b-a,3,h,WHITE,geometry);
-      }
-      if((edges&4)!=0){
-         quad(mesh,x,0,z-d,x,0,z-c,x,h,z-c,x,h,z-d,face,color(.82f,.83f,.84f));
-         floor(cap,x,y+c,3,d-c,h,WHITE,geometry);
-      }
-      if((edges&8)!=0){
-         quad(mesh,x+16,0,z-c,x+16,0,z-d,x+16,h,z-d,x+16,h,z-c,face,color(.70f,.72f,.75f));
-         floor(cap,x+13,y+c,3,d-c,h,WHITE,geometry);
-      }
+   }
+
+   /** Scratch region is consumed immediately by floor/quad; the atlas stays immutable. */
+   private TextureRegion cliffSlice(TextureRegion source, float u0, float v0, float u1, float v1) {
+      float du = source.getU2() - source.getU(), dv = source.getV2() - source.getV();
+      cliffPart.setRegion(source);
+      cliffPart.setRegion(source.getU()+du*u0, source.getV()+dv*v0,
+         source.getU()+du*u1, source.getV()+dv*v1);
+      return cliffPart;
    }
 
    private boolean building(Tile tile, float x, float y, String name) {
@@ -452,13 +466,15 @@ public final class JohtoRenderer {
          // Keep the doorway footprint open; the frame rises on its back edge.
          upright(assets.named("door_red"),x,y+14,.1f,16,19,WHITE); return true;
       }
-      boolean wall = name.contains("wall") || name.matches(".*house[0-9].*")
-         || name.contains("cave") && tile.isSolid && !name.contains("regi");
-      if (wall && tile.isSolid) {
-         TextureRegion face=assets.named(name.contains("cave") ? "cliff_dark" : name.contains("ruin") ? "ruin_wall" : "wall");
-         float h=name.contains("cave")?14:19;
+      // A floor name must not turn the furniture placed on it into a tall wall.
+      boolean wall = VisualGeometry.buildingWall(tile.name, tile.nameUpper, tile.isSolid);
+      if (wall && assets.object(tile) == null) {
+         boolean cave = name.contains("cave"), ruin = name.contains("ruin");
+         TextureRegion face=assets.named(cave ? "cliff_dark" : ruin ? "ruin_wall" : "wall");
+         TextureRegion cap=assets.named(cave ? "mountain" : ruin ? "ruin_floor" : "tile_pale");
+         float h=cave?14:19;
          quad(batch(geometry,face.getTexture()),x,0,-y,x+16,0,-y,x+16,h,-y,x,h,-y,face,WHITE);
-         floor(assets.named("tile_pale"),x,y,16,16,h,color(.87f,.86f,.80f),geometry);
+         floor(cap,x,y,16,16,h,color(.87f,.86f,.80f),geometry);
          return true;
       }
       return false;
