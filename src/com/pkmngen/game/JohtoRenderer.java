@@ -33,7 +33,8 @@ import java.util.WeakHashMap;
  * any method which advances simulation. Unsupported scenes keep the normal image.
  */
 public final class JohtoRenderer {
-   private static final float TILE = 16f;
+   // World units, not texture pixels. Changing artwork never resizes collision cells.
+   private static final float TILE = VisualSampling.WORLD_TILE_SIZE;
    private static final float WHITE = Color.WHITE_FLOAT_BITS;
    private static final int FLOATS_PER_VERTEX = 7;
    private static final int MAX_VERTICES = 65532;
@@ -321,7 +322,7 @@ public final class JohtoRenderer {
       boolean tree = isTree(tile, lower, upper);
       TextureRegion ground = assets.terrain(tile);
       if (ground == null) ground = tile.sprite;
-      if (tile.isLava) ground = assets.cell("water", x + (int)(seconds * 2f) * 16, y);
+      if (tile.isLava) ground = assets.cell("water", x + (int)(seconds * 2f) * TILE, y);
       float tint = lower.equals("volcano2") ? color(.66f,.67f,.68f) : WHITE;
       floor(ground, x, y, TILE, TILE, 0f, tint, geometry, tile.isLava ? 3f : 0f);
       // Coast geometry follows actual wet/dry adjacency; never adds collision.
@@ -341,7 +342,9 @@ public final class JohtoRenderer {
          boolean plant = names.contains("grass") || names.contains("flower");
          float width = names.contains("rock") ? 17f : plant ? 16f : 18f;
          float height = Math.min(25f, width * object.getRegionHeight() / Math.max(1f, object.getRegionWidth()));
-         if (!plant) shadow(x + 8, y + 7, width * .3f, 2.4f);
+         width = assets.worldWidth(object, width);
+         height = assets.worldHeight(object, height);
+         if (!plant) assetShadow(object, x + 8, y + 7, width * .3f, 2.4f);
          upright(object, x + 8 - width/2, y + 7, .15f, width, height, WHITE);
       } else if (tile.overSprite != null && tile.overSprite != tile.sprite) {
          // Unknown interactive machinery, doors, puzzle symbols and rare events
@@ -522,8 +525,12 @@ public final class JohtoRenderer {
 
    private void trainer(Player player, float lift) {
       TextureRegion region = assets.trainer(player, seconds, moving(player, player.position.x, player.position.y));
-      shadow(player.position.x + 8, player.position.y + 7, 4.5f, 2.5f);
-      anchored(region, player.position.x + 8, player.position.y + 7, .15f + lift, 16f, 3f, .85f);
+      assetShadow(region, player.position.x + 8, player.position.y + 7, 4.5f, 2.5f);
+      // Preserve the old 32px * .85 world height even when a frame is 64/128px.
+      float height = 32f * .85f;
+      float width = height * region.getRegionWidth() / region.getRegionHeight();
+      assetBillboard(region, player.position.x + 8, player.position.y + 7, .15f + lift,
+         width, height, .5f, 3f / 32f, WHITE, 0f);
    }
 
    private void anchored(TextureRegion region, float groundX, float groundY, float lift, float anchorX, float anchorY, float scale) {
@@ -549,10 +556,15 @@ public final class JohtoRenderer {
       String key = name.contains("tree4") || name.contains("snow") ? "tree_snow"
          : name.contains("savanna") ? "tree_dry" : name.contains("tree2") ? "tree_pine" : "tree";
       TextureRegion sprite = assets.named(key);
-      float height = name.contains("large") ? 38 : 31;
-      float width = height * sprite.getRegionWidth() / sprite.getRegionHeight();
-      shadow(x,y,Math.min(width*.35f,10f),4);
+      float height = assets.worldHeight(sprite, name.contains("large") ? 38 : 31);
+      float width = assets.worldWidth(sprite, height * sprite.getRegionWidth() / sprite.getRegionHeight());
+      assetShadow(sprite,x,y,Math.min(width*.35f,10f),4);
       upright(sprite,x-width/2,y,.2f,width,height,WHITE);
+   }
+
+   private void assetShadow(TextureRegion region, float x, float y, float width, float depth) {
+      BwAssets.SpriteLayout layout = assets.layout(region);
+      shadow(x + (layout == null ? 0f : layout.offsetX), y + (layout == null ? 0f : layout.offsetY), width, depth);
    }
 
    private void shadow(float x, float y, float width, float depth) {
@@ -572,6 +584,35 @@ public final class JohtoRenderer {
    }
 
    private void upright(TextureRegion region, float x, float y, float base, float width, float height, float tint, float style) {
+      BwAssets.SpriteLayout layout = assets == null ? null : assets.layout(region);
+      if (layout != null && layout.customized) {
+         assetBillboard(region, x + width * .5f, y, base, width, height, .5f, 0f, tint, style);
+         return;
+      }
+      uprightRaw(region, x, y, base, width, height, tint, style);
+   }
+
+   /** Anchors are normalized image fractions; offsets and sizes are world units.
+    * PMD sprite/offset metadata uses anchored() and is deliberately unaffected. */
+   private void assetBillboard(TextureRegion region, float groundX, float groundY, float base,
+      float width, float height, float anchorX, float anchorY, float tint, float style) {
+      BwAssets.SpriteLayout layout = assets.layout(region);
+      float offsetX = 0f, offsetY = 0f, elevation = 0f;
+      if (layout != null) {
+         width = layout.width(region, width);
+         height = layout.height(region, height);
+         anchorX = layout.anchorX(anchorX);
+         anchorY = layout.anchorY(anchorY);
+         offsetX = layout.offsetX;
+         offsetY = layout.offsetY;
+         elevation = layout.elevation;
+      }
+      uprightRaw(region, groundX + offsetX - width * anchorX,
+         groundY + offsetY - height * anchorY * MathUtils.sinDeg(50f),
+         base + elevation - height * anchorY * MathUtils.cosDeg(50f), width, height, tint, style);
+   }
+
+   private void uprightRaw(TextureRegion region, float x, float y, float base, float width, float height, float tint, float style) {
       // Camera-facing sprites keep their pixel proportions in the tilted world.
       float rise = height * MathUtils.cosDeg(50f), back = height * MathUtils.sinDeg(50f);
       quad(batch(geometry, region.getTexture()),
