@@ -50,6 +50,40 @@ public final class ExpansionDex {
 
     public static boolean contains(String name) { return name != null && entries().containsKey(name.toLowerCase(Locale.ROOT)); }
     public static List<String> names() { return Collections.unmodifiableList(new ArrayList<>(entries().keySet())); }
+    /** Pinned PokeAPI habitat metadata: zero means absent, never an inferred habitat. */
+    public static int habitatId(String name) {
+        JsonValue value = entries().get(name.toLowerCase(Locale.ROOT));
+        return value == null ? 0 : value.getInt("habitatId", 0);
+    }
+
+    public static boolean allowsHabitat(String name, WildSpawnRules.Habitat habitat) {
+        switch (habitatId(name)) {
+            case 1: return !habitat.water && habitat.tags.contains("cave");
+            case 2: return !habitat.water && habitat.tags.contains("woodland");
+            case 3: return !habitat.water && (habitat.profile.id.equals("plains") || habitat.profile.id.equals("savanna"));
+            case 4: return !habitat.water && (habitat.profile.id.equals("mountain") || habitat.profile.id.equals("snow"));
+            case 5: return false; // Rare authored encounters are not ordinary random spawns.
+            case 6: return !habitat.water && (habitat.tags.contains("arid") || habitat.tags.contains("rocky"));
+            case 7: return habitat.tags.contains("saltwater") && (habitat.water || habitat.wetness > 0);
+            case 8: return !habitat.water && habitat.tags.contains("interior");
+            case 9: return habitat.water || habitat.wetness > 0;
+            default: return true; // Upstream/unknown data keeps its authored route defaults.
+        }
+    }
+
+    private static boolean habitatRoute(int habitat, String route) {
+        switch (habitat) {
+            case 2: return route.equals("forest1") || route.equals("wooded_lake1") || route.equals("deep_forest");
+            case 3: return route.equals("savanna2");
+            case 4: return route.equals("mountain1");
+            case 6: return route.equals("desert1") || route.equals("mountain1");
+            case 7: return route.equals("beach2_water") || route.equals("ocean1");
+            case 9: return route.equals("wooded_lake1") || route.equals("wooded_lake_water1");
+            // Cave, urban and rare pools are authored special/dungeon encounters.
+            // Do not populate their empty or progression-sensitive route lists.
+            default: return false;
+        }
+    }
     public static String dexNumber(String name) {
         JsonValue value = entries().get(name);
         return value == null ? null : index(value);
@@ -174,7 +208,11 @@ public final class ExpansionDex {
             JsonValue value = item.getValue();
             if (!value.getBoolean("spawnable") || value.getInt("evolvesFrom") != 0) continue;
             List<String> types = Arrays.asList(value.get("types").asStringArray());
-            boolean matches = route.equals("volcano1") ? types.contains("FIRE")
+            int habitat = value.getInt("habitatId", 0);
+            // Habitat records are incomplete for later generations. Keep the old
+            // type-derived route defaults only for those explicitly unknown records.
+            boolean matches = habitat != 0 ? habitatRoute(habitat, route)
+                : route.equals("volcano1") ? types.contains("FIRE")
                 : route.equals("snow1") ? types.contains("ICE")
                 : route.equals("graveyard1") ? types.contains("GHOST")
                 : route.equals("desert1") ? types.contains("GROUND") || types.contains("ROCK")

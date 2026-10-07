@@ -24,7 +24,10 @@ public final class WildSpawnRules {
         public final int depth;
         public final boolean water, lava;
         private Habitat(Tile tile, Map<Vector2, Tile> map, String time) {
-            profile = BiomeProfiles.forTile(tile);
+            this(tile, map, time, BiomeProfiles.forTile(tile));
+        }
+        private Habitat(Tile tile, Map<Vector2, Tile> map, String time, BiomeProfiles.Profile profile) {
+            this.profile = profile;
             this.time = time == null ? "day" : time.toLowerCase(Locale.ROOT);
             water = isWater(tile);
             lava = tile != null && tile.isLava;
@@ -53,6 +56,13 @@ public final class WildSpawnRules {
     }
 
     public static Habitat habitat(Tile tile, Map<Vector2, Tile> map, String time) { return new Habitat(tile, map, time); }
+    /** Fishing pools explicitly distinguish sea, fresh water and the authored sand-fishing mechanic. */
+    public static Habitat fishingHabitat(Tile tile, Map<Vector2, Tile> map, String time, String route) {
+        BiomeProfiles.Profile profile = route.equals("sand_fishing1") ? BiomeProfiles.named("desert")
+            : route.equals("sea1") || route.equals("ocean1") ? BiomeProfiles.named("beach")
+            : BiomeProfiles.named("wetland");
+        return new Habitat(tile, map, time, profile);
+    }
     public static boolean isWater(Tile tile) { return tile != null && (tile.isWater || tile.isWaterfall) && !tile.isLava; }
 
     /** The legacy swim-only list omitted Milotic and later species. Owned companions keep their controls. */
@@ -66,6 +76,7 @@ public final class WildSpawnRules {
 
     public static boolean allows(String species, Habitat habitat) {
         if (species == null || habitat.lava) return false;
+        if (!ExpansionDex.allowsHabitat(species, habitat)) return false;
         JsonValue rule = BiomeProfiles.speciesRule(species);
         if (rule == null) return true; // Route's existing species pool still defines unlisted habitats.
         if (!containsAll(habitat.tags, rule.get("requires"))) return false;
@@ -79,7 +90,25 @@ public final class WildSpawnRules {
     /** Keeps duplicate route entries as their intentional relative rarity. No retry-loop bias. */
     public static String choose(Tile tile, Map<Vector2, Tile> map, String time, List<String> candidates, Random random) {
         if (tile == null || candidates.isEmpty()) return null;
+        // These authored progression pools are also used by scripted interiors;
+        // ordinary surface rules must not rewrite their intentional encounters.
+        if (tile.routeBelongsTo != null && tile.routeBelongsTo.isDungeon)
+            return candidates.get(random.nextInt(candidates.size()));
         Habitat habitat = habitat(tile, map, time);
+        return chooseEligible(habitat, candidates, random);
+    }
+
+    public static String chooseFishing(Tile tile, Map<Vector2, Tile> map, String time, String route, List<String> candidates, Random random) {
+        if (tile == null || candidates.isEmpty()) return null;
+        Habitat habitat = fishingHabitat(tile, map, time, route);
+        ArrayList<String> eligible = new ArrayList<>();
+        // Fishing originally sampled rod-filtered entries uniformly. Preserve
+        // duplicate entries and that distribution; land spawn weights do not apply.
+        for (String name : candidates) if (allows(name, habitat)) eligible.add(name);
+        return eligible.isEmpty() ? null : eligible.get(random.nextInt(eligible.size()));
+    }
+
+    private static String chooseEligible(Habitat habitat, List<String> candidates, Random random) {
         if (habitat.lava) return null;
         ArrayList<String> eligible = new ArrayList<>();
         ArrayList<Integer> weights = new ArrayList<>();
@@ -100,10 +129,8 @@ public final class WildSpawnRules {
                 if (roll < 0) return eligible.get(index);
             }
         }
-        // Explicit profile defaults prevent a bad/mixed route from silently emptying a biome.
-        // Intentionally empty route lists (scripted dungeons) returned above stay empty.
-        for (String fallback : habitat.profile.strings("spawn", habitat.water ? "fallbackWater" : "fallbackLand"))
-            if (allows(fallback, habitat)) return fallback;
+        // A filtered-empty pool means no encounter at this cell. Introducing a
+        // different species here would change authored route membership/rarity.
         return null;
     }
 

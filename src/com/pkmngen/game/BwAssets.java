@@ -51,6 +51,14 @@ public final class BwAssets {
    private void loadAtlas(FileHandle file, String defaultTexture, boolean builtin, boolean trainersOnly) {
       JsonValue root = new JsonReader().parse(file);
       if (!root.isObject()) throw new IllegalArgumentException(file + ": atlas must be an object.");
+      int schema = integer(root,"schemaVersion",1);
+      if(schema<1||schema>2)throw new IllegalArgumentException(file+": unsupported material schema "+schema);
+      if(schema==2) {
+         JsonValue contract=root.get("coordinateContract");
+         String expected=builtin?"source-pixels":"normalized";
+         if(contract==null||!expected.equals(contract.getString("anchorUnit","")))
+            throw new IllegalArgumentException(file+": schema 2 anchorUnit must be "+expected);
+      }
       JsonValue entries = root.get("regions");
       if (entries == null) entries = root;
       else defaultTexture = root.getString("texture", defaultTexture);
@@ -330,6 +338,7 @@ public final class BwAssets {
       if (name.contains("lavafall")) return profile.string("fluid", "lava", "lava_bright");
       if (name.contains("waterfall")) return profile.string("fluid", "water", "water");
       if (name.contains("kiln")) return "kiln";
+      if (name.contains("chimney")) return "chimney";
       if (name.contains("machine") || name.contains("fossilreviver") || name.contains("pokecenter")) return name.contains("__off") ? "machine" : "machine_active";
       if (name.contains("cables")) return "wall";
       if (name.contains("warp")) return "warp";

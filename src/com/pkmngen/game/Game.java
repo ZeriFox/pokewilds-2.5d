@@ -308,6 +308,10 @@ public class Game extends ApplicationAdapter {
 
    @Override
    public void dispose() {
+      for (Action action : this.actionStack) if (action instanceof Battle.LoadAndPlayAnimation) {
+         MoveEffectPresentation effect=((Battle.LoadAndPlayAnimation)action).presentation;
+         if (effect!=null) effect.dispose();
+      }
       if (this.johtoRenderer != null) {
          this.johtoRenderer.dispose();
       }
@@ -1013,6 +1017,7 @@ public class Game extends ApplicationAdapter {
       if (!PkmnMap.PeriodicSave.isSaveOld()) {
          PkmnMap.PeriodicSave.increaseTimer();
       }
+      StartupVerification.afterFrame(this, this.johtoRenderer);
    }
 
    private void toggleFullScreen() {

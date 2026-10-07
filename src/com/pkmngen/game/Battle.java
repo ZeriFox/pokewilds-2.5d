@@ -3709,6 +3709,7 @@ public class Battle {
       int frameNum = 1;
       Texture currText;
       Sprite currFrame;
+      MoveEffectPresentation presentation;
       Pokemon target;
       boolean firstStep = true;
       Matrix4 translation;
@@ -3726,7 +3727,6 @@ public class Battle {
       SpriteProxy regionProxy;
       int[][] screenRegions = new int[][]{{94, 84, 66, 56}, {0, 48, 80, 48}, {0, 104, 92, 40}, {68, 48, 92, 40}};
       int inverseLastFrame = -1;
-      ShaderProgram grayscaleShader = new ShaderProgram(EvolutionAnim.vertexShader, EvolutionAnim.fragmentShader);
 
       public LoadAndPlayAnimation(Game game, String name, Pokemon target, Action nextAction) {
          super();
@@ -3849,6 +3849,7 @@ public class Battle {
          game.uiBatch.setTransformMatrix(new Matrix4(new Vector3(0.0F, 0.0F, 0.0F), new Quaternion(), new Vector3(1.0F, 1.0F, 1.0F)));
          FileHandle filehandle = Gdx.files.internal("attacks/" + this.name + "/output/frame-" + String.format(Locale.ROOT, "%03d", this.frameNum) + ".png");
          if (!filehandle.exists()) {
+            if (this.presentation != null) this.presentation.dispose();
             if (this.drawTexture != null) {
                this.drawTexture.dispose();
             }
@@ -3878,7 +3879,10 @@ public class Battle {
 
             if (this.metadata.containsKey(this.frameNum)) {
                String properties = this.metadata.get(this.frameNum);
-               if (properties.contains("screenshot")) {
+               if (game.johtoBattleRenderer != null && this.presentation == null)
+                  this.presentation = new MoveEffectPresentation(this.name);
+               boolean legacyRaster = this.presentation == null || !this.presentation.drawMetadata(game, this, properties);
+               if (legacyRaster && properties.contains("screenshot")) {
                   String[] values = properties.split("screenshot:")[1].split(" ")[0].split(",");
                   this.pixmapX = Integer.valueOf(values[0]);
                   this.pixmapY = Integer.valueOf(values[1]);
@@ -3890,7 +3894,7 @@ public class Battle {
                   this.drawTexture = new Texture(this.newPixmap);
                }
 
-               if (properties.contains("row_copy") || properties.contains("row_displace") || properties.contains("row_split")) {
+               if (legacyRaster && (properties.contains("row_copy") || properties.contains("row_displace") || properties.contains("row_split"))) {
                   float heightM = game.currScreen.y / 144.0F;
                   this.newPixmap.fill();
 
@@ -4088,7 +4092,8 @@ public class Battle {
 
             if (this.metadata.containsKey(this.frameNum)) {
                String properties = this.metadata.get(this.frameNum);
-               if (properties.contains("player_shrink") || properties.contains("enemy_shrink")) {
+               if ((properties.contains("player_shrink") || properties.contains("enemy_shrink"))
+                  && (this.presentation == null || !this.presentation.drawShrink(game, properties))) {
                   int progress = 1;
                   Sprite baseSprite = game.player.currPokemon.backSprite;
                   Vector2 position = new Vector2(0.0F, 48.0F);
@@ -4179,7 +4184,10 @@ public class Battle {
 
             this.currText = TextureCache.get(filehandle);
             this.currFrame = new Sprite(this.currText, 0, 0, 160, 144);
-            this.currFrame.draw(game.uiBatch);
+            if (game.johtoBattleRenderer != null) {
+               if (this.presentation == null) this.presentation = new MoveEffectPresentation(this.name);
+               this.presentation.drawFrame(game, this.currFrame, this.metadata.getOrDefault(this.frameNum, ""));
+            } else this.currFrame.draw(game.uiBatch);
             if (this.metadata.containsKey(this.frameNum)) {
                String properties = this.metadata.get(this.frameNum);
                if (properties.contains("enemy_healthbar_gone")) {

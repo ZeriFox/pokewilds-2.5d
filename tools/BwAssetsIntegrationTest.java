@@ -52,7 +52,9 @@ public final class BwAssetsIntegrationTest extends ApplicationAdapter {
    }
    private void baseline() {
       BwAssets assets=BwAssets.get();
-      JsonValue atlas=new JsonReader().parse(Gdx.files.internal("visual/landscape/world-atlas.json"));
+      JsonValue atlas=new JsonReader().parse(Gdx.files.internal("visual/stardew/world-atlas.json"));
+      check(atlas.getInt("schemaVersion")==2,"Versioned active material contract");
+      check(atlas.get("coordinateContract").getString("anchorUnit").equals("source-pixels"),"Explicit source-pixel anchors");
       int[] positions={-65,-16,-1,0,16,65};
       for(JsonValue e=atlas.get("regions").child;e!=null;e=e.next) {
          builtinRegions++;
@@ -60,15 +62,16 @@ public final class BwAssetsIntegrationTest extends ApplicationAdapter {
          check(full!=null && full.getRegionWidth()==w && full.getRegionHeight()==h,"Full crop "+e.name);
          near(e.getFloat("anchorX",w/2f),assets.anchorX(e.name),"Pixel anchor "+e.name);
          near(e.getFloat("anchorX",w/2f)/w,assets.layout(full).anchorX(.5f),"Normalized anchor "+e.name);
-         int cols=Math.max(1,w/16),rows=Math.max(1,h/16);
+         int sw=e.getInt("sampleWidth",Math.min(16,w)),sh=e.getInt("sampleHeight",Math.min(16,h));
+         int cols=Math.max(1,w/sw),rows=Math.max(1,h/sh);
          for(int x:positions)for(int y:positions) {
             TextureRegion cell=assets.cell(e.name,x,y);
             int col=Math.floorMod((int)Math.floor(x/16f),cols),row=Math.floorMod((int)Math.floor(-y/16f),rows);
-            check(cell.getRegionX()==e.getInt("x")+col*16 && cell.getRegionY()==e.getInt("y")+row*16
-               && cell.getRegionWidth()==Math.min(16,w) && cell.getRegionHeight()==Math.min(16,h),"Legacy mosaic "+e.name);
+            check(cell.getRegionX()==e.getInt("x")+col*sw && cell.getRegionY()==e.getInt("y")+row*sh
+               && cell.getRegionWidth()==sw && cell.getRegionHeight()==sh,"Declared source sampling "+e.name);
          }
       }
-      check(builtinRegions==202,"Complete landscape atlas");
+      check(builtinRegions>=214 && builtinRegions==atlas.get("regions").size,"Complete active atlas including retained materials");
       int sequences=0;
       for(JsonValue e=atlas.get("animations").child;e!=null;e=e.next) {
          sequences++;String[] frames=e.get("frames").asStringArray();float fps=e.getFloat("fps");
@@ -138,8 +141,16 @@ public final class BwAssetsIntegrationTest extends ApplicationAdapter {
       reject(region+",\"sampleWidth\":1.5}","Fractional samples rejected");
       reject(region+",\"x\":100}","Out-of-bounds crop rejected");
       reject("{\"texture\":\"../escape.png\",\"width\":16,\"height\":16}","Relative traversal rejected");
+      rejectContract("{\"schemaVersion\":99,\"regions\":{}}","unsupported material schema");
+      rejectContract("{\"schemaVersion\":2,\"coordinateContract\":{\"anchorUnit\":\"source-pixels\"},\"regions\":{}}","anchorUnit must be normalized");
       override.writeString(valid(),false,"UTF-8");
       check(BwAssets.get().named("tree").getRegionWidth()==96,"Recovery after invalid override");
+   }
+   private void rejectContract(String document,String message) {
+      BwAssets.disposeShared();override.writeString(document,false,"UTF-8");
+      try {BwAssets.get();throw new IllegalStateException("Invalid material contract accepted");}
+      catch(IllegalArgumentException expected){check(expected.getMessage().contains(message),"Contextual contract error");}
+      finally{BwAssets.disposeShared();}
    }
    private void reject(String region,String reason) {
       override.writeString("{\"regions\":{\"invalid_probe\":"+region+"}}",false,"UTF-8");

@@ -3,13 +3,17 @@ package com.pkmngen.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.pkmngen.game.util.SpriteProxy;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 /** PMD actor presentation; original actions still own transforms and battle timing. */
 public final class PmdBattleSprites {
@@ -17,7 +21,8 @@ public final class PmdBattleSprites {
    private static long actorDraws, portraitDraws;
    private static final Color saved = new Color();
    private static final Map<String, Float> scales = new HashMap<>();
-   private static final Map<String, TextureRegion> trainerRegions = new HashMap<>();
+   private static final Map<Texture, Map<String, TextureRegion>> trainerRegions = new IdentityHashMap<>();
+   private static final Map<Pokemon, Boolean> diagnosedGhosts = new WeakHashMap<>();
    private static ShaderProgram flashShader;
 
    public static void beginFrame() { seconds += Math.min(.1f, Gdx.graphics.getDeltaTime()); }
@@ -29,6 +34,14 @@ public final class PmdBattleSprites {
       Game game = Game.staticGame;
       if (game == null || game.modernUi == null || batch != game.uiBatch || game.battle == null) return false;
       if (batch instanceof ModernBatch && ((ModernBatch)batch).suppressed) return true;
+      Pokemon own = game.player == null ? null : game.player.currPokemon;
+      Pokemon enemy = game.battle.oppPokemon;
+      boolean trainerActor=game.player != null && source == game.player.battleSprite;
+      boolean friendlyActor=own != null && source == own.backSprite;
+      boolean enemyActor=enemy != null && (source == enemy.sprite || enemy.introAnim != null && enemy.introAnim.contains(source));
+      if(!trainerActor&&!friendlyActor&&!enemyActor)return false;
+      boolean clipped=game.johtoBattleRenderer!=null&&game.johtoBattleRenderer.beginActorClip(batch);
+      try {
       if (game.player != null && source == game.player.battleSprite) {
          TextureRegion trainer = BwAssets.get().trainer(game.player.character,"up",seconds,false);
          if (trainer == null) return false;
@@ -42,28 +55,33 @@ public final class PmdBattleSprites {
          draw.setRotation(source.getRotation()); draw.draw(game.uiBatch);
          return true;
       }
-      Pokemon own = game.player == null ? null : game.player.currPokemon;
-      Pokemon enemy = game.battle.oppPokemon;
       if (own != null && source == own.backSprite) return draw(game, own, source, true, animation(game, own));
       if (enemy != null && (source == enemy.sprite || enemy.introAnim != null && enemy.introAnim.contains(source)))
          return draw(game, enemy, source, false, animation(game, enemy));
       return false;
+      } finally {
+         if(clipped)game.johtoBattleRenderer.endActorClip(batch);
+      }
    }
 
    /** The B/W avatar cell contains transparent padding; fit its complete visible body. */
    private static TextureRegion trimTrainer(TextureRegion source) {
-      String key=source.getRegionX()+":"+source.getRegionY();
-      TextureRegion cached=trainerRegions.get(key);
+      String key=source.getRegionX()+":"+source.getRegionY()+":"+source.getRegionWidth()+":"+source.getRegionHeight();
+      Map<String,TextureRegion> byRegion=trainerRegions.computeIfAbsent(source.getTexture(),ignored->new HashMap<>());
+      TextureRegion cached=byRegion.get(key);
       if(cached!=null)return cached;
-      Pixmap atlas=new Pixmap(Gdx.files.internal("visual/unova/world-atlas.png"));
+      TextureData data=source.getTexture().getTextureData();
+      if(data.getType()!=TextureData.TextureDataType.Pixmap)return source;
+      if(!data.isPrepared())data.prepare();
+      Pixmap atlas=data.consumePixmap();
       int left=source.getRegionWidth(),top=source.getRegionHeight(),right=-1,bottom=-1;
       for(int y=0;y<source.getRegionHeight();y++)for(int x=0;x<source.getRegionWidth();x++){
          if((atlas.getPixel(source.getRegionX()+x,source.getRegionY()+y)&255)==0)continue;
          left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);
       }
-      atlas.dispose();
+      if(data.disposePixmap())atlas.dispose();
       cached=right<left?source:new TextureRegion(source,left,top,right-left+1,bottom-top+1);
-      trainerRegions.put(key,cached);return cached;
+      byRegion.put(key,cached);return cached;
    }
 
    private static String animation(Game game, Pokemon pokemon) {
@@ -96,6 +114,11 @@ public final class PmdBattleSprites {
    public static boolean draw(Game game, Pokemon pokemon, Sprite source, boolean back, String animation) {
       if (game.modernUi == null || pokemon == null || pokemon.isEgg || source == null) return false;
       if (pokemon.isGhost) {
+         if (diagnosedGhosts.put(pokemon, Boolean.TRUE) == null)
+            Gdx.app.log("GhostPresentation", "entity=Pokemon species=" + pokemon.specie.name
+               + " isGhost=true requested=hidden-identity asset=procedural-spirit fallback=false"
+               + " time=" + (game.map == null ? "none" : game.map.timeOfDay)
+               + " shader=ui-default layer=battle-actor");
          // The night encounter intentionally hides its species until Silph Scope.
          // Present it as the same luminous wisp used in the modern world, never
          // as a missing-art fallback or as an early reveal of the real Pokemon.
@@ -221,5 +244,5 @@ public final class PmdBattleSprites {
       return event(game, species + (pokemon.isShiny ? "#shiny" : ""), x,y,width,height);
    }
 
-   public static void dispose() { if (flashShader != null) flashShader.dispose(); flashShader=null; scales.clear(); trainerRegions.clear(); }
+   public static void dispose() { if (flashShader != null) flashShader.dispose(); flashShader=null; scales.clear(); trainerRegions.clear(); diagnosedGhosts.clear(); }
 }

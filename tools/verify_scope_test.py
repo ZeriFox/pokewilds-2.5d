@@ -45,8 +45,25 @@ def main() -> int:
         def append(path: Path) -> None:
             path.write_bytes(path.read_bytes() + b"\n// unauthorized mutation\n")
 
-        for name in ("Attack.java", "Battle.java", "Player.java", "PkmnMap.java", "util/Save.java"):
+        for name in ("Attack.java", "Player.java", "PkmnMap.java", "util/Save.java"):
             reject("protected " + name, verifier.PREFIX + name, append)
+        reject("Battle outside presentation action", verifier.PREFIX + "Battle.java", append)
+        # Even read-only inventory cannot broaden the R15 presentation exception
+        # into combat logic. Hash freezing is not the only protection here.
+        battle_path = root / verifier.PREFIX / "Battle.java"
+        battle_bytes = battle_path.read_bytes()
+        try:
+            battle_path.write_bytes(b"// mutation outside the move renderer\n" + battle_bytes)
+            try:
+                verifier.audit(root, inventory=True)
+            except RuntimeError as error:
+                if "Protected combat rules" not in str(error):
+                    raise
+                results.append("PASS Battle combat remains immutable during inventory: " + str(error))
+            else:
+                raise AssertionError("Inventory accepted an out-of-scope Battle mutation")
+        finally:
+            battle_path.write_bytes(battle_bytes)
         reject("input changed after freeze", verifier.PREFIX + "InputProcessor.java", append)
         reject("new helper changed after freeze", verifier.PREFIX + "DesktopControls.java", append)
         reject("unreviewed original source", verifier.PREFIX + "DrawMap.java", append)

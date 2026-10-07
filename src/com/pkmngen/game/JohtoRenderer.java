@@ -482,7 +482,7 @@ public final class JohtoRenderer {
       if(!game.actionStack.contains(action))return;
       if (diagnosedGhosts.put(action, Boolean.TRUE) == null) {
          Gdx.app.log("GhostDiagnostic", "identity=" + action.getClass().getSimpleName()
-            + " source=scripted-encounter isGhost=true asset=procedural-spirit fallback=false"
+            + " source=scripted-encounter isGhost=not-a-Pokemon asset=procedural-spirit fallback=false"
             + " biome=" + game.map.currBiome + " time=" + game.map.timeOfDay
             + " shader=world-atmosphere layer=translucent");
       }
@@ -752,11 +752,39 @@ public final class JohtoRenderer {
          surfaceLift=elevation.height(x,y);
       }
       if (player.isSleeping) {
-         // A new sleeping bag and the BW head replace the old full-body composite.
-         floor(white,x-7,y-7,14,22,.16f,color(.16f,.32f,.39f),geometry);
-         floor(white,x-6,y+8,12,6,.2f,color(.81f,.86f,.78f),geometry);
-         trainerImage(person,14,x,y+6,.3f,0,.85f);
+         if (player.sleepingDir != null) {
+            // The saved bed target differs from the walkable cell beside it.
+            // Match the bed billboard's pillow plane, leaving its blanket visible.
+            x=player.sleepingDir.x+8;y=player.sleepingDir.y+7;
+            surfaceLift=elevation.height(x,y);
+            TextureRegion bed=assets.named("bed");
+            float bedScale=VisualGeometry.fitScale(bed.getRegionWidth(),bed.getRegionHeight(),24,29);
+            float bedWidth=assets.worldWidth(bed,bed.getRegionWidth()*bedScale);
+            float bedHeight=assets.worldHeight(bed,bed.getRegionHeight()*bedScale);
+            float pillow=bedHeight*.68f,bedLift=.24f;
+            BwAssets.SpriteLayout bedLayout=assets.layout(bed);
+            if (bedLayout!=null && bedLayout.customized) {
+               x+=bedLayout.offsetX+bedWidth*(.5f-bedLayout.anchorX(.5f));
+               y+=bedLayout.offsetY-bedHeight*bedLayout.anchorY(0f)*MathUtils.sinDeg(50f);
+               bedLift+=bedLayout.elevation-bedHeight*bedLayout.anchorY(0f)*MathUtils.cosDeg(50f);
+            }
+            person=assets.trainer(player.character,"down",seconds,false);
+            trainerImage(person,14,x,y+pillow*MathUtils.sinDeg(50f),
+               bedLift+pillow*MathUtils.cosDeg(50f),0,.55f);
+         } else {
+            // Ground sleeping keeps its own bag; furniture sleep uses the actual bed.
+            floor(white,x-7,y-7,14,22,.16f,color(.16f,.32f,.39f),geometry);
+            floor(white,x-6,y+8,12,6,.2f,color(.81f,.86f,.78f),geometry);
+            trainerImage(person,14,x,y+6,.3f,0,.85f);
+         }
       } else if (player.isSitting) {
+         for (Action action : game.actionStack) if (action instanceof Player.Sitting) {
+            Player.Sitting sitting=(Player.Sitting)action;
+            x=sitting.sittingOn.position.x+sitting.offsetX+8;
+            y=sitting.sittingOn.position.y+sitting.offsetY+7;
+            surfaceLift=elevation.height(x,y);
+            break;
+         }
          trainerImage(person,26,x,y,.3f,0,.85f);
       } else {
          assetShadow(person,x,y,4.5f,2.5f);

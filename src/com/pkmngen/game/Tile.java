@@ -378,7 +378,7 @@ public class Tile {
          } else if (tileName.equals("ledge1_down")) {
             Texture playerText;
             if (color) {
-               playerText = TextureCache.get(Gdx.files.internal("ledge1_down_color.png"));
+               playerText = TextureCache.get(Gdx.files.internal("tiles/ledge1_down_color.png"));
             } else {
                playerText = TextureCache.get(Gdx.files.internal("ledge1_down.png"));
             }
@@ -386,7 +386,7 @@ public class Tile {
             this.sprite = new SmolSprite(playerText, 0, 0, 16, 16);
             this.isLedge = true;
             this.ledgeDir = "down";
-         } else if (tileName.contains("ledge2")) {
+         } else if (tileName.contains("ledge2") && !tileName.equals("ledge2_corner_tl") && !tileName.equals("ledge2_corner_tr")) {
             this.sprite = TextureCache.getTileSprite(tileName);
             this.isLedge = true;
          } else if (tileName.equals("ledge1_left")) {
@@ -931,6 +931,9 @@ public class Tile {
             this.sprite = TextureCache.getTileSprite("buildings/building1_machine2");
             this.isSolid = true;
          } else if (tileName.equals("pedistal1")) {
+            // The pedestal is an upper-layer prop, like the fossil reviver.
+            // Its ground layer must exist before the shared positioning code.
+            this.sprite = TextureCache.getTileSprite("blank");
             this.nameUpper = this.name;
          } else if (tileName.equals("statue1")) {
             this.sprite = TextureCache.getTileSprite("statue1");
@@ -3080,7 +3083,15 @@ public class Tile {
                   System.out.println(name);
                }
 
-               String name = eligiblePokemon.get(Game.rand.nextInt(eligiblePokemon.size()));
+               String name = WildSpawnRules.chooseFishing(this, game.map.tiles, game.map.timeOfDay, route.name, eligiblePokemon, Game.rand);
+               if (name == null) {
+                  nextAction.append(new WaitFrames(game, 120,
+                     new DisplayText(game, "Not even a nibble...", null, null,
+                        new SplitAction(new SetField(game.player, "isFishing", false, null),
+                           new SetField(game, "playerCanMove", true, new WaitFrames(game, 30, null))))));
+                  game.insertAction(nextAction);
+                  return;
+               }
                int level = 10;
                if (rodName.equals("good rod")) {
                   level = 20;
@@ -3097,6 +3108,7 @@ public class Tile {
                   Map<String, String> evos = Specie.gen2Evos.get(pokemon.specie.name);
 
                   for (String evo : evos.keySet()) {
+                     if (!WildSpawnRules.allows(evos.get(evo), WildSpawnRules.fishingHabitat(this, game.map.tiles, game.map.timeOfDay, route.name))) continue;
                      try {
                         int evoLevel = Integer.valueOf(evo);
                         if (evoLevel <= pokemon.level && Game.rand.nextInt(256) >= 128) {

@@ -7,12 +7,10 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import java.util.IdentityHashMap;
 import java.util.Locale;
-import java.util.ArrayList;
 import java.nio.IntBuffer;
 import com.badlogic.gdx.utils.BufferUtils;
 
@@ -35,12 +33,10 @@ public final class JohtoBattleRenderer {
    private boolean battleCanvas;
    private boolean projectionSaved;
    private final Matrix4 previousUiProjection = new Matrix4();
-   private Texture overlayPixel;
    private int arenaWidth,arenaHeight;
    private float canvasWidth=160,canvasHeight=144;
-   private final ArrayList<float[]> marginOverlays=new ArrayList<>();
    private final IntBuffer previousScissor=BufferUtils.newIntBuffer(4);
-   private ShaderProgram arenaShader;
+   private boolean previousScissorEnabled;
 
    public static JohtoBattleRenderer get(Game game) { return game.johtoBattleRenderer; }
 
@@ -48,7 +44,6 @@ public final class JohtoBattleRenderer {
    public void prepareFrame(Game game, boolean worldRendered) {
       PmdBattleSprites.beginFrame();
       frame++;
-      marginOverlays.clear();
       phase = "none";
       for (Action action : game.actionStack) {
          if (action instanceof BattleIntro) phase = "intro";
@@ -110,8 +105,31 @@ public final class JohtoBattleRenderer {
       return true;
    }
 
-   // Existing boss/night overlays already draw across the full canvas in order.
-   private void marginOverlay(float x,float y,float w,float h,Color color) {}
+   /** Clip staged actor slides before they draw, never repaint over later effects. */
+   boolean beginActorClip(com.badlogic.gdx.graphics.g2d.Batch batch) {
+      if (!battleCanvas) return false;
+      batch.flush();
+      previousScissorEnabled=Gdx.gl.glIsEnabled(GL20.GL_SCISSOR_TEST);
+      previousScissor.clear();Gdx.gl.glGetIntegerv(GL20.GL_SCISSOR_BOX,previousScissor);
+      int w=Gdx.graphics.getBackBufferWidth(),h=Gdx.graphics.getBackBufferHeight();
+      float scale=Math.min(w/160f,h/144f);
+      int left=(int)Math.floor((w-160*scale)*.5f),bottom=(int)Math.floor((h-144*scale)*.5f);
+      int right=(int)Math.ceil((w+160*scale)*.5f),top=(int)Math.ceil((h+144*scale)*.5f);
+      if(previousScissorEnabled) {
+         left=Math.max(left,previousScissor.get(0));bottom=Math.max(bottom,previousScissor.get(1));
+         right=Math.min(right,previousScissor.get(0)+previousScissor.get(2));
+         top=Math.min(top,previousScissor.get(1)+previousScissor.get(3));
+      }
+      Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST);
+      Gdx.gl.glScissor(left,bottom,Math.max(0,right-left),Math.max(0,top-bottom));
+      return true;
+   }
+
+   void endActorClip(com.badlogic.gdx.graphics.g2d.Batch batch) {
+      batch.flush();
+      Gdx.gl.glScissor(previousScissor.get(0),previousScissor.get(1),previousScissor.get(2),previousScissor.get(3));
+      if(!previousScissorEnabled)Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);
+   }
 
    private static boolean isSpecialIntro(Action action) {
       return action != null && action.getClass().getSimpleName().equals("BattleIntro1");
@@ -171,7 +189,6 @@ public final class JohtoBattleRenderer {
       ModernUi ui = ModernUi.get(game);
       if (ui == null) return;
       ensureArena(biome);
-      arenaShader=game.uiBatch.getShader();
       oldColor.set(game.uiBatch.getColor());
       game.uiBatch.setColor(Color.WHITE);
       float aspect=Gdx.graphics.getBackBufferWidth()/(float)Math.max(1,Gdx.graphics.getBackBufferHeight());
@@ -201,7 +218,7 @@ public final class JohtoBattleRenderer {
    public void drawBossFade(Game game,float alpha) {
       if(alpha<=0)return;
       Color color=tint.set(ModernUi.INK).mul(1,1,1,MathUtils.clamp(alpha,0,1));
-      ModernUi.get(game).rect(game,-320,-288,800,720,color);marginOverlay(-320,-288,800,720,color);
+      ModernUi.get(game).rect(game,-320,-288,800,720,color);
    }
 
    /** Preserve Mewtwo's moving distortion with a GPU copy at the actual viewport size. */
@@ -228,7 +245,6 @@ public final class JohtoBattleRenderer {
    public void drawNightTint(Game game) {
       ModernUi ui = ModernUi.get(game);
       if (ui != null) ui.rect(game, -320, -288, 800, 720, tint.set(0.08f, 0.16f, 0.27f, 0.16f));
-      marginOverlay(-320,-288,800,720,tint);
    }
 
    public void drawFriendlyHealth(Game game, DrawFriendlyHealthGen2 health) {
@@ -347,7 +363,6 @@ public final class JohtoBattleRenderer {
       float p = progress(action, remaining);
       float pulse = 0.10f + 0.13f * (0.5f + 0.5f * MathUtils.sin(p * MathUtils.PI * 6f));
       ui.rect(game, -320, -288, 800, 720, tint.set(0.08f, 0.22f, 0.26f, pulse));
-      marginOverlay(-320,-288,800,720,tint);
       float band = MathUtils.clamp(p * 5f, 0f, 1f);
       ui.rect(game, 0, 60, 160 * band, 25, tint.set(0.08f, 0.24f, 0.28f, 0.94f));
       ui.rect(game, 0, 59, 160 * band, 1, ModernUi.GOLD);
@@ -364,8 +379,6 @@ public final class JohtoBattleRenderer {
       float p = MathUtils.clamp((total - remaining + 1f) / Math.min(28f, total), 0f, 1f);
       ui.rect(game, -320, -288, 800, 288 + 72 * p, ModernUi.INK);
       ui.rect(game, -320, 144 - 72 * p, 800, 432, ModernUi.INK);
-      marginOverlay(-320,-288,800,288+72*p,ModernUi.INK);
-      marginOverlay(-320,144-72*p,800,432,ModernUi.INK);
       ui.rect(game, 0, 72 * p, 160, 1, ModernUi.GOLD);
       ui.rect(game, 0, 143 - 72 * p, 160, 1, ModernUi.GOLD);
       countTransition();
@@ -375,7 +388,6 @@ public final class JohtoBattleRenderer {
       ModernUi ui = ModernUi.get(game);
       float alpha = MathUtils.clamp(remaining / (float)total(action, remaining), 0f, 1f);
       ui.rect(game, -320, -288, 800, 720, tint.set(ModernUi.PAPER).mul(1f, 1f, 1f, alpha));
-      marginOverlay(-320,-288,800,720,tint);
       countTransition();
    }
 
@@ -386,14 +398,12 @@ public final class JohtoBattleRenderer {
          : timer < 12 * slow ? 1f : timer < 14 * slow ? 0.75f : timer < 16 * slow ? 0.5f : timer < 18 * slow ? 0.25f : 0f;
       if (alpha > 0f) {
          ModernUi.get(game).rect(game, -320, -288, 800, 720, tint.set(ModernUi.PAPER).mul(1f, 1f, 1f, alpha));
-         marginOverlay(-320,-288,800,720,tint);
       }
       countTransition();
    }
 
    public void drawTravelFade(Game game, float alpha) {
       ModernUi.get(game).rect(game, -320, -288, 800, 720, tint.set(ModernUi.INK).mul(1f,1f,1f,alpha));
-      marginOverlay(-320,-288,800,720,tint);
       countTransition();
    }
 
@@ -559,7 +569,6 @@ public final class JohtoBattleRenderer {
       if (rippleSnapshot != null) rippleSnapshot.dispose();
       if (arena != null) arena.dispose();
       if (snapshotBatch != null) snapshotBatch.dispose();
-      if (overlayPixel != null) overlayPixel.dispose();
       transitionLengths.clear();
    }
 }

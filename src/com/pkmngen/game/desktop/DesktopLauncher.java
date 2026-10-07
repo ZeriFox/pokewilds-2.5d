@@ -44,6 +44,10 @@ public class DesktopLauncher {
       try {
          new Lwjgl3Application(new Game(args, scale), config);
       } catch (Throwable throwable) {
+         if (Boolean.getBoolean("pokewilds.verifyStartup")) {
+            throwable.printStackTrace();
+            System.exit(1);
+         }
          Game.saveErrorLogAndNotifyUser("PokeWilds crashed :( reason:\n\n", throwable);
       }
    }
@@ -117,6 +121,7 @@ public class DesktopLauncher {
       config.setTitle("PokeWilds");
       config.setWindowIcon("icon-64.png", "icon-32.png", "icon-256.png");
       config.setForegroundFPS(60);
+      if (Boolean.getBoolean("pokewilds.verifyStartup")) config.setInitialVisible(false);
       config.setWindowListener(
          new Lwjgl3WindowAdapter() {
             @Override

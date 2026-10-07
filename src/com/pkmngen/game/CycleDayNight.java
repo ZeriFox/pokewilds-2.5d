@@ -701,7 +701,6 @@ class CycleDayNight extends Action {
       if (game.map.tiles == game.map.overworldTiles && game.map.timeOfDay.equals("night") && game.playerCanMove && !game.player.isNearCampfire) {
          if (game.map.currBiome.equals("deep_forest") || game.map.currBiome.equals("graveyard") || game.map.currBiome.equals("wooded_lake")) {
             this.countDownToGhost--;
-            System.out.println(this.countDownToGhost);
             if (this.countDownToGhost <= 0) {
                Vector2 randPos = game.player.position.cpy().add(this.rand.nextInt(5) * 16 - 48, this.rand.nextInt(5) * 16 - 48);
                game.insertAction(new SpawnGhost(game, new Vector2(randPos)));
@@ -711,7 +710,6 @@ class CycleDayNight extends Action {
 
          if (game.player.nearCacturne) {
             this.countDownToCacturne--;
-            System.out.println(this.countDownToCacturne);
             if (this.countDownToCacturne <= 0) {
                this.countDownToCacturne = this.rand.nextInt(500) + 100;
                System.out.println("spawn cacturne");
@@ -778,7 +776,6 @@ class CycleDayNight extends Action {
                   game.insertAction(gengar.new Shadowed(null));
                } else {
                   this.countDownToGengar--;
-                  System.out.println(this.countDownToGengar);
                }
             }
          } else {

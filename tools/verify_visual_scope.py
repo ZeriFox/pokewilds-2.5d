@@ -20,7 +20,7 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "409b51ce8398b7f485055f5dce3df14abd1dce10164e1e2b69eb97bb81dc65e7"
+FROZEN_MANIFEST_SHA256 = "d8d302ca964604a72e0747ade53e76fc8a704ce1e94f2796fc3c56e1e0728c8c"
 PREFIX = "src/com/pkmngen/game/"
 V2_ARCHIVE = {
     "baseline/modernization-v2/modernization-scope.json": "f978edd535ac4440d6ce01924bc98135105a718e3a57faf9838827cd3ebf2343",
@@ -47,7 +47,10 @@ V5_ARCHIVE = {
 
 # Names and review scope are explicit; an edited manifest cannot expand them.
 MODIFIED_SCOPES = {
-    "desktop/DesktopLauncher.java": "Desktop input lifecycle: window focus callbacks release physical bindings and require release before refocus activation; launcher, save location and runtime behavior otherwise retained.",
+    "Battle.java": "R15 presentation only inside LoadAndPlayAnimation: explicitly classified screen-space frames and full-viewport snapshot/row-copy composition; outer combat rules remain byte-identical to the original snapshot.",
+    "CycleDayNight.java": "Remove three unconditional per-frame countdown prints; encounter triggers, timing, lighting and day/night simulation unchanged.",
+    "Tile.java": "Repair original ledge corner, colored ledge and pedestal asset construction; habitat-filter rod-restricted fishing and natural evolutions, preserving empty-pool no-nibble behavior; no serialization changes.",
+    "desktop/DesktopLauncher.java": "Desktop input focus callbacks and opt-in packaged-launch verification with a hidden window and nonzero crash exit; normal launcher and save location retained.",
     "BattleFadeOut.java": "Presentation: replace fade drawing while retaining action timing and dispatch.",
     "BattleIntro.java": "Presentation: preserve the modern world image during the original battle intro.",
     "BattleIntroAnim1.java": "Presentation: replace intro frame and border drawing, retain frame progression.",
@@ -91,6 +94,7 @@ ADDED_SCOPES = {
     "BiomeProfiles.java": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state.",
     "BwAssets.java": "Lazy, disposable local landscape atlas access, biome-specific semantic materials, validated optional texture overrides and sampling independent of the simulation grid, contextual missing-asset diagnostics and separate Black/White trainer assets.",
     "DesktopControls.java": "Authorized desktop binding parser, exact legacy-preset migration, text-entry detection and truthful dynamic hints.",
+    "StartupVerification.java": "Opt-in packaged-launch probe inside the delivered Game: observe 120 original menu frames, verify nonempty framebuffer, save capture and exit normally; disabled in ordinary play.",
     "ExpansionDex.java": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration.",
     "JohtoBattleRenderer.java": "Modern biome battle arenas/HUD, full-viewport composition, preserved-world transitions and presentation helpers for special boss actions.",
     "JohtoRenderer.java": "Exclusive perspective world drawing with shared derived terrain heights, continuous cliff/ramp geometry and contact shading, coherent biome materials/atmosphere, aspect-preserving decor, configurable sprite dimensions/anchors, proportional trainer crops and building-wall classification, modern intentional ghost presentation, anchored PMD actors and original field-action feedback; no persisted terrain or collision changes.",
@@ -99,17 +103,18 @@ ADDED_SCOPES = {
     "ModernPartyUi.java": "Modern setup/party/storage/nickname UI, full animated summary actors on all three pages and configured control hints.",
     "ModernUi.java": "Modern typography, shared logical viewport and anchored panel layout, dialogs, event backgrounds and menu rendering dispatch.",
     "ModernWorldGenerator.java": "Authorized deterministic procedural landforms, biome distribution and volcanic terrain.",
+    "MoveEffectPresentation.java": "R15 semantic local/screen effect classification, viewport-sized arena snapshots and GPU row/color effects, PMD shrink presentation, explicit GL state restoration and disposal; original action clocks and scheduling retained.",
     "PmdBattleSprites.java": "Exact PMD battle/event actors with diagonal battle-facing poses, complete animation-envelope fit and ground anchoring, trimmed trainers, hidden-identity ghost presentation and visual effects.",
     "PmdPokemonSprites.java": "Pinned PMD portrait/animation loading, timing/directions, bounded texture cache and complete animation bounds for uncropped actors.",
     "TrainerModel3D.java": "Existing optional experimental trainer model helper.",
     "VisualGeometry.java": "Pure presentation helpers for diagonal battle-facing poses, uniform sprite fitting, cliff footprint math and building-wall classification; no map or collision writes.",
     "VisualSampling.java": "Validated pixel-region sampling independent of the fixed simulation grid, including deterministic signed world coordinates and exact source-cell boundaries.",
     "WorldBatch.java": "Drop legacy world draw submissions while preserving original action step execution and state changes.",
-    "WildSpawnRules.java": "New-wild habitat filtering/rarity, safe nonempty fallback pools, oasis encounter anchoring and uncaught aquatic movement gating; no saved or owned Pokemon migration.",
+    "WildSpawnRules.java": "New-wild habitat filtering/rarity, metadata-backed habitat and fishing pools, no out-of-pool species injection, preserved authored dungeons, oasis encounter anchoring and uncaught aquatic movement gating; no saved or owned Pokemon migration.",
     "WorldElevation.java": "Read-only geometry sidecar derived from saved ledges and ramps; deterministic plateau/boundary constraint resolution, continuous ramp heights, local ambiguity diagnostics and cache invalidation without serialized height fields or gameplay collision edits.",
 }
 PROTECTED_NAMES = (
-    "Attack.java", "Battle.java", "Player.java", "Network.java", "util/Save.java",
+    "Attack.java", "Player.java", "Network.java", "util/Save.java",
     "CheckMovesLearned.java", "CheckEndOfBattle.java", "PkmnMap.java", "DrawSetupMenu.java",
 )
 
@@ -150,6 +155,18 @@ def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
         snapshot = root / CLASSIC_SOURCES / path
         if not snapshot.is_file() or sha256(snapshot) != expected:
             raise RuntimeError("Archived original source differs from classic digest: " + path)
+    # R15 needs the real move renderer. Keep combat logic outside that one
+    # presentation action immutable instead of allowing the whole Battle class.
+    battle_path = PREFIX + "Battle.java"
+    def battle_rules(path: Path) -> tuple[str, str]:
+        source = path.read_text(encoding="utf-8")
+        before, start, tail = source.partition("   static class LoadAndPlayAnimation extends Action {")
+        _, end, after = tail.partition("   class Network {")
+        if not start or not end:
+            raise RuntimeError("Battle presentation boundary missing")
+        return before, end + after
+    if battle_rules(root / battle_path) != battle_rules(root / CLASSIC_SOURCES / battle_path):
+        raise RuntimeError("Protected combat rules outside LoadAndPlayAnimation changed")
     changed = sorted(path for path, expected in original.items() if current[path] != expected)
     added = sorted(set(current) - set(original))
     expected_changed = {PREFIX + name for name in MODIFIED_SCOPES}

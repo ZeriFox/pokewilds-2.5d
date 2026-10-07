@@ -46,6 +46,7 @@ public final class PresentationReworkTest {
       @Override public void create() {
          super.create();actionStack.clear();Gdx.input.setInputProcessor(null);
          System.out.println("Requested viewport="+WIDTH+"x"+HEIGHT+" actual backbuffer="+Gdx.graphics.getBackBufferWidth()+"x"+Gdx.graphics.getBackBufferHeight());
+         require(Gdx.graphics.getBackBufferWidth()==WIDTH && Gdx.graphics.getBackBufferHeight()==HEIGHT,"Requested viewport was clamped; pixel probes would not cover the promised resolution");
          server=new Server();Network.register(server);
          map=new PkmnMap("presentation-rework-fixture");
          for(int y=-64;y<=64;y+=16)for(int x=-64;x<=64;x+=16){

@@ -55,7 +55,36 @@ public final class PmdBattleVisualTest {
          own.backSprite.setPosition(16,48); enemy.sprite.setPosition(96,88);
          battle.drawAction = new DrawBattle(this);
          currMusic = com.pkmngen.game.util.audio.AudioLoader.loadMusic("sounds/evolve_fanfare1.ogg");
+         verifyTrainerTrimming();
          verifyBattleDirections();
+      }
+
+      void verifyTrainerTrimming() {
+         Pixmap firstPixels=new Pixmap(64,48,Pixmap.Format.RGBA8888),secondPixels=new Pixmap(64,48,Pixmap.Format.RGBA8888);
+         firstPixels.setColor(Color.WHITE);firstPixels.fillRectangle(12,9,14,19);
+         secondPixels.setColor(Color.WHITE);secondPixels.fillRectangle(22,14,23,7);
+         Texture first=new Texture(firstPixels),second=new Texture(secondPixels);
+         try {
+            java.lang.reflect.Method trim=PmdBattleSprites.class.getDeclaredMethod("trimTrainer",TextureRegion.class);trim.setAccessible(true);
+            TextureRegion firstSource=new TextureRegion(first,8,6,40,28),secondSource=new TextureRegion(second,8,6,40,28);
+            TextureRegion firstTrim=(TextureRegion)trim.invoke(null,firstSource),secondTrim=(TextureRegion)trim.invoke(null,secondSource);
+            assertCrop(firstTrim,first,12,9,14,19,"First rectangular custom avatar");
+            assertCrop(secondTrim,second,22,14,23,7,"Same-coordinate avatar from a different texture");
+            require(trim.invoke(null,firstSource)==firstTrim&&trim.invoke(null,secondSource)==secondTrim,
+               "Trainer trim cache did not preserve independent texture identities");
+            TextureRegion smaller=(TextureRegion)trim.invoke(null,new TextureRegion(first,8,6,14,14));
+            assertCrop(smaller,first,12,9,10,11,"Same texture coordinates with a different crop size");
+            TextureRegion empty=new TextureRegion(first,40,36,8,8);
+            require(trim.invoke(null,empty)==empty,"Transparent custom avatar region did not preserve its original bounds");
+            require(firstSource.getRegionWidth()==40&&firstSource.getRegionHeight()==28,
+               "Trainer alpha trimming mutated the shared source region");
+            System.out.println("PMD CUSTOM TRAINER PASS: actual source alpha, rectangular crops, independent texture/size cache and immutable source");
+         }catch(ReflectiveOperationException ex){throw new IllegalStateException(ex);}
+         finally{first.dispose();second.dispose();firstPixels.dispose();secondPixels.dispose();}
+      }
+      void assertCrop(TextureRegion region,Texture texture,int x,int y,int width,int height,String reason) {
+         require(region.getTexture()==texture&&region.getRegionX()==x&&region.getRegionY()==y
+            &&region.getRegionWidth()==width&&region.getRegionHeight()==height,reason+" read wrong alpha bounds or cache identity");
       }
 
       void verifyBattleDirections() {

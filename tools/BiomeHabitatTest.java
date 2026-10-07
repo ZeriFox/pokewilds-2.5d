@@ -21,7 +21,7 @@ public final class BiomeHabitatTest {
         config.setInitialVisible(false); config.setWindowedMode(320, 288); config.setForegroundFPS(30);
         new Lwjgl3Application(new TestGame(), config);
         if (failure != null) { failure.printStackTrace(); System.exit(1); }
-        System.out.println("BIOME PASS: 14 profiles, native resolution, 20000 weighted choices, water/depth/time gates, actual PlayerStanding encounters, unique oasis identity preserved");
+        System.out.println("BIOME PASS: 14 profiles, native resolution, 20000 weighted choices, canonical/unknown expansion habitats, water/depth/time and fishing gates, preserved route pools, actual PlayerStanding encounters, unique oasis identity preserved");
         System.exit(0);
     }
     private static final class TestGame extends Game {
@@ -33,7 +33,7 @@ public final class BiomeHabitatTest {
                 map = new PkmnMap("habitat-fixture");
                 map.rand = new Random(391);
                 levelScalingEnabled = false;
-                profiles(); habitat(); actualEncounters(); oasis(); waterMovement();
+                profiles(); habitat(); expansionHabitats(); fishing(); actualEncounters(); oasis(); waterMovement();
             } catch (Throwable error) { failure = error; }
             Gdx.app.exit();
         }
@@ -100,7 +100,7 @@ public final class BiomeHabitatTest {
             check(!WildSpawnRules.allows("gastly", WildSpawnRules.habitat(forest, map.tiles, "day")), "Daytime forest Gastly");
             check(WildSpawnRules.allows("gastly", WildSpawnRules.habitat(forest, map.tiles, "night")), "Night ghost absent");
             check(WildSpawnRules.allows("gastly", WildSpawnRules.habitat(cemetery, map.tiles, "day")), "Haunted habitat ignored");
-            check(WildSpawnRules.choose(dry, map.tiles, "day", List.of("milotic"), new Random(1)).equals("trapinch"), "Invalid pool emptied biome");
+            check(WildSpawnRules.choose(dry, map.tiles, "day", List.of("milotic"), new Random(1)) == null, "Filtered pool injected a species absent from the route");
             check(WildSpawnRules.choose(dry, map.tiles, "day", List.of(), new Random(1)) == null, "Scripted empty route populated");
             check(WildSpawnRules.choose(tile("lava1", "volcano1"), map.tiles, "day", List.of("numel"), new Random(1)) == null, "Wildlife on solid lava");
             Random first = new Random(87), second = new Random(87);
@@ -124,7 +124,7 @@ public final class BiomeHabitatTest {
             check(result != null && (result.specie.name.equals("numel") || result.specie.name.equals("camerupt")), "Actual grass encounter ignored habitat");
             Route.allowedPokemon.put("desert1", new ArrayList<>(List.of("milotic")));
             result = standing.checkWildEncounter(this, dry.position);
-            check(result != null && result.specie.name.equals("trapinch"), "Actual grass fallback failed");
+            check(result == null, "Filtered grass pool injected an unauthorized species");
             Tile forest = tile("grass2", "forest1"); forest.items = new HashMap<>();
             map.tiles.put(forest.position.cpy(), forest);
             Route.allowedPokemon.put("forest1", new ArrayList<>(List.of("gastly")));
@@ -133,6 +133,61 @@ public final class BiomeHabitatTest {
             result = standing.checkWildEncounter(this, forest.position);
             check(result != null && List.of("gastly", "haunter", "gengar").contains(result.specie.name), "Actual nighttime ghost missing");
             Route.allowedPokemon.remove("desert1"); Route.allowedPokemon.remove("forest1");
+        }
+        private void expansionHabitats() {
+            check(ExpansionDex.habitatId("treecko") == 2 && ExpansionDex.habitatId("wailmer") == 7
+                && ExpansionDex.habitatId("mudkip") == 9, "Canonical habitat metadata changed");
+            check(ExpansionDex.habitatId("sprigatito") == 0, "Missing metadata was invented");
+            List<String> forestPool = new Route("forest1", 10).allowedPokemon();
+            check(forestPool.contains("skitty") && !new Route("savanna2", 10).allowedPokemon().contains("skitty"),
+                "Known forest habitat is still routed solely by Normal type");
+            check(new Route("mountain1", 10).allowedPokemon().contains("spinda"), "Known mountain species lost its habitat route");
+            check(new Route("regi_cave1", 10).allowedPokemon().isEmpty(), "Metadata populated an authored empty dungeon");
+            check(forestPool.contains("sprigatito"), "Unknown later-generation habitat lost the documented route default");
+            map.tiles.clear();
+            Tile forest = tile("green1", "forest1"), desert = tile("desert2", "desert1");
+            check(WildSpawnRules.allows("treecko", WildSpawnRules.habitat(forest, map.tiles, "day")), "Forest gate rejected Treecko");
+            check(!WildSpawnRules.allows("treecko", WildSpawnRules.habitat(desert, map.tiles, "day")), "Known forest species passed desert gate");
+            Tile sea = tile("water2", "ocean1"), fresh = tile("water1", "wooded_lake_water1");
+            check(WildSpawnRules.allows("wailmer", WildSpawnRules.habitat(sea, map.tiles, "day")), "Sea habitat rejected Wailmer");
+            check(!WildSpawnRules.allows("wailmer", WildSpawnRules.habitat(fresh, map.tiles, "day")), "Marine habitat accepted freshwater");
+            Tile near = new Tile("green1", new Vector2(16, 0), true, new Route("wooded_lake1", 10));
+            Tile far = new Tile("green1", new Vector2(80, 0), true, near.routeBelongsTo);
+            map.tiles.put(fresh.position.cpy(), fresh);
+            check(WildSpawnRules.allows("mudkip", WildSpawnRules.habitat(near, map.tiles, "day")), "Water-edge habitat rejected adjacent shore");
+            check(!WildSpawnRules.allows("mudkip", WildSpawnRules.habitat(far, map.tiles, "day")), "Water-edge metadata ignored actual water proximity");
+            check(WildSpawnRules.choose(tile("grass2", "regi_cave1"), map.tiles, "day", List.of("feebas"), new Random(1)).equals("feebas"),
+                "Ordinary habitat rules rewrote an explicit scripted dungeon pool");
+        }
+        private void fishing() {
+            map.tiles.clear();
+            Tile sand = tile("desert2", "desert1"), ocean = tile("water2", "ocean1"), pond = tile("water1", "oasis1");
+            check(WildSpawnRules.chooseFishing(sand, map.tiles, "day", "sand_fishing1", List.of("milotic", "trapinch"), new Random(1)).equals("trapinch"),
+                "Authored desert sand-fishing mechanic changed");
+            check(WildSpawnRules.chooseFishing(sand, map.tiles, "day", "sand_fishing1", List.of("milotic"), new Random(1)) == null,
+                "Fishing on dry sand generated Milotic or a species absent from the rod pool");
+            check(WildSpawnRules.chooseFishing(ocean, map.tiles, "day", "sea1", List.of("feebas"), new Random(1)) == null,
+                "Freshwater fish passed saltwater fishing gate");
+            check(WildSpawnRules.chooseFishing(pond, map.tiles, "day", "oasis_pond1", List.of("feebas"), new Random(1)).equals("feebas"),
+                "Rod-eligible oasis fish was rejected");
+            check(WildSpawnRules.chooseFishing(pond, map.tiles, "day", "oasis_pond1", List.of(), new Random(1)) == null,
+                "Empty rod pool generated an encounter");
+            List<String> rodPool = List.of("feebas", "wailmer", "magikarp", "feebas", "magikarp", "feebas");
+            List<String> eligible = List.of("feebas", "magikarp", "feebas", "magikarp", "feebas");
+            Random sequential = new Random(0) {
+                private int next;
+                @Override public int nextInt(int bound) {
+                    check(bound == eligible.size(), "Fishing reweighted or deduplicated the authored rod entries: " + bound);
+                    return next++ % bound;
+                }
+            };
+            for (String expected : eligible)
+                check(WildSpawnRules.chooseFishing(pond, map.tiles, "day", "oasis_pond1", rodPool, sequential).equals(expected),
+                    "Fishing changed the order or multiplicity of eligible rod entries");
+            Random original = new Random(60421), filtered = new Random(60421);
+            for (int sample = 0; sample < 1000; sample++)
+                check(WildSpawnRules.chooseFishing(pond, map.tiles, "day", "oasis_pond1", rodPool, filtered)
+                    .equals(eligible.get(original.nextInt(eligible.size()))), "Fishing changed the original uniform selection sequence");
         }
         private void oasis() {
             Map<Vector2, Tile> tiles = new HashMap<>();
