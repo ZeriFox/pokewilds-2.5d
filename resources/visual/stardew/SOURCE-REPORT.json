@@ -1,0 +1,114 @@
+{
+  "status": "acquisition-only",
+  "rights": "Original game artwork. Stardew Valley: ConcernedApe. Pokemon: Nintendo / Game Freak / Creatures. Public hosting does not grant a new redistribution or commercial license. Preserve the original rights and credits.",
+  "sources": [
+    {
+      "name": "spring-outdoors",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "game": "Stardew Valley",
+      "sheetCredits": "Mr Mad Mothy; marios1999",
+      "image": "https://www.spriters-resource.com/media/assets/85/88632.png?updated=1755475338",
+      "file": "resources/visual/stardew/sources/spring-outdoors.png",
+      "width": 656,
+      "height": 1664,
+      "sha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "status": "downloaded"
+    },
+    {
+      "name": "winter-outdoors",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88665/",
+      "game": "Stardew Valley",
+      "sheetCredits": "Mr Mad Mothy; marios1999",
+      "image": "https://www.spriters-resource.com/media/assets/86/88665.png?updated=1755475342",
+      "file": "resources/visual/stardew/sources/winter-outdoors.png",
+      "width": 656,
+      "height": 1664,
+      "sha256": "8b3df72486cd76e50e18664d482f2cb7b4c329b8251e7495d370a80f914e83de",
+      "status": "downloaded"
+    },
+    {
+      "name": "desert",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88594/",
+      "game": "Stardew Valley",
+      "sheetCredits": "Mr Mad Mothy; marios1999",
+      "image": "https://www.spriters-resource.com/media/assets/85/88594.png?updated=1755475330",
+      "file": "resources/visual/stardew/sources/desert.png",
+      "width": 304,
+      "height": 368,
+      "sha256": "34a44a2b5e385dc6c5c1e9e2ba454e9454dabae0095c00d999a35e921e7ccbd5",
+      "status": "downloaded"
+    },
+    {
+      "name": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "game": "Stardew Valley",
+      "sheetCredits": "marios1999",
+      "image": "https://www.spriters-resource.com/media/assets/221/223937.png?updated=1755490527",
+      "file": "resources/visual/stardew/sources/volcano.png",
+      "width": 400,
+      "height": 576,
+      "sha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "status": "downloaded"
+    },
+    {
+      "name": "interiors",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88658/",
+      "game": "Stardew Valley",
+      "sheetCredits": "Mr Mad Mothy; marios1999",
+      "image": "https://www.spriters-resource.com/media/assets/86/88658.png?updated=1755475341",
+      "file": "resources/visual/stardew/sources/interiors.png",
+      "width": 512,
+      "height": 1744,
+      "sha256": "601c150e12e41c881f6a17a26403a49fc7d4b38b95cf752a4910f5975650e867",
+      "status": "downloaded"
+    },
+    {
+      "name": "walls-floors",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88659/",
+      "game": "Stardew Valley",
+      "sheetCredits": "Mr Mad Mothy; marios1999",
+      "image": "https://www.spriters-resource.com/media/assets/86/88659.png?updated=1755475341",
+      "file": "resources/visual/stardew/sources/walls-floors.png",
+      "width": 256,
+      "height": 848,
+      "sha256": "2f2f5a717ec6aa5053537d83a01abecb1b71965c53ebf2ca98408c32bbdef263",
+      "status": "downloaded"
+    },
+    {
+      "name": "flooring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/169045/",
+      "game": "Stardew Valley",
+      "sheetCredits": "Babycake",
+      "image": "https://www.spriters-resource.com/media/assets/166/169045.png?updated=1755486046",
+      "file": "resources/visual/stardew/sources/flooring.png",
+      "width": 512,
+      "height": 256,
+      "sha256": "ce54b4d4bfff51f928fdba4a7a8903b986b4cbd09450dfd7aa42e2f451681615",
+      "status": "downloaded"
+    },
+    {
+      "name": "furniture",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/126521/",
+      "game": "Stardew Valley",
+      "sheetCredits": "Babycake; BlobfishCultist; marios1999",
+      "image": "https://www.spriters-resource.com/media/assets/123/126521.png?updated=1755479763",
+      "file": "resources/visual/stardew/sources/furniture.png",
+      "width": 980,
+      "height": 1488,
+      "sha256": "5016a03bc073935845600769381cec187e98aa3fbcfe8fcaa048b8aa540b6011",
+      "status": "downloaded"
+    },
+    {
+      "name": "frlg-menu",
+      "page": "https://www.spriters-resource.com/game_boy_advance/pokemonfireredleafgreen/asset/3854/",
+      "game": "Pokemon FireRed / LeafGreen",
+      "sheetCredits": "Redzagoon",
+      "image": "https://www.spriters-resource.com/media/assets/4/3854.png?updated=1755472417",
+      "file": "resources/visual/stardew/sources/frlg-menu.png",
+      "width": 495,
+      "height": 288,
+      "sha256": "266cdea4ff7093d5ef9e9ebab1394360b557a4ee6eb37f448d5febfd71e45cb9",
+      "status": "downloaded"
+    }
+  ]
+}
