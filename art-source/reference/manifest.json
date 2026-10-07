@@ -69,6 +69,36 @@
     "status": "downloaded",
     "rights": "ConcernedApe / Stardew Valley"
   },
+  "furniture": {
+    "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/126521/",
+    "image": "https://www.spriters-resource.com/media/assets/123/126521.png?updated=1755479763",
+    "sha256": "5016a03bc073935845600769381cec187e98aa3fbcfe8fcaa048b8aa540b6011",
+    "width": 980,
+    "height": 1488,
+    "bytes": 297563,
+    "status": "downloaded",
+    "rights": "ConcernedApe / Stardew Valley"
+  },
+  "flooring": {
+    "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/169045/",
+    "image": "https://www.spriters-resource.com/media/assets/166/169045.png?updated=1755486046",
+    "sha256": "ce54b4d4bfff51f928fdba4a7a8903b986b4cbd09450dfd7aa42e2f451681615",
+    "width": 512,
+    "height": 256,
+    "bytes": 58037,
+    "status": "downloaded",
+    "rights": "ConcernedApe / Stardew Valley"
+  },
+  "chairs": {
+    "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/169570/",
+    "image": "https://www.spriters-resource.com/media/assets/166/169570.png?updated=1755486125",
+    "sha256": "85df36f2e76612dbb7ac40eb7b22d13d08bf15e9168afbc0a3391661388984cc",
+    "width": 239,
+    "height": 125,
+    "bytes": 3250,
+    "status": "downloaded",
+    "rights": "ConcernedApe / Stardew Valley"
+  },
   "party": {
     "page": "https://www.spriters-resource.com/game_boy_advance/pokemonfireredleafgreen/asset/3854/",
     "image": "https://www.spriters-resource.com/media/assets/4/3854.png?updated=1755472417",
