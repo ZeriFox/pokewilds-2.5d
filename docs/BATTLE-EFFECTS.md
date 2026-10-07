@@ -98,8 +98,49 @@ geometry, GL restoration, command-area protection and mid-Surf window-close
 cleanup pass at all three resolutions. Real Surf/Thunder/Dig/Water Gun PNGs
 were inspected after the fixes; the magenta lower region in this test is an
 intentional command-area sentinel, not product UI. Full playable UI screenshots
-come from the separate end-to-end fixture. Live window resize is outside this
-fixture's claims; it verifies three actual viewport sizes in separate processes.
+come from the separate end-to-end fixture. Those eight-sequence checks use
+three separate processes; live resize during an active move is covered by the
+dedicated regression below.
+
+### Resize during the same active move
+
+Run `python tools/active_move_resize_test.py`. It compiles only
+`ActiveMoveResizeTest`, then runs the actual `Game`, battle actors and
+`Battle.LoadAndPlayAnimation` from the current built JAR. No production classes
+or loose resources precede the JAR. Both real actions continue through
+1280×720 → 1024×768 → 1600×600: Surf requests its two window changes after
+frames 32 and 90, and Tackle after frames 31 and 39. The original action and
+target identities persist; callbacks cannot advance the action, and every
+render executes exactly one animation step. The next action runs once on the
+following render after original completion.
+
+The test requires resized Surf snapshots, changed pixels in the expanded
+field at both new sizes, unchanged command-area pixels, preserved actor
+anchors and original Tackle translations, and restored framebuffer, viewport,
+scissor, depth mask, shader, transform and UI projection. Tackle must remain
+local. Its independent target oracle reads the actual authored PNG alpha
+bounds, projects them at the new size, requires overlap with the real enemy,
+rejects attack changes outside those bounds, and compares its opaque pixels
+exactly. The existing health-panel rectangles and shadows are excluded only
+from this attack-difference mask because the production renderer deliberately
+redraws them; command-area and panorama checks remain exact.
+
+The first Windows diagnostic passed against JAR
+`ad9a49459a306a379634f9fb37ce2766ce064ede612a50fd0a884bec4e8828ea`:
+348 Surf frames and 57 Tackle frames, four in-flight resizes, three Surf FBO
+captures, 3,384 and 564 matching opaque Tackle pixels after its two resizes,
+and normal completion/disposal. The PNGs were inspected. As in the earlier
+fixture, magenta marks the protected command area and is not product UI.
+
+Tracked reruns write a latest status receipt plus uniquely named log, receipt
+and PNG files directly under `build/active-move-resize/`. Each receipt binds
+the exact commit, working-tree state, JAR, runner, Java harness, log and PNG
+hashes. An isolated temporary compilation directory contains only the three
+test classes. Setup starts with status `running`, and errors retain a `failed`
+receipt and that run's evidence; a prior success cannot certify a new run.
+The native orchestrator includes this as its 22nd check. Read its latest
+receipt for the current candidate's outcome; this is not coverage of every
+move, portrait window or arbitrary modded animation.
 
 ### Mesa nearest-neighbor boundary evidence
 
