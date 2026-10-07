@@ -1,0 +1,59 @@
+name: Revision workspace
+on:
+  push:
+    branches: [feature/stardew-world-frlg-ui]
+    paths: [.github/workflows/revision-workspace.yml]
+permissions:
+  contents: write
+jobs:
+  workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Acquire complementary trees, cave and swamp sheets
+        run: |
+          python - <<'PY'
+          import sys,json
+          from pathlib import Path
+          sys.path.insert(0,'tools')
+          import import_requested_art as art
+          path=Path('resources/visual/stardew/SOURCE-REPORT.json')
+          previous=json.loads(path.read_text())
+          art.SOURCES=[
+            ('trees','pc_computer/stardewvalley',153614,'Stardew Valley','Raffadax; DigiC300; marios1999'),
+            ('mines','pc_computer/stardewvalley',84485,'Stardew Valley','Whitetimber; marios1999'),
+            ('witch-swamp','pc_computer/stardewvalley',83961,'Stardew Valley','DigiC300'),
+          ]
+          art.main()
+          current=json.loads(path.read_text())
+          previous['sources'].extend(current['sources'])
+          path.write_text(json.dumps(previous,indent=2)+'\n')
+          PY
+      - name: Record complementary sources on the working branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add resources/visual/stardew/
+          if ! git diff --cached --quiet; then
+            git commit -m 'Acquire Stardew tree, mine and swamp sheets with provenance'
+            git push origin HEAD:feature/stardew-world-frlg-ui
+          fi
+      - name: Restore pinned build inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v0.8.11-johto.2 --repo ZeriFox/pokewilds-2.5d --pattern pokewilds-2.5d-build-inputs.zip --dir "$RUNNER_TEMP"
+          echo "5692696180a62dc1c8822e2a2d2a324f60647535a821865d7fb556e109b3883f  $RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" -d .
+      - name: Export working files, excluding Git credentials and metadata
+        run: |
+          git rev-parse HEAD > WORKSPACE-COMMIT.txt
+          tar --exclude=./.git --exclude=./build --exclude=./dist -czf "$RUNNER_TEMP/revision-workspace.tar.gz" .
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: revision-workspace
+          path: ${{ runner.temp }}/revision-workspace.tar.gz
+          retention-days: 3
+          compression-level: 0
+          if-no-files-found: error
