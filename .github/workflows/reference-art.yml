@@ -32,3 +32,9 @@ jobs:
             gh auth setup-git
             git push origin HEAD:feature/stardew-world-battle
           fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: reference-images
+          path: art-source/reference/
+          retention-days: 3
+          if-no-files-found: error
