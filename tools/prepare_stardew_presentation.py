@@ -12,8 +12,10 @@ from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'art-source/reference'
+COMPATIBILITY = ROOT / 'art-source/compatibility'
 OUTPUT = ROOT / 'resources/visual/stardew'
 CONTRACT = {
+    'anchorUnit': 'source-pixels',
     'crop': 'source pixels; x/y from top-left; width/height positive',
     'sample': 'source pixels; exact divisors; whole canvas for objects and UI',
     'anchor': 'source pixels from left/bottom; converted by BwAssets.pixelAnchor',
@@ -81,6 +83,15 @@ def prepare(output=OUTPUT):
         images[name] = Image.open(path).convert('RGBA')
         if images[name].size != (info['width'], info['height']):
             raise ValueError('Unexpected sheet dimensions: ' + name)
+    retained_sources = json.loads((COMPATIBILITY / 'manifest.json').read_text(encoding='utf-8'))
+    for name, info in retained_sources.items():
+        path = COMPATIBILITY / info['file']
+        if digest(path) != info['sha256']:
+            raise ValueError('Retained source changed: ' + name)
+        images[name] = Image.open(path).convert('RGBA')
+        if images[name].size != (info['width'], info['height']):
+            raise ValueError('Unexpected retained source dimensions: ' + name)
+        manifest[name] = info
 
     base_dir = ROOT / 'resources/visual/landscape'
     base_image = Image.open(base_dir / 'world-atlas.png').convert('RGBA')
@@ -94,7 +105,7 @@ def prepare(output=OUTPUT):
         provenance[key] = {'retainedFrom': 'visual/landscape/world-atlas.json', 'region': key}
     animations = dict(original.get('animations', {}))
 
-    def add(key, source, box, *, prop=False, size=None, tint=None, sample=None, component=None):
+    def add(key, source, box, *, prop=False, size=None, tint=None, sample=None, component=None, anchor=None):
         x, y, w, h = box
         if min(x, y) < 0 or min(w, h) <= 0 or x+w > images[source].width or y+h > images[source].height:
             raise ValueError('Out of bounds crop: ' + key)
@@ -129,7 +140,7 @@ def prepare(output=OUTPUT):
                zip((metadata[key]['sampleWidth'], metadata[key]['sampleHeight']), art.size)):
             raise ValueError('Sampling must divide the full region: ' + key)
         if prop:
-            metadata[key].update(anchorX=w/2, anchorY=h-bounds[3])
+            metadata[key].update(anchorX=anchor[0] if anchor else w/2, anchorY=anchor[1] if anchor else h-bounds[3])
         if size:
             scale = min(size[0]/w, size[1]/h)
             metadata[key].update(worldWidth=w*scale, worldHeight=h*scale)
@@ -137,6 +148,8 @@ def prepare(output=OUTPUT):
         provenance[key] = {'source': source, 'page': manifest[source]['page'],
                            'sourceSha256': manifest[source]['sha256'], 'crop': list(box),
                            'transformations': transformations, 'rights': manifest[source]['rights']}
+        if source in retained_sources:
+            provenance[key]['retainedCompatibility'] = retained_sources[source]
 
     def alias(new, old):
         materials[new] = materials[old].copy()
@@ -172,9 +185,11 @@ def prepare(output=OUTPUT):
     alias('volcano_path','volcanic_ash')
     for i in range(4):
         add('stardew_lava_'+str(i), 'volcano', (i*32,320,32,32))
+        add('stardew_lava_cooled_'+str(i), 'volcano', (i*32,320,32,32), tint=('#391924','#b45b27'))
     alias('lava_bright','stardew_lava_0')
     animations['lava_bright'] = {'frames': ['stardew_lava_'+str(i) for i in range(4)], 'fps': 4}
-    add('lava_cooled', 'volcano', (0,320,32,32), tint=('#391924','#b45b27'))
+    alias('lava_cooled','stardew_lava_cooled_0')
+    animations['lava_cooled'] = {'frames': ['stardew_lava_cooled_'+str(i) for i in range(4)], 'fps': 4}
     add('graveyard_ground', 'spring', (48,208,16,16), tint=('#48534c','#818775'))
     add('graveyard_path', 'desert', (16,64,16,16), tint=('#656d62','#929780'))
     add('graveyard_cliff', 'mines', (144,80,32,32), tint=('#3e4a45','#828a77'))
@@ -213,10 +228,13 @@ def prepare(output=OUTPUT):
     add('couch','furniture',(0,208,48,32),prop=True,size=(29,19))
     add('desk','furniture',(0,352,32,48),prop=True,size=(22,28))
     add('table','furniture',(224,400,80,48),prop=True,size=(32,20))
-    add('bed','furniture',(512,312,48,56),prop=True,size=(24,28))
-    add('shelf','furniture',(592,0,32,32),prop=True,size=(20,26))
+    # This sheet's right-hand furniture section starts two pixels off the grid.
+    # Grid-aligned x512/x592 omit the right bedpost/bookcase border.
+    add('bed','furniture',(514,312,48,56),prop=True,size=(24,28))
+    add('shelf','furniture',(594,0,32,32),prop=True,size=(20,26))
     # Retain the audited landscape wardrobe: the previous (512,368,32,32)
     # Stardew crop was a cut-off door, not a wardrobe.
+    add('chimney','chimney',(0,0,16,16),prop=True,size=(16,16),anchor=(12,8))
 
     # This sheet is Pokemon Menu (party), not the FRLG bag. Use its reusable
     # frames for both interfaces without baking labels, HP values or Pokemon.
@@ -261,6 +279,7 @@ def prepare(output=OUTPUT):
         'baseAtlasSha256':digest(base_dir/'world-atlas.png'),
         'baseMetadataSha256':digest(base_dir/'world-atlas.json'),
         'referenceManifestSha256':digest(SOURCE/'manifest.json'),
+        'compatibilityManifestSha256':digest(COMPATIBILITY/'manifest.json'),
         'redistribution': 'Reference downloads are not grants of redistribution rights; see project rights review.',
         'regions':provenance},indent=2)+'\n')
     write_text(output/'CREDITS.txt','Selected environment tiles: Stardew Valley / ConcernedApe.\n'

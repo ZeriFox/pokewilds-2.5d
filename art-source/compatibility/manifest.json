@@ -1,0 +1,14 @@
+{
+  "chimney": {
+    "file": "chimney.png",
+    "member": "tiles/buildings/chimney1.png",
+    "sourceArchive": "lib/upstream-runtime.jar",
+    "sourceArchiveSha256": "b005765d793ae5d8872a239da01b6920a1eb988ba147f3b5e0d60f3a1261d3fe",
+    "sha256": "517e7b306eb77e8832ebb6a13d2beec704320fbd0d58a881a0b5e4c7c30089b1",
+    "width": 16,
+    "height": 16,
+    "rights": "Retained upstream PokeWilds artwork; inherited source provenance and credits apply. No new rights grant.",
+    "page": "https://github.com/ZeriFox/pokewilds-2.5d",
+    "status": "retained"
+  }
+}

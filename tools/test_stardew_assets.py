@@ -57,10 +57,14 @@ class StardewAssetsTest(unittest.TestCase):
                 self.assertGreater(animation['fps'], 0)
                 self.assertEqual(len({frame.size for frame in frames}), 1)
                 self.assertEqual(len({frame.tobytes() for frame in frames}), len(frames))
+        self.assertEqual(len(self.meta['animations']), 6, 'Retain all mechanical animation roles')
+        for name in ('lava_bright', 'lava_cooled'):
+            self.assertEqual(len(self.meta['animations'][name]['frames']), 4)
 
     def test_complete_furniture_and_rocks_preserve_all_source_pixels(self):
         for name, source_name, box in [
-            ('bed', 'furniture', (512, 312, 560, 368)),
+            ('bed', 'furniture', (514, 312, 562, 368)),
+            ('shelf', 'furniture', (594, 0, 626, 32)),
             ('table', 'furniture', (224, 400, 304, 448)),
             ('chair', 'furniture', (0, 0, 16, 32)),
             ('rock', 'spring', (528, 32, 560, 64)),
@@ -110,6 +114,7 @@ class StardewAssetsTest(unittest.TestCase):
         self.assertEqual(self.provenance['atlasSha256'], generator.digest(self.output / 'world-atlas.png'))
         self.assertEqual(self.provenance['metadataSha256'], generator.digest(self.output / 'world-atlas.json'))
         self.assertEqual(self.meta['schemaVersion'], 2)
+        self.assertEqual(self.meta['coordinateContract']['anchorUnit'], 'source-pixels')
 
     def test_modified_reference_is_rejected_before_writing(self):
         destination = Path(self.temp.name) / 'bad-reference'
@@ -121,6 +126,13 @@ class StardewAssetsTest(unittest.TestCase):
     def test_invalid_component_seed_cannot_silently_hide_an_object(self):
         with self.assertRaisesRegex(ValueError, 'visible artwork'):
             generator.isolated_component(Image.new('RGBA', (4, 4)), (2, 2))
+
+    def test_retained_chimney_preserves_authentic_pixels_and_origin(self):
+        source = Image.open(generator.COMPATIBILITY / 'chimney.png').convert('RGBA')
+        self.assertEqual(self.region('chimney').tobytes(), source.tobytes())
+        region = self.meta['regions']['chimney']
+        self.assertEqual((region['anchorX'], region['anchorY']), (12, 8))
+        self.assertIn('retainedCompatibility', self.provenance['regions']['chimney'])
 
 
 if __name__ == '__main__':

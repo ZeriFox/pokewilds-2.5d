@@ -1,6 +1,7 @@
 {
   "schemaVersion": 2,
   "coordinateContract": {
+    "anchorUnit": "source-pixels",
     "crop": "source pixels; x/y from top-left; width/height positive",
     "sample": "source pixels; exact divisors; whole canvas for objects and UI",
     "anchor": "source pixels from left/bottom; converted by BwAssets.pixelAnchor",
@@ -39,7 +40,7 @@
       ]
     },
     "dirt": {
-      "x": 1529,
+      "x": 1549,
       "y": 2,
       "width": 16,
       "height": 16,
@@ -81,7 +82,7 @@
       ]
     },
     "stone_floor": {
-      "x": 147,
+      "x": 291,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -109,7 +110,7 @@
       ]
     },
     "cliff": {
-      "x": 764,
+      "x": 784,
       "y": 2,
       "width": 32,
       "height": 32,
@@ -123,7 +124,7 @@
       ]
     },
     "cliff_earth": {
-      "x": 872,
+      "x": 892,
       "y": 2,
       "width": 32,
       "height": 32,
@@ -131,7 +132,7 @@
       "anchorY": 0
     },
     "cliff_dark": {
-      "x": 836,
+      "x": 856,
       "y": 2,
       "width": 32,
       "height": 32,
@@ -159,7 +160,7 @@
       ]
     },
     "wood_floor": {
-      "x": 28,
+      "x": 174,
       "y": 493,
       "width": 16,
       "height": 16,
@@ -173,7 +174,7 @@
       ]
     },
     "tile_floor": {
-      "x": 310,
+      "x": 454,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -187,7 +188,7 @@
       ]
     },
     "wall": {
-      "x": 1643,
+      "x": 1787,
       "y": 344,
       "width": 16,
       "height": 45,
@@ -201,7 +202,7 @@
       ]
     },
     "wall_wood": {
-      "x": 1683,
+      "x": 1827,
       "y": 344,
       "width": 16,
       "height": 45,
@@ -239,7 +240,7 @@
       "anchorY": 0
     },
     "steps": {
-      "x": 127,
+      "x": 271,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -289,7 +290,7 @@
       ]
     },
     "cliff_volcano": {
-      "x": 980,
+      "x": 1000,
       "y": 2,
       "width": 32,
       "height": 32,
@@ -297,7 +298,7 @@
       "anchorY": 0
     },
     "volcano_path": {
-      "x": 1607,
+      "x": 1751,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -311,7 +312,7 @@
       ]
     },
     "volcano": {
-      "x": 1587,
+      "x": 1731,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -325,7 +326,7 @@
       ]
     },
     "cliff_cap": {
-      "x": 800,
+      "x": 820,
       "y": 2,
       "width": 32,
       "height": 32,
@@ -333,7 +334,7 @@
       "anchorY": 0
     },
     "cliff_grass": {
-      "x": 908,
+      "x": 928,
       "y": 2,
       "width": 32,
       "height": 32,
@@ -365,7 +366,7 @@
       "anchorY": 0
     },
     "tile_pale": {
-      "x": 330,
+      "x": 474,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -411,7 +412,7 @@
       "anchorY": 0
     },
     "water_0": {
-      "x": 1811,
+      "x": 1955,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -419,8 +420,8 @@
       "anchorY": 0
     },
     "water_shallow_0": {
-      "x": 1931,
-      "y": 344,
+      "x": 42,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
@@ -435,7 +436,7 @@
       "anchorY": 0
     },
     "water_1": {
-      "x": 1831,
+      "x": 1975,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -443,8 +444,8 @@
       "anchorY": 0
     },
     "water_shallow_1": {
-      "x": 1951,
-      "y": 344,
+      "x": 62,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
@@ -459,7 +460,7 @@
       "anchorY": 0
     },
     "water_2": {
-      "x": 1851,
+      "x": 1995,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -467,8 +468,8 @@
       "anchorY": 0
     },
     "water_shallow_2": {
-      "x": 1971,
-      "y": 344,
+      "x": 82,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
@@ -483,7 +484,7 @@
       "anchorY": 0
     },
     "water_3": {
-      "x": 1871,
+      "x": 2015,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -491,8 +492,8 @@
       "anchorY": 0
     },
     "water_shallow_3": {
-      "x": 1991,
-      "y": 344,
+      "x": 102,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
@@ -507,7 +508,7 @@
       "anchorY": 0
     },
     "water": {
-      "x": 1791,
+      "x": 1935,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -515,8 +516,8 @@
       "anchorY": 0
     },
     "water_shallow": {
-      "x": 1911,
-      "y": 344,
+      "x": 22,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
@@ -539,15 +540,15 @@
       "anchorY": 0
     },
     "water_ripple": {
-      "x": 1891,
-      "y": 344,
+      "x": 2,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
       "anchorY": 0
     },
     "desert_ground": {
-      "x": 1381,
+      "x": 1401,
       "y": 2,
       "width": 16,
       "height": 16,
@@ -561,7 +562,7 @@
       ]
     },
     "desert_path": {
-      "x": 1401,
+      "x": 1421,
       "y": 2,
       "width": 16,
       "height": 16,
@@ -575,7 +576,7 @@
       ]
     },
     "desert_cliff": {
-      "x": 1264,
+      "x": 1284,
       "y": 2,
       "width": 32,
       "height": 48,
@@ -589,7 +590,7 @@
       ]
     },
     "desert_cliff_cap": {
-      "x": 1300,
+      "x": 1320,
       "y": 2,
       "width": 16,
       "height": 16,
@@ -603,7 +604,7 @@
       ]
     },
     "desert_ramp": {
-      "x": 1421,
+      "x": 1441,
       "y": 2,
       "width": 32,
       "height": 32,
@@ -611,7 +612,7 @@
       "anchorY": 0
     },
     "volcanic_basalt": {
-      "x": 1318,
+      "x": 1462,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -625,7 +626,7 @@
       ]
     },
     "volcanic_cracked": {
-      "x": 1437,
+      "x": 1581,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -639,7 +640,7 @@
       ]
     },
     "volcanic_ash": {
-      "x": 1282,
+      "x": 1426,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -653,7 +654,7 @@
       ]
     },
     "volcanic_obsidian": {
-      "x": 1511,
+      "x": 1655,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -667,7 +668,7 @@
       ]
     },
     "volcanic_cliff": {
-      "x": 1381,
+      "x": 1525,
       "y": 344,
       "width": 16,
       "height": 32,
@@ -681,7 +682,7 @@
       ]
     },
     "volcanic_cliff_cap": {
-      "x": 1401,
+      "x": 1545,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -689,7 +690,7 @@
       "anchorY": 0
     },
     "volcanic_ramp": {
-      "x": 1531,
+      "x": 1675,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -755,7 +756,7 @@
       "anchorY": 0
     },
     "cliff_snow": {
-      "x": 944,
+      "x": 964,
       "y": 2,
       "width": 32,
       "height": 32,
@@ -1053,7 +1054,7 @@
       ]
     },
     "tree": {
-      "x": 366,
+      "x": 510,
       "y": 344,
       "width": 48,
       "height": 96,
@@ -1071,7 +1072,7 @@
       "worldHeight": 48.0
     },
     "tree_small": {
-      "x": 690,
+      "x": 834,
       "y": 344,
       "width": 48,
       "height": 96,
@@ -1089,7 +1090,7 @@
       "worldHeight": 48.0
     },
     "tree_pine": {
-      "x": 638,
+      "x": 782,
       "y": 344,
       "width": 48,
       "height": 96,
@@ -1107,7 +1108,7 @@
       "worldHeight": 44.0
     },
     "tree_dry": {
-      "x": 456,
+      "x": 600,
       "y": 344,
       "width": 48,
       "height": 80,
@@ -1125,7 +1126,7 @@
       "worldHeight": 45.0
     },
     "tree_snow": {
-      "x": 742,
+      "x": 886,
       "y": 344,
       "width": 48,
       "height": 96,
@@ -1143,7 +1144,7 @@
       "worldHeight": 44.0
     },
     "tree_oak": {
-      "x": 508,
+      "x": 652,
       "y": 344,
       "width": 126,
       "height": 122,
@@ -1177,7 +1178,7 @@
       "anchorY": 0
     },
     "tree_dead": {
-      "x": 418,
+      "x": 562,
       "y": 344,
       "width": 34,
       "height": 31,
@@ -1271,7 +1272,7 @@
       "anchorY": 0
     },
     "flowers": {
-      "x": 1865,
+      "x": 1885,
       "y": 2,
       "width": 14,
       "height": 10,
@@ -1279,7 +1280,7 @@
       "anchorY": 0
     },
     "flowers_fairy": {
-      "x": 1883,
+      "x": 1903,
       "y": 2,
       "width": 11,
       "height": 10,
@@ -1319,7 +1320,7 @@
       "anchorY": 0
     },
     "stump": {
-      "x": 167,
+      "x": 311,
       "y": 344,
       "width": 19,
       "height": 16,
@@ -1353,7 +1354,7 @@
       "anchorY": 0
     },
     "fence_wood": {
-      "x": 1690,
+      "x": 1710,
       "y": 2,
       "width": 16,
       "height": 16,
@@ -1361,7 +1362,7 @@
       "anchorY": 0
     },
     "door": {
-      "x": 1564,
+      "x": 1584,
       "y": 2,
       "width": 20,
       "height": 39,
@@ -1369,7 +1370,7 @@
       "anchorY": 0
     },
     "door_locked": {
-      "x": 1588,
+      "x": 1608,
       "y": 2,
       "width": 20,
       "height": 37,
@@ -1377,7 +1378,7 @@
       "anchorY": 0
     },
     "door_open": {
-      "x": 1612,
+      "x": 1632,
       "y": 2,
       "width": 30,
       "height": 44,
@@ -1385,15 +1386,15 @@
       "anchorY": 0
     },
     "window": {
-      "x": 2011,
-      "y": 344,
+      "x": 122,
+      "y": 493,
       "width": 22,
       "height": 32,
       "anchorX": 11.0,
       "anchorY": 0
     },
     "window_dark": {
-      "x": 2,
+      "x": 148,
       "y": 493,
       "width": 22,
       "height": 32,
@@ -1419,7 +1420,7 @@
       "worldHeight": 23.0
     },
     "desk": {
-      "x": 1493,
+      "x": 1513,
       "y": 2,
       "width": 32,
       "height": 48,
@@ -1437,7 +1438,7 @@
       "worldHeight": 28.0
     },
     "table": {
-      "x": 226,
+      "x": 370,
       "y": 344,
       "width": 80,
       "height": 48,
@@ -1481,7 +1482,7 @@
       "worldHeight": 28.0
     },
     "couch": {
-      "x": 1016,
+      "x": 1036,
       "y": 2,
       "width": 48,
       "height": 32,
@@ -1517,7 +1518,7 @@
       "worldHeight": 20.0
     },
     "wardrobe": {
-      "x": 1703,
+      "x": 1847,
       "y": 344,
       "width": 64,
       "height": 41,
@@ -1629,7 +1630,7 @@
       "anchorY": 0
     },
     "forest_tree": {
-      "x": 1950,
+      "x": 1970,
       "y": 2,
       "width": 48,
       "height": 96,
@@ -1695,7 +1696,7 @@
       "anchorY": 0
     },
     "desert_rock": {
-      "x": 1457,
+      "x": 1477,
       "y": 2,
       "width": 32,
       "height": 32,
@@ -1713,7 +1714,7 @@
       "worldHeight": 18.0
     },
     "desert_decor": {
-      "x": 1363,
+      "x": 1383,
       "y": 2,
       "width": 14,
       "height": 15,
@@ -1721,7 +1722,7 @@
       "anchorY": 0
     },
     "desert_cactus": {
-      "x": 1244,
+      "x": 1264,
       "y": 2,
       "width": 16,
       "height": 48,
@@ -1739,7 +1740,7 @@
       "worldHeight": 30.0
     },
     "desert_dead_tree": {
-      "x": 1320,
+      "x": 1340,
       "y": 2,
       "width": 39,
       "height": 46,
@@ -1747,7 +1748,7 @@
       "anchorY": 0
     },
     "volcanic_rock": {
-      "x": 1567,
+      "x": 1711,
       "y": 344,
       "width": 16,
       "height": 32,
@@ -1765,7 +1766,7 @@
       "worldHeight": 28.0
     },
     "volcanic_crystal": {
-      "x": 1457,
+      "x": 1601,
       "y": 344,
       "width": 12,
       "height": 25,
@@ -1773,7 +1774,7 @@
       "anchorY": 0
     },
     "volcanic_charred_tree": {
-      "x": 1338,
+      "x": 1482,
       "y": 344,
       "width": 39,
       "height": 46,
@@ -1781,7 +1782,7 @@
       "anchorY": 0
     },
     "volcanic_dead_shrub": {
-      "x": 1473,
+      "x": 1617,
       "y": 344,
       "width": 34,
       "height": 31,
@@ -1847,7 +1848,7 @@
       "anchorY": 0
     },
     "warp": {
-      "x": 1771,
+      "x": 1915,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -1863,7 +1864,7 @@
       "anchorY": 0
     },
     "cracked": {
-      "x": 1068,
+      "x": 1088,
       "y": 2,
       "width": 16,
       "height": 16,
@@ -1871,7 +1872,7 @@
       "anchorY": 0
     },
     "statue": {
-      "x": 110,
+      "x": 254,
       "y": 344,
       "width": 13,
       "height": 28,
@@ -1879,7 +1880,7 @@
       "anchorY": 0
     },
     "tree_top": {
-      "x": 794,
+      "x": 938,
       "y": 344,
       "width": 29,
       "height": 27,
@@ -1911,7 +1912,7 @@
       "anchorY": 0
     },
     "fence": {
-      "x": 1670,
+      "x": 1690,
       "y": 2,
       "width": 16,
       "height": 16,
@@ -1919,7 +1920,7 @@
       "anchorY": 0
     },
     "door_red": {
-      "x": 1646,
+      "x": 1666,
       "y": 2,
       "width": 20,
       "height": 37,
@@ -1927,7 +1928,7 @@
       "anchorY": 0
     },
     "cushion": {
-      "x": 1088,
+      "x": 1108,
       "y": 2,
       "width": 32,
       "height": 32,
@@ -1951,7 +1952,7 @@
       "anchorY": 0
     },
     "doll": {
-      "x": 1549,
+      "x": 1569,
       "y": 2,
       "width": 11,
       "height": 14,
@@ -1959,7 +1960,7 @@
       "anchorY": 0
     },
     "switch": {
-      "x": 190,
+      "x": 334,
       "y": 344,
       "width": 32,
       "height": 48,
@@ -1975,7 +1976,7 @@
       "anchorY": 0
     },
     "ultraball": {
-      "x": 1272,
+      "x": 1416,
       "y": 344,
       "width": 6,
       "height": 9,
@@ -2007,7 +2008,7 @@
       "anchorY": 0
     },
     "fire_0": {
-      "x": 1741,
+      "x": 1761,
       "y": 2,
       "width": 27,
       "height": 36,
@@ -2015,7 +2016,7 @@
       "anchorY": 0
     },
     "fire_1": {
-      "x": 1772,
+      "x": 1792,
       "y": 2,
       "width": 27,
       "height": 36,
@@ -2023,7 +2024,7 @@
       "anchorY": 0
     },
     "fire_2": {
-      "x": 1803,
+      "x": 1823,
       "y": 2,
       "width": 27,
       "height": 36,
@@ -2031,7 +2032,7 @@
       "anchorY": 0
     },
     "fire_3": {
-      "x": 1834,
+      "x": 1854,
       "y": 2,
       "width": 27,
       "height": 36,
@@ -2039,7 +2040,7 @@
       "anchorY": 0
     },
     "fire": {
-      "x": 1710,
+      "x": 1730,
       "y": 2,
       "width": 27,
       "height": 36,
@@ -2060,8 +2061,36 @@
         32
       ]
     },
+    "stardew_lava_cooled_0": {
+      "x": 110,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
     "stardew_lava_1": {
       "x": 2,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "stardew_lava_cooled_1": {
+      "x": 146,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -2088,6 +2117,20 @@
         32
       ]
     },
+    "stardew_lava_cooled_2": {
+      "x": 182,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
     "stardew_lava_3": {
       "x": 74,
       "y": 344,
@@ -2102,8 +2145,22 @@
         32
       ]
     },
+    "stardew_lava_cooled_3": {
+      "x": 218,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
     "forest_bush": {
-      "x": 1898,
+      "x": 1918,
       "y": 2,
       "width": 48,
       "height": 48,
@@ -2121,7 +2178,7 @@
       "worldHeight": 19.0
     },
     "deep_forest_bush": {
-      "x": 1124,
+      "x": 1144,
       "y": 2,
       "width": 48,
       "height": 48,
@@ -2139,7 +2196,7 @@
       "worldHeight": 19.0
     },
     "deep_forest_tree": {
-      "x": 1176,
+      "x": 1196,
       "y": 2,
       "width": 64,
       "height": 112,
@@ -2157,7 +2214,7 @@
       "worldHeight": 51.0
     },
     "wall_cap": {
-      "x": 1663,
+      "x": 1807,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -2170,8 +2227,26 @@
         16
       ]
     },
+    "chimney": {
+      "x": 764,
+      "y": 2,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ],
+      "anchorX": 12,
+      "anchorY": 8,
+      "worldWidth": 16.0,
+      "worldHeight": 16.0
+    },
     "ui_frlg_background": {
-      "x": 827,
+      "x": 971,
       "y": 344,
       "width": 220,
       "height": 145,
@@ -2185,7 +2260,7 @@
       ]
     },
     "ui_frlg_row": {
-      "x": 1128,
+      "x": 1272,
       "y": 344,
       "width": 140,
       "height": 19,
@@ -2199,7 +2274,7 @@
       ]
     },
     "ui_frlg_leader": {
-      "x": 1051,
+      "x": 1195,
       "y": 344,
       "width": 73,
       "height": 46,
@@ -2256,6 +2331,15 @@
         "stardew_lava_1",
         "stardew_lava_2",
         "stardew_lava_3"
+      ],
+      "fps": 4
+    },
+    "lava_cooled": {
+      "frames": [
+        "stardew_lava_cooled_0",
+        "stardew_lava_cooled_1",
+        "stardew_lava_cooled_2",
+        "stardew_lava_cooled_3"
       ],
       "fps": 4
     }

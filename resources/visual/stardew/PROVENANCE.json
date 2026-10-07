@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "atlasSha256": "c8da61934dfe4f6cfa7f7c668c154be85c8d1c5701534e4a39bd948953672071",
-  "metadataSha256": "a22164eeaaa242786f9efd3efba3787c5f39e945917e46474eab6228b8bebafb",
+  "atlasSha256": "7e0b72fdd434030974b5a79974b33a9402f944bec9ee8ecc4aa70a3dcb23cca4",
+  "metadataSha256": "059761e6ff6845418553bc74cf550dc87e6b8e59736c76207fa3e9ee07e7bdbf",
   "baseAtlasSha256": "10b4a5c31d9e01261a5a6b965845e8475c5ea131e7a574ae3909f4c68c35cc37",
   "baseMetadataSha256": "ddcb38b29a146b174e06f39a3e32b2c935fe056a8ad417d3631f47f27ad80cb2",
   "referenceManifestSha256": "bf66d4c3a7c1d1c3bbe76732bbaacd6bb35760436c59f719e572a1ab725f0004",
+  "compatibilityManifestSha256": "3926ad49cdc774247f305031964c043166e8f34dab1f36138a00900c8fd0a6d1",
   "redistribution": "Reference downloads are not grants of redistribution rights; see project rights review.",
   "regions": {
     "grass": {
@@ -716,24 +717,7 @@
       "aliasOf": "stardew_lava_0"
     },
     "lava_cooled": {
-      "source": "volcano",
-      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
-      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
-      "crop": [
-        0,
-        320,
-        32,
-        32
-      ],
-      "transformations": [
-        {
-          "grayscaleColorMap": [
-            "#391924",
-            "#b45b27"
-          ]
-        }
-      ],
-      "rights": "ConcernedApe / Stardew Valley"
+      "aliasOf": "stardew_lava_cooled_0"
     },
     "tree": {
       "source": "spring",
@@ -1139,7 +1123,7 @@
       "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/126521/",
       "sourceSha256": "5016a03bc073935845600769381cec187e98aa3fbcfe8fcaa048b8aa540b6011",
       "crop": [
-        512,
+        514,
         312,
         48,
         56
@@ -1151,7 +1135,7 @@
             56
           ],
           "visibleBounds": [
-            2,
+            0,
             0,
             48,
             56
@@ -1191,7 +1175,7 @@
       "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/126521/",
       "sourceSha256": "5016a03bc073935845600769381cec187e98aa3fbcfe8fcaa048b8aa540b6011",
       "crop": [
-        592,
+        594,
         0,
         32,
         32
@@ -1203,7 +1187,7 @@
             32
           ],
           "visibleBounds": [
-            2,
+            0,
             0,
             32,
             32
@@ -1564,6 +1548,26 @@
       "transformations": [],
       "rights": "ConcernedApe / Stardew Valley"
     },
+    "stardew_lava_cooled_0": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        0,
+        320,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#391924",
+            "#b45b27"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
     "stardew_lava_1": {
       "source": "volcano",
       "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
@@ -1575,6 +1579,26 @@
         32
       ],
       "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "stardew_lava_cooled_1": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        32,
+        320,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#391924",
+            "#b45b27"
+          ]
+        }
+      ],
       "rights": "ConcernedApe / Stardew Valley"
     },
     "stardew_lava_2": {
@@ -1590,6 +1614,26 @@
       "transformations": [],
       "rights": "ConcernedApe / Stardew Valley"
     },
+    "stardew_lava_cooled_2": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        64,
+        320,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#391924",
+            "#b45b27"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
     "stardew_lava_3": {
       "source": "volcano",
       "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
@@ -1601,6 +1645,26 @@
         32
       ],
       "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "stardew_lava_cooled_3": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        96,
+        320,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#391924",
+            "#b45b27"
+          ]
+        }
+      ],
       "rights": "ConcernedApe / Stardew Valley"
     },
     "forest_bush": {
@@ -1646,6 +1710,44 @@
     },
     "wall_cap": {
       "aliasOf": "wood_floor"
+    },
+    "chimney": {
+      "source": "chimney",
+      "page": "https://github.com/ZeriFox/pokewilds-2.5d",
+      "sourceSha256": "517e7b306eb77e8832ebb6a13d2beec704320fbd0d58a881a0b5e4c7c30089b1",
+      "crop": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "transformations": [
+        {
+          "preserveCanvas": [
+            16,
+            16
+          ],
+          "visibleBounds": [
+            8,
+            0,
+            16,
+            8
+          ]
+        }
+      ],
+      "rights": "Retained upstream PokeWilds artwork; inherited source provenance and credits apply. No new rights grant.",
+      "retainedCompatibility": {
+        "file": "chimney.png",
+        "member": "tiles/buildings/chimney1.png",
+        "sourceArchive": "lib/upstream-runtime.jar",
+        "sourceArchiveSha256": "b005765d793ae5d8872a239da01b6920a1eb988ba147f3b5e0d60f3a1261d3fe",
+        "sha256": "517e7b306eb77e8832ebb6a13d2beec704320fbd0d58a881a0b5e4c7c30089b1",
+        "width": 16,
+        "height": 16,
+        "rights": "Retained upstream PokeWilds artwork; inherited source provenance and credits apply. No new rights grant.",
+        "page": "https://github.com/ZeriFox/pokewilds-2.5d",
+        "status": "retained"
+      }
     },
     "ui_frlg_background": {
       "source": "party",

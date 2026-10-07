@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "sourceProvenance": "PMD-PROVENANCE.json",
+  "rights": "Existing PMDCollab credits and rights remain applicable; no new rights grant.",
+  "modernRendering": "Original PMD sheets and metadata remain unchanged.",
+  "files": {
+    "raikou_overw1.png": {
+      "source": "resources/visual/pmd/sprite/0243/Idle-Anim.png",
+      "sourceSha256": "76f1cb3ed29f46d70eb32ac1d7f00871e41a42f76efdb4ffa3cdd7bf09ef9806",
+      "pose": "Idle, down, frame 0",
+      "crop": [
+        17,
+        1,
+        23,
+        31
+      ],
+      "scaledTo": [
+        12,
+        16
+      ],
+      "filter": "nearest",
+      "canvas": [
+        16,
+        16
+      ],
+      "anchor": "bottom center",
+      "sha256": "4a3ba21d67aa895fa5a0a7992a5405c1b461b01fce4d362eb2da903b338bf96d"
+    },
+    "entei_overw1.png": {
+      "source": "resources/visual/pmd/sprite/0244/Idle-Anim.png",
+      "sourceSha256": "ad961a2b960bedbf2a608964e75f1fb7ce03eb3c2e6498984dca6297115713e6",
+      "pose": "Idle, down, frame 0",
+      "crop": [
+        10,
+        5,
+        29,
+        31
+      ],
+      "scaledTo": [
+        15,
+        16
+      ],
+      "filter": "nearest",
+      "canvas": [
+        16,
+        16
+      ],
+      "anchor": "bottom center",
+      "sha256": "d0d6a60235354e36ecc63518a88fafb51462964be638e836c769cf88939b42ee"
+    },
+    "suicune_overw1.png": {
+      "source": "resources/visual/pmd/sprite/0245/Idle-Anim.png",
+      "sourceSha256": "3ff451f131dd998aa70b918d5612062a1c2f9b5c874dd92d3ee88441b39355a2",
+      "pose": "Idle, down, frame 0",
+      "crop": [
+        9,
+        2,
+        30,
+        31
+      ],
+      "scaledTo": [
+        15,
+        16
+      ],
+      "filter": "nearest",
+      "canvas": [
+        16,
+        16
+      ],
+      "anchor": "bottom center",
+      "sha256": "89928d59a4059302c34df9786543627bd2f48e72d14d21e8c69bc218f7095111"
+    }
+  }
+}
