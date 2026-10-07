@@ -1,0 +1,34 @@
+name: Reference art preparation
+on:
+  push:
+    branches: [feature/stardew-world-battle]
+    paths: ['tools/acquire_reference_sheets.py', '.github/workflows/reference-art.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - run: python -m pip install Pillow==11.3.0
+      - name: Download selected public reference sheets
+        run: python tools/acquire_reference_sheets.py
+      - name: Retain reference images and provenance on the working branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$GITHUB_REF_NAME" = 'feature/stardew-world-battle'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add art-source/reference
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record selected reference sheets and provenance for visual integration'
+            gh auth setup-git
+            git push origin HEAD:feature/stardew-world-battle
+          fi
