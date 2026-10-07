@@ -1,4 +1,4 @@
-name: Presentation rework verification
+name: R15 diagnostic - exact snapshot pixels
 
 on:
   workflow_dispatch:
@@ -65,15 +65,15 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri libglx-mesa0 libasound2t64
-      - name: Verify exact built JAR in native fixtures
-        run: xvfb-run -a -s '-screen 0 2560x1440x24' python tools/verify_rework.py --stage native
+      - name: R15 diagnostic only - exact built JAR snapshot pixels
+        run: xvfb-run -a -s '-screen 0 2560x1440x24' python tools/move_effect_presentation_test.py
       - name: Confirm sources were not rewritten
         run: git diff --exit-code
       - name: Preserve measured test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: presentation-verification-${{ github.sha }}
+          name: r15-diagnostic-${{ github.sha }}
           retention-days: 7
           if-no-files-found: error
           path: |
@@ -82,3 +82,4 @@ jobs:
             build/visual-scope.json
             build/*/*.log
             build/*/*.png
+            build/move-effects/**/*.png

@@ -158,9 +158,28 @@ public final class MoveEffectPresentationTest {
             require((transparent.getPixel(x,y)&255)==0,"Identity test needs the actual transparent intro frame");
          transparent.dispose();identity.drawFrame(this,empty,"");uiBatch.flush();
          Pixmap identityShot=ScreenUtils.getFrameBufferPixmap(0,0,W,H);
+         // Diagnostic evidence is preserved before the unchanged exact-pixel assertion.
+         save(baseline,"identity-expected.png");save(identityShot,"identity-actual.png");
+         System.out.println("R15 DIAGNOSTIC framebuffer bits R/G/B/A="+gl(0x0D52,1)[0]+"/"+gl(0x0D53,1)[0]+"/"+gl(0x0D54,1)[0]+"/"+gl(0x0D55,1)[0]
+            +" dither="+Gdx.gl.glIsEnabled(GL20.GL_DITHER)+" sampleBuffers="+gl(0x80A8,1)[0]+" samples="+gl(0x80A9,1)[0]);
+         int diagnosticMismatch=0,diagnosticMax=0;int[] channelMax=new int[4];
+         for(int y=H/2;y<H-2;y+=11)for(int x:new int[]{3,21,W-22,W-4}) {
+            int expected=baseline.getPixel(x,y),actual=identityShot.getPixel(x,y);
+            if(expected!=actual)diagnosticMismatch++;
+            for(int c=0;c<4;c++) {int delta=Math.abs(((expected>>>(24-8*c))&255)-((actual>>>(24-8*c))&255));channelMax[c]=Math.max(channelMax[c],delta);diagnosticMax=Math.max(diagnosticMax,delta);}
+         }
+         System.out.println("R15 DIAGNOSTIC identity sampledMismatch="+diagnosticMismatch+" maxChannelDelta="+diagnosticMax+" RGBAmax="+Arrays.toString(channelMax));
          int comparisons=0;
          // Actor animation is not advanced; compare asymmetric arena margins away from panels.
          for(int y=H/2;y<H-2;y+=11)for(int x:new int[]{3,21,W-22,W-4}) {
+            if(baseline.getPixel(x,y)!=identityShot.getPixel(x,y)) {
+               System.out.println("R15 DIAGNOSTIC first mismatch screen-bottom-origin="+x+","+y+" PNG-top-origin="+x+","+(H-1-y));
+               for(int dy=-1;dy<=1;dy++)for(int dx=-1;dx<=1;dx++) {
+                  int expected=baseline.getPixel(x+dx,y+dy),actual=identityShot.getPixel(x+dx,y+dy);int[] delta=new int[4];
+                  for(int c=0;c<4;c++)delta[c]=((actual>>>(24-8*c))&255)-((expected>>>(24-8*c))&255);
+                  System.out.println(String.format(java.util.Locale.ROOT,"R15 DIAGNOSTIC neighbor %d,%d expectedRGBA=%08x actualRGBA=%08x signedDelta=%s",x+dx,y+dy,expected,actual,Arrays.toString(delta)));
+               }
+            }
             require(baseline.getPixel(x,y)==identityShot.getPixel(x,y),"Snapshot orientation/identity changed arena pixel "+x+","+y);
             comparisons++;
          }
