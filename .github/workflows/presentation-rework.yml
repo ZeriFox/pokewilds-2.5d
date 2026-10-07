@@ -1,0 +1,120 @@
+name: Presentation rework verification
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/stardew-world-battle]
+    paths:
+      - '.github/workflows/presentation-rework.yml'
+      - 'tools/prepare_stardew_presentation.py'
+      - 'tools/apply_presentation_rework.py'
+      - 'tools/PresentationReworkTest.java'
+      - 'tools/presentation_rework_test.py'
+permissions:
+  contents: write
+concurrency:
+  group: presentation-rework-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/feature/stardew-world-battle'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      LIBGL_ALWAYS_SOFTWARE: 'true'
+      ALSOFT_DRIVERS: 'null'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.ref }}
+          persist-credentials: true
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Prepare selected source art and apply reviewed presentation changes
+        run: |
+          python -m pip install Pillow==11.3.0
+          python tools/prepare_stardew_presentation.py
+          python tools/apply_presentation_rework.py
+      - name: Pure regressions and frozen source audit
+        run: |
+          python tools/test_flexible_sampling.py
+          python tools/test_visual_geometry.py
+          python tools/verify_visual_scope.py
+          python tools/verify_scope_test.py
+          python tools/verify_landscape_assets.py
+      - name: Restore verified build inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v0.8.11-johto.2 --repo ZeriFox/pokewilds-2.5d --pattern pokewilds-2.5d-build-inputs.zip --dir "$RUNNER_TEMP"
+          echo "5692696180a62dc1c8822e2a2d2a324f60647535a821865d7fb556e109b3883f  $RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" -d .
+      - name: Compile complete game
+        run: python build.py
+      - name: Install software OpenGL display
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri libglx-mesa0 libasound2t64
+      - name: Native landscape and battle suites
+        run: |
+          xvfb-run -a -s '-screen 0 1600x1000x24' python tools/landscape_smoke_test.py || { cat build/landscape-smoke/*.log; exit 1; }
+          xvfb-run -a -s '-screen 0 1600x1000x24' python tools/pmd_battle_visual_test.py
+          xvfb-run -a -s '-screen 0 1600x1000x24' python tools/presentation_rework_test.py
+      - name: Terrain, biomes, controls and field actions
+        run: |
+          xvfb-run -a -s '-screen 0 1920x1200x24' python tools/bw_assets_integration_test.py
+          xvfb-run -a -s '-screen 0 1920x1200x24' python tools/world_elevation_test.py
+          xvfb-run -a -s '-screen 0 1920x1200x24' python tools/biome_scene_test.py
+          xvfb-run -a -s '-screen 0 1920x1200x24' python tools/field_scene_test.py
+          if [ -f tools/ui_layout_test.py ]; then xvfb-run -a -s '-screen 0 1920x1200x24' python tools/ui_layout_test.py; fi
+      - name: Commit only tested presentation outputs to the working branch
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          jar=Path('dist/pokewilds-rebuilt.jar')
+          result={'status':'passed','sourceCommit':os.environ['GITHUB_SHA'],
+              'workflowRun':os.environ['GITHUB_RUN_ID'],'jarSha256':hashlib.sha256(jar.read_bytes()).hexdigest(),
+              'checks':['sampling','geometry','frozen source audit','audit tamper regression','landscape assets','complete Java 17 compilation','native landscape','native battle','native full-viewport effects','BwAssets integration','world elevation','biome scenes','field scenes'],
+              'platform':'Ubuntu software OpenGL (Mesa/Xvfb)',
+              'limitations':'Not a complete manual Windows campaign or an exhaustive test of every move, generated map and multiplayer session.'}
+          Path('docs/PRESENTATION-TEST-RESULT.json').write_text(json.dumps(result,indent=2)+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/com/pkmngen/game/BwAssets.java src/com/pkmngen/game/JohtoRenderer.java src/com/pkmngen/game/JohtoBattleRenderer.java src/com/pkmngen/game/ModernPartyUi.java src/com/pkmngen/game/ModernInventoryUi.java src/com/pkmngen/game/PmdBattleSprites.java src/com/pkmngen/game/util/SpriteProxy.java
+          git add resources/visual/stardew baseline/presentation-before-stardew baseline/modernization-scope.json tools/verify_visual_scope.py docs/PRESENTATION-REWORK-2026-10-07.md docs/PRESENTATION-TEST-RESULT.json
+          git diff --cached --check
+          git commit -m 'Integrate tested Stardew scenery, FRLG menus, structural interiors and widescreen battle effects'
+          git push origin HEAD:feature/stardew-world-battle
+      - name: Preserve review images, logs and resumable sources
+        if: always()
+        run: |
+          mkdir -p build/recovery
+          tar -czf build/recovery/rework-source.tar.gz src tools resources baseline docs build.py
+          if [ -d lib ]; then tar -czf build/recovery/build-inputs.tar.gz lib; fi
+          find build -name '*.log' -maxdepth 4 -print
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: presentation-rework-${{ github.run_id }}
+          retention-days: 7
+          compression-level: 0
+          path: |
+            build/recovery/
+            build/build-report.json
+            build/visual-scope.json
+            build/landscape-smoke/*.png
+            build/landscape-smoke/*.log
+            build/pmd-battle-visual/*.png
+            build/pmd-battle-visual/*.log
+            build/presentation-rework/*.png
+            build/presentation-rework/*.log
+            build/biome-scenes/*.png
+            build/biome-scenes/*.log
+            build/field-scenes/*.log
+            build/ui-layout/*.png
+            build/ui-layout/*.log
+            build/bw-assets-integration/*.log
+            build/world-elevation/*.log
