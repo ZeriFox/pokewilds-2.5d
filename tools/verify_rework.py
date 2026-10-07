@@ -11,6 +11,7 @@ import hashlib
 import json
 from pathlib import Path
 import platform
+import shutil
 import subprocess
 import sys
 
@@ -50,6 +51,35 @@ def files(folder: Path) -> dict[str, str]:
             for p in sorted(folder.rglob("*")) if p.is_file()}
 
 
+def png_fingerprint(path: Path) -> dict:
+    from PIL import Image
+    with Image.open(path) as image:
+        rgba = image.convert("RGBA")
+        return {"size": list(rgba.size), "rgba_sha256": hashlib.sha256(rgba.tobytes()).hexdigest()}
+
+
+def preparation_diff(before: dict, after: dict, before_pixels: dict, receipt: dict) -> None:
+    from PIL import Image, features
+    receipt["image_backend"] = {"pillow": Image.__version__, "zlib": features.version_codec("zlib")}
+    receipt["asset_differences"] = []
+    for name in sorted(set(before) | set(after)):
+        if before.get(name) == after.get(name):
+            continue
+        row = {"file": name, "before_sha256": before.get(name), "after_sha256": after.get(name)}
+        if name in before_pixels:
+            row["before_png"] = before_pixels[name]
+        source = ROOT / name
+        if source.is_file():
+            target = OUT / "preparation-changed" / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, target)
+            if source.suffix.lower() == ".png":
+                row["after_png"] = png_fingerprint(source)
+                row["pixels_equal"] = row.get("before_png") == row["after_png"]
+        receipt["asset_differences"].append(row)
+    print(json.dumps({"image_backend": receipt["image_backend"], "asset_differences": receipt["asset_differences"]}, indent=2), flush=True)
+
+
 def git(*args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
 
@@ -85,6 +115,7 @@ def run_stage(stage: str) -> None:
     save()
     try:
         before = {**files(ROOT / "resources/visual/stardew"), **files(ROOT / "resources/pokemon")} if stage == "prepare" else None
+        before_pixels = {name: png_fingerprint(ROOT / name) for name in (before or {}) if name.endswith(".png")}
         if stage == "native":
             if git("status", "--porcelain", "--untracked-files=all"):
                 raise RuntimeError("Acceptance requires a clean committed checkpoint; use individual native scripts for development diagnostics")
@@ -114,6 +145,8 @@ def run_stage(stage: str) -> None:
         if stage == "prepare":
             after = {**files(ROOT / "resources/visual/stardew"), **files(ROOT / "resources/pokemon")}
             if not before or before != after:
+                preparation_diff(before or {}, after, before_pixels, receipt)
+                save()
                 raise RuntimeError("Asset preparation differs from tracked input; review and commit generated assets first")
             tracked = set(git("ls-files", "resources/visual/stardew", "resources/pokemon").splitlines())
             if not set(after).issubset(tracked):
