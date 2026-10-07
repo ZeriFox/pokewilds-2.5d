@@ -151,6 +151,16 @@ public final class MoveEffectPresentationTest {
       void verifyOrientation(Pixmap baseline) {
          MoveEffectPresentation identity=new MoveEffectPresentation("surf_player_gsc");
          identity.drawMetadata(this,animation,"screenshot:0,0,160,144 row_copy:60,60");
+         // Read the actual FBO independently: final compositing remains bit-exact.
+         uiBatch.flush();Pixmap capturedShot;
+         int previousFramebuffer=gl(GL20.GL_FRAMEBUFFER_BINDING,1)[0];
+         try {
+            java.lang.reflect.Field snapshotField=MoveEffectPresentation.class.getDeclaredField("snapshot");snapshotField.setAccessible(true);
+            com.badlogic.gdx.graphics.glutils.FrameBuffer captured=(com.badlogic.gdx.graphics.glutils.FrameBuffer)snapshotField.get(identity);
+            Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER,captured.getFramebufferHandle());
+            capturedShot=ScreenUtils.getFrameBufferPixmap(0,0,W,H);
+         } catch(ReflectiveOperationException failure) {throw new RuntimeException(failure);}
+         finally {Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER,previousFramebuffer);}
          com.badlogic.gdx.graphics.g2d.Sprite empty=new com.badlogic.gdx.graphics.g2d.Sprite(
             com.pkmngen.game.util.TextureCache.get(Gdx.files.internal("attacks/surf_player_gsc/output/frame-001.png")));
          Pixmap transparent=new Pixmap(Gdx.files.internal("attacks/surf_player_gsc/output/frame-001.png"));
@@ -158,12 +168,47 @@ public final class MoveEffectPresentationTest {
             require((transparent.getPixel(x,y)&255)==0,"Identity test needs the actual transparent intro frame");
          transparent.dispose();identity.drawFrame(this,empty,"");uiBatch.flush();
          Pixmap identityShot=ScreenUtils.getFrameBufferPixmap(0,0,W,H);
-         int comparisons=0;
-         // Actor animation is not advanced; compare asymmetric arena margins away from panels.
+         int copiedPixels=0;
+         float centralScale=Math.min(W/160f,H/144f);
+         int marginLeft=(int)Math.floor((W-160*centralScale)*.5f),marginRight=(int)Math.ceil((W+160*centralScale)*.5f);
+         float canvasHeight=Math.max(144f,160f*H/W),canvasBottom=(144-canvasHeight)*.5f;
+         int firstArenaRow=(int)Math.ceil((48-canvasBottom)*H/canvasHeight);
+         for(int y=firstArenaRow;y<H;y++)for(int x=0;x<W;x++)if(x<marginLeft||x>=marginRight) {
+            boolean exact=capturedShot.getPixel(x,y)==identityShot.getPixel(x,y);
+            if(!exact){save(capturedShot,"identity-captured-fbo.png");save(identityShot,"identity-actual.png");}
+            require(exact,"Snapshot composite changed captured FBO pixel "+x+","+y);
+            copiedPixels++;
+         }
+         capturedShot.dispose();require(copiedPixels>0,"Snapshot FBO comparison has no margin pixels");
+         System.out.println("Snapshot FBO-to-composite strict identity PASS ("+copiedPixels+" pixels)");
+         int arenaHeight;
+         try {
+            java.lang.reflect.Field arenaField=JohtoBattleRenderer.class.getDeclaredField("arena");arenaField.setAccessible(true);
+            arenaHeight=((com.badlogic.gdx.graphics.Texture)arenaField.get(johtoBattleRenderer)).getHeight();
+         } catch(ReflectiveOperationException failure) {throw new RuntimeException(failure);}
+         int comparisons=0,strictComparisons=0,nearestBoundaryMatches=0,invertedRejected=0,shiftedRejected=0;
+         // Exact color/position everywhere except a mathematically exact NEAREST tie.
+         // Mesa rerasterizes those ties onto either adjoining source texel in the FBO;
+         // the copy itself was verified pixel-identical to the captured FBO.
          for(int y=H/2;y<H-2;y+=11)for(int x:new int[]{3,21,W-22,W-4}) {
-            require(baseline.getPixel(x,y)==identityShot.getPixel(x,y),"Snapshot orientation/identity changed arena pixel "+x+","+y);
+            int actual=identityShot.getPixel(x,y);
+            boolean exact=baseline.getPixel(x,y)==actual;
+            boolean matches=snapshotPixelMatches(baseline,x,y,actual,arenaHeight);
+            if(!matches){save(baseline,"identity-expected.png");save(identityShot,"identity-actual.png");}
+            require(matches,"Snapshot orientation/identity changed arena pixel "+x+","+y);
+            if(!nearestTieRow(y,arenaHeight))strictComparisons++;
+            if(!exact)nearestBoundaryMatches++;
+            // Negative controls use the identical comparator: a vertical inversion or
+            // a general one-pixel translation must not be accepted as a tie-break.
+            if(!snapshotPixelMatches(baseline,x,y,identityShot.getPixel(x,H-1-y),arenaHeight))invertedRejected++;
+            if(!snapshotPixelMatches(baseline,x,y,identityShot.getPixel(x,y+1),arenaHeight))shiftedRejected++;
             comparisons++;
          }
+         require(strictComparisons>comparisons/2,"Insufficient strict non-boundary identity samples");
+         require(invertedRejected>comparisons/2,"Snapshot comparator accepted inverted image");
+         require(shiftedRejected>0,"Snapshot comparator accepted a general pixel translation");
+         System.out.println("Snapshot identity strict="+strictComparisons+" exactNearestBoundaryAlternatives="+nearestBoundaryMatches
+            +" rejectedInversion="+invertedRejected+" rejectedTranslation="+shiftedRejected+" arenaHeight="+arenaHeight);
          identityShot.dispose();identity.dispose();
          // Compare expanded actual Surf image against normal Sprite geometry, including UV orientation.
          johtoBattleRenderer.drawBackground(this);uiBatch.flush();
@@ -185,6 +230,15 @@ public final class MoveEffectPresentationTest {
          if(DrawEnemyHealth.shouldDraw)johtoBattleRenderer.drawEnemyHealth(this,battle.drawAction.drawEnemyHealthAction);
          modernUi.rect(this,-320,-288,800,335,new Color(.8f,.04f,.6f,1));uiBatch.flush();
          System.out.println("Snapshot and real PNG orientation PASS ("+comparisons+" arena samples)");
+      }
+      static boolean nearestTieRow(int y,int sourceHeight) {
+         // Pixel center maps to an integer source-texel edge, using exact integers.
+         return ((2L*y+1)*sourceHeight)%(2L*H)==0;
+      }
+      static boolean snapshotPixelMatches(Pixmap baseline,int x,int y,int actual,int sourceHeight) {
+         if(baseline.getPixel(x,y)==actual)return true;
+         if(!nearestTieRow(y,sourceHeight))return false;
+         return y>0&&baseline.getPixel(x,y-1)==actual||y+1<H&&baseline.getPixel(x,y+1)==actual;
       }
       void save(Pixmap shot,String filename){PixmapIO.PNG png=new PixmapIO.PNG();png.setFlipY(true);try{png.write(Gdx.files.local(filename),shot);}catch(java.io.IOException failure){throw new RuntimeException(failure);}finally{png.dispose();}}
    }

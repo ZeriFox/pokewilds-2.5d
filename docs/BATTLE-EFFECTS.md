@@ -100,3 +100,33 @@ were inspected after the fixes; the magenta lower region in this test is an
 intentional command-area sentinel, not product UI. Full playable UI screenshots
 come from the separate end-to-end fixture. Live window resize is outside this
 fixture's claims; it verifies three actual viewport sizes in separate processes.
+
+### Mesa nearest-neighbor boundary evidence
+
+The Linux CI run for `4d3a1d02446e72411ff61c325848a489036407fd` built the same
+JAR SHA256 as Windows (`ad9a49459a306a379634f9fb37ce2766ce064ede612a50fd0a884bec4e8828ea`),
+but rejected a screen-to-repaint identity sample on Mesa llvmpipe. Two isolated
+R15 diagnostic runs retained exact assertions and saved the source screen,
+raw captured FBO and final composite. The second run is
+https://github.com/ZeriFox/pokewilds-2.5d/actions/runs/37678169777.
+
+At 1280×720, all 19,938 differing pixels in the 230,400 arena-margin pixels
+were already different in the raw FBO. Every difference lay on an exact
+nearest-neighbor texel boundary in the 2.5× scaled arena (PNG rows 2 modulo 5),
+and each was the exact RGBA value of one immediate vertical neighbor. There
+were zero differences between the raw FBO and its final composite. This is
+nearest-neighbor tie selection during repainting, not a color-rounding error,
+UV inversion or a displaced final copy. The original failed logs and PNGs
+are retained locally under `build/mesa-diagnostic/`.
+
+The fixture now compares raw FBO versus final composite **exactly at every
+arena-margin pixel**. Its separate screen-versus-repaint orientation check
+allows only either immediate vertical neighbor at a mathematically exact
+source-texel boundary: `(2*y+1)*sourceHeight % (2*viewportHeight) == 0`.
+The source height is read from the actual arena texture. All RGBA channels
+must still match exactly; non-boundary pixels remain position-exact. Negative
+controls feed the identical comparator a vertically inverted image and a
+general one-pixel translation and require rejection. The actual Surf PNG UV
+comparison, local-effect margin equality, GL state and original frame/schedule
+assertions remain unchanged. No production rendering or assets changed for
+this test correction.

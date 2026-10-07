@@ -111,3 +111,33 @@ rather than claiming allocation-free rendering. The raw comparison, per-run metr
 provenance and real before/after framebuffers are in
 `build/performance-comparison/`. These observations do not promise FPS on other
 hardware or replace a manual campaign, multiplayer or operating-system DPI test.
+
+## Final-JAR repeat — 2026-10-07
+
+The preceding measurements are historical diagnostic evidence for `f5a817d5…`.
+All compatibility and paired performance runs were repeated for the final JAR
+`ad9a49459a306a379634f9fb37ce2766ce064ede612a50fd0a884bec4e8828ea`, against the same
+verified prior JAR `928958d8…`, with the same fixture, Java, GPU and resolution.
+The complete vertical slice also passes on this JAR, including the strengthened
+foreground-wall check: all 1,301 feet and 2,406 torso reference pixels remain
+recognizable within the documented transparency tolerance; collision is unchanged.
+
+| Metric | Prior build | Final JAR |
+| --- | ---: | ---: |
+| Median of per-run p95 CPU render time | 3.9091 ms | 4.1095 ms |
+| Median of per-run mean CPU render time | 3.3639 ms | 3.5546 ms |
+| Approximate render-thread allocation | 4.453 MB/frame | 4.438 MB/frame |
+| Managed textures / shaders | 66 / 3 | 66 / 3 |
+| RGBA8 base-level texture estimate | 38,794,492 bytes | 38,917,372 bytes |
+
+The measured p95 increase is 0.2004 ms (+5.13%). The same measurement limitations
+above apply: this is CPU render wall time, not a GPU/FPS guarantee; the texture
+estimate is not measured VRAM, and allocation remains substantial in both builds.
+Receipt `build/performance-comparison/comparison.json` SHA-256:
+`cae05c217621a9f2e0ef7b189ffd5eb7d938d257bc63fe9fa9e4f01627a2e2da`.
+
+The final-JAR old-save check retains the same 215,337 exterior tiles, 9,025
+interior tiles, 314 wild Pokémon, party and inventory identities through both
+versions' load/save/reload. All four original files remain byte-identical.
+Receipt `build/save-compatibility/save-compatibility.json` SHA-256:
+`0bf32e1c66f2f2796f08e049fbbaaa00c380bf88f5ff7e2ee04b6fa6a8108e41`.
