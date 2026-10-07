@@ -1,8 +1,10 @@
 # PokeWilds 2.5D — biomi, interfaccia e rilievi
 
-Una ricostruzione PC di PokeWilds 0.8.11 con mondo prospettico, sprite animati [PMDCollab](https://sprites.pmdcollab.org/), allenatori di [Pokémon Black / White](https://www.spriters-resource.com/ds_dsi/pokemonblackwhite/), paesaggi coerenti per bioma, menù coordinati e nuove arene di lotta. Il paesaggio mantiene Pixel Crawler come base, integra Woods, Cold Cave e Forest_1 e usa un set vulcanico di Sevarihk e tre piccoli elementi CC0 per le sagome mancanti.
+Una ricostruzione PC di PokeWilds 0.8.11 in Java/LibGDX, con mondo prospettico, sprite animati [PMDCollab](https://sprites.pmdcollab.org/) e allenatori di Pokémon Black / White. Il rework recuperato usa un atlante ambientale Stardew di 218 regioni e sei animazioni, pannelli ispirati a FireRed/LeafGreen, arredi completi e mosse con effetti estesi al viewport. I Pokémon PMD e il sistema di rilievi vengono conservati. Fonti, trasformazioni e limiti di distribuzione sono registrati in [ASSET-RIGHTS.md](docs/ASSET-RIGHTS.md).
 
 La versione aggiunge **552 specie giocabili** alle 410 della base, per **962 specie totali**, una caldera vulcanica e rampe percorribili tra alcune terrazze montane. La mappa resta procedurale: il nuovo passaggio di generazione modifica davvero terreno e collisioni. La presentazione predefinita usa sprite 2D e la build normale esclude i modelli GLB. È una versione Windows PC x64, non un port Nintendo 3DS.
+
+Stato effettivo, prossimo comando e prove del rework: [REWORK-STATUS.md](docs/REWORK-STATUS.md), [REWORK-TESTS.md](docs/REWORK-TESTS.md), [copertura materiali](docs/ASSET-COVERAGE.md). Le anteprime seguenti sono storiche; gli screenshot del nuovo JAR sono negli artifact di verifica e nella consegna della build.
 
 ![Mondo procedurale in 2.5D](anteprima-25d.png)
 
@@ -24,7 +26,9 @@ Il ramo **`main`** riunisce le correzioni di johto.3 con **14 profili di bioma**
 
 ## Giocare su Windows
 
-Se hai la **cartella locale completa già compilata**, apri **`AVVIA-POKEWILDS.cmd`** oppure **`run-johto.cmd`**: non serve `build.cmd`. In quella cartella Java 17 e il JAR compilato sono già inclusi. Mantieni insieme launcher, `dist/` e `toolchain/`; non spostare soltanto il file di avvio.
+Nel nuovo pacchetto Windows estratto apri **`GIOCA.cmd`** oppure **`run-johto.cmd`**: non serve `build.cmd`. In quella cartella Java 17 e il JAR compilato sono già inclusi. Mantieni insieme launcher, `dist/` e `toolchain/`; non spostare soltanto il file di avvio.
+
+Il pacchetto Stardew viene assemblato e verificato da [tools/package_windows.py](tools/package_windows.py) e [tools/verify_windows_package.py](tools/verify_windows_package.py), con runtime incluso e ricevuta legata all’hash dello ZIP. La pubblicazione automatica degli asset di riferimento non è attiva; la consegna locale è distinta dai sorgenti.
 
 Il pacchetto Windows della [release privata v0.8.11-johto.3](https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.3) resta la **versione binaria precedente**: richiede un account con accesso e non comprende tutta questa integrazione di `main`. L'aggiornamento del codice non crea una nuova release binaria.
 
@@ -36,7 +40,7 @@ Il preset completo originale frecce/Z/X viene migrato una volta a WASD/mouse in 
 
 ## Contenuto e limiti
 
-- **Mondo:** 202 regioni e 6 sequenze animate nell'atlante `visual/landscape`; 14 profili assegnano terreno, pareti, altezze visive, fluidi, decorazioni, atmosfera, habitat e transizioni. Deserto, vulcano e cimitero hanno materiali dedicati. Il fantasma notturno è un incontro originale legittimo, ora rappresentato da un'apparizione moderna; un asset mancante non genera un fantasma sostitutivo.
+- **Mondo:** 218 regioni e 6 sequenze animate nell'atlante attivo `visual/stardew`; `visual/unova` fornisce gli avatar e `visual/custom` mantiene la priorità esplicita degli override; 14 profili assegnano terreno, pareti, altezze visive, fluidi, decorazioni, atmosfera, habitat e transizioni. Deserto, vulcano e cimitero hanno materiali dedicati. Il fantasma notturno è un incontro originale legittimo, ora rappresentato da un'apparizione moderna; un asset mancante non genera un fantasma sostitutivo.
 - **Interfaccia e lotte:** layout a righe e colonne, comandi e tutorial con binding effettivi, quantità separate dai nomi e testo adattato agli spazi; portrait PMD e Pokémon intero animato su tutte e tre le pagine del riepilogo. Le arene riutilizzano i materiali del bioma; panorama e transizioni coprono la finestra.
 - **Habitat:** i nuovi incontri considerano ambiente, acqua effettiva, prossimità dell'acqua, profondità geometrica, orario e pesi di rarità. Milotic resta nell'acqua dell'oasi; gli acquatici selvatici coperti dalle regole non possono passeggiare sulla sabbia. I Pokémon posseduti conservano i loro controlli.
 - **Pokédex:** 552 aggiunte con dati e grida da versioni registrate. Sono usate soltanto mosse già implementate; condizioni evolutive non supportate sono escluse. Non tutte le forme alternative o varianti shiny hanno artwork esatto. Dettagli in [POKEDEX-ESPANSO.txt](POKEDEX-ESPANSO.txt).

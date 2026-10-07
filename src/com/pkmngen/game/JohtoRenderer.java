@@ -13,8 +13,11 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.FloatArray;
 import java.lang.reflect.Field;
@@ -62,6 +65,9 @@ public final class JohtoRenderer {
    private float surfaceLift;
    private float actorPlaneZ;
    private final Vector3 projectedAnchor = new Vector3();
+   private final BoundingBox wallOcclusionBounds = new BoundingBox();
+   private final Ray wallOcclusionRay = new Ray();
+   private final Vector3 wallOcclusionMin = new Vector3(), wallOcclusionMax = new Vector3(), wallOcclusionTarget = new Vector3();
    private final Color ambientTint = new Color(Color.WHITE), fogColor = new Color();
    private float fogDensity, desaturation;
    private long ghostFrames;
@@ -617,19 +623,46 @@ public final class JohtoRenderer {
          TextureRegion cap=assets.named(caveWall?"mountain":name.contains("ruin")?"ruin_floor":"wall_cap");
          if(cap==null)cap=assets.named("wood_floor");
          float height=caveWall?16:24,z=-y;
-         Geometry mesh=batch(geometry,face.getTexture());
-         if(!structuralNeighbour(game,x,y-16))quad(mesh,x,0,z,x+16,0,z,x+16,height,z,x,height,z,face,WHITE);
-         if(!structuralNeighbour(game,x,y+16))quad(mesh,x+16,0,z-16,x,0,z-16,x,height,z-16,x+16,height,z-16,face,color(.82f,.85f,.87f));
-         if(!structuralNeighbour(game,x-16,y))quad(mesh,x,0,z-16,x,0,z,x,height,z,x,height,z-16,face,color(.88f,.90f,.91f));
-         if(!structuralNeighbour(game,x+16,y))quad(mesh,x+16,0,z,x+16,0,z-16,x+16,height,z-16,x+16,height,z,face,color(.73f,.78f,.81f));
-         floor(cap,x,y,16,16,height,WHITE,geometry);
+         // The cap can cover the actor even when the visible front face is far
+         // below them on screen. Fade the complete intervening wall segment;
+         // retain its geometry and neighbour culling, so corners never gain holes.
+         float alpha=interiorWallOccludesPlayer(game,x,y,height)?.12f:1f;
+         Map<Texture,Geometry> groups=alpha<1f?translucent:geometry;
+         float wallTint=Color.toFloatBits(1,1,1,alpha);
+         Geometry mesh=batch(groups,face.getTexture());
+         if(!structuralNeighbour(game,x,y-16))quad(mesh,x,0,z,x+16,0,z,x+16,height,z,x,height,z,face,wallTint);
+         if(!structuralNeighbour(game,x,y+16))quad(mesh,x+16,0,z-16,x,0,z-16,x,height,z-16,x+16,height,z-16,face,Color.toFloatBits(.82f,.85f,.87f,alpha));
+         if(!structuralNeighbour(game,x-16,y))quad(mesh,x,0,z-16,x,0,z,x,height,z,x,height,z-16,face,Color.toFloatBits(.88f,.90f,.91f,alpha));
+         if(!structuralNeighbour(game,x+16,y))quad(mesh,x+16,0,z,x+16,0,z-16,x+16,height,z-16,x+16,height,z,face,Color.toFloatBits(.73f,.78f,.81f,alpha));
+         floor(cap,x,y,16,16,height,wallTint,groups);
          if(name.contains("window")) {
             TextureRegion window=assets.named("window");
-            if(window!=null)quad(batch(geometry,window.getTexture()),x+3,7,z+.05f,x+13,7,z+.05f,x+13,19,z+.05f,x+3,19,z+.05f,window,WHITE);
+            if(window!=null)quad(batch(groups,window.getTexture()),x+3,7,z+.05f,x+13,7,z+.05f,x+13,19,z+.05f,x+3,19,z+.05f,window,wallTint);
          }
          return true;
       }
       if(upper.isEmpty()&&lower.contains("floor"))return true;
+      return false;
+   }
+
+   /** Presentation only: test sight lines to feet/torso, never alter a map tile. */
+   private boolean interiorWallOccludesPlayer(Game game,float x,float y,float height) {
+      if(game.map.tiles==game.map.overworldTiles)return false;
+      float px=game.player.position.x+8,py=game.player.position.y+7;
+      // Behind/alongside walls keep their full appearance. Camera pitch is fixed;
+      // the wall must lie wholly on the camera side of the player's ground point.
+      if(y+TILE>py)return false;
+      wallOcclusionBounds.set(wallOcclusionMin.set(x,surfaceLift,-y-TILE),
+         wallOcclusionMax.set(x+TILE,surfaceLift+height,-y));
+      float ground=elevation.height(px,py)+.15f;
+      for(int row=0;row<3;row++) {
+         float h=row*8f-1f;
+         for(int col=-1;col<=1;col++) {
+            wallOcclusionTarget.set(px+col*8f,ground+h*MathUtils.cosDeg(50),-py-h*MathUtils.sinDeg(50));
+            wallOcclusionRay.set(camera.position,wallOcclusionTarget.sub(camera.position).nor());
+            if(Intersector.intersectRayBoundsFast(wallOcclusionRay,wallOcclusionBounds))return true;
+         }
+      }
       return false;
    }
 

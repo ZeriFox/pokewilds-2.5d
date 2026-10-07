@@ -5,7 +5,7 @@
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "66558d906673f4d22cbf02cae033da6cd4c3682e956292c00b361ab9f45bcf1c",
+  "reviewed_patch_sha256": "9892a9d65b2223cac0a5b8a89ac48aabdb6e39fddfd5ec466a262ca650c7d55f",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/CheckEndOfBattle.java",
@@ -249,7 +249,7 @@
       "scope": "Modern biome battle arenas/HUD, full-viewport composition, preserved-world transitions and presentation helpers for special boss actions."
     },
     "src/com/pkmngen/game/JohtoRenderer.java": {
-      "reviewed_sha256": "59d00c78c266131a1613389faf791e2bc3e0ed261e4a411f221f09e6d8e1f0dd",
+      "reviewed_sha256": "87d1febc769137fb0d8eb058ee8068a5b553beaecbeedffa0da0fc91ad9736a7",
       "scope": "Exclusive perspective world drawing with shared derived terrain heights, continuous cliff/ramp geometry and contact shading, coherent biome materials/atmosphere, aspect-preserving decor, configurable sprite dimensions/anchors, proportional trainer crops and building-wall classification, modern intentional ghost presentation, anchored PMD actors and original field-action feedback; no persisted terrain or collision changes."
     },
     "src/com/pkmngen/game/ModernBatch.java": {
@@ -337,7 +337,8 @@
     "2026-10-07 reviewed catalog constructor repairs, schema-2 anchor units, actor-only scissor, pinned habitat/fishing gates and opt-in real Windows launcher probe. Native verification pending on this diagnostic checkpoint.",
     "2026-10-07 R15 explicitly authorizes presentation hooks only inside Battle.LoadAndPlayAnimation; verifier now independently compares every byte outside that class against immutable classic sources. Added viewport FBO/metadata helper, PMD shrink path, seated/bed-target anchors, uniform rod-pool selection and log-only countdown cleanup. No historical audit archive changed.",
     "R15 UV regression: real move PNGs and FBO snapshots use explicit SpriteBatch UV ordering; negative orientation/identity test reproduced the inverted framebuffer on JAR54c4 before the fix.",
-    "R15 local row copies now composite only their authored target band and retain the untouched live scene; explicit screen/recolor effects retain full-view composition. Game.dispose releases presentation owned by an active move on early exit. Native regression covers local margins and mid-Surf shutdown."
+    "R15 local row copies now composite only their authored target band and retain the untouched live scene; explicit screen/recolor effects retain full-view composition. Game.dispose releases presentation owned by an active move on early exit. Native regression covers local margins and mid-Surf shutdown.",
+    "R13 independent framebuffer review rejected f5a817d5: foreground wall cap hides all foot pixels despite the old head-only visibility assertion. Reviewed JohtoRenderer-only correction ray-tests interior wall bounds against feet/torso and renders intervening faces/cap/window with alpha .12 in the existing translucent pass. Geometry, adjacency, collision, tiles and saves are unchanged; exterior rendering bypasses this rule. The strengthened native test must pass on the new complete JAR before acceptance."
   ],
   "historical_v2": "baseline/modernization-v2/archive.json",
   "historical_v3": "baseline/modernization-v3/",

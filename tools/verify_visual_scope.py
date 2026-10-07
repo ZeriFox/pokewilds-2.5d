@@ -20,7 +20,7 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "d8d302ca964604a72e0747ade53e76fc8a704ce1e94f2796fc3c56e1e0728c8c"
+FROZEN_MANIFEST_SHA256 = "d4a7cb4610478f983a99920ba88b3e0f71ef28dd571528441c0ddce6b8d5a747"
 PREFIX = "src/com/pkmngen/game/"
 V2_ARCHIVE = {
     "baseline/modernization-v2/modernization-scope.json": "f978edd535ac4440d6ce01924bc98135105a718e3a57faf9838827cd3ebf2343",
