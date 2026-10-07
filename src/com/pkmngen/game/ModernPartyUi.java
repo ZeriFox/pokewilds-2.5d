@@ -1,6 +1,6 @@
 package com.pkmngen.game;
 
-import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -13,6 +13,8 @@ import java.util.Map;
 public final class ModernPartyUi {
    private static final Color SOFT = new Color(0.87f, 0.94f, 0.88f, 1f);
    private static final String PARTY_NESTED = DrawPokemonMenu.class.getName() + "$";
+   private long animationFrame = Long.MIN_VALUE;
+   private float animationSeconds;
    private static final String STATS_NESTED = DrawStatsScreen.class.getName() + "$";
 
    public boolean covers(Action action) {
@@ -123,10 +125,10 @@ public final class ModernPartyUi {
             else if (!menu.avatarSprites.isEmpty()) sprite(game, menu.avatarSprites.get(avatarFrame(menu.avatarSprites.size(), DrawSetupMenu.avatarAnimCounter)), 136, y + 1, 10, 12, false);
          } else ui.fitText(game, (selected && row.kind == 0 ? "← " : "") + value + (selected && row.kind == 0 ? " →" : ""), 62, y + 9.5f, 5.8f, 86, ModernUi.INK);
       }
-      String help = "↑↓ Select   ←→ Change   " + key(InputProcessor.keyboardA) + " Start";
+      String help = DesktopControls.vertical() + " Select   " + DesktopControls.horizontal() + " Change   " + DesktopControls.confirm() + " Start";
       for (SetupRow row : rows) if (row.index == DrawSetupMenu.currIndex) {
-         if (row.kind == 1) help = "Type to edit   Backspace Delete   ↑↓ Select";
-         if (row.kind == 2) help = "←→ Trainer / color   ↑↓ Change   ← Return";
+         if (row.kind == 1) help = "Type to edit   Backspace Delete   Arrow Up/Down Select";
+         if (row.kind == 2) help = DesktopControls.horizontal() + " Trainer / color   " + DesktopControls.vertical() + " Change   " + key(InputProcessor.keyboardLeft) + " Return";
       }
       ui.footer(game, help);
    }
@@ -148,7 +150,7 @@ public final class ModernPartyUi {
       ui.fitText(game, "FIELD JOURNAL", 34, 129, 4.1f, 32, ModernUi.MUTED);
       ui.text(game, "Party", 35, 117, 5.5f, ModernUi.INK);
       ui.text(game, game.player.pokemon.size() + " / 6", 35, 106, 7, ModernUi.ACCENT);
-      ui.footer(game, "↑↓ Select   " + confirmBack());
+      ui.footer(game, DesktopControls.vertical() + " Select   " + confirmBack());
    }
 
    private void party(ModernUi ui, Game game, DrawPokemonMenu menu, int selected, int scroll, int moving) {
@@ -187,7 +189,7 @@ public final class ModernPartyUi {
          ui.fitText(game, hp + " / " + max, 105, y + 12, 5.1f, 43, ModernUi.MUTED);
          ui.bar(game, 91, y + 3, 57, 3, max > 0 ? (float)hp / max : 0, healthColor(hp, max));
       }
-      String navigation = menu.isStorageChest ? "←→ Party / storage   " : "↑↓ Select   ";
+      String navigation = menu.isStorageChest ? DesktopControls.horizontal() + " Party / storage   " : DesktopControls.vertical() + " Select   ";
       if (pokemon.size() > 6) ui.text(game, (Math.max(0, scroll) + 1) + "–" + Math.min(scroll + 6, pokemon.size()) + " / " + pokemon.size(), 113, 18, 4.1f, ModernUi.MUTED);
       ui.footer(game, navigation + confirmBack());
    }
@@ -195,67 +197,101 @@ public final class ModernPartyUi {
    private void stats(ModernUi ui, Game game, DrawStatsScreen menu) {
       Pokemon p = menu.pokemon;
       if (p == null) return;
+      if (animationFrame != Gdx.graphics.getFrameId()) {
+         animationFrame = Gdx.graphics.getFrameId();
+         animationSeconds += Math.min(.1f, Gdx.graphics.getDeltaTime());
+      }
       String[] pages = {"Overview", "Moves", "Stats"};
       ui.fullScreen(game, displayName(p), pages[Math.max(0, Math.min(2, menu.currIndex))] + "  /  " + (menu.currIndex + 1) + " of 3");
-      ui.panel(game, 6, 77, 148, 40);
-      if (!PmdBattleSprites.portrait(game, p, 10, 81, 41, 32)) sprite(game, p.sprite, 10, 81, 41, 32, true);
-      ui.text(game, "Lv " + p.level, 59, 111, 8, ModernUi.ACCENT);
-      ui.text(game, p.gender == null ? "" : p.gender.equals("male") ? "♂" : p.gender.equals("female") ? "♀" : "", 94, 111, 7, ModernUi.MUTED);
-      if (p.isShiny) ui.text(game, "SHINY", 114, 110, 5.2f, ModernUi.GOLD);
-      ui.fitText(game, typeNames(p), 59, 99, 5.5f, 86, ModernUi.INK);
-      String detail = menu.currIndex == 2 ? "Trainer  " + (p.previousOwner == null ? "—" : p.previousOwner.name) : "Status  " + condition(p);
-      ui.fitText(game, detail, 59, 88, 5.1f, 86, ModernUi.MUTED);
+      // The complete animated actor has a dedicated column on all three pages.
+      ModernUi.Box summary=ModernUi.Layout.CONTENT;
+      ModernUi.Box actorColumn=new ModernUi.Box(summary.x,summary.y,60,summary.height);
+      ui.panel(game, actorColumn);
+      ui.rect(game, 8, 18, 56, 74, SOFT);
+      if (!PmdBattleSprites.portrait(game, p, 10, 94, 21, 21)) sprite(game, p.sprite, 10, 94, 21, 21, true);
+      ui.fitText(game, "Lv " + p.level, 35, 108, 6.5f, 27, ModernUi.ACCENT);
+      if (p.isShiny) ui.text(game, "SHINY", 35, 99, 4.2f, ModernUi.GOLD);
+      summaryActor(game, p, 10, 23, 52, 64);
+      ui.panel(game, 71, 79, 83, 38);
+      ui.fitText(game, typeNames(p), 77, 109, 5.7f, 70, ModernUi.INK);
+      String gender = p.gender == null ? "" : p.gender.equals("male") ? "Male" : p.gender.equals("female") ? "Female" : "Genderless";
+      ui.fitText(game, "Status  " + condition(p), 77, 99, 5.3f, 70, ModernUi.MUTED);
+      ui.fitText(game, menu.currIndex == 2 ? "OT  " + (p.previousOwner == null ? "—" : p.previousOwner.name) : gender, 77, 88, 5.1f, 70, ModernUi.MUTED);
       if (menu.currIndex == 0) {
          int hp = stat(p.currentStats, "hp"), max = stat(p.maxStats, "hp");
-         ui.panel(game, 6, 16, 148, 56);
-         ui.text(game, "HEALTH", 13, 65, 5.2f, ModernUi.MUTED);
-         ui.text(game, hp + " / " + max, 103, 66, 7, ModernUi.INK);
-         ui.bar(game, 13, 50, 134, 5, max > 0 ? (float)hp / max : 0, healthColor(hp, max));
-         ui.text(game, "Experience", 13, 43, 5.5f, ModernUi.MUTED);
-         ui.fitText(game, Integer.toString(p.exp), 102, 43, 5.5f, 45, ModernUi.INK);
-         ui.text(game, "Next level", 13, 31, 5.5f, ModernUi.MUTED);
-         ui.fitText(game, Integer.toString(Math.max(0, p.calcExpForLevel(p.level + 1) - p.exp)), 102, 31, 5.5f, 45, ModernUi.ACCENT);
+         ui.panel(game, 71, 16, 83, 58);
+         ui.text(game, "HP", 77, 66, 5.2f, ModernUi.MUTED);
+         ui.fitText(game, hp + " / " + max, 99, 66, 6.5f, 48, ModernUi.INK);
+         ui.bar(game, 77, 54, 70, 4, max > 0 ? (float)hp / max : 0, healthColor(hp, max));
+         ui.fitText(game, "Experience", 77, 47, 4.8f, 31, ModernUi.MUTED);
+         ui.fitText(game, Integer.toString(p.exp), 114, 47, 5.5f, 33, ModernUi.INK);
+         int levelStart=p.calcExpForLevel(p.level), levelEnd=p.calcExpForLevel(p.level+1);
+         ui.bar(game,77,34,70,3,levelEnd>levelStart?(p.exp-levelStart)/(float)(levelEnd-levelStart):1,ModernUi.ACCENT);
+         ui.fitText(game, "Next level", 77, 28, 4.8f, 31, ModernUi.MUTED);
+         ui.fitText(game, Integer.toString(Math.max(0, levelEnd-p.exp)), 114, 28, 5.5f, 33, ModernUi.ACCENT);
       } else if (menu.currIndex == 1) {
          for (int i = 0; i < 4; i++) {
             String move = p.attacks != null && i < p.attacks.length ? p.attacks[i] : null;
-            ui.panel(game, 6, 59 - i * 14, 148, 12);
-            ui.text(game, String.valueOf(i + 1), 12, 67 - i * 14, 5, ModernUi.GOLD);
-            ui.fitText(game, move == null ? "—" : title(move), 25, 68 - i * 14, 6.5f, 122, move == null ? ModernUi.MUTED : ModernUi.INK);
+            ui.panel(game, 71, 60 - i * 14, 83, 12);
+            ui.text(game, String.valueOf(i + 1), 76, 68 - i * 14, 4.8f, ModernUi.GOLD);
+            ui.fitText(game, move == null ? "—" : title(move), 84, 68 - i * 14, 5.6f, 64, move == null ? ModernUi.MUTED : ModernUi.INK);
          }
       } else {
          String[] names = {"Attack", "Defense", "Sp. Attack", "Sp. Defense", "Speed"};
          String[] keys = {"attack", "defense", "specialAtk", "specialDef", "speed"};
-         ui.panel(game, 6, 16, 148, 56);
+         ui.panel(game, 71, 16, 83, 58);
          for (int i = 0; i < names.length; i++) {
-            float y = 66 - i * 9.3f;
-            ui.text(game, names[i], 13, y, 5.4f, ModernUi.MUTED);
-            ui.text(game, Integer.toString(stat(p.maxStats, keys[i])), 123, y, 5.8f, ModernUi.INK);
-            ui.bar(game, 64, y - 5, 49, 3, Math.min(1, stat(p.maxStats, keys[i]) / 300f), ModernUi.ACCENT);
+            float y = 67 - i * 10f;
+            ui.text(game, names[i], 77, y, 4.8f, ModernUi.MUTED);
+            ui.fitText(game, Integer.toString(stat(p.maxStats, keys[i])), 131, y, 5.2f, 17, ModernUi.INK);
+            ui.bar(game, 77, y - 5, 47, 1.8f, Math.min(1, stat(p.maxStats, keys[i]) / 300f), ModernUi.ACCENT);
          }
       }
-      ui.footer(game, "←→ Page   ↑↓ Pokémon   " + key(InputProcessor.keyboardB) + " Back");
+      ui.footer(game, DesktopControls.horizontal() + " Page   " + DesktopControls.vertical() + " Pokémon   " + DesktopControls.back() + " Back");
+   }
+
+   private void summaryActor(Game game, Pokemon pokemon, float x, float y, float w, float h) {
+      PmdPokemonSprites source = PmdPokemonSprites.get();
+      PmdPokemonSprites.Frame frame = source.frame(pokemon, "down", "Idle", animationSeconds);
+      PmdPokemonSprites.AnimationBounds bounds = source.bounds(pokemon, "down", "Idle");
+      if (frame == null || bounds == null || bounds.width <= 0 || bounds.height <= 0) {
+         sprite(game, pokemon.sprite, x, y, w, h, true);
+         return;
+      }
+      // One scale and anchor for the entire animation: no frame crops or breathing scale.
+      float scale = Math.min(w / bounds.width, h / bounds.height);
+      float anchorX = x + (w - bounds.width * scale) / 2f - bounds.minX * scale;
+      float anchorY = y + (h - bounds.height * scale) / 2f - bounds.minY * scale;
+      game.uiBatch.draw(frame.region, anchorX - frame.anchorX * scale, anchorY - frame.anchorY * scale,
+         frame.width * scale, frame.height * scale);
    }
 
    private void controls(ModernUi ui, Game game, DrawControls action) {
       if (action.remove) return;
       ui.fullScreen(game, "A NEW ADVENTURE", action.displayControls ? "While your island takes shape…" : "Field notes");
-      ui.panel(game, 8, 43, 144, 73);
+      ModernUi.Box card=ModernUi.Layout.CONTENT;
+      ui.panel(game,card);
+      ModernUi.Box content=card.inset(ModernUi.Layout.PADDING);
       if (action.displayControls) {
+         ui.text(game,"KEYBOARD + MOUSE",content.x,content.top(),5,ModernUi.MUTED);
          String[][] controls = {
-            {"Movement", key(InputProcessor.keyboardUp) + " / " + key(InputProcessor.keyboardDown) + " / " + key(InputProcessor.keyboardLeft) + " / " + key(InputProcessor.keyboardRight)},
-            {"Confirm / interact", key(InputProcessor.keyboardA)}, {"Back / run", key(InputProcessor.keyboardB)},
-            {"Menu", key(InputProcessor.keyboardStart)}, {"Field selection", key(InputProcessor.keyboardL) + " / " + key(InputProcessor.keyboardR)}
+            {"Movement", DesktopControls.movement()},
+            {"Confirm / interact", DesktopControls.confirm()}, {"Cancel / back", DesktopControls.back()},
+            {"Adventure menu", DesktopControls.menu()}, {"Field selection", key(InputProcessor.keyboardL) + " / " + key(InputProcessor.keyboardR)}
          };
+         ModernUi.Box grid=new ModernUi.Box(content.x,content.y+19,content.width,content.height-29);
          for (int i = 0; i < controls.length; i++) {
-            ui.text(game, controls[i][0], 15, 108 - i * 12, 5.8f, ModernUi.INK);
-            ui.fitText(game, controls[i][1], 95, 108 - i * 12, 5.8f, 47, ModernUi.ACCENT);
+            ui.controlRow(game,grid.row(i,controls.length,1),controls[i][0],controls[i][1]);
          }
+         ui.rect(game,content.x,content.y+16,content.width,0.6f,ModernUi.LINE);
+         ui.fitText(game,"Hold "+DesktopControls.back()+" while moving to run.",content.x,content.y+12,5.2f,content.width,ModernUi.MUTED);
+         ui.fitText(game,"LMB = left mouse    RMB = right mouse",content.x,content.y+5,4.6f,content.width,ModernUi.MUTED);
       } else {
-         String tip = action.currTrainerTip.replace("TRAINER TIPS!", "").trim();
-         ui.text(game, "TRAINER TIP", 15, 108, 6, ModernUi.ACCENT);
-         ui.wrapped(game, tip, 15, 95, 6.3f, 129, 5, ModernUi.INK);
+         String tip = DesktopControls.hints(action.currTrainerTip.replace("TRAINER TIPS!", "").trim());
+         ui.text(game, "TRAINER TIP", content.x, content.top(), 6, ModernUi.ACCENT);
+         ui.wrapped(game, tip, content.x, content.top()-15, 6.3f, content.width, 8, ModernUi.INK);
       }
-      ui.footer(game, key(InputProcessor.keyboardA) + " Next tip");
+      ui.footer(game, DesktopControls.confirm() + " Next tip   Your configured controls are shown above");
    }
 
    private void levelUp(ModernUi ui, Game game, GainExpAnimationGen2.ShowLevelUpStats action) {
@@ -280,7 +316,7 @@ public final class ModernPartyUi {
       String name = letters(action.text);
       if (!action.disabled && action.avatarAnimCounter >= 12) name += "_";
       ui.fitText(game, name, 16, 71, 8, 128, ModernUi.INK);
-      ui.fitText(game, action.disabled ? "Confirm your changes below" : "Type a name  /  Backspace Delete", 16, 54, 4.3f, 128, ModernUi.MUTED);
+      ui.fitText(game, action.disabled ? "Confirm your changes below" : "Type a name / Backspace Delete / Enter Set", 16, 54, 4.3f, 128, ModernUi.MUTED);
    }
 
    private void intro(ModernUi ui, Game game, Action next, String title, int remaining, int total) {
@@ -300,7 +336,7 @@ public final class ModernPartyUi {
    private void outro(ModernUi ui, Game game, Menu previous, int remaining) {
       if (previous != null) parent(ui, game, previous);
       float alpha = Math.max(0, Math.min(1, remaining / 34f));
-      if (alpha > 0) ui.rect(game, -200, -200, 560, 544, new Color(ModernUi.PAPER.r, ModernUi.PAPER.g, ModernUi.PAPER.b, alpha));
+      if (alpha > 0) ui.fill(game, new Color(ModernUi.PAPER.r, ModernUi.PAPER.g, ModernUi.PAPER.b, alpha));
    }
 
    private void parent(ModernUi ui, Game game, Action action) {
@@ -354,7 +390,7 @@ public final class ModernPartyUi {
       String normalized = word.replace('_', ' ').toLowerCase(Locale.ROOT);
       return Character.toUpperCase(normalized.charAt(0)) + normalized.substring(1);
    }
-   private static String key(int code) { String name = Keys.toString(code); return name == null ? "?" : name; }
+   private static String key(int code) { return DesktopControls.label(code); }
    private static String confirmBack() { return key(InputProcessor.keyboardA) + " Confirm   " + key(InputProcessor.keyboardB) + " Back"; }
    private static String letters(List<Character> letters) { StringBuilder text = new StringBuilder(); for (Character letter : letters) text.append(letter); return text.toString(); }
    private static String pick(String[] values, int index) { return values[Math.max(0, Math.min(values.length - 1, index))]; }

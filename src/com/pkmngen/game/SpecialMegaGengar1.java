@@ -8,7 +8,8 @@ import java.util.HashMap;
 
 class SpecialMegaGengar1 extends Pokemon {
    public SpecialMegaGengar1(int level) {
-      super("Mega Gengar", level);
+      super("mgengar", level);
+      this.nickname="Mega Gengar";
       this.baseStats.put("hp", 300);
       this.baseStats.put("attack", 65);
       this.baseStats.put("defense", 80);
@@ -27,5 +28,23 @@ class SpecialMegaGengar1 extends Pokemon {
       this.calcMaxStats();
       this.currentStats = new HashMap<>(this.maxStats);
       this.initHabitatValues();
+   }
+
+   /** The shipped boss has art but no standalone ASM species definition. */
+   static boolean initializeSpecies(Specie variant,String name,Pokemon.Generation generation) {
+      if(name==null||!(name.equalsIgnoreCase("mgengar")||name.equalsIgnoreCase("mega gengar")))return false;
+      // Enter through Specie.init as well as the encounter constructor, so a
+      // caught boss can reload in a fresh process without any missing ASM file.
+      variant.init("gengar",generation);
+      variant.name="mgengar";variant.modNickname="Mega Gengar";
+      variant.learnSet=new HashMap<>(variant.learnSet);
+      variant.baseStats.put("hp",300);variant.baseStats.put("attack",65);variant.baseStats.put("defense",80);
+      variant.baseStats.put("specialAtk",170);variant.baseStats.put("specialDef",95);variant.baseStats.put("speed",130);
+      variant.baseStats.put("catchRate",3);
+      variant.learnSet.put(1,new String[]{"Shadow Claw","Night Shade","Lick",null});
+      Specie.gen2Attacks.put("mgengar",variant.learnSet);
+      Specie.gen2Evos.put("mgengar",new HashMap<>(Specie.gen2Evos.get("gengar")));
+      Pokemon.baseSpecies.put("mgengar",Pokemon.baseSpecies.get("gengar"));
+      return true;
    }
 }

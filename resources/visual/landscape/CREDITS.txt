@@ -1,0 +1,39 @@
+LOCAL LANDSCAPE ASSETS
+Original downloaded packs are preserved outside the project. This atlas is an integration for this local game, not an asset pack.
+Pixel Crawler supplies the common material/object language; Woods and supplied Forest_1 supply nature; Cold Cave supplies cave details. Sevarihk supplies the secondary volcanic stone/lava material set. Two CC0 marionline gravestones and one CC0 ScratchIO cactus provide missing silhouettes. Desert, volcano and graveyard use dedicated source-derived palette families.
+
+Anokolisa - Pixel Crawler - Free Pack 2.11.zip
+https://anokolisa.itch.io/free-pixel-art-asset-pack-topdown-tileset-rpg-16x16-sprites
+Embedded Terms.txt allows game projects and modifications; assets cannot be sold as a standalone final product.
+
+zedpxl - pixel_16_woods v2 free.zip
+https://zedpxl.itch.io/pixelart-forest-asset-pack
+Author page allows commercial/noncommercial games and modification; forbids resale/redistribution of the asset pack, AI and NFT use. No license file in supplied archive.
+
+Asset Alliance - Cold Cave FREE.zip
+https://gif-superretroworld.itch.io/cold-cave
+Embedded LICENSE.txt allows games and modification; forbids direct asset distribution/sale, claiming authorship, NFT/metaverse/AI projects.
+
+Haydeos - Forest_1.png
+https://haydeos.itch.io/fantasy-forest-rpg-maker-tileset
+Author page allows games and modification across engines; forbids standalone redistribution, AI training, NFT/blockchain use. Author discloses AI-assisted base forms and manual refinement.
+
+marionline - graveyard-marionline.png
+https://opengameart.org/content/forest-graveyard-tileset
+CC0 1.0; public-domain dedication, modification and redistribution permitted. Attribution retained voluntarily. Source/licensing checked 2026-10-07.
+
+ScratchIO - desert-scratchio.png
+https://opengameart.org/content/desert-level-decorations-pixel-art
+CC0 1.0; public-domain dedication, modification and redistribution permitted. One cactus crop used with the same dry-vegetation palette as the main pack. Source/licensing checked 2026-10-07.
+
+Sevarihk - lava-dark-stone_large.png
+https://opengameart.org/content/stone-and-lava-ground-tiles
+CC-BY 4.0. Attribution: Stone and Lava Ground Tiles by Sevarihk, linked creator page. Modified: cropped continuous lava, luminance palette for hot/cooled states, toroidal frame motion. Source/licensing checked 2026-10-07.
+
+Sevarihk - stone_terrain_addon.png
+https://opengameart.org/content/stone-and-lava-ground-tiles
+CC-BY 4.0. Attribution: Stone and Lava Ground Tiles by Sevarihk, linked creator page. Modified: exact material crops and cool basalt luminance palette. Source/licensing checked 2026-10-07.
+
+Preparation: exact crops, alpha trimming, listed source-sprite compositions and explicit luminance palette variants. No generative edits.
+RW_TileAnimations.js was inspected as text only, is not executed or redistributed; Java animation uses atlas frame indices.
+B/W player sheets retain their existing separate visual/unova provenance.

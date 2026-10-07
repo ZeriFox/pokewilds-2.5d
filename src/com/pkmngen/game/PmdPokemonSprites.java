@@ -109,6 +109,38 @@ public final class PmdPokemonSprites implements Disposable {
       return frame(key(pokemon), direction, animation, stateTime);
    }
 
+   /** Exact extents of an entire direction, relative to its ground anchor; no GPU load. */
+   public AnimationBounds bounds(Pokemon pokemon, String direction, String animation) {
+      return bounds(key(pokemon), direction, animation);
+   }
+
+   public AnimationBounds bounds(String species, String direction, String animation) {
+      Entry entry = entry(species);
+      if (entry == null) return null;
+      String selected = entry.animations.get((animation == null ? "Idle" : animation).toLowerCase(Locale.ROOT));
+      if (selected == null) selected = entry.fallback;
+      if (selected == null) return null;
+      int requestedRow = directionIndex(direction);
+      String cacheKey = selected + ":" + requestedRow;
+      AnimationBounds cached = entry.bounds.get(cacheKey);
+      if (cached != null) return cached;
+      JsonValue animations = metadata(entry.sourcePath);
+      JsonValue data = animations == null ? null : animations.get(selected);
+      if (data == null) return null;
+      int count = data.get("durations").size;
+      int row = data.getInt("rows") == 1 ? 0 : requestedRow;
+      float minX = Float.POSITIVE_INFINITY, minY = Float.POSITIVE_INFINITY;
+      float maxX = Float.NEGATIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY;
+      for (int column = 0; column < count; column++) {
+         float[] cell = data.get("frames").get(row * count + column).asFloatArray();
+         minX = Math.min(minX, -cell[4]); minY = Math.min(minY, -cell[5]);
+         maxX = Math.max(maxX, cell[2] - cell[4]); maxY = Math.max(maxY, cell[3] - cell[5]);
+      }
+      cached = new AnimationBounds(minX, minY, maxX, maxY);
+      entry.bounds.put(cacheKey, cached);
+      return cached;
+   }
+
    /** PMD cells are timed at 60 ticks/second; stateTime is elapsed seconds. */
    public Frame frame(String species, String direction, String animation, float stateTime) {
       Entry entry = entry(species);
@@ -172,6 +204,7 @@ public final class PmdPokemonSprites implements Disposable {
          else if (basic.equals("nidoranm")) basic = "nidoran_m";
          else if (basic.equals("farfetchd")) basic = "farfetch_d";
          else if (basic.equals("hooh")) basic = "ho_oh";
+         else if (basic.equals("mgengar")) basic = "megagengar";
          result = entries.get(basic + (parts.length == 2 ? "#" + parts[1] : ""));
       }
       return result;
@@ -270,6 +303,7 @@ public final class PmdPokemonSprites implements Disposable {
       String portrait;
       String fallback;
       final Map<String, String> animations = new HashMap<>();
+      final Map<String, AnimationBounds> bounds = new HashMap<>();
    }
 
    private static final class CachedTexture {
@@ -281,6 +315,14 @@ public final class PmdPokemonSprites implements Disposable {
       int totalTicks;
       long bytes;
       long lastFrame;
+   }
+
+   public static final class AnimationBounds {
+      public final float minX, minY, maxX, maxY, width, height;
+      AnimationBounds(float minX, float minY, float maxX, float maxY) {
+         this.minX=minX; this.minY=minY; this.maxX=maxX; this.maxY=maxY;
+         this.width=maxX-minX; this.height=maxY-minY;
+      }
    }
 
    /**

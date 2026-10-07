@@ -27,19 +27,19 @@ final class ModernInventoryUi {
          String description=DrawItemMenuGen2.itemDescriptions.get(selected.toLowerCase(Locale.ROOT));
          if(description==null) description=selected.equalsIgnoreCase("Cancel")?"Return to your adventure.":"Choose an item to use or drop.";
          ui.wrapped(game,description,11,37,5.5f,138,3,ModernUi.MUTED);
-         ui.footer(game,m.isSorting?"Select a destination     X  Cancel":"Left / Right  Pocket     Z  Select     X  Back");
+         ui.footer(game,m.isSorting?"Select a destination   "+DesktopControls.back()+" Cancel":DesktopControls.horizontal()+" Pocket   "+DesktopControls.confirm()+" Select   "+DesktopControls.back()+" Back");
       } else if(a instanceof DrawItemMenu) {
          DrawItemMenu m=(DrawItemMenu)a;
          ui.fullScreen(game,m.isGuideMenu?"FIELD GUIDE":"BAG",m.isGuideMenu?"Explore, build, discover":"Your supplies");
          list(ui,game,m.itemsList,m.currIndex,m.cursorPos,110,17,true,m.isSorting,m.sortingIndex);
-         ui.footer(game,"Up / Down  Browse     Z  Open     X  Back");
+         ui.footer(game,DesktopControls.vertical()+" Browse   "+DesktopControls.confirm()+" Open   "+DesktopControls.back()+" Back");
       } else if(a instanceof DrawItemMenu.DrawGuideText) {
          DrawItemMenu.DrawGuideText m=(DrawItemMenu.DrawGuideText)a;
          ui.fullScreen(game,"FIELD GUIDE",at(m.entries,m.index));
          ui.panel(game,5,16,150,100);
          StringBuilder content=new StringBuilder(); for(char c:m.text) content.append(c);
-         ui.wrapped(game,content.toString(),11,108,5.9f,138,12,ModernUi.INK);
-         ui.footer(game,"Up / Down  Topic     X  Back");
+         ui.wrapped(game,DesktopControls.hints(content.toString()),11,108,5.9f,138,12,ModernUi.INK);
+         ui.footer(game,DesktopControls.vertical()+" Topic   "+DesktopControls.back()+" Back");
       } else if(a instanceof DrawCraftsMenu) {
          DrawCraftsMenu m=(DrawCraftsMenu)a;
          ui.fullScreen(game,"CRAFTING","Make something for your adventure");
@@ -49,7 +49,7 @@ final class ModernInventoryUi {
             boolean enough=i>=m.craftReqColors.size() || m.craftReqColors.get(i).a>.9f;
             ui.fitText(game,m.craftReqs.get(i).replaceAll(" +"," "),11,36-i*7,5.8f,137,enough?ModernUi.ACCENT:ModernUi.RED);
          }
-         ui.footer(game,"Up / Down  Recipe     Z  Select     X  Back");
+         ui.footer(game,DesktopControls.vertical()+" Recipe   "+DesktopControls.confirm()+" Select   "+DesktopControls.back()+" Back");
       } else if(a instanceof DrawItemMenu.Intro) {
          ui.render(game,((DrawItemMenu.Intro)a).prevMenu);
       } else if(a instanceof DrawMiniMap.Intro) {
@@ -71,7 +71,7 @@ final class ModernInventoryUi {
             Object amount=ModernUi.field(a,"amount");
             ui.panel(game,73,46,81,44); ui.text(game,"QUANTITY",80,83,5.5f,ModernUi.MUTED);
             ui.text(game,"x "+(amount==null?1:amount),87,72,13,ModernUi.INK);
-            ui.fitText(game,"Arrows adjust / "+ModernUi.confirmKey()+" select",78,52,4.4f,70,ModernUi.MUTED);
+            ui.fitText(game,DesktopControls.movement()+" adjust / "+ModernUi.confirmKey()+" select",78,52,4.4f,70,ModernUi.MUTED);
          }
       }
    }
@@ -81,11 +81,10 @@ final class ModernInventoryUi {
       ui.panel(game,6,top-visible*rowHeight-2,148,visible*rowHeight+4);
       for(int i=0;i<visible && i+offset<entries.size();i++) {
          String name=entries.get(i+offset); float y=top-(i+1)*rowHeight;
-         ui.row(game,(sorting && i+offset==sortingIndex?"* ":"")+name,9,y,142,rowHeight-1,i==cursor);
-         if(counts && game.player!=null && game.player.hasItem(name)) {
-            // Reserve the right edge for quantities, covering unusually long original names.
-            Color bg=i==cursor?ModernUi.ACCENT:ModernUi.PAPER;
-            ui.rect(game,126,y,24,rowHeight-1,bg);
+         boolean hasCount=counts && game.player!=null && game.player.hasItem(name);
+         // Allocate two columns before text layout; quantities never paint over item names.
+         ui.row(game,(sorting && i+offset==sortingIndex?"* ":"")+name,9,y,142,rowHeight-1,i==cursor,hasCount?24:0);
+         if(hasCount) {
             ui.fitText(game,"x"+game.player.getItemAmount(name),129,y+rowHeight-4,5.8f,19,i==cursor?ModernUi.PAPER:ModernUi.MUTED);
          }
       }

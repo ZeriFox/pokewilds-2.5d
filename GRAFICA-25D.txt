@@ -1,11 +1,14 @@
-POKEWILDS — PMD + BLACK/WHITE, 2.5D — v0.8.11-johto.2
+POKEWILDS — PMD + PROFILI DI BIOMA, 2.5D — AGGIORNAMENTO LOCALE 2026-10-07
 
 AVVIO
+AVVIA-POKEWILDS.cmd avvia il JAR locale; non serve eseguire build.cmd per giocare.
+Questa iterazione non e' pubblicata su GitHub. Il JAR verificato e i controlli
+conclusi sono identificati in VERIFICA.txt; johto.2 e' una release precedente.
 run-johto.cmd e run-johto-sprites.cmd: stessa presentazione 2.5D, cartella
 run-johto per impostazioni/salvataggi. Java 17 e' incluso nel pacchetto Windows.
 run.cmd: grafica classica e cartella run separata.
 "johto" resta nel nome dei launcher; le nuove risorse provengono da PMDCollab
-e Black/White, non da estrazioni HeartGold/SoulSilver.
+per i Pokemon, Black/White per gli allenatori e dalle fonti paesaggio qui sotto.
 
 MONDO
 La camera prospettica guarda sprite 2D ancorati al terreno. I Pokemon usano
@@ -14,17 +17,58 @@ I due protagonisti B/W sostituiscono visivamente le skin maschili/femminili;
 la scelta memorizzata nei dati del player rimane intatta.
 Giorno, notte e interni condividono renderer e tinte del mondo.
 
-Erba, acqua, alberi, rocce, pareti e materiali degli edifici provengono da B/W.
+Erba, acqua, alberi, rocce, pareti e materiali degli edifici provengono da
+Pixel Crawler, Woods, Cold Cave e Forest_1, integrati in visual/landscape.
+Il set secondario Stone and Lava Ground Tiles di Sevarihk fornisce lava organica
+e materiali vulcanici; tre piccoli elementi CC0 completano lapidi e cactus.
+L'atlante contiene 202 regioni e 6 sequenze animate. I 14 profili nel file
+visual/biomes/profiles.json coordinano materiali, rilievi, fluidi, decorazioni,
+atmosfera, regole habitat e transizioni senza cambiare l'identita' dei tile.
 Arredi e architetture sono composizioni del renderer con tali materiali.
-Le pareti seguono i dirupi effettivi e lasciano aperte le rampe. Non viene
-inventata un'altitudine globale dai nomi dei tile. La lava usa una colorazione
-luminosa adattata dal renderer.
+La revisione locale v5 dei rilievi alza l'intero piano superiore. WorldElevation
+risolve vincoli di quota provenienti da dirupi e rampe salvati e condivide gli
+angoli delle superfici attraversabili per raccordare le aperture. Pavimento,
+piedi degli attori e camera leggono la stessa superficie triangolata.
+Le pareti chiudono soltanto differenze reali tra superfici adiacenti; non
+vengono estrusi muretti dove entrambe le parti sono alla stessa quota.
+Un bordo sottile sul piano alto e un'ombra di contatto alla base rendono
+leggibile il dislivello. Una lieve luce direzionale segue la pendenza.
+Rampe e raccordi conservano il terreno del bioma; le sole rampe dichiarate
+ricevono segni trasversali aderenti al pendio, senza fasce sui piani circostanti.
+E' geometria derivata: anche sulle mappe caricate non salva nuove altezze,
+non migra salvataggi e non cambia collisioni o regole di movimento.
+
+Il deserto usa ground, rock, cliff, cap e ramp dedicati; non prende la parete
+globale. Cactus e ciuffi secchi hanno ritagli corretti e piedi ancorati.
+Il vulcano combina basalto, crosta fratturata, cenere, ossidiana, vegetazione
+carbonizzata e 16 frame per ciascuna delle due varianti di lava. Le zone
+fratturate sono stabili nello spazio e non consumano il generatore casuale.
+Il cimitero ha terreno grigio-verde, lapidi leggibili, alberi spogli, vegetazione
+spenta, tinta desaturata e nebbia animata. La nebbia segue i profili vicini.
+Le cascate sono superfici verticali animate collegate alla geometria del mondo.
+Le maree guadabili mantengono il fondale sotto un velo d'acqua trasparente;
+anche le pozzanghere conservano il letto locale. I sentieri della mansion
+possono ereditare una route neve dalla generazione originale: la presentazione
+ne ricava il materiale dall'ambiente vicino, senza cambiare route o incontri.
+
+Il fantasma notturno e' l'incontro originale SpawnGhost/Ghost: non era un errore
+di texture. Conserva azioni e condizioni del gioco, ma viene rappresentato
+come apparizione luminosa moderna. Marker e asset mancanti non producono altri
+fantasmi: i marker ignoti sono invisibili, gli ostacoli solidi restano leggibili
+e le risorse mancanti vengono segnalate con asset, bioma, tile e orario.
 
 GENERAZIONE E POKEDEX
 ModernWorldGenerator modifica vere celle, ostacoli e passaggi prima degli
 spawn: EMBER CALDERA, sentieri, lava, rocce e rampe tra alcune terrazze.
 Si applica a nuove isole e nuove aree oltre i bordi; non riscrive i terreni dei
 salvataggi caricati. Regole e limiti: GENERAZIONE-MODERNA.txt.
+WildSpawnRules filtra nuovi incontri usando bioma, acqua reale, prossimita',
+profondita' geometrica, orario e rarita'. L'incontro Milotic dell'oasi viene
+ancorato all'acqua dopo la generazione. Gli acquatici selvatici coperti dalle
+regole rispettano l'acqua anche quando si muovono; i Pokemon posseduti sono
+esclusi dal nuovo vincolo. Non vengono cancellati o teletrasportati Pokemon
+gia' caricati e non cambia il formato di salvataggio. Specie senza una regola
+dedicata mantengono il pool originale della propria area.
 
 552 specie aggiuntive alle 410 della base portano il totale a 962 e hanno
 dati, grida e risorse PMD da versioni registrate.
@@ -36,15 +80,30 @@ Pannelli chiari, bordi sottili, accenti verde petrolio/oro per setup,
 caricamento, comandi, giocatore, squadra/deposito, riepilogo, borsa, guida,
 crafting, quantita', conferme, dialoghi, soprannome e livello. Anche minimappa,
 notifiche, requisiti di costruzione, evoluzione e schiusa condividono il tema.
-Portrait e attori PMD sono usati dove disponibili.
+Portrait e attori PMD sono usati dove disponibili. Le tre pagine del riepilogo
+mantengono un Pokemon intero animato accanto ai dati e al piccolo portrait.
+Il riquadro usa gli ingombri di tutti i frame Idle: proporzioni costanti,
+nessun ritaglio o cambio di scala durante l'animazione.
+WASD naviga; mouse sinistro conferma, destro annulla o, tenuto, corre.
+I testi di aiuto seguono i binding effettivi. Input testo e gamepad restano
+separati dai nuovi comandi del mouse.
+ModernUi.Layout/Box definiscono margini, righe, colonne e distanze. Lo stesso
+canvas logico 160x144 viene scalato uniformemente, mantenendo testo e pulsanti
+proporzionati. Tutorial e comandi riservano colonne separate alle etichette
+e ai tasti; nomi lunghi, descrizioni e quantita' hanno aree distinte.
+I test comprendono finestre equivalenti a 100/125/150%, rapporti larghi e
+verticali e dimensioni del desktop. Non sono una certificazione di tutti i
+monitor, driver e cambi DPI fisici del sistema operativo.
 
-Arene composte con materiali B/W, sprite PMD, pannelli HP/EXP e comandi coordinati. La lista mosse
+Arene composte con gli stessi materiali del paesaggio locale, sprite PMD, pannelli HP/EXP e comandi coordinati.
+Il panorama si estende ai bordi delle finestre larghe; sprite, effetti e pannelli
+mantengono la propria area utile senza deformazioni. La lista mosse
 mostra dati gia' implementati, senza aggiungere PP o nuove regole. Gli HP
 seguono le animazioni originali. Un'immagine GPU del mondo moderno mantiene
 coerenti introduzione e transizioni; anche incontri speciali e viaggi ricevono
 i nuovi passaggi grafici.
 I renderer leggono lo stato senza richiamare step() o consumare RNG.
-La release comprende anche modifiche non grafiche al generatore e al Pokedex,
+L'aggiornamento comprende anche modifiche non grafiche a generatore, habitat e Pokedex,
 documentate separatamente: non e' una patch esclusivamente visiva.
 
 FONTI
@@ -56,46 +115,95 @@ Autori, hash e copertura: PMD-PROVENANCE.json. Crediti: licenses/PMD-*.
 Artwork personalizzati CC BY-NC 4.0; originali Chunsoft e altri materiali
 mantengono i rispettivi diritti.
 
-B/W trainer, Barubary:
-https://www.spriters-resource.com/ds_dsi/pokemonblackwhite/asset/34024/
-B/W ambiente, Brom:
-https://textures.spriters-resource.com/ds_dsi/pokemonblackwhite/asset/375513/
-B/W arene, tsuka:
-https://textures.spriters-resource.com/ds_dsi/pokemonblackwhite/asset/368759/
-resources/visual/unova/world-atlas.png contiene 143 regioni da queste fonti.
-world-atlas.json registra i rettangoli; sources/ conserva fogli e ZIP originali.
-PROVENANCE.json e CREDITS.txt nella stessa cartella descrivono hash e derivazioni.
-Preparazione: ritagli, trasparenza del colore di sfondo dei trainer, packing.
-Lava, rilievi e composizione degli arredi sono adattamenti del renderer.
-I materiali B/W non sono presentati come MIT, CC0 o artwork originale del progetto.
+PAESAGGIO LOCALE (202 regioni, 6 sequenze animate)
+Anokolisa / Pixel Crawler:
+https://anokolisa.itch.io/free-pixel-art-asset-pack-topdown-tileset-rpg-16x16-sprites
+zedpxl / Woods:
+https://zedpxl.itch.io/pixelart-forest-asset-pack
+Asset Alliance / Cold Cave:
+https://gif-superretroworld.itch.io/cold-cave
+Haydeos / Forest_1:
+https://haydeos.itch.io/fantasy-forest-rpg-maker-tileset
+Sevarihk / Stone and Lava Ground Tiles:
+https://opengameart.org/content/stone-and-lava-ground-tiles
+CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
+Ritagli, palette basaltica/calda/raffreddata e 16 frame di scorrimento sono
+modifiche locali. Conservare attribuzione, link e LICENSE-Sevarihk-CC-BY.txt.
+marionline / Forest / Graveyard tileset (due lapidi):
+https://opengameart.org/content/forest-graveyard-tileset
+ScratchIO / Desert Level Decorations (un cactus):
+https://opengameart.org/content/desert-level-decorations-pixel-art
+Entrambi CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
 
-Le texture generate della prima prova restano archiviate in visual/johto/,
-con ART_PROMPT.txt e ART_FOLIAGE_PROMPT.txt; il renderer corrente usa B/W.
+Ricerca verificata 2026-10-07: ASSET-RESEARCH.json documenta le fonti valutate.
+Modern User Interface di LimeZu richiede acquisto e non e' stato integrato;
+Top Down Forest Tileset di PixiVan non offre al momento un download disponibile.
+Nessun acquisto. I dettagli e i link alle pagine ufficiali restano nel report.
+
+resources/visual/landscape/world-atlas.png e world-atlas.json contengono i ritagli.
+PROVENANCE.json registra hash originali, rettangoli e trasformazioni; CREDITS.txt
+conserva autori e termini. I download originali restano in
+work/landscape-assets/sources, fuori dal progetto. Nessun pack autonomo viene
+pubblicato. Preparazione: ritagli, trimming alpha, composizioni dichiarate e
+varianti cromatiche esplicite. Nessuna modifica generativa degli asset.
+Lava calda e raffreddata condividono lo stesso disegno e scorrimento; gli
+originali sono fissati da SHA-256 e la ricostruzione dell'atlante e' offline.
+RW_TileAnimations.js e' stato letto come testo, non viene eseguito o distribuito.
+
+B/W: restano attuali gli allenatori di Barubary:
+https://www.spriters-resource.com/ds_dsi/pokemonblackwhite/asset/34024/
+visual/unova conserva l'atlante precedente e la provenienza di Brom/tsuka;
+il renderer vi legge soltanto gli allenatori. Le texture generate della prima
+prova rimangono archiviate in visual/johto/ con i loro prompt e crediti.
 I vecchi modelli GLB sono esclusi dalla build normale. build.py --include-3d
 include i file opzionali presenti senza riattivare da sola gli attori 3D.
 
 CODICE E VERIFICHE
-JohtoRenderer/BwAssets: mondo e atlante B/W.
+JohtoRenderer/BwAssets: mondo e atlante paesaggio locale; trainer B/W separati.
+BiomeProfiles: risoluzione del profilo da terreno, oggetto, bioma e route.
+WorldElevation: vincoli di quota dei dirupi, angoli condivisi e raccordi continui.
+height() usa gli stessi triangoli del renderer; isSloped() distingue i pendii.
+observe() confronta una firma strutturale: cambi di bordo, rampa o altezza del
+profilo invalidano la cache; maree e cambi di sola texture non la ricostruiscono.
+Nessuna scrittura nei tile o nei salvataggi. terrainSurface()/terrainEdges()
+creano piani e pareti reali; ramp() aggiunge segni soltanto alle rampe inclinate.
+WildSpawnRules: contesto habitat, filtri e selezione pesata dei nuovi incontri.
 PmdPokemonSprites/PmdBattleSprites: animazioni e portrait.
+DesktopControls/InputProcessor: binding PC, migrazione del preset e stato dei pulsanti.
+WorldBatch: soppressione del disegno legacy senza saltare le azioni.
 ModernUi, ModernBatch, ModernPartyUi, ModernInventoryUi e JohtoBattleRenderer:
 schermate e lotte. build.cmd ricompila; README.md descrive le dipendenze.
 
 landscape_smoke_test.py verifica fixture native giorno/notte, rilievi, caldera,
 interni e viaggio. Altri test coprono generazione reale, Pokedex, menu, crafting,
 lotte, cattura e save/load. verify_visual_scope.py confronta con la base PC
-l'ambito approvato delle modifiche grafiche, del generatore e del catalogo.
+l'ambito approvato delle modifiche grafiche, dei comandi, del generatore e del catalogo.
+biome_scene_test.py aggiunge scene dei biomi, fantasma e geometria; i controlli
+degli habitat sono in biome_habitat_test.py, quelli dei layout in ui_layout_test.py.
+relief_visual_test.py carica una copia isolata della caldera salvata e prova
+terrazze chiuse/aperture: quote, triangoli inviati alla GPU, contrasto e rampe,
+camminata con PlayerMoving originale e continuita' di piedi e camera.
+world_elevation_test.py controlla vincoli, angoli, raccordi, cache e determinismo.
+verify_landscape_assets.py controlla tutti i riferimenti dei profili, opacita',
+ancore, fotogrammi distinti, palette e provenienza delle nuove risorse.
 VERIFICA.txt riporta gli esiti conclusi e l'hash testato. Le prove con classi
 di sviluppo sovrapposte non equivalgono alla verifica del solo JAR finale.
 
 LIMITI
-Alcuni simboli di puzzle/macchinari, strutture come la Pokemon Mansion,
-oggetti speciali, emote e pickup conservano
-le risorse originali per mantenerne riconoscibile la funzione.
-Mosse sul campo, costruzione, pesca, riposo, minimappa e scene particolari
-possono usare il renderer normale del mondo; i menu sostituiti mantengono il tema.
+Edifici speciali e oggetti del mondo sono composti con materiali moderni.
+Simboli funzionali e stato degli oggetti guidano gli indicatori del renderer;
+le celle solide non classificate mostrano un ostacolo coerente con il bioma.
+Alcuni effetti di lotta e segnali di stato conservano le risorse originali.
+Mosse sul campo, costruzione, pesca e riposo mantengono il renderer 2.5D.
+Le vecchie chiamate di disegno vengono soppresse, mentre gli step delle azioni
+e i loro effetti sui dati vengono eseguiti normalmente.
 La minimappa conserva il disegno funzionale originale con una nuova cornice.
 Specie/forme PMD assenti usano i fallback dichiarati; le nuove specie giocabili
 sono selezionate secondo la copertura documentata nel Pokedex.
 Non tutte le mosse, gli incontri speciali e il multiplayer sono coperti dai test.
+L'umidita' e la profondita' degli habitat derivano dalle celle vicine, non da
+una simulazione idrologica. La geometria ricostruisce i confini leggibili nei
+tile; dati di bordo contraddittori vengono risolti in modo deterministico.
 Non viene aggiunto un asse verticale alle regole. Destinazione: Windows PC x64,
 non Nintendo 3DS.
+AGGIORNAMENTO-BIOMI.txt organizza implementazione e limiti in quattro sezioni.

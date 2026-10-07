@@ -246,7 +246,7 @@ class DrawUseTossMenu extends Menu {
                game.player.currRod = itemName;
                Action newAction = new DisplayText(
                   game,
-                  "Press Z to cast the line.",
+                  DesktopControls.authoredHint(game, "Press Z to cast the line."),
                   null,
                   false,
                   true,
@@ -270,7 +270,7 @@ class DrawUseTossMenu extends Menu {
 
                game.insertAction(
                   new DisplayText(
-                     game, text, null, false, true, new WaitFrames(game, 10, new RemoveAction(this.prevMenu, new SetField(game, "playerCanMove", true, null)))
+                     game, DesktopControls.authoredHint(game, text), null, false, true, new WaitFrames(game, 10, new RemoveAction(this.prevMenu, new SetField(game, "playerCanMove", true, null)))
                   )
                );
             } else if (!itemName.equals("moomoo milk")

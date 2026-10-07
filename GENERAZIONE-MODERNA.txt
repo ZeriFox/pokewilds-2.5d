@@ -1,4 +1,4 @@
-GENERAZIONE PROCEDURALE MODERNA — versione 1
+GENERAZIONE PROCEDURALE MODERNA — versione 1, presentazione dei rilievi v5
 
 GenIsland1 conserva la generazione dell'isola, delle strutture e dei dungeon.
 Prima degli spawn ordinari e della costruzione delle coste viene applicato
@@ -46,8 +46,20 @@ API per la presentazione:
 ModernWorldGenerator.isVolcanic(Tile), isRamp(Tile), biomeLabel(Tile).
 Tile.biome resta "volcano"; volcano2 identifica i sentieri della caldera;
 volcano1 il terreno vulcanico; lava1 le celle di lava; rock_volcano1 i massi.
-Non ricavare un'altezza arbitraria dai nomi mountain*: disegnare soltanto le
-pareti ledges3_* realmente presenti e lasciare visivamente aperte le rampe.
+WorldElevation ricava le quote dai vincoli dei dirupi ledges3_* e delle rampe
+esistenti; non assegna un'altezza arbitraria ai nomi mountain*. I piani superiori
+vengono realmente alzati. Angoli condivisi raccordano le superfici attraversabili
+e le aperture senza cambiare Tile, collisioni o salti originali. height() usa
+gli stessi triangoli del renderer; tileHeight(), lowHeight() e isSloped()
+espongono quote e pendenze a terreno, personaggi e camera.
+terrainSurface() disegna i piani e terrainEdges() chiude solo i dislivelli
+effettivi, con bordo sottile e ombra di contatto. Le rampe dichiarate ricevono
+segni aderenti al pendio; i raccordi usano il materiale del bioma. La cache
+delle quote segue una firma strutturale dei bordi, indipendente dalle maree
+e dalle sole texture. Non vengono salvate nuove altezze.
+Questa correzione della vista vale anche sulle mappe gia' caricate; non avvia
+ModernWorldGenerator su quei salvataggi. La revisione v5 resta solo locale,
+senza pubblicazione su GitHub o migrazione dei file del giocatore.
 
 Verifica:
 python tools/modern_world_test.py
@@ -59,3 +71,11 @@ rendering, movimento, salvataggio/caricamento e chiusura ordinata.
 Per sviluppo prima della build: aggiungere --sources. L'opzione compila soltanto
 i sorgenti del generatore sopra il JAR e viene dichiarata nel log.
 Evidenze: build/modern-world/modern-world.log e relativi PNG nativi.
+
+Verifica separata della presentazione dei rilievi:
+python tools/world_elevation_test.py --saved-island
+python tools/relief_visual_test.py
+Il secondo test usa una copia isolata del salvataggio di regressione sotto
+build/world-reload/, non la partita utente. Controlla piani, pareti, aperture,
+rampe e camminata originale con camera continua, conservando gli hash dei file.
+I risultati e il JAR effettivamente testato sono registrati in VERIFICA.txt.

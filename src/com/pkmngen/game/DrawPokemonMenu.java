@@ -1404,7 +1404,7 @@ class DrawPokemonMenu extends Menu {
                                  new PlayMusic(
                                     pokemon,
                                     new DisplayText(
-                                       game, pokemon.nickname.toUpperCase(Locale.ROOT) + " is using POWER! Power machinery by pressing Z.", null, null, null
+                                       game, pokemon.nickname.toUpperCase(Locale.ROOT) + DesktopControls.authoredHint(game, " is using POWER! Power machinery by pressing Z."), null, null, null
                                     )
                                  )
                               );

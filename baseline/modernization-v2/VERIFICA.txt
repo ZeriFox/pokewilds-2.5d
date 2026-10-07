@@ -1,0 +1,75 @@
+VERIFICA — PokeWilds v0.8.11-johto.2 — 5 ottobre 2026
+
+BUILD E AMBITO
+PASS sul JAR distribuito: 211 sorgenti Java, 441 classi,
+36745 risorse aggiunte, 297412191 byte.
+SHA-256: da8987ed8d2eb274050f3254db11096c6c4d59b5286e2074fb3f82de47882122
+JDK Temurin 17.0.20.1 Windows x64; javac --release 17.
+CRC ZIP, classi compilate/impacchettate e hash sorgenti: PASS.
+Nessun GLB nella build predefinita. I launcher 2.5D impostano MODELS=off.
+Il codice precedente e i crediti 3D restano disponibili come esperimento storico.
+Report completo: build/build-report.json. Avvisi javac: deprecazioni/generici.
+
+Scope schema2: 169 dei 198 sorgenti originali invariati; 29 modificati
+esplicitamente; 13 sorgenti aggiunti. Tutti i 211 hash corrispondono alla build.
+Battle, Attack, Player, InputProcessor, Network e util/Save sono protetti e
+byte-identici alla base. Generatore e roster sono modifiche volute e dichiarate.
+Manifest congelato: baseline/modernization-scope.json; audit precedente archiviato
+in baseline/johto-v1/. 10 test negativi respingono modifiche non approvate.
+Questa delimitazione non e' una prova di equivalenza completa del gameplay.
+
+TEST NATIVI SUL SOLO JAR
+Tutti i test sotto usano solo il JAR e classi dei test, senza classi di produzione
+sovrapposte o risorse sciolte. Ogni log contiene il medesimo SHA-256 riportato sopra.
+
+python tools/smoke_test.py: PASS.
+Avvio/menu/120 frame/chiusura. Menu classico identico per byte alla baseline:
+f352884e8dcc7531ab4043b1c6ff5d406d4bf61ff580ad74c6d69e8baee4139a
+
+python tools/modern_world_test.py: PASS.
+8 fixture da 16641 celle: overlay deterministico dato stesso terreno/seed,
+indipendenza dall'ordine di inserimento, terrazze accessibili, lava solida,
+landmark protetti, collisioni e conversione TileData. Inoltre vera isola con
+movimento tramite input originale, salvataggio e ricaricamento riusciti.
+Ultimo campione reale: WORLDGEN v1 seed=2591355162068421230 tiles=255510->255510 coast=52 ramps=411 dryComponents=1208->1062 volcanic=1448 lava=88 newLava=66 outcrops=0 center=0,-112
+L'intero generatore originale non e' riproducibile da un singolo seed.
+
+python tools/landscape_smoke_test.py: PASS, 335 frame e 8 PNG.
+Giorno/notte, pareti e rampe, caldera, interni, vere azioni EnterBuilding/uscita;
+nessun errore GL o fallback nelle scene del test. La fixture e' distinta dalle
+schermate del mondo generato in build/modern-world.
+
+python tools/modern_ui_smoke_test.py: PASS.
+UI: frames=6803, screens=[DrawSetupMenu, DrawControls, DrawPlayerMenu, DrawPokemonMenu, SelectedMenu, DrawStatsScreen, DrawItemMenuGen2, DrawUseTossMenu, DrawMiniMap, DrawItemMenu, DrawGuideText, DrawCraftsMenu, SelectAmount, Selected, DrawBattleMenuNormal, DrawAttacksMenu, ShowLevelUpStats, SetNickname, DrawYesNoMenu, DisplayText], battleFrames=4065, transitionFrames=461, snapshotFrames=690, PNGs=70
+PMD: battle=5957, portraits=2227, sheets=19, textureBytes=4763904
+Input originali, 20 tipi di menu, crafting, borsa/deposito/statistiche,
+nickname/dialoghi, mosse Leer e Low Kick con danni/HP, fuga e cattura reale
+di Sprigatito con Master Ball, crescita e confronto dopo save/load.
+Zero frame di attori 3D e zero modelli caricati; 70 catture native.
+
+python tools/expansion_dex_test.py: PASS.
+Tutte le 552 specie nuove create con contesto GL; statistiche/mosse canoniche,
+sprite, conversione PokemonData, cattura/Heavy Ball, crescita, Torchic->Combusken,
+uovo/schiusa Sprigatito e grida. Vero save/load di Combusken16/Sprigatito5/
+Fuecoco8 shiny. 227 inserimenti verificati sulle sette route del test.
+
+python tools/pmd_asset_smoke_test.py --bundled: PASS.
+PMD PASS variants=2126 portraits=2125 animations=10024 directionChecks=80192 timingChecks=9988 missingPortraits=1 missingSprites=101 maxTextures=160 maxTextureBytes=67108864
+Il catalogo include forme/varianti: non tutti questi numeri sono specie giocabili.
+Limite cache effettivo 160 texture/64 MiB, espulsione verificata.
+python tools/pmd_battle_visual_test.py: PASS, 16 PNG.
+Sconfitta amico/nemico, invio Pokemon, evoluzione, schiusa, shiny e trasparenza:
+azioni originali e nuovi corpi PMD, ritaglio verticale della sconfitta verificato.
+
+COPERTURA E LIMITI
+Windows x64, OpenGL NVIDIA RTX4060. Prove isolate sotto build/: nessuna partita
+personale in run/ o run-johto/ modificata. Questi tempi non sono benchmark.
+962 specie nazionali distinte, 552 aggiunte; 63 candidate rinviate.
+Portrait base di 1025 specie e sprite base di 980 nel catalogo grafico. Pokedex,
+forme, varianti ed evoluzioni ammesse sono descritti in POKEDEX-ESPANSO.txt.
+Alcuni effetti di mosse, uova, ghost, cue speciali ed emote restano originali;
+certe azioni sul campo conservano il renderer normale per targeting/feedback.
+Non sono coperti ogni attacco/incontro speciale, multiplayer o lunghe partite.
+Dettagli: GRAFICA-25D.txt, GENERAZIONE-MODERNA.txt e manifest di provenienza.
+Le anteprime 25d/vulcano vengono da mondi procedurali reali; anteprima-alture
+illustra la fixture controllata. Le altre anteprime provengono dalla prova UI.

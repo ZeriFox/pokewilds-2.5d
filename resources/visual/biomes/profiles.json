@@ -1,0 +1,991 @@
+{
+  "version": 1,
+  "notes": "Tile identity, saved routes and scripted encounter identity remain unchanged. Profiles supply presentation and procedural habitat rules. Depth is geometric water enclosure, not simulated bathymetry.",
+  "profiles": {
+    "plains": {
+      "label": "GREEN MEADOW",
+      "tags": [
+        "temperate",
+        "land"
+      ],
+      "terrain": {
+        "ground": "grass_light",
+        "path": "path",
+        "rock": "mountain",
+        "ash": "grass_light"
+      },
+      "cliff": {
+        "front": "cliff",
+        "top": "mountain",
+        "ramp": "steps"
+      },
+      "height": {
+        "cliffHeight": 12,
+        "rampRise": 12,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "rock",
+        "tree": "tree",
+        "bush": "bush",
+        "grass": "grass_tuft",
+        "gravestone": "gravestone"
+      },
+      "ambient": {
+        "fogDensity": 0,
+        "fogColor": "a5b5b0",
+        "tint": "ffffff",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "rattata"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "forest": {
+      "label": "WOODLAND",
+      "tags": [
+        "temperate",
+        "woodland"
+      ],
+      "terrain": {
+        "ground": "grass",
+        "path": "path",
+        "rock": "mountain",
+        "ash": "grass"
+      },
+      "cliff": {
+        "front": "cliff",
+        "top": "mountain",
+        "ramp": "steps"
+      },
+      "height": {
+        "cliffHeight": 12,
+        "rampRise": 12,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "rock",
+        "tree": "tree",
+        "bush": "bush",
+        "grass": "grass_tuft",
+        "gravestone": "gravestone"
+      },
+      "ambient": {
+        "fogDensity": 0,
+        "fogColor": "a5b5b0",
+        "tint": "ffffff",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "caterpie"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "deep_forest": {
+      "label": "DEEP FOREST",
+      "tags": [
+        "temperate",
+        "woodland",
+        "sheltered"
+      ],
+      "terrain": {
+        "ground": "grass",
+        "path": "path",
+        "rock": "mountain",
+        "ash": "grass"
+      },
+      "cliff": {
+        "front": "cliff",
+        "top": "mountain",
+        "ramp": "steps"
+      },
+      "height": {
+        "cliffHeight": 12,
+        "rampRise": 12,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "rock",
+        "tree": "tree",
+        "bush": "bush",
+        "grass": "grass_tuft",
+        "gravestone": "gravestone"
+      },
+      "ambient": {
+        "fogDensity": 0.035,
+        "fogColor": "a5b5b0",
+        "tint": "d2e6d2",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "zubat"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "desert": {
+      "label": "SUNWORN DESERT",
+      "tags": [
+        "arid",
+        "land"
+      ],
+      "terrain": {
+        "ground": "desert_ground",
+        "path": "desert_path",
+        "rock": "desert_cliff_cap",
+        "ash": "desert_ground"
+      },
+      "cliff": {
+        "front": "desert_cliff",
+        "top": "desert_cliff_cap",
+        "ramp": "desert_ramp"
+      },
+      "height": {
+        "cliffHeight": 14,
+        "rampRise": 14,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "desert_rock",
+        "tree": "desert_dead_tree",
+        "bush": "desert_decor",
+        "grass": "desert_decor",
+        "gravestone": "gravestone",
+        "cactus": "desert_cactus"
+      },
+      "ambient": {
+        "fogDensity": 0,
+        "fogColor": "a5b5b0",
+        "tint": "fff4dc",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "trapinch"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "volcano": {
+      "label": "EMBER CALDERA",
+      "tags": [
+        "volcanic",
+        "arid",
+        "land"
+      ],
+      "terrain": {
+        "ground": "volcanic_basalt",
+        "path": "volcanic_cracked",
+        "rock": "volcanic_obsidian",
+        "ash": "volcanic_ash"
+      },
+      "cliff": {
+        "front": "volcanic_cliff",
+        "top": "volcanic_cliff_cap",
+        "ramp": "volcanic_ramp"
+      },
+      "height": {
+        "cliffHeight": 14,
+        "rampRise": 14,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "volcanic_rock",
+        "tree": "volcanic_charred_tree",
+        "bush": "volcanic_dead_shrub",
+        "grass": "volcanic_dead_shrub",
+        "gravestone": "gravestone",
+        "crystal": "volcanic_crystal"
+      },
+      "ambient": {
+        "fogDensity": 0.035,
+        "fogColor": "654d50",
+        "tint": "eee5e4",
+        "desaturation": 0,
+        "glow": 0.16
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "numel"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "graveyard": {
+      "label": "VEILED GRAVEYARD",
+      "tags": [
+        "haunted",
+        "land"
+      ],
+      "terrain": {
+        "ground": "graveyard_ground",
+        "path": "graveyard_path",
+        "rock": "graveyard_ground",
+        "ash": "graveyard_ground"
+      },
+      "cliff": {
+        "front": "graveyard_cliff",
+        "top": "graveyard_cliff_cap",
+        "ramp": "graveyard_ramp"
+      },
+      "height": {
+        "cliffHeight": 12,
+        "rampRise": 12,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "graveyard_rock",
+        "tree": "graveyard_dead_tree",
+        "bush": "graveyard_weeds",
+        "grass": "graveyard_weeds",
+        "gravestone": "graveyard_tomb"
+      },
+      "ambient": {
+        "fogDensity": 0.14,
+        "fogColor": "9cac9b",
+        "tint": "bdc9bc",
+        "desaturation": 0.34,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "gastly"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "snow": {
+      "label": "FROST RIDGE",
+      "tags": [
+        "cold",
+        "land"
+      ],
+      "terrain": {
+        "ground": "snow",
+        "path": "snow",
+        "rock": "snow",
+        "ash": "snow"
+      },
+      "cliff": {
+        "front": "cliff_snow",
+        "top": "snow",
+        "ramp": "steps"
+      },
+      "height": {
+        "cliffHeight": 14,
+        "rampRise": 14,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "rock_ice",
+        "tree": "tree_snow",
+        "bush": "bush",
+        "grass": "grass_tuft",
+        "gravestone": "gravestone"
+      },
+      "ambient": {
+        "fogDensity": 0,
+        "fogColor": "a5b5b0",
+        "tint": "e3efff",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "swinub"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "mountain": {
+      "label": "HIGHLAND",
+      "tags": [
+        "rocky",
+        "land"
+      ],
+      "terrain": {
+        "ground": "mountain",
+        "path": "path",
+        "rock": "mountain",
+        "ash": "mountain"
+      },
+      "cliff": {
+        "front": "cliff",
+        "top": "mountain",
+        "ramp": "steps"
+      },
+      "height": {
+        "cliffHeight": 14,
+        "rampRise": 14,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "rock",
+        "tree": "tree",
+        "bush": "bush",
+        "grass": "grass_tuft",
+        "gravestone": "gravestone"
+      },
+      "ambient": {
+        "fogDensity": 0,
+        "fogColor": "a5b5b0",
+        "tint": "ffffff",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "geodude"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "beach": {
+      "label": "SALTWIND COAST",
+      "tags": [
+        "coastal",
+        "saltwater",
+        "land"
+      ],
+      "terrain": {
+        "ground": "sand",
+        "path": "sand",
+        "rock": "sand",
+        "ash": "sand"
+      },
+      "cliff": {
+        "front": "cliff",
+        "top": "sand",
+        "ramp": "steps"
+      },
+      "height": {
+        "cliffHeight": 12,
+        "rampRise": 12,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "rock",
+        "tree": "tree",
+        "bush": "bush",
+        "grass": "grass_tuft",
+        "gravestone": "gravestone"
+      },
+      "ambient": {
+        "fogDensity": 0,
+        "fogColor": "a5b5b0",
+        "tint": "ffffff",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "krabby"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "wetland": {
+      "label": "CLEARWATER LAKE",
+      "tags": [
+        "freshwater",
+        "wetland",
+        "woodland"
+      ],
+      "terrain": {
+        "ground": "grass",
+        "path": "path",
+        "rock": "mountain",
+        "ash": "grass"
+      },
+      "cliff": {
+        "front": "cliff",
+        "top": "mountain",
+        "ramp": "steps"
+      },
+      "height": {
+        "cliffHeight": 12,
+        "rampRise": 12,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "rock",
+        "tree": "tree",
+        "bush": "bush",
+        "grass": "grass_tuft",
+        "gravestone": "gravestone"
+      },
+      "ambient": {
+        "fogDensity": 0,
+        "fogColor": "a5b5b0",
+        "tint": "ffffff",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "wooper"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "oasis": {
+      "label": "DESERT OASIS",
+      "tags": [
+        "freshwater",
+        "wetland",
+        "arid"
+      ],
+      "terrain": {
+        "ground": "desert_ground",
+        "path": "desert_path",
+        "rock": "desert_cliff_cap",
+        "ash": "desert_ground"
+      },
+      "cliff": {
+        "front": "desert_cliff",
+        "top": "desert_cliff_cap",
+        "ramp": "desert_ramp"
+      },
+      "height": {
+        "cliffHeight": 12,
+        "rampRise": 12,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "desert_rock",
+        "tree": "tree_dry",
+        "bush": "bush",
+        "grass": "grass_tuft",
+        "gravestone": "gravestone"
+      },
+      "ambient": {
+        "fogDensity": 0,
+        "fogColor": "a5b5b0",
+        "tint": "ffffff",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "sandshrew"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "savanna": {
+      "label": "DRY SAVANNA",
+      "tags": [
+        "arid",
+        "land"
+      ],
+      "terrain": {
+        "ground": "grass_dry",
+        "path": "dirt",
+        "rock": "desert_cliff_cap",
+        "ash": "grass_dry"
+      },
+      "cliff": {
+        "front": "desert_cliff",
+        "top": "desert_cliff_cap",
+        "ramp": "desert_ramp"
+      },
+      "height": {
+        "cliffHeight": 12,
+        "rampRise": 12,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "desert_rock",
+        "tree": "tree_dry",
+        "bush": "bush",
+        "grass": "grass_tuft",
+        "gravestone": "gravestone"
+      },
+      "ambient": {
+        "fogDensity": 0,
+        "fogColor": "a5b5b0",
+        "tint": "ffffff",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "rattata"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "cave": {
+      "label": "STONE HOLLOW",
+      "tags": [
+        "cave",
+        "sheltered",
+        "rocky"
+      ],
+      "terrain": {
+        "ground": "cave_floor",
+        "path": "cave_floor",
+        "rock": "cave_floor",
+        "ash": "cave_floor"
+      },
+      "cliff": {
+        "front": "cliff_dark",
+        "top": "cave_floor",
+        "ramp": "steps"
+      },
+      "height": {
+        "cliffHeight": 14,
+        "rampRise": 14,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "cave_stalagmite",
+        "tree": "tree_dry",
+        "bush": "bush",
+        "grass": "grass_tuft",
+        "gravestone": "gravestone"
+      },
+      "ambient": {
+        "fogDensity": 0,
+        "fogColor": "a5b5b0",
+        "tint": "dddded",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "zubat"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    },
+    "interior": {
+      "label": "SHELTER",
+      "tags": [
+        "interior",
+        "sheltered"
+      ],
+      "terrain": {
+        "ground": "wood_floor",
+        "path": "wood_floor",
+        "rock": "mountain",
+        "ash": "wood_floor"
+      },
+      "cliff": {
+        "front": "cliff",
+        "top": "mountain",
+        "ramp": "steps"
+      },
+      "height": {
+        "cliffHeight": 12,
+        "rampRise": 12,
+        "shoreDepth": 2
+      },
+      "fluid": {
+        "water": "water",
+        "shallow": "water_shallow",
+        "lava": "lava_bright",
+        "cooledLava": "lava_cooled"
+      },
+      "decor": {
+        "rock": "rock",
+        "tree": "tree",
+        "bush": "bush",
+        "grass": "grass_tuft",
+        "gravestone": "gravestone"
+      },
+      "ambient": {
+        "fogDensity": 0,
+        "fogColor": "a5b5b0",
+        "tint": "ffffff",
+        "desaturation": 0,
+        "glow": 0
+      },
+      "spawn": {
+        "defaultWeight": 20,
+        "fallbackLand": [
+          "rattata"
+        ],
+        "fallbackWater": [
+          "magikarp"
+        ],
+        "allowLava": false
+      },
+      "transition": {
+        "blendWidth": 8,
+        "edgeDarkening": 0.08,
+        "shoreWidth": 2
+      }
+    }
+  },
+  "speciesRules": [
+    {
+      "species": [
+        "milotic"
+      ],
+      "requires": [
+        "water",
+        "freshwater"
+      ],
+      "minWetness": 1,
+      "minDepth": 1,
+      "weight": 1
+    },
+    {
+      "species": [
+        "feebas"
+      ],
+      "requires": [
+        "water",
+        "freshwater"
+      ],
+      "minWetness": 1,
+      "minDepth": 1,
+      "weight": 3
+    },
+    {
+      "species": [
+        "trapinch",
+        "vibrava",
+        "flygon",
+        "sandile",
+        "krokorok",
+        "krookodile",
+        "gible",
+        "gabite",
+        "garchomp",
+        "cacnea",
+        "cacturne"
+      ],
+      "anyBiomeTags": [
+        "arid"
+      ],
+      "forbids": [
+        "water",
+        "lava"
+      ],
+      "weight": 20
+    },
+    {
+      "species": [
+        "numel",
+        "camerupt"
+      ],
+      "anyBiomeTags": [
+        "arid",
+        "volcanic"
+      ],
+      "forbids": [
+        "water",
+        "lava"
+      ],
+      "weight": 20
+    },
+    {
+      "species": [
+        "gastly",
+        "haunter",
+        "gengar"
+      ],
+      "forbids": [
+        "water",
+        "lava"
+      ],
+      "nightUnlessTags": [
+        "haunted",
+        "ruins"
+      ],
+      "weight": 12
+    },
+    {
+      "species": [
+        "magikarp",
+        "gyarados",
+        "goldeen",
+        "seaking",
+        "remoraid",
+        "octillery",
+        "finneon",
+        "lumineon",
+        "wishiwashi",
+        "arrokuda",
+        "barraskewda",
+        "basculin",
+        "basculegion",
+        "luvdisc",
+        "alomomola",
+        "wailmer",
+        "wailord",
+        "carvanha",
+        "sharpedo",
+        "chinchou",
+        "lanturn",
+        "horsea",
+        "seadra",
+        "kingdra",
+        "tentacool",
+        "tentacruel",
+        "qwilfish",
+        "overqwil",
+        "mantyke",
+        "mantine",
+        "frillish",
+        "jellicent",
+        "skrelp",
+        "dragalge",
+        "clauncher",
+        "clawitzer",
+        "dondozo",
+        "veluza"
+      ],
+      "requires": [
+        "water"
+      ],
+      "minDepth": 1,
+      "weight": 20
+    },
+    {
+      "species": [
+        "slugma",
+        "magcargo",
+        "torkoal",
+        "magmar",
+        "magmortar",
+        "heatmor",
+        "sizzlipede",
+        "centiskorch"
+      ],
+      "forbids": [
+        "water"
+      ],
+      "weight": 20
+    },
+    {
+      "species": [
+        "lapras"
+      ],
+      "requires": [
+        "water"
+      ],
+      "minDepth": 1,
+      "weight": 3
+    },
+    {
+      "species": [
+        "dratini",
+        "dragonair"
+      ],
+      "requires": [
+        "water",
+        "freshwater"
+      ],
+      "minDepth": 1,
+      "weight": 3
+    }
+  ]
+}

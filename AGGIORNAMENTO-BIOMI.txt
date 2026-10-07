@@ -1,0 +1,225 @@
+POKEWILDS 2.5D — DOCUMENTO MASTER DELL'AGGIORNAMENTO LOCALE
+Data: 2026-10-07 — revisione locale v5 dei rilievi
+
+Questa iterazione resta sul PC locale. Non e' stata pubblicata su GitHub;
+la release privata johto.2 e' precedente. Per giocare si usa il JAR locale
+tramite AVVIA-POKEWILDS.cmd, senza compilare sul computer del giocatore.
+VERIFICA.txt identifica il JAR verificato e i test effettivamente conclusi.
+Questo documento descrive l'implementazione: non sostituisce quel rapporto.
+
+Obiettivo: una presentazione coerente che condivida materiali, quote e
+atmosfera del bioma, con habitat leggibili e UI stabile. La mappa resta
+procedurale; sprite e portrait PMD dei Pokemon vengono mantenuti.
+L'indice seguente comprende funzioni appena aggiunte e funzioni della
+precedente iterazione riutilizzate e controllate in questo aggiornamento.
+
+A. BUG TECNICI E CONTINUITA' DELLA PRESENTAZIONE
+
+A1. Apparizione notturna e asset mancanti
+L'analisi ha identificato SpawnGhost/Ghost come un incontro reale del gioco,
+non come un fallback per texture assente. Rimuoverlo avrebbe cambiato una
+meccanica. JohtoRenderer.ghost() gli assegna invece un'apparizione luminosa
+coerente con la vista 2.5D; azioni e condizioni originali restano attive.
+BwAssets.objectName() restituisce null per marker ignoti: non inventa un
+fantasma, una pietra o una piastra al posto di una texture sconosciuta.
+Le celle solide mantengono un ostacolo visivo; gli asset attesi e mancanti
+vengono segnalati da reportMissing(key, tile, timeOfDay), con nome dell'asset,
+profilo, terreno, oggetto e orario. Il registro e' deduplicato e limitato.
+
+A2. Abilita', ingresso e uscita dalle lotte
+WorldBatch sopprime le chiamate di disegno del vecchio mondo durante la
+presentazione moderna, senza saltare step(), timer o effetti delle azioni.
+JohtoRenderer.fieldPlayer(), fieldPokemon() e fieldTarget() presentano le
+azioni sul campo, le cavalcature e le anteprime della costruzione nello stesso
+mondo. La validita' della costruzione resta quella delle regole originali.
+JohtoBattleRenderer gestisce panorama esteso, immagine GPU del mondo e
+finishFrame() per mantenere il mondo moderno durante le fasi di transizione.
+Le arene leggono gli stessi materiali dei profili; non viene usato un vecchio
+fotogramma del terreno come ripiego durante la ricomposizione della scena.
+
+A3. Piedi, dimensioni e bordi della battaglia
+PmdPokemonSprites/PmdBattleSprites usano gli ingombri delle animazioni e
+ancoraggi coerenti ai piedi, con scala stabile tra i frame. Il panorama della
+lotta copre la finestra; attori e HUD mantengono un'area utile proporzionata.
+Questa soluzione riutilizza metadati e bounds PMD, senza sostituire i Pokemon
+con modelli 3D. Effetti e mosse restano limitati a quelli implementati.
+
+Limiti A
+La soppressione del vecchio disegno non elimina la logica originale del gioco.
+Alcuni effetti di lotta e segnali funzionali conservano le risorse originali;
+le forme PMD mancanti hanno i fallback documentati. Le prove coprono flussi
+e campioni precisi, non ogni mossa, incontro speciale o sessione multiplayer.
+
+B. UI, COMANDI E SCHEDA POKEMON
+
+B1. Layout comune
+ModernUi.Layout raccoglie misure e margini; ModernUi.Box fornisce inset(),
+row() e column(). applyViewport() scala uniformemente il canvas logico
+160x144 secondo la finestra. controlRow() e keycap() separano etichette e
+tasti; fitText() e wrapped() mantengono i testi nelle aree assegnate.
+ModernInventoryUi riserva spazi distinti a nome e quantita'. Le schermate
+comandi e tutorial non sovrappongono la colonna dei tasti alle descrizioni.
+
+B2. Comandi e testi coerenti
+Preset: WASD movimento; LMB conferma/interazione; RMB annulla e, tenuto
+durante il movimento, corre; Invio menu; C/V selezione; F11 schermo intero.
+DesktopControls.loadBindings() migra soltanto il preset originale completo
+frecce/Z/X. Le personalizzazioni vengono conservate. InputProcessor tratta
+pressione, mantenimento e rilascio del mouse separatamente dal touch.
+DesktopControls.hints()/authoredHint() aggiornano gli aiuti scritti dal gioco
+in base ai binding attivi. I testi liberi del giocatore e nomi come Porygon-Z
+non devono essere riscritti. Nei campi nome WASD continua a digitare lettere;
+le frecce cambiano campo e Invio conferma il soprannome.
+
+B3. Portrait e figura intera
+ModernPartyUi mostra portrait e Pokemon completo animato sulle tre pagine
+di Status Info. Il pannello riserva spazio ai dati e usa l'ingombro dell'intera
+animazione Idle per evitare ritagli o variazioni di scala tra i fotogrammi.
+
+Limiti B
+ui_layout_test.py/UiLayoutTest esercitano menu reali a finestre 640x576,
+800x720 e 960x864, equivalenti a 100/125/150%, oltre a rapporti larghi,
+verticali e alle dimensioni del desktop. Verificano proiezione uniforme,
+bordi e separazione delle colonne; non simulano tutti i monitor e i cambi
+DPI hardware del sistema operativo. La prova gamepad usa input simulato.
+LimeZu Modern User Interface e' stato valutato, ma richiede acquisto:
+nessun file del pacchetto e' stato acquistato o integrato.
+
+C. DIREZIONE VISIVA, BIOMI E GEOMETRIA
+
+C1. Profili completi
+BiomeProfiles.load(), forTile() e named() leggono
+resources/visual/biomes/profiles.json. I 14 profili sono plains, forest,
+deep_forest, desert, volcano, graveyard, snow, mountain, beach, wetland,
+cave, interior, oasis e savanna.
+Ogni profilo comprende terrain, cliff, height, fluid, decor, ambient,
+spawn e transition. I getter terrain(), cliff(), decor(), string(), number()
+e tags() alimentano materiali, geometria, atmosfera e regole degli incontri.
+La selezione considera terreno, oggetto, bioma e route, preservando identita'
+e formato dei tile esistenti. Un dirupo generico nel deserto riceve il set
+desertico, non la parete globale.
+I sentieri della mansion possono ereditare una route neve anche in un'altra
+regione. Il renderer usa l'ambiente circostante per correggere quel materiale;
+la route memorizzata e la selezione degli incontri restano intatte.
+
+C2. Set coerenti e correzione dei ritagli
+L'atlante comprende 202 regioni e 6 sequenze animate. Pixel Crawler rimane
+la base comune, Woods/Forest_1 forniscono la natura, Cold Cave i dettagli
+di grotta. Sevarihk e' il set secondario per la materia vulcanica.
+Deserto: ground, path, rock, cliff, cliff_cap e ramp dedicati; vegetazione
+secca, cactus reale e ciuffi ritagliati senza pezzi sospesi.
+Vulcano: basalto, crosta fratturata, cenere, ossidiana, pareti e rampe scure,
+alberi carbonizzati, lava calda e raffreddata. Le due lave usano la stessa
+geometria organica con 16 frame ciascuna; non un simbolo con quadrati rossi.
+BwAssets.terrainName() alterna basalto e fratture in zone stabili di 4x4 celle
+mediante coordinate, senza consumare Game.rand. Soot conserva la cenere.
+Cimitero: fondo grigio-verde, sentieri spenti, pareti dedicate, vegetazione
+secca e due lapidi leggibili. JohtoRenderer.atmosphere()/shaderAtmosphere()
+applicano tinta, desaturazione e nebbia animata dai profili circostanti.
+collectLights() comprende il bagliore locale della lava.
+
+C3. Rilievi realmente condivisi
+La v5 corregge il caso in cui il contorno sembrava un muretto mentre il terreno
+su entrambi i lati restava sullo stesso piano. WorldElevation.update() risolve
+vincoli di differenza di quota: i dirupi salvati hanno priorita' sulle semplici
+continuazioni piane, le rampe forniscono la direzione del raccordo. Gli angoli
+condivisi collegano le superfici attraversabili e le aperture senza introdurre
+barriere nei dati. I vincoli contraddittori sono trattati deterministicamente.
+height() segue gli stessi due triangoli usati per disegnare ogni cella;
+tileHeight(), lowHeight() e isSloped() espongono livelli e pendenze.
+observe() confronta una firma strutturale di dirupi, rampe e parametri di quota:
+una modifica geometrica invalida la cache, una marea o una sola texture no.
+JohtoRenderer.terrainSurface() disegna l'intero piano alla quota derivata,
+con materiale del bioma e lieve illuminazione direzionale sulle pendenze.
+terrainEdges() chiude le differenze reali fra superfici con pareti, un bordo
+sottile in cima e un'ombra di contatto alla base. Nessun muretto aggiuntivo
+viene creato fra due superfici della stessa quota. ramp() aggiunge sottili
+segni trasversali alle rampe dichiarate e inclinate: tutti e quattro i vertici
+seguono il pendio. I raccordi impliciti conservano la normale texture del bioma.
+coast() e waterfall() seguono le quote effettive delle superfici collegate.
+Personaggio, Pokemon e camera usano lo stesso campo di altezze del terreno.
+Le celle di marea guadabili mostrano il fondale con uno strato sottile
+trasparente, anziche' un pavimento d'acqua opaco. Le pozzanghere mantengono
+il letto locale; guadabilita' e collisioni non dipendono dall'opacita' grafica.
+Non si tratta di nuove altezze salvate: la geometria e' derivata dai tile
+originali. Non vengono cambiate collisioni, salti o regole di movimento
+verticale. I dati di bordo contraddittori sono risolti deterministicamente.
+
+C4. Provenienza e ricostruzione
+prepare_landscape_assets.py ricrea offline l'atlante da originali fissati
+tramite SHA-256. Registra ritagli, trasparenza, palette e scorrimento dei
+frame in PROVENANCE.json. verify_landscape_assets.py controlla bounds,
+ancore, opacita', frame distinti, riferimenti dei 14 profili e assenza di
+materiali globali nei ruoli dedicati dei tre biomi speciali.
+Fonte vulcanica: Stone and Lava Ground Tiles, Sevarihk, CC BY 4.0.
+https://opengameart.org/content/stone-and-lava-ground-tiles
+https://creativecommons.org/licenses/by/4.0/
+Modifiche: ritagli, palette e 16 frame di scorrimento. Conservare
+resources/visual/landscape/LICENSE-Sevarihk-CC-BY.txt e CREDITS.txt.
+Lapidi: Forest / Graveyard tileset, marionline, CC0 1.0.
+https://opengameart.org/content/forest-graveyard-tileset
+Cactus: Desert Level Decorations, ScratchIO, CC0 1.0.
+https://opengameart.org/content/desert-level-decorations-pixel-art
+https://creativecommons.org/publicdomain/zero/1.0/
+Le altre fonti mantengono tutti i propri termini: GRAFICA-25D.txt e
+resources/visual/landscape/PROVENANCE.json ne riportano autori e collegamenti.
+La ricerca verificata il 2026-10-07 e' in ASSET-RESEARCH.json. PixiVan
+non offriva un download disponibile; Cemetery di mutantleg e' CC0 ma non
+e' stato integrato per non mescolare un'altra prospettiva. Nessun acquisto.
+
+Limiti C
+Le quote non sono un nuovo formato 3D della mappa e la geometria non modifica
+la fisica originale. Caldera e rampe del generatore riguardano nuove isole
+e nuove aree; i terreni dei salvataggi caricati non vengono riscritti.
+Gli originali dei pacchetti restano fuori dal progetto. Le licenze delle
+fonti non vengono sostituite dalla licenza del codice del gioco.
+
+D. COERENZA DEGLI HABITAT E DEI NUOVI INCONTRI
+
+D1. Contesto e selezione
+WildSpawnRules.habitat() determina profilo, tag, presenza reale d'acqua,
+lava, vicinanza dell'acqua, profondita' geometrica e orario. allows()
+applica requisiti/esclusioni delle specie; choose() seleziona i candidati
+ammessi con pesi e conserva la rarita' relativa delle voci duplicate.
+I pool originali delle route restano la base; i profili forniscono fallback
+espliciti se un pool non vuoto non contiene specie ammissibili. Liste vuote
+di dungeon e incontri sceneggiati non vengono riempite automaticamente.
+GenIsland1 usa queste regole nelle nuove aree; PlayerStanding le usa nei
+nuovi incontri e nelle evoluzioni selvatiche pertinenti.
+
+D2. Milotic e gli acquatici
+anchorOasisEncounter() conserva l'incontro Milotic dell'oasi e ne corregge
+la cella generata scegliendo acqua libera dell'oasi, dopo i passaggi sulle
+coste. Non lo cancella per far scomparire il problema.
+mustStayInWater() colma la lista nuotatori originale per le specie acquatiche
+dichiarate nelle regole. I rami di movimento di Pokemon rispettano quel
+vincolo per i selvatici. Un Pokemon posseduto resta escluso dal nuovo filtro.
+Queste operazioni non eliminano ne' teletrasportano Pokemon gia' caricati da
+salvataggio e non migrano il terreno salvato. Il vincolo di movimento dei
+selvatici vale anche dopo il caricamento, senza riscriverne l'identita'.
+
+Limiti D
+Profondita' significa cella d'acqua circondata o di bordo; umidita' significa
+prossimita' dell'acqua nelle celle vicine. Non e' una simulazione idrologica.
+Le specie senza regola dedicata mantengono il pool originale della route.
+Gli habitat di allevamento originali e le regole di combattimento non sono
+sostituiti da questo sistema. Gli incontri speciali conservano la loro
+identita'; l'oasi applica soltanto la correzione della cella generata.
+L'aggiunta di regole habitat cambia intenzionalmente i nuovi incontri:
+non viene rivendicata equivalenza completa del gameplay con PokeWilds 0.8.11.
+
+VERIFICHE E ANTEPRIME
+VERIFICA.txt distingue i test sul JAR finale dalle prove con classi di
+sviluppo sovrapposte e riporta risultati/hash effettivi.
+Test specifici: biome_habitat_test.py, biome_scene_test.py,
+world_elevation_test.py, relief_visual_test.py, ui_layout_test.py,
+verify_landscape_assets.py. Il test dei rilievi confronta la geometria realmente
+inviata al renderer con il piano calpestato, prova una caldera gia' salvata e
+terrazze con aperture, misura contrasto e leggibilita' delle rampe e attraversa
+i dislivelli usando PlayerMoving originale. Verifica la continuita' della
+camera e gli hash dei file della copia di salvataggio. Si aggiunge alle prove
+su azioni sul campo, battaglie, generazione, comandi, cattura e save/load.
+Le prove native usano partite isolate sotto build/, non il salvataggio utente.
+Anteprime nella root del progetto: anteprima-cimitero.png,
+anteprima-deserto.png, anteprima-comandi.png, anteprima-vulcano.png,
+anteprima-alture.png, anteprima-lotta.png e anteprima-status.png.

@@ -2,6 +2,7 @@ package com.pkmngen.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -16,6 +17,7 @@ public final class PmdBattleSprites {
    private static long actorDraws, portraitDraws;
    private static final Color saved = new Color();
    private static final Map<String, Float> scales = new HashMap<>();
+   private static final Map<String, TextureRegion> trainerRegions = new HashMap<>();
    private static ShaderProgram flashShader;
 
    public static void beginFrame() { seconds += Math.min(.1f, Gdx.graphics.getDeltaTime()); }
@@ -30,9 +32,13 @@ public final class PmdBattleSprites {
       if (game.player != null && source == game.player.battleSprite) {
          TextureRegion trainer = BwAssets.get().trainer(game.player.character,"up",seconds,false);
          if (trainer == null) return false;
+         trainer = trimTrainer(trainer);
          Sprite draw = new Sprite(trainer);
-         draw.setBounds(source.getX(), source.getY(), source.getWidth(), source.getHeight());
-         draw.setColor(source.getColor()); draw.setOriginCenter(); draw.setScale(source.getScaleX(),source.getScaleY());
+         float scale = Math.min(source.getWidth()/trainer.getRegionWidth(), source.getHeight()/trainer.getRegionHeight());
+         float width=trainer.getRegionWidth()*scale, height=trainer.getRegionHeight()*scale;
+         float groundY=source.getY()-(game.battle.drawAction instanceof SpecialBattleMegaGengar.DrawBattle1?13:0);
+         draw.setBounds(source.getX()+(source.getWidth()-width)*.5f, groundY, width,height);
+         draw.setColor(source.getColor()); draw.setOrigin(width*.5f,0); draw.setScale(source.getScaleX(),source.getScaleY());
          draw.setRotation(source.getRotation()); draw.draw(game.uiBatch);
          return true;
       }
@@ -42,6 +48,22 @@ public final class PmdBattleSprites {
       if (enemy != null && (source == enemy.sprite || enemy.introAnim != null && enemy.introAnim.contains(source)))
          return draw(game, enemy, source, false, animation(game, enemy));
       return false;
+   }
+
+   /** The B/W avatar cell contains transparent padding; fit its complete visible body. */
+   private static TextureRegion trimTrainer(TextureRegion source) {
+      String key=source.getRegionX()+":"+source.getRegionY();
+      TextureRegion cached=trainerRegions.get(key);
+      if(cached!=null)return cached;
+      Pixmap atlas=new Pixmap(Gdx.files.internal("visual/unova/world-atlas.png"));
+      int left=source.getRegionWidth(),top=source.getRegionHeight(),right=-1,bottom=-1;
+      for(int y=0;y<source.getRegionHeight();y++)for(int x=0;x<source.getRegionWidth();x++){
+         if((atlas.getPixel(source.getRegionX()+x,source.getRegionY()+y)&255)==0)continue;
+         left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);
+      }
+      atlas.dispose();
+      cached=right<left?source:new TextureRegion(source,left,top,right-left+1,bottom-top+1);
+      trainerRegions.put(key,cached);return cached;
    }
 
    private static String animation(Game game, Pokemon pokemon) {
@@ -72,7 +94,23 @@ public final class PmdBattleSprites {
    }
 
    public static boolean draw(Game game, Pokemon pokemon, Sprite source, boolean back, String animation) {
-      if (game.modernUi == null || pokemon == null || pokemon.isEgg || pokemon.isGhost || source == null) return false;
+      if (game.modernUi == null || pokemon == null || pokemon.isEgg || source == null) return false;
+      if (pokemon.isGhost) {
+         // The night encounter intentionally hides its species until Silph Scope.
+         // Present it as the same luminous wisp used in the modern world, never
+         // as a missing-art fallback or as an early reveal of the real Pokemon.
+         ModernUi ui=ModernUi.get(game);float ratio=source.getWidth()/Math.max(1,pokemon.specie.sprite.getWidth());
+         float cx=source.getX()+source.getWidth()*.5f,cy=source.getY()+17*ratio;
+         for(int layer=0;layer<4;layer++) {
+            float radius=(17-layer*2.5f)*ratio;
+            Color color=new Color(.64f+layer*.07f,.71f+layer*.06f,.94f,source.getColor().a*(.15f+layer*.05f));
+            for(float y=-radius;y<=radius;y+=Math.max(.5f,ratio)) {
+               float half=(float)Math.sqrt(Math.max(0,radius*radius-y*y));
+               ui.rect(game,cx-half,cy+y,half*2,Math.max(.5f,ratio),color);
+            }
+         }
+         return true;
+      }
       PmdPokemonSprites.Frame frame = PmdPokemonSprites.get().frame(pokemon, back ? "up" : "down", animation, seconds);
       if (frame == null) return false;
       float originalHeight = back ? 48f : pokemon.specie.sprite.getWidth();
@@ -82,9 +120,20 @@ public final class PmdBattleSprites {
       String key = pokemon.specie.name + pokemon.isShiny + back;
       Float baseScale = scales.get(key);
       if (baseScale == null) {
-         PmdPokemonSprites.Frame idle = PmdPokemonSprites.get().frame(pokemon, back ? "up" : "down", "Idle", 0);
-         if (idle == null) idle = frame;
-         baseScale = Math.min(1.5f, Math.min(48f / Math.max(1,idle.width), 44f / Math.max(1,idle.height)));
+         // Fit the complete animation envelope once; individual trimmed frames
+         // may be larger or offset by jumps, tails and attack movement.
+         float minX=0,minY=0,maxX=0,maxY=0;
+         for (String name : new String[]{"Idle","Walk","Attack","Hurt","Sleep"}) {
+            PmdPokemonSprites.AnimationBounds bounds=PmdPokemonSprites.get().bounds(pokemon,back?"up":"down",name);
+            if (bounds == null) continue;
+            minX=Math.min(minX,bounds.minX); minY=Math.min(minY,bounds.minY);
+            maxX=Math.max(maxX,bounds.maxX); maxY=Math.max(maxY,bounds.maxY);
+         }
+         baseScale = Math.min(1.5f, Math.min(56f/Math.max(1,maxX-minX),46f/Math.max(1,maxY-minY)));
+         // Leave room below the PMD ground anchor for feet/shadows without
+         // intersecting the command panel, and above it for the entire pose.
+         baseScale=Math.min(baseScale,Math.min(44f/Math.max(1,maxY),6f/Math.max(1,-minY)));
+         baseScale=Math.min(baseScale,33f/Math.max(1,Math.max(-minX,maxX)));
          scales.put(key, baseScale);
       }
       float scale = baseScale * source.getWidth() / (back ? 48f : pokemon.specie.sprite.getWidth());
@@ -98,9 +147,10 @@ public final class PmdBattleSprites {
       }
       Sprite draw = new Sprite(visible);
       float width = frame.width * scale, height = visible.getRegionHeight() * scale;
+      float groundY=source.getY()-(back&&game.battle.drawAction instanceof SpecialBattleMegaGengar.DrawBattle1?14:0);
       draw.setBounds(source.getX() + source.getWidth()*.5f - frame.anchorX*scale,
-         source.getY() - frame.anchorY*scale*fraction, width, height);
-      draw.setOriginCenter(); draw.setRotation(source.getRotation());
+         groundY - frame.anchorY*scale*fraction, width, height);
+      draw.setOrigin(frame.anchorX*scale,frame.anchorY*scale*fraction); draw.setRotation(source.getRotation());
       draw.setScale(source.getScaleX(), source.getScaleY());
       Color tint = new Color(source.getColor());
       if (SpriteProxy.darkenAllColors1 || SpriteProxy.darkenAllColors2 || SpriteProxy.darkenAllColors3
@@ -143,10 +193,12 @@ public final class PmdBattleSprites {
       if (game.modernUi == null) return false;
       PmdPokemonSprites.Frame frame = PmdPokemonSprites.get().frame(species,"down","Idle",seconds);
       if (frame == null) return false;
-      PmdPokemonSprites.Frame idle = PmdPokemonSprites.get().frame(species,"down","Idle",0);
-      if (idle == null) idle = frame;
-      float scale = Math.min(width/Math.max(1,idle.width),height/Math.max(1,idle.height));
-      game.uiBatch.draw(frame.region,x+width/2-frame.anchorX*scale,y-frame.anchorY*scale,frame.width*scale,frame.height*scale);
+      PmdPokemonSprites.AnimationBounds bounds=PmdPokemonSprites.get().bounds(species,"down","Idle");
+      if (bounds == null) return false;
+      float scale=Math.min(width/Math.max(1,bounds.width),height/Math.max(1,bounds.height));
+      float originX=x+(width-bounds.width*scale)*.5f-bounds.minX*scale;
+      float originY=y+(height-bounds.height*scale)*.5f-bounds.minY*scale;
+      game.uiBatch.draw(frame.region,originX-frame.anchorX*scale,originY-frame.anchorY*scale,frame.width*scale,frame.height*scale);
       actorDraws++; return true;
    }
 
@@ -154,5 +206,5 @@ public final class PmdBattleSprites {
       return event(game, species + (pokemon.isShiny ? "#shiny" : ""), x,y,width,height);
    }
 
-   public static void dispose() { if (flashShader != null) flashShader.dispose(); flashShader=null; scales.clear(); }
+   public static void dispose() { if (flashShader != null) flashShader.dispose(); flashShader=null; scales.clear(); trainerRegions.clear(); }
 }

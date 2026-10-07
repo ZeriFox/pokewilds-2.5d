@@ -129,12 +129,12 @@ public class Game extends ApplicationAdapter {
    int temp2;
    int scale = 3;
    public static String[][] defaultSettings = new String[][]{
-      {"keyboard-A", "Z"},
-      {"keyboard-B", "X"},
-      {"keyboard-Left", "Left"},
-      {"keyboard-Right", "Right"},
-      {"keyboard-Up", "Up"},
-      {"keyboard-Down", "Down"},
+      {"keyboard-A", "MouseLeft"},
+      {"keyboard-B", "MouseRight"},
+      {"keyboard-Left", "A"},
+      {"keyboard-Right", "D"},
+      {"keyboard-Up", "W"},
+      {"keyboard-Down", "S"},
       {"keyboard-Start", "Enter"},
       {"keyboard-L", "C"},
       {"keyboard-R", "V"},
@@ -205,7 +205,7 @@ public class Game extends ApplicationAdapter {
       this.profiler = new GameProfiler(this.debugInputEnabled);
       staticGame = this;
       this.gameThread = Thread.currentThread();
-      this.mapBatch = new ProxyBatch();
+      this.mapBatch = new WorldBatch("johto".equalsIgnoreCase(System.getProperty("pokewilds.visual", "classic")));
       this.uiBatch = new ModernBatch();
       this.mapBatch.enableBlending();
       this.uiBatch.enableBlending();
@@ -842,6 +842,7 @@ public class Game extends ApplicationAdapter {
       }
 
       this.cam.update();
+      if (this.mapBatch instanceof WorldBatch) ((WorldBatch)this.mapBatch).beginWorldFrame();
       this.mapBatch.setProjectionMatrix(this.cam.combined);
       this.mapBatch.begin();
       if (!this.player.dontDrawMapDuringBattle && canUseFrameBuffers && this.mapBatch.getColor().r < 1.0F) {
@@ -949,6 +950,7 @@ public class Game extends ApplicationAdapter {
       for (Action action : this.actionStackCopy) {
          if (action != null && action.getCamera().equals("map")) {
             try {
+               if (this.mapBatch instanceof WorldBatch) ((WorldBatch)this.mapBatch).captureTarget(action instanceof DrawBuildTile);
                if (action.firstStep) {
                   action.firstStep(this);
                   action.firstStep = false;
@@ -957,6 +959,8 @@ public class Game extends ApplicationAdapter {
                action.step(this);
             } catch (Exception e) {
                e.printStackTrace();
+            } finally {
+               if (this.mapBatch instanceof WorldBatch) ((WorldBatch)this.mapBatch).captureTarget(false);
             }
          }
       }
@@ -1003,6 +1007,7 @@ public class Game extends ApplicationAdapter {
       }
 
       this.uiBatch.end();
+      if (this.johtoBattleRenderer != null) this.johtoBattleRenderer.finishFrame(this);
       if (!PkmnMap.PeriodicSave.isSaveOld()) {
          PkmnMap.PeriodicSave.increaseTimer();
       }
@@ -1026,7 +1031,9 @@ public class Game extends ApplicationAdapter {
    public void resize(int width, int height) {
       if (height > 0) {
          this.viewport.update(width + width % 2, height + height % 2);
-         if (Gdx.app.getType() == ApplicationType.Android) {
+         if (this.modernUi != null) {
+            this.modernUi.applyViewport(this, width, height);
+         } else if (Gdx.app.getType() == ApplicationType.Android) {
             int menuHeight = 160 * height / width;
             int offsetY = (menuHeight - 144) / 2;
             this.uiBatch.getProjectionMatrix().setToOrtho2D(0.0F, -offsetY, 160.0F, menuHeight);
@@ -1135,15 +1142,7 @@ public class Game extends ApplicationAdapter {
             }
          }
 
-         InputProcessor.keyboardA = Keys.valueOf(capitalize(values.get("keyboard-A")));
-         InputProcessor.keyboardB = Keys.valueOf(capitalize(values.get("keyboard-B")));
-         InputProcessor.keyboardLeft = Keys.valueOf(capitalize(values.get("keyboard-Left")));
-         InputProcessor.keyboardRight = Keys.valueOf(capitalize(values.get("keyboard-Right")));
-         InputProcessor.keyboardUp = Keys.valueOf(capitalize(values.get("keyboard-Up")));
-         InputProcessor.keyboardDown = Keys.valueOf(capitalize(values.get("keyboard-Down")));
-         InputProcessor.keyboardStart = Keys.valueOf(capitalize(values.get("keyboard-Start")));
-         InputProcessor.keyboardL = Keys.valueOf(capitalize(values.get("keyboard-L")));
-         InputProcessor.keyboardR = Keys.valueOf(capitalize(values.get("keyboard-R")));
+         overwriteFile |= DesktopControls.loadBindings(values);
          musicDisabled = Boolean.valueOf(values.get("muteMusic"));
          specialPhysicalSplitEnabled = Boolean.valueOf(values.get("specPhysSplitEnabled"));
          photosensitiveMode = Boolean.valueOf(values.get("photosensitiveMode"));

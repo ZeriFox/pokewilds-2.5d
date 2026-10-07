@@ -255,8 +255,9 @@ class RegigigasBattle {
             this.fadeAlpha -= 0.05F;
          }
 
-         game.uiBatch.flush();
-         Gdx.gl.glClear(16384);
+         JohtoBattleRenderer modern=JohtoBattleRenderer.get(game);
+         if(modern==null){game.uiBatch.flush();Gdx.gl.glClear(16384);}
+         else modern.drawBossBackground(game);
          if (doShockwave || this.alsoDoShockwave) {
             doShockwave = false;
             this.alsoDoShockwave = false;
@@ -270,7 +271,7 @@ class RegigigasBattle {
          }
 
          this.color.set(game.uiBatch.getColor());
-         if (this.fadeAlpha > 0.0F) {
+         if (modern==null && this.fadeAlpha > 0.0F) {
             game.uiBatch.setColor(1.0F, 1.0F, 1.0F, this.fadeAlpha);
             game.uiBatch.draw(this.bg1, 0.0F, 0.0F);
          }
@@ -281,8 +282,11 @@ class RegigigasBattle {
             if (i == 5) {
                game.uiBatch.setColor(this.color);
                if (game.battle.oppPokemon != null && DrawBattle.shouldDrawOppPokemon) {
+                  Sprite actor=new Sprite(game.battle.oppPokemon.sprite);actor.translateY(breathingOffsetY);
+                  if(!PmdBattleSprites.draw(game,game.battle.oppPokemon,actor,false,shouldBreathe?"Idle":"Attack")){
                   game.uiBatch.draw(lowerSprite, game.battle.oppPokemon.sprite.getX(), game.battle.oppPokemon.sprite.getY());
                   game.uiBatch.draw(upperSprite, game.battle.oppPokemon.sprite.getX(), game.battle.oppPokemon.sprite.getY() + breathingOffsetY);
+                  }
                }
             }
 
@@ -322,7 +326,7 @@ class RegigigasBattle {
                   x = Math.max(0.0, x);
                   x = Math.min(Math.PI, x);
                   double offsetY3 = (float)Math.sin(x);
-                  game.uiBatch
+                  if(modern==null)game.uiBatch
                      .draw(
                         this.spriteProxy,
                         (int)(offsetX * offsetX2) + j * 16 - 80,
@@ -361,9 +365,11 @@ class RegigigasBattle {
          }
 
          game.uiBatch.setColor(this.color);
+         if(modern!=null)modern.drawBossShockwave(game,this.waveTimer,this.fadeAlpha);
          game.player.battleSprite.draw(game.uiBatch);
-         game.uiBatch.draw(this.textBox2, -92.0F, -8.0F);
-         if (this.fadeAlpha > 0.0F) {
+         if(modern==null)game.uiBatch.draw(this.textBox2, -92.0F, -8.0F);
+         if(modern!=null)modern.drawBossFade(game,this.fadeAlpha);
+         if (modern==null && this.fadeAlpha > 0.0F) {
             game.uiBatch.setColor(1.0F, 1.0F, 1.0F, this.fadeAlpha);
             game.uiBatch.draw(this.helper2, -8.0F, -8.0F);
 

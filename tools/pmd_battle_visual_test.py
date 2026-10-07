@@ -19,7 +19,8 @@ def main():
     runtime.append(JAR)
     cp = os.pathsep.join(map(str,runtime))
     production = [str(ROOT / "src/com/pkmngen/game" / name) for name in (
-        "PmdBattleSprites.java", "EvolutionAnim.java", "EggHatchAnim.java", "PokemonFrame.java",
+        "PmdPokemonSprites.java", "PmdBattleSprites.java", "JohtoBattleRenderer.java", "DrawBattle.java",
+        "EvolutionAnim.java", "EggHatchAnim.java", "PokemonFrame.java",
         "FriendlyFaint.java", "EnemyFaint.java", "ThrowOutPokemonCrystal.java", "util/SpriteProxy.java")]
     java,javac = find_jdk()
     with (out / "pmd-battle-visual.log").open("w",encoding="utf-8") as log:

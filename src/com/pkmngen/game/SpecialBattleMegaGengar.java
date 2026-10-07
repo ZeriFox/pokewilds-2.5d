@@ -58,7 +58,7 @@ class SpecialBattleMegaGengar extends Action {
          game.displayTextAction = null;
          SpecialMegaGengar1 gengar = new SpecialMegaGengar1(70);
          game.battle.oppPokemon = gengar;
-         Action triggerAction = new PlayMusic(game.player.currPokemon.specie.name, new WaitFrames(game, 6, new DrawBattleMenuNormal(game, null)));
+         Action triggerAction = new PlayMusic(game.player.currPokemon, new WaitFrames(game, 6, new DrawBattleMenuNormal(game, null)));
          Action nextAction = new BattleIntro(
             new SpecialBattleMegaGengar.BattleIntro1(
                new SplitAction(
@@ -163,6 +163,8 @@ class SpecialBattleMegaGengar extends Action {
 
       @Override
       public void step(Game game) {
+         JohtoBattleRenderer modern=JohtoBattleRenderer.get(game);
+         if(modern!=null)modern.drawBossBackground(game);
          game.player.battleSprite.draw(game.uiBatch);
       }
    }
@@ -211,9 +213,10 @@ class SpecialBattleMegaGengar extends Action {
             }
          }
 
-         this.bgSprite.draw(game.uiBatch);
+         JohtoBattleRenderer modern=JohtoBattleRenderer.get(game);
+         if(modern!=null)modern.drawBossBackground(game);else this.bgSprite.draw(game.uiBatch);
          this.gengar.breathingSprite.setPosition(this.gengar.sprite.getX(), this.gengar.sprite.getY() - this.offsetY);
-         this.gengar.breathingSprite.draw(game.uiBatch);
+         if(modern==null)this.gengar.breathingSprite.draw(game.uiBatch);
          this.gengar.sprite.setPosition(this.gengar.sprite.getX(), this.gengar.sprite.getY() - this.offsetY2);
          this.gengar.sprite.draw(game.uiBatch);
          this.gengar.sprite.setPosition(this.gengar.sprite.getX(), this.gengar.sprite.getY() + this.offsetY2);
@@ -276,7 +279,7 @@ class SpecialBattleMegaGengar extends Action {
             this.moves_relative.remove(0);
          } else {
             if (this.timer == 30) {
-               game.insertAction(new PlayMusic(game.battle.oppPokemon.specie.name, null));
+               game.insertAction(new PlayMusic(game.battle.oppPokemon, null));
             } else if (this.timer == 20) {
                ShaderProgram shader = new ShaderProgram(EvolutionAnim.vertexShader, this.getShader(0.7F));
                game.uiBatch.setShader(shader);

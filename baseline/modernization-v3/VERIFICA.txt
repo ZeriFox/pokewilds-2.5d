@@ -1,0 +1,155 @@
+VERIFICA — aggiornamento locale dopo PokeWilds johto.2
+
+BUILD LOCALE VERIFICATA
+Stato: PASS. Nessuna nuova pubblicazione, commit o push GitHub.
+Avvio: AVVIA-POKEWILDS.cmd oppure run-johto.cmd; il JAR e' gia' compilato.
+Artifact: dist/pokewilds-rebuilt.jar
+SHA-256: b0de23294795f0f6f2c0b4936f4850df8b50d2b61d27fe2d7ecc62df6681e1af
+Dimensione: 297750824 byte; 108889 voci ZIP.
+Build Java 17: 213 sorgenti, 444 classi compilate, 36787 file risorsa locali.
+Zero classi di gioco copiate dal runtime upstream. Modelli GLB esclusi.
+CRC ZIP e corrispondenza delle classi compilate verificati da build.py.
+Ambiente: Windows x64, Temurin 17.0.20.1, OpenGL NVIDIA RTX 4060.
+Evidenza: build/build-report.json.
+
+Tutti i test runtime elencati sotto sono stati ripetuti su questo JAR, senza
+--sources, --classes-override o classi di produzione sovrapposte. Le classi
+compilate dai wrapper sono i soli harness di test. I risultati delle build
+intermedie non sono usati per certificare questo artifact.
+
+SORGENTI E AMBITO
+python tools/verify_visual_scope.py: PASS.
+213 sorgenti = 165 dei 198 originali byte-identici + 33 originali modificati
+con ambito esplicito + 15 classi aggiunte. Scope include grafica, comandi PC,
+generazione procedurale, Pokedex aggiuntivo e compatibilita' del boss Mega Gengar.
+Attack, Battle, Player, PkmnMap, Network, Save, CheckMovesLearned, CheckEndOfBattle
+e DrawSetupMenu restano byte-identici alla base PC e protetti dal verifier.
+Manifest schema 3 congelato, SHA-256:
+4b9d503e27d00be1b822f8e39e8bc4f425610d8f631bad4cea2ef347d398c700
+Diff completo approvato, SHA-256:
+eeeab61bd3812d0622cce3c34a92e5d1df3f2e27c5dec88a58bbd0260ccb8750
+Digest aggregato sorgenti del build-report:
+1d2d5226a8da97f81ffac8d19122598585f8b810b6e9af4edfe690a23c150855
+Tutti i 213 hash individuali del build-report coincidono con l'audit congelato.
+Evidenze: build/visual-scope.json, build/visual-hooks.patch,
+build/scope-negative/build-alignment.txt.
+
+python tools/verify_scope_test.py: PASS, 13 mutazioni respinte in copie isolate.
+Coprono file protetti, input/helper modificati dopo freeze, originale non
+approvato, rimozione/aggiunta sorgenti, manifest, base classica e archivio v2.
+Nessun aggiornamento automatico degli hash dal verifier o da --inventory.
+La delimitazione dei sorgenti non dimostra equivalenza completa del gameplay.
+Evidenza: build/scope-negative/results.txt.
+
+L'audit della precedente release johto.2 e' conservato byte-per-byte in
+baseline/modernization-v2/ (manifest, verifier, VERIFICA.txt e archive.json).
+Non e' stato riscritto per giustificare questa iterazione.
+
+COMANDI E RIEPILOGO POKEMON
+python tools/desktop_controls_test.py: PASS.
+Migrazione e persistenza reali Game.loadSettings: solo il preset completo
+frecce/Z/X diventa WASD/mouse; impostazioni personalizzate conservate.
+Mouse sinistro conferma, destro annulla/corre; press/held/release e debounce
+anche dopo consumo dei flag pubblici. Nessun click desktop attiva il touch D-pad.
+WASD muove/naviga e resta testo nel nickname e nei campi setup; il selettore
+New/Load rimane navigabile. Gamepad simulato con stick/pulsante e sovrapposizione
+mouse senza doppio trigger. Input sospeso/ripreso senza click inventati.
+DrawControls.step e overlay verificati anche con un glifo custom non disponibile.
+270 frame nativi, nove PNG: Machop, Gyarados e Sprigatito su tutte e tre le pagine.
+Ogni frame Idle verificato nel riquadro 52x64: 4/4/7 frame rispettivamente;
+scala stabile, Pokemon intero, nessun clipping. Tre PNG finali ispezionate.
+Evidenze: build/desktop-controls/desktop-controls.log e summary-*.png.
+
+INTERFACCIA, LOTTA E TRANSIZIONI
+python tools/modern_ui_smoke_test.py: PASS.
+6803 frame, 20 tipi di schermata, 76 PNG; 4065 frame di lotta,
+4413 di transizione e 4642 con snapshot moderno.
+Menu, crafting, incontro NPC, turni/mosse, fuga, cattura, livello e vero
+salvataggio/caricamento. Ritorno al mondo incluso. Zero modelli 3D caricati
+e zero frame di attori 3D. PMD: 5957 draw di lotta, 2227 portrait.
+Evidenze: build/ui-battle-smoke/modern-ui-smoke.log e PNG.
+
+python tools/battle_viewport_test.py: PASS.
+Cinque dimensioni finestra (640x576, 1280x720, 420x840, 1440x400, 321x289),
+cinque biomi e cinque zoom; 170 frame di uscita, 77 catture.
+Copertura del panorama controllata su 10284560 pixel ai margini; il caso senza
+snapshot del mondo rimane opaco, senza esporre i vecchi livelli.
+Evidenze: build/battle-viewport/battle-viewport.log e PNG.
+
+python tools/pmd_battle_visual_test.py: PASS, 16 catture.
+Azioni originali EnemyFaint, FriendlyFaint, ThrowOutPokemonCrystal,
+EvolutionAnim, EggHatchAnim e PokemonFrame, con shiny, alpha, tint e scala.
+Evidenze: build/pmd-battle-visual/pmd-battle-visual.log e PNG.
+
+python tools/boss_battle_visual_test.py: PASS, 18 catture.
+Introduzione Mewtwo 641 frame, Mega Gengar 391, sequenza speciale Regigigas 201.
+Rocce e ripple originali avanzano; send-out e cleanup verificati.
+Il boss Mega Gengar ora usa una definizione dedicata mgengar, mantenendo le
+statistiche esplicite originali e senza modificare il Gengar ordinario.
+Test in processo nuovo, senza chiamare il costruttore dell'incontro:
+caricamento PokemonDataBase mgengar shiny, svuotamento cache e round-trip
+PokemonData superati; cry dex 094 caricato. Network e Save non modificati.
+Evidenze: build/boss-battle-visual/boss-battle-visual.log e PNG.
+
+MONDO, AZIONI SUL CAMPO E PAESAGGIO
+python tools/field_scene_test.py: PASS.
+405 frame moderni; 128761 draw legacy scartati e zero inviati.
+Attivazioni originali POWER/BUILD/DIG/SURF/FLY, movimento Surf reale,
+preview di costruzione, luce e pose. Le action continuano ad avanzare mentre
+WorldBatch sopprime solo l'invio dei vecchi draw.
+Evidenze: build/field-scenes/field-scenes.log e PNG.
+
+python tools/landscape_smoke_test.py: PASS, 415 frame, 10 PNG.
+Giorno/notte, rilievi/rampe, caldera, interni, vero EnterBuilding e uscita,
+materiali/oggetti, gradini, finestre e segnali di piantagione. Catture finali
+ispezionate; nessun problema bloccante rilevato.
+Evidenze: build/landscape-smoke/landscape-smoke.log e PNG.
+
+python tools/modern_world_test.py: PASS.
+Fixture native con 8 seed: determinismo indipendente dall'ordine d'inserimento,
+impronta invariata, terrazze raggiungibili, lava solida, landmark protetti,
+compatibilita' TileData. Nuova isola S reale: 179958 celle conservate al reload,
+movimento, salvataggio/caricamento, 257 frame moderni, zero fallback classici.
+Nel passaggio su questa isola: 23 correzioni costa, 400 rampe,
+componenti asciutte 863 -> 666; 1464 celle vulcaniche, 94 lava (57 nuove),
+3 affioramenti. Il mondo nel complesso non e' reso totalmente connesso.
+world-caldera.png mostra la stessa isola dopo il caricamento: il solo player
+viene spostato per la cattura su terreno reale libero vicino alla lava;
+nessuna riscrittura del terreno e nessun salvataggio aggiuntivo.
+Evidenze: build/modern-world/modern-world.log, world-loaded.png,
+world-caldera.png e save isolato smoke-world.sav.
+
+python tools/verify_landscape_assets.py: PASS.
+137 regioni, 4 animazioni, 27 materiali opachi, 21 oggetti trasparenti.
+Bounds, ancore, hash/provenienza, copertura, trasparenza, frame distinti e
+stati pianta/porta verificati. I sei file del pacchetto visual/landscape nel
+JAR sono byte-identici ai file verificati. Fonti e termini in CREDITS.txt
+e PROVENANCE.json del pacchetto. Evidenza: build/landscape-assets-check.json.
+
+POKEDEX E RISORSE PMD
+python tools/expansion_dex_test.py: PASS.
+Tutte le 552 specie aggiuntive e le 227 aggiunte ai candidati per bioma;
+statistiche/mosse canoniche supportate, calcoli cattura, livello/evoluzione,
+uovo/schiusa, crescita, audio e sprite nativi. Save/load reale del team
+Combusken 16, Sprigatito 5, Fuecoco 8 shiny. Totale nazionale giocabile 962
+(410 base + 552), 63 specie differite come documentato in POKEDEX-ESPANSO.txt.
+Evidenza: build/expansion-dex-test/expansion-dex-test.log.
+
+python tools/pmd_asset_smoke_test.py --bundled: PASS.
+2128 varianti, 2127 portrait, 10034 animazioni, 80272 controlli direzione,
+9998 controlli timing. Mancanze catalogate: 1 portrait e 101 sprite di
+varianti; sono previste, non sostituite con artwork di un'altra specie.
+Cache LRU: massimo 160 texture e 67108864 byte. I conteggi delle varianti
+includono forme/shiny e non sono il numero delle specie nazionali giocabili.
+Evidenza: build/pmd-asset-smoke/pmd-asset-smoke.log.
+
+COMPATIBILITA' E LIMITI
+python tools/smoke_test.py: PASS, menu classico 120 frame e chiusura pulita.
+Evidenza: build/smoke/smoke.log.
+
+Input e gamepad usano polling simulato; non e' una prova di gamepad fisico.
+Le prove native verificano percorsi e catture specifici, non ogni combinazione
+di Pokemon, evento, biome, hardware o multiplayer. Dati e stati di test sono
+isolati in build/. Le prove OpenGL su Windows non sono un benchmark 3DS.
+Mancanze esatte PMD, evoluzioni non supportate e altri limiti del Pokedex
+restano documentati in POKEDEX-ESPANSO.txt e GRAFICA-25D.txt.

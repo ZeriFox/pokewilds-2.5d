@@ -112,10 +112,19 @@ public final class PmdBattleVisualTest {
                enemy.sprite.setAlpha(.3f); background(); enemy.sprite.draw(uiBatch); finish("15-effect-alpha.png"); enemy.sprite.setAlpha(1f); break;
             case 15:
                background(); enemy.sprite.setScale(.5f); enemy.sprite.draw(uiBatch); finish("16-effect-scale.png"); enemy.sprite.setScale(1f); break;
+            case 16:
+               enemy=new Pokemon("gastly",21);battle.oppPokemon=enemy;enemy.spookify();enemy.sprite.setPosition(96,88);
+               background();
+               if(!PmdBattleSprites.draw(this,enemy,enemy.sprite,false,"Idle"))throw new IllegalStateException("Mystery ghost used old art");
+               finish("17-night-mystery.png");
+               if(!enemy.isGhost)throw new IllegalStateException("Presentation revealed hidden species");break;
+            case 17:
+               enemy.revealGhost();enemy.sprite.setPosition(96,88);background();enemy.sprite.draw(uiBatch);finish("18-night-revealed.png");break;
             default:
                verifyDifferent("08-reveal-normal.png","09-reveal-shiny.png","Shiny reveal rendered normal appearance");
                verifyDifferent("13-effect-normal.png","14-effect-lighten.png","Lighten battle effect was ignored");
                verifyDifferent("13-effect-normal.png","15-effect-alpha.png","Sprite alpha was ignored");
+               verifyDifferent("17-night-mystery.png","18-night-revealed.png","Silph Scope did not reveal the actual species");
                complete = true; Gdx.app.exit();
          }
          if (Gdx.gl.glGetError() != GL20.GL_NO_ERROR) throw new IllegalStateException("OpenGL error in visual phase " + phase);

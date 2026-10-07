@@ -1,0 +1,4611 @@
+{
+  "schema": 2,
+  "scope": "Local game integration from user-supplied downloads, CC-BY volcanic materials and three CC0 prop crops; no standalone asset-pack redistribution.",
+  "source_storage": "work/landscape-assets/sources, outside game project",
+  "sources": {
+    "crawler": {
+      "file": "Pixel Crawler - Free Pack 2.11.zip",
+      "sha256": "b7b228ca232da9958f191b01db87764dddb67610116151e06e8dd8ade6de94b8",
+      "author": "Anokolisa",
+      "page": "https://anokolisa.itch.io/free-pixel-art-asset-pack-topdown-tileset-rpg-16x16-sprites",
+      "terms": "Embedded Terms.txt allows game projects and modifications; assets cannot be sold as a standalone final product."
+    },
+    "woods": {
+      "file": "pixel_16_woods v2 free.zip",
+      "sha256": "85411ba94b2ddebb9c1384c4b8c932812127b6e5ad8da4f2a3166db9870eb045",
+      "author": "zedpxl",
+      "page": "https://zedpxl.itch.io/pixelart-forest-asset-pack",
+      "terms": "Author page allows commercial/noncommercial games and modification; forbids resale/redistribution of the asset pack, AI and NFT use. No license file in supplied archive."
+    },
+    "cave": {
+      "file": "Cold Cave FREE.zip",
+      "sha256": "55ea764ac030ae0decc3f98261ac1c56461f02c652dc7651761203df25e21cb8",
+      "author": "Asset Alliance",
+      "page": "https://gif-superretroworld.itch.io/cold-cave",
+      "terms": "Embedded LICENSE.txt allows games and modification; forbids direct asset distribution/sale, claiming authorship, NFT/metaverse/AI projects."
+    },
+    "forest": {
+      "file": "Forest_1.png",
+      "sha256": "42c2fbe8929964d6aaba1aa15298e51619042dfe072a4ee389811a8ea4dbcd84",
+      "author": "Haydeos",
+      "page": "https://haydeos.itch.io/fantasy-forest-rpg-maker-tileset",
+      "terms": "Author page allows games and modification across engines; forbids standalone redistribution, AI training, NFT/blockchain use. Author discloses AI-assisted base forms and manual refinement."
+    },
+    "graveyard": {
+      "file": "graveyard-marionline.png",
+      "sha256": "1529ee5c3b927107178ef7ed7a3af02ac93a60860543c227678ff3ceb3c5d094",
+      "author": "marionline",
+      "page": "https://opengameart.org/content/forest-graveyard-tileset",
+      "download_url": "https://opengameart.org/sites/default/files/tileset_48.png",
+      "terms": "CC0 1.0; public-domain dedication, modification and redistribution permitted. Attribution retained voluntarily. Source/licensing checked 2026-10-07.",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "desert": {
+      "file": "desert-scratchio.png",
+      "sha256": "373c83623b9ac0a776120abb89c25b7b6d33acd0b2a4d052f717083563c005bf",
+      "author": "ScratchIO",
+      "page": "https://opengameart.org/content/desert-level-decorations-pixel-art",
+      "download_url": "https://opengameart.org/sites/default/files/desert_decorations_0.png",
+      "terms": "CC0 1.0; public-domain dedication, modification and redistribution permitted. One cactus crop used with the same dry-vegetation palette as the main pack. Source/licensing checked 2026-10-07.",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "volcanic_lava": {
+      "file": "lava-dark-stone_large.png",
+      "sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "author": "Sevarihk",
+      "page": "https://opengameart.org/content/stone-and-lava-ground-tiles",
+      "download_url": "https://opengameart.org/sites/default/files/lava-dark-stone_large.png",
+      "terms": "CC-BY 4.0. Attribution: Stone and Lava Ground Tiles by Sevarihk, linked creator page. Modified: cropped continuous lava, luminance palette for hot/cooled states, toroidal frame motion. Source/licensing checked 2026-10-07.",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "volcanic_stone": {
+      "file": "stone_terrain_addon.png",
+      "sha256": "1179ce4c2998b7e4a9c4e0ed728bff1c5f70b6ff45b14a90e1801587c6bfcaa5",
+      "author": "Sevarihk",
+      "page": "https://opengameart.org/content/stone-and-lava-ground-tiles",
+      "download_url": "https://opengameart.org/sites/default/files/stone_terrain_addon.png",
+      "terms": "CC-BY 4.0. Attribution: Stone and Lava Ground Tiles by Sevarihk, linked creator page. Modified: exact material crops and cool basalt luminance palette. Source/licensing checked 2026-10-07.",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "regions": {
+    "grass": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        16,
+        160,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "path": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        96,
+        160,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "dirt": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        176,
+        160,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "snow": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        16,
+        352,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "sand": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        96,
+        352,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "stone_floor": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        256,
+        16,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "mountain": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        32,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "cliff": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        96,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "cliff_earth": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        16,
+        96,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "cliff_dark": {
+      "source": "cave",
+      "member": "Tileset_FREE.png",
+      "member_sha256": "0721a4fdc6fb85bd366deccb0570b4727cfb2892e8af08e9b06f6fe4bb927246",
+      "crop": [
+        0,
+        32,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "opaque_underlay": [
+            55,
+            49,
+            56,
+            255
+          ]
+        }
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "cave_floor": {
+      "source": "cave",
+      "member": "Tileset_FREE.png",
+      "member_sha256": "0721a4fdc6fb85bd366deccb0570b4727cfb2892e8af08e9b06f6fe4bb927246",
+      "crop": [
+        16,
+        80,
+        16,
+        16
+      ],
+      "operations": [],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "wood_floor": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Dungeon_Tiles.png",
+      "member_sha256": "11ae371cc3fc62e5f9ea7132931d268cfe8e536a186dc08cb16f44de09d33771",
+      "crop": [
+        224,
+        16,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "tile_floor": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Dungeon_Tiles.png",
+      "member_sha256": "11ae371cc3fc62e5f9ea7132931d268cfe8e536a186dc08cb16f44de09d33771",
+      "crop": [
+        64,
+        0,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "wall": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Dungeon_Tiles.png",
+      "member_sha256": "11ae371cc3fc62e5f9ea7132931d268cfe8e536a186dc08cb16f44de09d33771",
+      "crop": [
+        0,
+        16,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "wall_wood": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Dungeon_Tiles.png",
+      "member_sha256": "11ae371cc3fc62e5f9ea7132931d268cfe8e536a186dc08cb16f44de09d33771",
+      "crop": [
+        224,
+        16,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "roof": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Roofs.png",
+      "member_sha256": "2e1ab98c501a4d711ae998933d05f586f72444abb790377cab7d268caea63b07",
+      "crop": [
+        48,
+        160,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "roof_green": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Roofs.png",
+      "member_sha256": "2e1ab98c501a4d711ae998933d05f586f72444abb790377cab7d268caea63b07",
+      "crop": [
+        176,
+        160,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "rug": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        340,
+        340,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "steps": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        32,
+        16,
+        16
+      ],
+      "operations": [],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "grass_light": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        16,
+        160,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#33592b",
+            "#8cad46"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "grass_dry": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        16,
+        160,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#726334",
+            "#c0b15a"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "basalt": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        32,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#28262e",
+            "#706c73"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "cliff_volcano": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        96,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#23212a",
+            "#67616b"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcano_path": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        96,
+        160,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#4f423e",
+            "#a18060"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcano": {
+      "alias": "basalt",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "cliff_cap": {
+      "alias": "mountain",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "cliff_grass": {
+      "alias": "cliff_earth",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "ramp": {
+      "alias": "steps",
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "ruin_floor": {
+      "alias": "tile_floor",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "ruin_wall": {
+      "alias": "wall",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "tile_pale": {
+      "alias": "snow",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "brick_floor": {
+      "alias": "roof",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "sand_shore": {
+      "alias": "sand",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "path_dry": {
+      "alias": "dirt",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "bridge": {
+      "alias": "wood_floor",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "water_0": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        80,
+        16,
+        16,
+        16
+      ],
+      "operations": [],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_shallow_0": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        80,
+        16,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#237e8d",
+            "#9fd6c7"
+          ]
+        }
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "lava_0": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        80,
+        16,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#ab2521",
+            "#ffd171"
+          ]
+        }
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_1": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        176,
+        16,
+        16,
+        16
+      ],
+      "operations": [],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_shallow_1": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        176,
+        16,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#237e8d",
+            "#9fd6c7"
+          ]
+        }
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "lava_1": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        176,
+        16,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#ab2521",
+            "#ffd171"
+          ]
+        }
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_2": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        272,
+        16,
+        16,
+        16
+      ],
+      "operations": [],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_shallow_2": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        272,
+        16,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#237e8d",
+            "#9fd6c7"
+          ]
+        }
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "lava_2": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        272,
+        16,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#ab2521",
+            "#ffd171"
+          ]
+        }
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_3": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        368,
+        16,
+        16,
+        16
+      ],
+      "operations": [],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_shallow_3": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        368,
+        16,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#237e8d",
+            "#9fd6c7"
+          ]
+        }
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "lava_3": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Water_tiles.png",
+      "member_sha256": "d7d193f4abfbd0e9c8b420fe6436d90b1fbb1fcb8166ec29577dc10528713673",
+      "crop": [
+        368,
+        16,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "luminance_palette": [
+            "#ab2521",
+            "#ffd171"
+          ]
+        }
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water": {
+      "alias": "water_0",
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_shallow": {
+      "alias": "water_shallow_0",
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "lava": {
+      "alias": "lava_0",
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "river": {
+      "alias": "water_shallow",
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_ripple": {
+      "alias": "water_shallow",
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "desert_ground": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        96,
+        352,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            184,
+            194
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#bc8d55",
+            "#e6c587"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "desert_path": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        176,
+        160,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            100,
+            118
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#9e743e",
+            "#ccaa6c"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "desert_cliff": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        16,
+        96,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            48,
+            118
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#71523b",
+            "#c59659"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "desert_cliff_cap": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        16,
+        32,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            111,
+            118
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#b3834e",
+            "#c89a5c"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "desert_ramp": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        16,
+        256,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            48,
+            118
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#87623f",
+            "#cc9b5d"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcanic_basalt": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        32,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            91,
+            96
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#30313b",
+            "#41424d"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcanic_cracked": {
+      "source": "volcanic_stone",
+      "member": null,
+      "member_sha256": "1179ce4c2998b7e4a9c4e0ed728bff1c5f70b6ff45b14a90e1801587c6bfcaa5",
+      "crop": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            66,
+            114
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#252530",
+            "#51515e"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcanic_ash": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        96,
+        352,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            184,
+            194
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#62606c",
+            "#76727c"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcanic_obsidian": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        32,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            91,
+            96
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#1e2130",
+            "#34364a"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcanic_cliff": {
+      "source": "volcanic_stone",
+      "member": null,
+      "member_sha256": "1179ce4c2998b7e4a9c4e0ed728bff1c5f70b6ff45b14a90e1801587c6bfcaa5",
+      "crop": [
+        32,
+        96,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            66,
+            114
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#181b27",
+            "#53525e"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcanic_cliff_cap": {
+      "source": "volcanic_stone",
+      "member": null,
+      "member_sha256": "1179ce4c2998b7e4a9c4e0ed728bff1c5f70b6ff45b14a90e1801587c6bfcaa5",
+      "crop": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            66,
+            114
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#343440",
+            "#4b4a58"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcanic_ramp": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        256,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            35,
+            96
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#232530",
+            "#62606d"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "graveyard_ground": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        16,
+        160,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            72,
+            87
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#404c45",
+            "#596557"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "graveyard_path": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        176,
+        160,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            100,
+            118
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#555950",
+            "#737568"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "graveyard_cliff": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        96,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            35,
+            96
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#323d39",
+            "#6e7b6d"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "graveyard_cliff_cap": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        32,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            91,
+            96
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#526054",
+            "#636c5d"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "graveyard_ramp": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        256,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            35,
+            96
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#39473e",
+            "#7b8575"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "cliff_snow": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        96,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            35,
+            96
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#668797",
+            "#c5e0e6"
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "lava_bright_0": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            0,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_0": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            0,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_1": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            4,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_1": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            4,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_2": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            8,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_2": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            8,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_3": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            12,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_3": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            12,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_4": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            16,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_4": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            16,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_5": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            20,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_5": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            20,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_6": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            24,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_6": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            24,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_7": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            28,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_7": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            28,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_8": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            32,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_8": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            32,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_9": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            36,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_9": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            36,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_10": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            40,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_10": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            40,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_11": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            44,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_11": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            44,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_12": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            48,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_12": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            48,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_13": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            52,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_13": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            52,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_14": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            56,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_14": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            56,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_15": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#60242a",
+            "#ffca73"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            60,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_15": {
+      "source": "volcanic_lava",
+      "member": null,
+      "member_sha256": "5186e497358a2b3b62599f278704897ef50001b56d6edab737b1fc79fd5240c2",
+      "crop": [
+        160,
+        32,
+        64,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            74,
+            153
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#292a35",
+            "#bf6944"
+          ]
+        },
+        {
+          "toroidal_flow_offset": [
+            60,
+            0
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright": {
+      "alias": "lava_bright_0",
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled": {
+      "alias": "lava_cooled_0",
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "tree": {
+      "source": "forest",
+      "member": null,
+      "member_sha256": "42c2fbe8929964d6aaba1aa15298e51619042dfe072a4ee389811a8ea4dbcd84",
+      "crop": [
+        144,
+        16,
+        96,
+        128
+      ],
+      "operations": [
+        {
+          "border_connected_white_alpha": {
+            "minimum_channel": 240,
+            "maximum_channel_spread": 10
+          }
+        },
+        {
+          "alpha_trim": [
+            4,
+            12,
+            92,
+            121
+          ]
+        }
+      ],
+      "anchorX": 44.0,
+      "anchorY": 0
+    },
+    "tree_small": {
+      "source": "forest",
+      "member": null,
+      "member_sha256": "42c2fbe8929964d6aaba1aa15298e51619042dfe072a4ee389811a8ea4dbcd84",
+      "crop": [
+        48,
+        160,
+        48,
+        80
+      ],
+      "operations": [
+        {
+          "border_connected_white_alpha": {
+            "minimum_channel": 240,
+            "maximum_channel_spread": 10
+          }
+        },
+        {
+          "alpha_trim": [
+            1,
+            20,
+            48,
+            80
+          ]
+        }
+      ],
+      "anchorX": 23.5,
+      "anchorY": 0
+    },
+    "tree_pine": {
+      "source": "forest",
+      "member": null,
+      "member_sha256": "42c2fbe8929964d6aaba1aa15298e51619042dfe072a4ee389811a8ea4dbcd84",
+      "crop": [
+        256,
+        0,
+        80,
+        144
+      ],
+      "operations": [
+        {
+          "border_connected_white_alpha": {
+            "minimum_channel": 240,
+            "maximum_channel_spread": 10
+          }
+        },
+        {
+          "alpha_trim": [
+            0,
+            10,
+            66,
+            137
+          ]
+        }
+      ],
+      "anchorX": 33.0,
+      "anchorY": 0
+    },
+    "tree_dry": {
+      "source": "forest",
+      "member": null,
+      "member_sha256": "42c2fbe8929964d6aaba1aa15298e51619042dfe072a4ee389811a8ea4dbcd84",
+      "crop": [
+        256,
+        144,
+        64,
+        96
+      ],
+      "operations": [
+        {
+          "border_connected_white_alpha": {
+            "minimum_channel": 240,
+            "maximum_channel_spread": 10
+          }
+        },
+        {
+          "alpha_trim": [
+            2,
+            4,
+            63,
+            96
+          ]
+        }
+      ],
+      "anchorX": 30.5,
+      "anchorY": 0
+    },
+    "tree_snow": {
+      "source": "forest",
+      "member": null,
+      "member_sha256": "42c2fbe8929964d6aaba1aa15298e51619042dfe072a4ee389811a8ea4dbcd84",
+      "crop": [
+        448,
+        16,
+        64,
+        128
+      ],
+      "operations": [
+        {
+          "border_connected_white_alpha": {
+            "minimum_channel": 240,
+            "maximum_channel_spread": 10
+          }
+        },
+        {
+          "green_foliage_luminance_palette": [
+            "#557f98",
+            "#eef8fc"
+          ],
+          "mask": "green > red and green > blue; bark unchanged"
+        },
+        {
+          "alpha_trim": [
+            4,
+            11,
+            61,
+            116
+          ]
+        }
+      ],
+      "anchorX": 28.5,
+      "anchorY": 0
+    },
+    "tree_oak": {
+      "source": "forest",
+      "member": null,
+      "member_sha256": "42c2fbe8929964d6aaba1aa15298e51619042dfe072a4ee389811a8ea4dbcd84",
+      "crop": [
+        624,
+        0,
+        144,
+        144
+      ],
+      "operations": [
+        {
+          "border_connected_white_alpha": {
+            "minimum_channel": 240,
+            "maximum_channel_spread": 10
+          }
+        },
+        {
+          "alpha_trim": [
+            8,
+            18,
+            134,
+            140
+          ]
+        }
+      ],
+      "anchorX": 63.0,
+      "anchorY": 0
+    },
+    "bush": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        0,
+        0,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            2,
+            5,
+            31,
+            32
+          ]
+        }
+      ],
+      "anchorX": 14.5,
+      "anchorY": 0
+    },
+    "bush_dry": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        96,
+        0,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            2,
+            5,
+            31,
+            32
+          ]
+        }
+      ],
+      "anchorX": 14.5,
+      "anchorY": 0
+    },
+    "tree_dead": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        192,
+        64,
+        48,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            5,
+            1,
+            39,
+            32
+          ]
+        }
+      ],
+      "anchorX": 17.0,
+      "anchorY": 0
+    },
+    "cactus": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Trees/Model_02/Size_02.png",
+      "member_sha256": "0000ffc51444db1a9eeee30b5e11c943a8274c42f871ac6fd1940a1a06d0d7e5",
+      "crop": [
+        0,
+        0,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            3,
+            1,
+            32,
+            48
+          ]
+        }
+      ],
+      "anchorX": 14.5,
+      "anchorY": 0
+    },
+    "aloe": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        80,
+        144,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            3,
+            31,
+            28
+          ]
+        }
+      ],
+      "anchorX": 15.5,
+      "anchorY": 0
+    },
+    "rock": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Rocks.png",
+      "member_sha256": "37b0e1bd023f945099f30cf79d37a8098a5acbb5c616a4c2482bc0cb3c923464",
+      "crop": [
+        128,
+        16,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            3,
+            3,
+            29,
+            30
+          ]
+        }
+      ],
+      "anchorX": 13.0,
+      "anchorY": 0
+    },
+    "rock_small": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Rocks.png",
+      "member_sha256": "37b0e1bd023f945099f30cf79d37a8098a5acbb5c616a4c2482bc0cb3c923464",
+      "crop": [
+        64,
+        16,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            1,
+            3,
+            15,
+            14
+          ]
+        }
+      ],
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "rock_ice": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Rocks.png",
+      "member_sha256": "37b0e1bd023f945099f30cf79d37a8098a5acbb5c616a4c2482bc0cb3c923464",
+      "crop": [
+        160,
+        272,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            4,
+            12,
+            29,
+            32
+          ]
+        }
+      ],
+      "anchorX": 12.5,
+      "anchorY": 0
+    },
+    "grass_tuft": {
+      "source": "woods",
+      "member": "pixel_16_woods v2 free/free_pixel_16_woods.png",
+      "member_sha256": "8b31588ae4299cf2b11c888e9ed6c872b6ae0b0b9301fae19fe5a0751632d812",
+      "crop": [
+        224,
+        48,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            1,
+            4,
+            15,
+            16
+          ]
+        }
+      ],
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "grass_dry_tuft": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        96,
+        272,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            1,
+            1,
+            15,
+            16
+          ]
+        }
+      ],
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "flowers": {
+      "source": "woods",
+      "member": "pixel_16_woods v2 free/free_pixel_16_woods.png",
+      "member_sha256": "8b31588ae4299cf2b11c888e9ed6c872b6ae0b0b9301fae19fe5a0751632d812",
+      "crop": [
+        80,
+        80,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            1,
+            4,
+            15,
+            14
+          ]
+        }
+      ],
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "flowers_fairy": {
+      "source": "woods",
+      "member": "pixel_16_woods v2 free/free_pixel_16_woods.png",
+      "member_sha256": "8b31588ae4299cf2b11c888e9ed6c872b6ae0b0b9301fae19fe5a0751632d812",
+      "crop": [
+        256,
+        48,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            2,
+            6,
+            13,
+            16
+          ]
+        }
+      ],
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "mushroom": {
+      "source": "woods",
+      "member": "pixel_16_woods v2 free/free_pixel_16_woods.png",
+      "member_sha256": "8b31588ae4299cf2b11c888e9ed6c872b6ae0b0b9301fae19fe5a0751632d812",
+      "crop": [
+        224,
+        64,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            4,
+            6,
+            14,
+            15
+          ]
+        }
+      ],
+      "anchorX": 5.0,
+      "anchorY": 0
+    },
+    "seedling": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        0,
+        144,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            6,
+            6,
+            11,
+            14
+          ]
+        }
+      ],
+      "anchorX": 2.5,
+      "anchorY": 0
+    },
+    "plant_growing": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        0,
+        176,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            3,
+            2,
+            14,
+            15
+          ]
+        }
+      ],
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "berry_fruit": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        0,
+        352,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            3,
+            1,
+            14,
+            15
+          ]
+        }
+      ],
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "stump": {
+      "source": "woods",
+      "member": "pixel_16_woods v2 free/free_pixel_16_woods.png",
+      "member_sha256": "8b31588ae4299cf2b11c888e9ed6c872b6ae0b0b9301fae19fe5a0751632d812",
+      "crop": [
+        224,
+        80,
+        32,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            7,
+            0,
+            26,
+            16
+          ]
+        }
+      ],
+      "anchorX": 9.5,
+      "anchorY": 0
+    },
+    "cave_stalagmite": {
+      "source": "cave",
+      "member": "Tileset_FREE.png",
+      "member_sha256": "0721a4fdc6fb85bd366deccb0570b4727cfb2892e8af08e9b06f6fe4bb927246",
+      "crop": [
+        112,
+        16,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            2,
+            0,
+            15,
+            16
+          ]
+        }
+      ],
+      "anchorX": 6.5,
+      "anchorY": 0
+    },
+    "cave_crystal": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Rocks.png",
+      "member_sha256": "37b0e1bd023f945099f30cf79d37a8098a5acbb5c616a4c2482bc0cb3c923464",
+      "crop": [
+        144,
+        256,
+        16,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            2,
+            23,
+            14,
+            48
+          ]
+        }
+      ],
+      "anchorX": 6.0,
+      "anchorY": 0
+    },
+    "fence_wood": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Props.png",
+      "member_sha256": "d8dacb0e07d83f74ae4ccbcc70f7a61aad57042ffa17fde55df8d3a2f5dc0e2a",
+      "crop": [
+        32,
+        176,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "door": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Props.png",
+      "member_sha256": "d8dacb0e07d83f74ae4ccbcc70f7a61aad57042ffa17fde55df8d3a2f5dc0e2a",
+      "crop": [
+        160,
+        16,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            6,
+            9,
+            26,
+            48
+          ]
+        }
+      ],
+      "anchorX": 10.0,
+      "anchorY": 0
+    },
+    "door_locked": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Props.png",
+      "member_sha256": "d8dacb0e07d83f74ae4ccbcc70f7a61aad57042ffa17fde55df8d3a2f5dc0e2a",
+      "crop": [
+        128,
+        16,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            6,
+            11,
+            26,
+            48
+          ]
+        }
+      ],
+      "anchorX": 10.0,
+      "anchorY": 0
+    },
+    "door_open": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Props.png",
+      "member_sha256": "d8dacb0e07d83f74ae4ccbcc70f7a61aad57042ffa17fde55df8d3a2f5dc0e2a",
+      "crop": [
+        64,
+        16,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            1,
+            4,
+            31,
+            48
+          ]
+        }
+      ],
+      "anchorX": 15.0,
+      "anchorY": 0
+    },
+    "window": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Props.png",
+      "member_sha256": "d8dacb0e07d83f74ae4ccbcc70f7a61aad57042ffa17fde55df8d3a2f5dc0e2a",
+      "crop": [
+        64,
+        64,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            5,
+            0,
+            27,
+            32
+          ]
+        }
+      ],
+      "anchorX": 11.0,
+      "anchorY": 0
+    },
+    "window_dark": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Props.png",
+      "member_sha256": "d8dacb0e07d83f74ae4ccbcc70f7a61aad57042ffa17fde55df8d3a2f5dc0e2a",
+      "crop": [
+        192,
+        64,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            5,
+            0,
+            27,
+            32
+          ]
+        }
+      ],
+      "anchorX": 11.0,
+      "anchorY": 0
+    },
+    "chair": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        64,
+        32,
+        16,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            3,
+            2,
+            14,
+            26
+          ]
+        }
+      ],
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "desk": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        112,
+        64,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            3,
+            32,
+            32
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "table": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        80,
+        0,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            7,
+            32,
+            42
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "bench": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Props.png",
+      "member_sha256": "d8dacb0e07d83f74ae4ccbcc70f7a61aad57042ffa17fde55df8d3a2f5dc0e2a",
+      "crop": [
+        16,
+        128,
+        32,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            1,
+            4,
+            31,
+            16
+          ]
+        }
+      ],
+      "anchorX": 15.0,
+      "anchorY": 0
+    },
+    "bed": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        0,
+        288,
+        32,
+        64
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            1,
+            5,
+            31,
+            59
+          ]
+        }
+      ],
+      "anchorX": 15.0,
+      "anchorY": 0
+    },
+    "couch": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        272,
+        0,
+        48,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            7,
+            1,
+            41,
+            48
+          ]
+        }
+      ],
+      "anchorX": 17.0,
+      "anchorY": 0
+    },
+    "shelf": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        48,
+        96,
+        48,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            2,
+            48,
+            48
+          ]
+        }
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0
+    },
+    "wardrobe": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        432,
+        0,
+        64,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            7,
+            64,
+            48
+          ]
+        }
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "pot": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        32,
+        352,
+        16,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            8,
+            15,
+            32
+          ]
+        }
+      ],
+      "anchorX": 7.5,
+      "anchorY": 0
+    },
+    "chest": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        144,
+        64,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            3,
+            12,
+            29,
+            32
+          ]
+        }
+      ],
+      "anchorX": 13.0,
+      "anchorY": 0
+    },
+    "machine": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        112,
+        0,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            4,
+            0,
+            28,
+            48
+          ]
+        }
+      ],
+      "anchorX": 12.0,
+      "anchorY": 0
+    },
+    "machine_active": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        144,
+        0,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            0,
+            32,
+            48
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "kiln": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        272,
+        48,
+        48,
+        96
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            0,
+            48,
+            96
+          ]
+        }
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0
+    },
+    "sign": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        224,
+        256,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            2,
+            4,
+            30,
+            27
+          ]
+        }
+      ],
+      "anchorX": 14.0,
+      "anchorY": 0
+    },
+    "lamp": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Buildings/Interior/Interior_Props_01.png",
+      "member_sha256": "e6ce1e2bbc3006e4ee4d3337d800a057e8cc25f531df9dfde2854f1ead522051",
+      "crop": [
+        208,
+        64,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            2,
+            3,
+            30,
+            48
+          ]
+        }
+      ],
+      "anchorX": 14.0,
+      "anchorY": 0
+    },
+    "key": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Resources.png",
+      "member_sha256": "46cb1578decf9bd9e4f682686d824ce650540981f4abd6489ea9a35bbc7bc1ac",
+      "crop": [
+        96,
+        48,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            2,
+            4,
+            14,
+            11
+          ]
+        }
+      ],
+      "anchorX": 6.0,
+      "anchorY": 0
+    },
+    "item": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Resources.png",
+      "member_sha256": "46cb1578decf9bd9e4f682686d824ce650540981f4abd6489ea9a35bbc7bc1ac",
+      "crop": [
+        96,
+        16,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            5,
+            3,
+            11,
+            12
+          ]
+        }
+      ],
+      "anchorX": 3.0,
+      "anchorY": 0
+    },
+    "fossil": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Resources.png",
+      "member_sha256": "46cb1578decf9bd9e4f682686d824ce650540981f4abd6489ea9a35bbc7bc1ac",
+      "crop": [
+        16,
+        16,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            4,
+            30,
+            30
+          ]
+        }
+      ],
+      "anchorX": 15.0,
+      "anchorY": 0
+    },
+    "ruin_gate": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Dungeon_Tiles.png",
+      "member_sha256": "11ae371cc3fc62e5f9ea7132931d268cfe8e536a186dc08cb16f44de09d33771",
+      "crop": [
+        32,
+        112,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            0,
+            32,
+            48
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "spikes": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Dungeon_Tiles.png",
+      "member_sha256": "11ae371cc3fc62e5f9ea7132931d268cfe8e536a186dc08cb16f44de09d33771",
+      "crop": [
+        64,
+        112,
+        16,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            9,
+            16,
+            48
+          ]
+        }
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "hole": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Dungeon_Tiles.png",
+      "member_sha256": "11ae371cc3fc62e5f9ea7132931d268cfe8e536a186dc08cb16f44de09d33771",
+      "crop": [
+        0,
+        160,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            0,
+            32,
+            48
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "forest_tree": {
+      "source": "forest",
+      "member": null,
+      "member_sha256": "42c2fbe8929964d6aaba1aa15298e51619042dfe072a4ee389811a8ea4dbcd84",
+      "crop": [
+        350,
+        304,
+        130,
+        245
+      ],
+      "operations": [
+        {
+          "border_connected_white_alpha": {
+            "minimum_channel": 240,
+            "maximum_channel_spread": 10
+          }
+        },
+        {
+          "alpha_trim": [
+            0,
+            0,
+            124,
+            241
+          ]
+        }
+      ],
+      "anchorX": 62.0,
+      "anchorY": 0
+    },
+    "forest_tree_willow": {
+      "source": "forest",
+      "member": null,
+      "member_sha256": "42c2fbe8929964d6aaba1aa15298e51619042dfe072a4ee389811a8ea4dbcd84",
+      "crop": [
+        480,
+        144,
+        96,
+        112
+      ],
+      "operations": [
+        {
+          "border_connected_white_alpha": {
+            "minimum_channel": 240,
+            "maximum_channel_spread": 10
+          }
+        },
+        {
+          "alpha_trim": [
+            12,
+            7,
+            85,
+            89
+          ]
+        }
+      ],
+      "anchorX": 36.5,
+      "anchorY": 0
+    },
+    "alternate_tree": {
+      "source": "woods",
+      "member": "pixel_16_woods v2 free/free_pixel_16_woods.png",
+      "member_sha256": "8b31588ae4299cf2b11c888e9ed6c872b6ae0b0b9301fae19fe5a0751632d812",
+      "crop": [
+        272,
+        0,
+        64,
+        80
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            3,
+            10,
+            62,
+            80
+          ]
+        }
+      ],
+      "anchorX": 29.5,
+      "anchorY": 0
+    },
+    "alternate_tree_small": {
+      "source": "woods",
+      "member": "pixel_16_woods v2 free/free_pixel_16_woods.png",
+      "member_sha256": "8b31588ae4299cf2b11c888e9ed6c872b6ae0b0b9301fae19fe5a0751632d812",
+      "crop": [
+        272,
+        80,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            3,
+            12,
+            31,
+            48
+          ]
+        }
+      ],
+      "anchorX": 14.0,
+      "anchorY": 0
+    },
+    "alternate_tree_pine": {
+      "source": "woods",
+      "member": "pixel_16_woods v2 free/free_pixel_16_woods.png",
+      "member_sha256": "8b31588ae4299cf2b11c888e9ed6c872b6ae0b0b9301fae19fe5a0751632d812",
+      "crop": [
+        304,
+        80,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            4,
+            17,
+            29,
+            48
+          ]
+        }
+      ],
+      "anchorX": 12.5,
+      "anchorY": 0
+    },
+    "alternate_tree_dry": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Trees/Model_01/Size_02.png",
+      "member_sha256": "81267c215f04b3bed0a0a28b9530472ffbf78bb20f3be349c676d933367d893f",
+      "crop": [
+        96,
+        64,
+        32,
+        64
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            0,
+            2,
+            32,
+            64
+          ]
+        }
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "alternate_tree_snow": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Trees/Model_01/Size_02.png",
+      "member_sha256": "81267c215f04b3bed0a0a28b9530472ffbf78bb20f3be349c676d933367d893f",
+      "crop": [
+        224,
+        0,
+        32,
+        64
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            1,
+            18,
+            27,
+            64
+          ]
+        }
+      ],
+      "anchorX": 13.0,
+      "anchorY": 0
+    },
+    "desert_rock": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Rocks.png",
+      "member_sha256": "37b0e1bd023f945099f30cf79d37a8098a5acbb5c616a4c2482bc0cb3c923464",
+      "crop": [
+        128,
+        16,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            30,
+            132
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#705238",
+            "#d6ab6d"
+          ]
+        },
+        {
+          "alpha_trim": [
+            3,
+            3,
+            29,
+            30
+          ]
+        }
+      ],
+      "anchorX": 13.0,
+      "anchorY": 0
+    },
+    "desert_decor": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        96,
+        272,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            30,
+            97
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#715b3b",
+            "#bcad68"
+          ]
+        },
+        {
+          "alpha_trim": [
+            1,
+            1,
+            15,
+            16
+          ]
+        }
+      ],
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "desert_cactus": {
+      "source": "desert",
+      "member": null,
+      "member_sha256": "373c83623b9ac0a776120abb89c25b7b6d33acd0b2a4d052f717083563c005bf",
+      "crop": [
+        152,
+        16,
+        32,
+        64
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            92,
+            165
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#485439",
+            "#909969"
+          ]
+        },
+        {
+          "alpha_trim": [
+            5,
+            9,
+            29,
+            64
+          ]
+        }
+      ],
+      "anchorX": 12.0,
+      "anchorY": 0
+    },
+    "desert_dead_tree": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        192,
+        96,
+        48,
+        48
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            30,
+            113
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#544533",
+            "#a28b62"
+          ]
+        },
+        {
+          "alpha_trim": [
+            4,
+            2,
+            43,
+            48
+          ]
+        }
+      ],
+      "anchorX": 19.5,
+      "anchorY": 0
+    },
+    "volcanic_rock": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Rocks.png",
+      "member_sha256": "37b0e1bd023f945099f30cf79d37a8098a5acbb5c616a4c2482bc0cb3c923464",
+      "crop": [
+        128,
+        16,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            30,
+            132
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#1d202b",
+            "#62616f"
+          ]
+        },
+        {
+          "alpha_trim": [
+            3,
+            3,
+            29,
+            30
+          ]
+        }
+      ],
+      "anchorX": 13.0,
+      "anchorY": 0
+    },
+    "volcanic_crystal": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Rocks.png",
+      "member_sha256": "37b0e1bd023f945099f30cf79d37a8098a5acbb5c616a4c2482bc0cb3c923464",
+      "crop": [
+        144,
+        256,
+        16,
+        48
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            0,
+            246
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#171c29",
+            "#777891"
+          ]
+        },
+        {
+          "alpha_trim": [
+            2,
+            23,
+            14,
+            48
+          ]
+        }
+      ],
+      "anchorX": 6.0,
+      "anchorY": 0
+    },
+    "volcanic_charred_tree": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        192,
+        96,
+        48,
+        48
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            30,
+            113
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#1f222d",
+            "#69616a"
+          ]
+        },
+        {
+          "alpha_trim": [
+            4,
+            2,
+            43,
+            48
+          ]
+        }
+      ],
+      "anchorX": 19.5,
+      "anchorY": 0
+    },
+    "volcanic_dead_shrub": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        192,
+        64,
+        48,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            30,
+            113
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#2d2b34",
+            "#82727a"
+          ]
+        },
+        {
+          "alpha_trim": [
+            5,
+            1,
+            39,
+            32
+          ]
+        }
+      ],
+      "anchorX": 17.0,
+      "anchorY": 0
+    },
+    "graveyard_rock": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Rocks.png",
+      "member_sha256": "37b0e1bd023f945099f30cf79d37a8098a5acbb5c616a4c2482bc0cb3c923464",
+      "crop": [
+        128,
+        16,
+        32,
+        32
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            30,
+            132
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#38473f",
+            "#828e7b"
+          ]
+        },
+        {
+          "alpha_trim": [
+            3,
+            3,
+            29,
+            30
+          ]
+        }
+      ],
+      "anchorX": 13.0,
+      "anchorY": 0
+    },
+    "graveyard_dead_tree": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        192,
+        96,
+        48,
+        48
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            30,
+            113
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#2c3830",
+            "#798171"
+          ]
+        },
+        {
+          "alpha_trim": [
+            4,
+            2,
+            43,
+            48
+          ]
+        }
+      ],
+      "anchorX": 19.5,
+      "anchorY": 0
+    },
+    "graveyard_weeds": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Props/Static/Vegetation.png",
+      "member_sha256": "1a3bdf11e56148a2971e08174f80108eb568ac222db2cb495121da8680de519d",
+      "crop": [
+        96,
+        272,
+        16,
+        16
+      ],
+      "operations": [
+        {
+          "visible_luminance_range": [
+            30,
+            97
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#39483a",
+            "#798469"
+          ]
+        },
+        {
+          "alpha_trim": [
+            1,
+            1,
+            15,
+            16
+          ]
+        }
+      ],
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "graveyard_tomb": {
+      "source": "graveyard",
+      "member": null,
+      "member_sha256": "1529ee5c3b927107178ef7ed7a3af02ac93a60860543c227678ff3ceb3c5d094",
+      "crop": [
+        80,
+        140,
+        20,
+        20
+      ],
+      "operations": [
+        {
+          "transparent_color": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "visible_luminance_range": [
+            74,
+            173
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#46524d",
+            "#aab5a7"
+          ]
+        },
+        {
+          "alpha_trim": [
+            2,
+            1,
+            19,
+            20
+          ]
+        }
+      ],
+      "anchorX": 8.5,
+      "anchorY": 0
+    },
+    "graveyard_tomb_square": {
+      "source": "graveyard",
+      "member": null,
+      "member_sha256": "1529ee5c3b927107178ef7ed7a3af02ac93a60860543c227678ff3ceb3c5d094",
+      "crop": [
+        140,
+        140,
+        20,
+        20
+      ],
+      "operations": [
+        {
+          "transparent_color": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "visible_luminance_range": [
+            74,
+            173
+          ]
+        },
+        {
+          "luminance_palette": [
+            "#46524d",
+            "#aab5a7"
+          ]
+        },
+        {
+          "alpha_trim": [
+            2,
+            4,
+            19,
+            20
+          ]
+        }
+      ],
+      "anchorX": 8.5,
+      "anchorY": 0
+    },
+    "grass_patch": {
+      "source": "woods",
+      "member": "pixel_16_woods v2 free/free_pixel_16_woods.png",
+      "member_sha256": "8b31588ae4299cf2b11c888e9ed6c872b6ae0b0b9301fae19fe5a0751632d812",
+      "crop": [
+        160,
+        32,
+        32,
+        32
+      ],
+      "operations": [],
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "warp": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Dungeon_Tiles.png",
+      "member_sha256": "11ae371cc3fc62e5f9ea7132931d268cfe8e536a186dc08cb16f44de09d33771",
+      "crop": [
+        96,
+        304,
+        16,
+        16
+      ],
+      "operations": [],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "pressure_plate": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Floors_Tiles.png",
+      "member_sha256": "9c30bb02ff1f776ed6a036270af63d9ad2e369c37c68440f28b1a87ad0d44891",
+      "crop": [
+        256,
+        16,
+        16,
+        16
+      ],
+      "operations": [],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "cracked": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Tilesets/Wall_Tiles.png",
+      "member_sha256": "21ddee9775168e0785727fc006e750b957fd37ae3912a388e205186c591f76f7",
+      "crop": [
+        112,
+        96,
+        16,
+        16
+      ],
+      "operations": [],
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "statue": {
+      "source": "cave",
+      "member": "Tileset_FREE.png",
+      "member_sha256": "0721a4fdc6fb85bd366deccb0570b4727cfb2892e8af08e9b06f6fe4bb927246",
+      "crop": [
+        112,
+        0,
+        16,
+        32
+      ],
+      "operations": [
+        {
+          "alpha_trim": [
+            2,
+            4,
+            15,
+            32
+          ]
+        }
+      ],
+      "anchorX": 6.5,
+      "anchorY": 0
+    },
+    "tree_top": {
+      "alias": "bush",
+      "anchorX": 14.5,
+      "anchorY": 0
+    },
+    "plant": {
+      "alias": "bush",
+      "anchorX": 14.5,
+      "anchorY": 0
+    },
+    "palm_top": {
+      "alias": "tree_oak",
+      "anchorX": 63.0,
+      "anchorY": 0
+    },
+    "palm_trunk": {
+      "alias": "tree_dead",
+      "anchorX": 17.0,
+      "anchorY": 0
+    },
+    "fence": {
+      "alias": "fence_wood",
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "door_red": {
+      "alias": "door_locked",
+      "anchorX": 10.0,
+      "anchorY": 0
+    },
+    "cushion": {
+      "alias": "rug",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "gravestone": {
+      "alias": "statue",
+      "anchorX": 6.5,
+      "anchorY": 0
+    },
+    "pedestal": {
+      "alias": "statue",
+      "anchorX": 6.5,
+      "anchorY": 0
+    },
+    "doll": {
+      "alias": "berry_fruit",
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "switch": {
+      "alias": "machine_active",
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "pokeball": {
+      "alias": "berry_fruit",
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "ultraball": {
+      "alias": "item",
+      "anchorX": 3.0,
+      "anchorY": 0
+    },
+    "berry_empty": {
+      "alias": "tree_small",
+      "anchorX": 23.5,
+      "anchorY": 0
+    },
+    "berry_growing": {
+      "alias": "plant_growing",
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "berry_full": {
+      "composition": [
+        "tree_small",
+        "berry_fruit"
+      ],
+      "anchorX": 23.5,
+      "anchorY": 0
+    },
+    "fire_0": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Stations/Bonfire/Fire_01-Sheet.png",
+      "member_sha256": "1712667a4dcfe620d41793a0d043a45b845298ce8f8a0a418a68763775ca80b2",
+      "crop": [
+        0,
+        0,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "shared_animation_alpha_bounds": [
+            2,
+            7,
+            29,
+            43
+          ]
+        }
+      ],
+      "anchorX": 13.5,
+      "anchorY": 0
+    },
+    "fire_1": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Stations/Bonfire/Fire_01-Sheet.png",
+      "member_sha256": "1712667a4dcfe620d41793a0d043a45b845298ce8f8a0a418a68763775ca80b2",
+      "crop": [
+        32,
+        0,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "shared_animation_alpha_bounds": [
+            2,
+            7,
+            29,
+            43
+          ]
+        }
+      ],
+      "anchorX": 13.5,
+      "anchorY": 0
+    },
+    "fire_2": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Stations/Bonfire/Fire_01-Sheet.png",
+      "member_sha256": "1712667a4dcfe620d41793a0d043a45b845298ce8f8a0a418a68763775ca80b2",
+      "crop": [
+        64,
+        0,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "shared_animation_alpha_bounds": [
+            2,
+            7,
+            29,
+            43
+          ]
+        }
+      ],
+      "anchorX": 13.5,
+      "anchorY": 0
+    },
+    "fire_3": {
+      "source": "crawler",
+      "member": "Pixel Crawler - Free Pack/Environment/Structures/Stations/Bonfire/Fire_01-Sheet.png",
+      "member_sha256": "1712667a4dcfe620d41793a0d043a45b845298ce8f8a0a418a68763775ca80b2",
+      "crop": [
+        96,
+        0,
+        32,
+        48
+      ],
+      "operations": [
+        {
+          "shared_animation_alpha_bounds": [
+            2,
+            7,
+            29,
+            43
+          ]
+        }
+      ],
+      "anchorX": 13.5,
+      "anchorY": 0
+    },
+    "fire": {
+      "alias": "fire_0",
+      "anchorX": 13.5,
+      "anchorY": 0
+    }
+  },
+  "animations": {
+    "water": {
+      "fps": 5,
+      "frames": [
+        "water_0",
+        "water_1",
+        "water_2",
+        "water_3"
+      ]
+    },
+    "water_shallow": {
+      "fps": 5,
+      "frames": [
+        "water_shallow_0",
+        "water_shallow_1",
+        "water_shallow_2",
+        "water_shallow_3"
+      ]
+    },
+    "lava": {
+      "fps": 5,
+      "frames": [
+        "lava_0",
+        "lava_1",
+        "lava_2",
+        "lava_3"
+      ]
+    },
+    "lava_bright": {
+      "fps": 5,
+      "frames": [
+        "lava_bright_0",
+        "lava_bright_1",
+        "lava_bright_2",
+        "lava_bright_3",
+        "lava_bright_4",
+        "lava_bright_5",
+        "lava_bright_6",
+        "lava_bright_7",
+        "lava_bright_8",
+        "lava_bright_9",
+        "lava_bright_10",
+        "lava_bright_11",
+        "lava_bright_12",
+        "lava_bright_13",
+        "lava_bright_14",
+        "lava_bright_15"
+      ]
+    },
+    "lava_cooled": {
+      "fps": 5,
+      "frames": [
+        "lava_cooled_0",
+        "lava_cooled_1",
+        "lava_cooled_2",
+        "lava_cooled_3",
+        "lava_cooled_4",
+        "lava_cooled_5",
+        "lava_cooled_6",
+        "lava_cooled_7",
+        "lava_cooled_8",
+        "lava_cooled_9",
+        "lava_cooled_10",
+        "lava_cooled_11",
+        "lava_cooled_12",
+        "lava_cooled_13",
+        "lava_cooled_14",
+        "lava_cooled_15"
+      ]
+    },
+    "fire": {
+      "fps": 8,
+      "frames": [
+        "fire_0",
+        "fire_1",
+        "fire_2",
+        "fire_3"
+      ]
+    }
+  },
+  "biomeFamilies": {
+    "desert": [
+      "desert_ground",
+      "desert_path",
+      "desert_cliff",
+      "desert_cliff_cap",
+      "desert_ramp",
+      "desert_rock",
+      "desert_decor",
+      "desert_cactus",
+      "desert_dead_tree"
+    ],
+    "volcano": [
+      "volcanic_basalt",
+      "volcanic_cracked",
+      "volcanic_ash",
+      "volcanic_obsidian",
+      "volcanic_cliff",
+      "volcanic_cliff_cap",
+      "volcanic_ramp",
+      "volcanic_rock",
+      "volcanic_crystal",
+      "volcanic_charred_tree",
+      "volcanic_dead_shrub",
+      "lava_bright_0",
+      "lava_cooled_0",
+      "lava_bright_1",
+      "lava_cooled_1",
+      "lava_bright_2",
+      "lava_cooled_2",
+      "lava_bright_3",
+      "lava_cooled_3",
+      "lava_bright_4",
+      "lava_cooled_4",
+      "lava_bright_5",
+      "lava_cooled_5",
+      "lava_bright_6",
+      "lava_cooled_6",
+      "lava_bright_7",
+      "lava_cooled_7",
+      "lava_bright_8",
+      "lava_cooled_8",
+      "lava_bright_9",
+      "lava_cooled_9",
+      "lava_bright_10",
+      "lava_cooled_10",
+      "lava_bright_11",
+      "lava_cooled_11",
+      "lava_bright_12",
+      "lava_cooled_12",
+      "lava_bright_13",
+      "lava_cooled_13",
+      "lava_bright_14",
+      "lava_cooled_14",
+      "lava_bright_15",
+      "lava_cooled_15",
+      "lava_bright",
+      "lava_cooled"
+    ],
+    "graveyard": [
+      "graveyard_ground",
+      "graveyard_path",
+      "graveyard_cliff",
+      "graveyard_cliff_cap",
+      "graveyard_ramp",
+      "graveyard_rock",
+      "graveyard_dead_tree",
+      "graveyard_weeds",
+      "graveyard_tomb",
+      "graveyard_tomb_square"
+    ]
+  },
+  "outputs": {
+    "world-atlas.png": {
+      "sha256": "10b4a5c31d9e01261a5a6b965845e8475c5ea131e7a574ae3909f4c68c35cc37",
+      "bytes": 207656
+    },
+    "world-atlas.json": {
+      "sha256": "ddcb38b29a146b174e06f39a3e32b2c935fe056a8ad417d3631f47f27ad80cb2",
+      "bytes": 31312
+    }
+  }
+}

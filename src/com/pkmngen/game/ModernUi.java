@@ -25,6 +25,41 @@ public final class ModernUi {
    private final Map<String,Character> letters = new HashMap<>();
    private long drawCount;
    private String lastScreenId = "";
+   private float viewportX, viewportY, viewportWidth = Layout.WIDTH, viewportHeight = Layout.HEIGHT;
+
+   /** All menus share one logical canvas. DPI/window changes scale the whole canvas uniformly. */
+   public static final class Layout {
+      public static final float WIDTH = 160, HEIGHT = 144, MARGIN = 6, GAP = 4, PADDING = 5;
+      public static final Box CONTENT = new Box(MARGIN, 16, WIDTH - MARGIN * 2, 101);
+      private Layout() {}
+   }
+
+   /** Bottom-left boxes allow each view to allocate rows/columns before drawing text or actors. */
+   public static final class Box {
+      public final float x, y, width, height;
+      public Box(float x, float y, float width, float height) {
+         this.x=x; this.y=y; this.width=Math.max(0,width); this.height=Math.max(0,height);
+      }
+      public float top() { return y+height; }
+      public Box inset(float padding) { return new Box(x+padding,y+padding,width-padding*2,height-padding*2); }
+      public Box column(int index, int count, float gap) {
+         float cell=(width-gap*(count-1))/count;
+         return new Box(x+index*(cell+gap),y,cell,height);
+      }
+      public Box row(int index, int count, float gap) {
+         float cell=(height-gap*(count-1))/count;
+         return new Box(x,top()-(index+1)*cell-index*gap,width,cell);
+      }
+   }
+
+   public void applyViewport(Game game, int width, int height) {
+      if(width<=0 || height<=0) return;
+      float scale=Math.min(width/Layout.WIDTH,height/Layout.HEIGHT);
+      viewportWidth=width/scale; viewportHeight=height/scale;
+      viewportX=(Layout.WIDTH-viewportWidth)/2; viewportY=(Layout.HEIGHT-viewportHeight)/2;
+      game.uiBatch.getProjectionMatrix().setToOrtho2D(viewportX,viewportY,viewportWidth,viewportHeight);
+   }
+   public Box viewportBounds() { return new Box(viewportX,viewportY,viewportWidth,viewportHeight); }
 
    public ModernUi() {
       Pixmap p = new Pixmap(1,1,Pixmap.Format.RGBA8888);
@@ -94,7 +129,7 @@ public final class ModernUi {
          if(m.signCounter>0) toast(game,"Requires: "+m.text,m.bgSprite.getY());
       } else if(action instanceof DrawWhiteScreen) {
          // Menu transitions retain their original duration, using the shared paper instead of a white flash.
-         rect(game,-200,-200,560,544,BACK);
+         fill(game,BACK);
          rect(game,62,70,36,2,LINE); rect(game,62,70,12,2,ACCENT);
       } else if(action instanceof DisplayText.ScrollTextUp || action instanceof DisplayTextIntro.ScrollTextUp) {
          Object owner = enclosing(action);
@@ -111,7 +146,7 @@ public final class ModernUi {
    public void mapFrame(Game game) {
       for(Action a:game.actionStack) if(a instanceof DrawMiniMap) {
          header(game,"WORLD MAP","Procedural island");
-         footer(game,"Arrows  Pan     Z  Select     X  Back"); mark(a); break;
+         footer(game,DesktopControls.movement()+"  Pan     "+confirmKey()+"  Select     "+backKey()+"  Back"); mark(a); break;
       }
    }
    public void rect(Game game,float x,float y,float w,float h,Color color) {
@@ -122,6 +157,8 @@ public final class ModernUi {
       rect(game,x+1,y-1,w,h,new Color(INK.r,INK.g,INK.b,0.18f));
       rect(game,x,y,w,h,LINE); rect(game,x+0.65f,y+0.65f,w-1.3f,h-1.3f,PAPER);
    }
+   public void panel(Game game,Box bounds) { panel(game,bounds.x,bounds.y,bounds.width,bounds.height); }
+   public void fill(Game game,Color color) { rect(game,viewportX,viewportY,viewportWidth,viewportHeight,color); }
    public void text(Game game,String value,float x,float top,float size,Color color) {
       if(value==null || value.isEmpty()) return;
       font.getData().setScale(size/32f); font.setColor(color);
@@ -131,6 +168,7 @@ public final class ModernUi {
       font.getData().setScale(size/32f); layout.setText(font,normalize(value)); return layout.width;
    }
    public void fitText(Game game,String value,float x,float top,float size,float maxWidth,Color color) {
+      if(maxWidth<=0) return;
       float actual=width(value,size); text(game,value,x,top,actual>maxWidth?size*maxWidth/actual:size,color);
    }
    public void wrapped(Game game,String value,float x,float top,float size,float maxWidth,int lines,Color color) {
@@ -139,36 +177,54 @@ public final class ModernUi {
       for(String word:normalize(value).split("\\s+")) {
          String next=line.length()==0?word:line+" "+word;
          if(width(next,size)>maxWidth && line.length()>0) {
-            text(game,line.toString(),x,top-row*(size+2),size,color); line.setLength(0); row++;
+            fitText(game,line.toString(),x,top-row*(size+2),size,maxWidth,color); line.setLength(0); row++;
             if(row>=lines) return;
          }
          if(line.length()>0) line.append(' '); line.append(word);
       }
-      if(row<lines) text(game,line.toString(),x,top-row*(size+2),size,color);
+      if(row<lines) fitText(game,line.toString(),x,top-row*(size+2),size,maxWidth,color);
    }
    public void bar(Game game,float x,float y,float w,float h,float ratio,Color color) {
       rect(game,x,y,w,h,LINE); rect(game,x+0.5f,y+0.5f,Math.max(0,(w-1)*Math.min(1,Math.max(0,ratio))),h-1,color);
    }
    public void row(Game game,String value,float x,float y,float w,float h,boolean selected) {
+      row(game,value,x,y,w,h,selected,0);
+   }
+   public void row(Game game,String value,float x,float y,float w,float h,boolean selected,float reserveRight) {
       if(selected) { rect(game,x,y,w,h,ACCENT); rect(game,x,y,2,h,GOLD); }
       else rect(game,x,y,w,h,new Color(1f,1f,1f,.35f));
-      fitText(game,value,x+5,y+h-(h-7)/2,7,w-10,selected?PAPER:INK);
+      fitText(game,value,x+5,y+h-(h-7)/2,7,w-10-reserveRight,selected?PAPER:INK);
    }
    public void header(Game game,String title,String subtitle) {
-      rect(game,-200,121,560,223,INK); rect(game,0,121,160,1.2f,GOLD);
-      text(game,title,8,140,9,PAPER); fitText(game,subtitle,8,128.5f,4.7f,144,LINE);
+      rect(game,viewportX,121,viewportWidth,viewportY+viewportHeight-121,INK); rect(game,0,121,160,1.2f,GOLD);
+      fitText(game,title,8,140,9,144,PAPER); fitText(game,subtitle,8,128.5f,4.7f,144,LINE);
    }
    public void fullScreen(Game game,String title,String subtitle) {
-      rect(game,-200,-200,560,544,BACK); header(game,title,subtitle);
+      fill(game,BACK); header(game,title,subtitle);
    }
    public void footer(Game game,String value) {
-      String hints=value.replace("Z ",confirmKey()+" ").replace("X ",backKey()+" ");
-      rect(game,-200,-200,560,212,INK); fitText(game,hints,7,8.5f,4.7f,146,PAPER);
+      String hints=DesktopControls.hints(value).replace("↑↓", DesktopControls.vertical()).replace("←→", DesktopControls.horizontal())
+         .replace("Up / Down", DesktopControls.vertical()).replace("Left / Right", DesktopControls.horizontal())
+         .replace("Arrows", DesktopControls.movement());
+      rect(game,viewportX,viewportY,viewportWidth,12-viewportY,INK); fitText(game,hints,7,8.5f,4.7f,146,PAPER);
    }
-   public static String confirmKey() { return com.badlogic.gdx.Input.Keys.toString(InputProcessor.keyboardA); }
-   public static String backKey() { return com.badlogic.gdx.Input.Keys.toString(InputProcessor.keyboardB); }
+   public void keycap(Game game,String value,Box bounds) {
+      rect(game,bounds.x,bounds.y-1,bounds.width,bounds.height,LINE);
+      rect(game,bounds.x,bounds.y,bounds.width,bounds.height,PAPER);
+      float size=5.6f, actual=width(value,size);
+      if(actual>bounds.width-6) size*=Math.max(0,bounds.width-6)/actual;
+      text(game,value,bounds.x+(bounds.width-width(value,size))/2,bounds.y+(bounds.height+size)/2+.5f,size,ACCENT);
+   }
+   public void controlRow(Game game,Box row,String label,String binding) {
+      float keys=Math.min(55,row.width*.42f), gap=Layout.GAP;
+      Box keyBox=new Box(row.x+row.width-keys,row.y+2,keys,row.height-4);
+      fitText(game,label,row.x,row.y+(row.height+5.8f)/2+.5f,5.8f,row.width-keys-gap,INK);
+      keycap(game,binding,keyBox);
+   }
+   public static String confirmKey() { return DesktopControls.confirm(); }
+   public static String backKey() { return DesktopControls.back(); }
    public void eventBackdrop(Game game,String title,Action action) {
-      rect(game,-200,-200,560,544,BACK);
+      fill(game,BACK);
       panel(game,8,43,144,88);
       text(game,title,12,140,6.5f,ACCENT);
       rect(game,8,130,144,1,GOLD);
@@ -178,7 +234,7 @@ public final class ModernUi {
       int start=Math.max(0,selected-5); int visible=Math.min(6,words.size());
       float h=17+visible*14, y=45;
       if(y+h>137) y=137-h;
-      panel(game,68,y,87,h); text(game,title,74,y+h-5,5,MUTED);
+      panel(game,68,y,87,h); fitText(game,title,74,y+h-5,5,75,MUTED);
       for(int i=0;i<visible;i++) row(game,words.get(start+i),72,y+h-17-(i+1)*14,79,13,start+i==selected);
    }
    private void dialogue(Game game,DisplayText text) {
@@ -203,7 +259,8 @@ public final class ModernUi {
          row.getValue().sort(Comparator.comparingDouble(Sprite::getX));
          StringBuilder line=new StringBuilder();
          for(Sprite glyph:row.getValue()) line.append(letters.getOrDefault(key(glyph),'?'));
-         fitText(game,line.toString().stripTrailing(),8,row.getKey()+8.5f,8.5f,142,INK);
+         String revealed = line.toString().stripTrailing();
+         fitText(game,revealed,8,row.getKey()+8.5f,8.5f,142,INK);
       }
    }
    private static String key(Sprite s) { return System.identityHashCode(s.getTexture())+":"+s.getRegionX()+":"+s.getRegionY()+":"+s.getRegionWidth()+":"+s.getRegionHeight(); }

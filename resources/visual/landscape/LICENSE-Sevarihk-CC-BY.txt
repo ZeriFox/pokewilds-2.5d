@@ -1,0 +1,8 @@
+Stone and Lava Ground Tiles by Sevarihk
+https://opengameart.org/content/stone-and-lava-ground-tiles
+Published 2023-04-14; license verified 2026-10-07.
+Creative Commons Attribution 4.0 International
+https://creativecommons.org/licenses/by/4.0/
+Sources: lava-dark-stone_large.png and stone_terrain_addon.png from the linked author page.
+Changes: exact crops; cool basalt, bright lava and cooled lava luminance palettes; 16 toroidal animation frames from the 64px continuous lava crop.
+No endorsement by the original author is implied. Full input hashes and per-region changes are in PROVENANCE.json.

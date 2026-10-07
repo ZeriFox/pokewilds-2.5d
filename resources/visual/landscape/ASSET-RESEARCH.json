@@ -1,0 +1,53 @@
+{
+  "checkedOn": "2026-10-07",
+  "direction": "Keep Pixel Crawler as the common 16px material and prop language. Retain the supplied nature and cave sheets. Sevarihk provides the secondary volcanic material family. Add only missing silhouettes from CC0 sources, mapped to the same biome palettes; preserve current PMD Pokemon.",
+  "sources": [
+    {
+      "title": "Stone and Lava Ground Tiles",
+      "author": "Sevarihk",
+      "url": "https://opengameart.org/content/stone-and-lava-ground-tiles",
+      "license": "CC-BY 4.0",
+      "finding": "Creator supplies matching volcanic lava, rocky terrain and cliff textures, permits reuse and edits with attribution and a source link.",
+      "decision": "Acquired as the secondary special-biome material family. Continuous lava replaces sparse bubble/symbol crops. Shared organic fissure geometry gets hot and cooled palettes and 16 flow frames; matching source stone crops supply cracked ground and cliffs. Attribution, license link and modifications recorded in LICENSE-Sevarihk-CC-BY.txt and PROVENANCE.json."
+    },
+    {
+      "title": "Modern User Interface - RPG asset pack [16x16]",
+      "author": "LimeZu",
+      "url": "https://limezu.itch.io/modernuserinterface",
+      "finding": "Creator lists 16x16, 32x32 and 48x48 frames/buttons, a gamepad UI update, and a paid download at USD 6 or more.",
+      "decision": "Evaluated; not acquired or incorporated. No purchase made. The existing native UI remains the implementation base."
+    },
+    {
+      "title": "Top Down Forest Tileset",
+      "author": "PixiVan",
+      "url": "https://pixivan.itch.io/top-down-forest-tileset",
+      "finding": "Creator permits game use and modification, but the page has no download available; the creator says the pack is being reworked after missing source files.",
+      "decision": "Evaluated; not acquired or incorporated. Keep the user's available nature pack rather than silently substituting an unrelated art family."
+    },
+    {
+      "title": "Forest / Graveyard tileset",
+      "author": "marionline",
+      "url": "https://opengameart.org/content/forest-graveyard-tileset",
+      "license": "CC0 1.0",
+      "finding": "Creator supplies a 20x20 top-down tileset and marks it CC0.",
+      "decision": "Acquired. Integrate exactly two gravestone silhouettes, remove source black colour key and apply the gray-green graveyard palette. Source hash and crops recorded in PROVENANCE.json."
+    },
+    {
+      "title": "Tileset: Cemetery (16x16)",
+      "author": "mutantleg",
+      "url": "https://opengameart.org/content/tileset-cemetery-16x16",
+      "license": "CC0 1.0",
+      "finding": "Creator marks the cemetery tileset CC0; its level-facing artwork is intended for side views.",
+      "decision": "Evaluated; not incorporated, to avoid mixing a second cemetery perspective with the chosen top-down gravestones."
+    },
+    {
+      "title": "Desert Level Decorations (Pixel-Art)",
+      "author": "ScratchIO",
+      "url": "https://opengameart.org/content/desert-level-decorations-pixel-art",
+      "license": "CC0 1.0",
+      "finding": "Creator supplies a CC0 decoration sheet with real cactus silhouettes. The old atlas cactus region was actually a leafy tree from Pixel Crawler.",
+      "decision": "Acquired. Integrate one upright cactus sprite with the same dry-vegetation palette as the desert family. Do not import the pack's terrain, stones or trees. Source hash and crop recorded in PROVENANCE.json."
+    }
+  ],
+  "limitations": "Research records the pages at the checked date. Source downloads remain outside the game project; no asset pack was bought or published. Native scene and UI checks are separate from atlas validation."
+}

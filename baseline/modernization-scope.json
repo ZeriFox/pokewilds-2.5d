@@ -1,18 +1,17 @@
 {
-  "schema": 2,
+  "schema": 5,
   "status": "frozen",
-  "purpose": "Reviewed modernization source scope: presentation, new procedural topology/biomes and authorized additional Pokemon. Never auto-updated by the verifier; not proof of total gameplay equivalence.",
+  "purpose": "Local structural modernization with reviewed terrain relief: shared derived plateau/ramp heights, native cliff geometry/contact cues, coherent biome presentation, habitat-aware wild encounters and existing desktop/UI/roster work. Frozen after explicit source and native visual review; not proof of total gameplay equivalence.",
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "0c0e8a0074b8667e593705bd21982540190c363b488f8db3828c92d02ee1ba12",
+  "reviewed_patch_sha256": "61f9d15f08cb7843f1a99333566e2154c4c8e1480fe140b43df32cfd895501a5",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/Battle.java",
     "src/com/pkmngen/game/CheckEndOfBattle.java",
     "src/com/pkmngen/game/CheckMovesLearned.java",
     "src/com/pkmngen/game/DrawSetupMenu.java",
-    "src/com/pkmngen/game/InputProcessor.java",
     "src/com/pkmngen/game/Network.java",
     "src/com/pkmngen/game/PkmnMap.java",
     "src/com/pkmngen/game/Player.java",
@@ -54,6 +53,11 @@
       "reviewed_sha256": "01092eceba1e423ddf338b6e8703be7f8ebd8a0872a799b0da649f78cad7b8f2",
       "scope": "Presentation: modern safari commands; retain selection and input logic."
     },
+    "src/com/pkmngen/game/DrawControls.java": {
+      "baseline_sha256": "9cb930d72fc59572adb56f3ec85709c09def2a7b4fec8faa525650fdec10bf31",
+      "reviewed_sha256": "cead10049d92ff0c8492cef38e03e4948399df183fc704c90babae36bfad2bd6",
+      "scope": "Desktop controls presentation: show configured movement, confirm, back/run and menu bindings."
+    },
     "src/com/pkmngen/game/DrawEnemyHealthGen2.java": {
       "baseline_sha256": "b2050ab5a6da9b33b5ceeda16d11e1c4ea5b3023b2a7049f618219992fbfd0da",
       "reviewed_sha256": "05956c02b87a3f56cccd15e08420a75525acd07a61b9fcdfc6339c82697bd923",
@@ -63,6 +67,16 @@
       "baseline_sha256": "60d218d1a0e020b97ea58abc2d1f568e37db8e463d87f230f1f57dbd3ceb94b6",
       "reviewed_sha256": "772559e0eb83639c1efc0f364e4b5e086304c1378e98e7156612c768f07db7aa",
       "scope": "Presentation: modern party HP/EXP panel; retain health updates."
+    },
+    "src/com/pkmngen/game/DrawPokemonMenu.java": {
+      "baseline_sha256": "291a42dd61f09ad5066c6943efefbe8b6657542f8119a4f832d13937734588e2",
+      "reviewed_sha256": "7a3e59d2ee994ed9ec4e2149c556d0699be6b49519c11c2bf77bb43df958ac2c",
+      "scope": "Desktop UI layout: remove stale fixed-key guidance from the party menu while preserving menu selection and actions."
+    },
+    "src/com/pkmngen/game/DrawUseTossMenu.java": {
+      "baseline_sha256": "0e905cd44b3710eb5e8b24a9287320f004c22dfc7ac4b054f22235c9fdf3230e",
+      "reviewed_sha256": "8e81e6d3572f09f198f6c8d92c359196b6b37d822ab8b947d8e8bb86d4d1226d",
+      "scope": "Desktop UI layout: show configured action bindings without altering item-use/toss state transitions."
     },
     "src/com/pkmngen/game/EggHatchAnim.java": {
       "baseline_sha256": "af5acd790ef524f88bdf1b52d60ff11853dd6c229c820d1d03e5db715b3d263f",
@@ -101,13 +115,18 @@
     },
     "src/com/pkmngen/game/Game.java": {
       "baseline_sha256": "b2e7c404c3a06923632d6cf2490a71ac8e0b16588290a930ae48a9ad9401afdb",
-      "reviewed_sha256": "d5bac268e8d80c7842039535d7d02a0206edd0b2dd132b7b90d18ffe77b62485",
-      "scope": "Integration: visual allocation/disposal, world/UI dispatch, PMD/BW/expanded-dex resource cleanup."
+      "reviewed_sha256": "aeda490146b138fbac33a370fb9453edd62b79dd33f7e7351e5fec80c1482255",
+      "scope": "Integration: exclusive modern world/UI drawing without skipping action steps; resource lifecycle; desktop defaults and legacy preset migration; unified modern viewport sizing."
     },
     "src/com/pkmngen/game/GenIsland1.java": {
       "baseline_sha256": "be2c0d51ed41558b70fec8455b1144f091989411b5f77dea35a1588251b2d105",
-      "reviewed_sha256": "e45db8ad690eaac1f8c8d253098bb5724bcba59b9a6b974261d09f84c7318e8c",
-      "scope": "Generation: authorized modern terrain/biome pass before original coastification."
+      "reviewed_sha256": "429898ff54e7561aad08f68c74fb74fe13ae6983e5e53c170bcc5659e904a203",
+      "scope": "Generation: modern terrain pass before coastification, habitat-aware wild selection, safe oasis anchoring and explicit bounded retries for mansion drafts lacking a valid endpoint."
+    },
+    "src/com/pkmngen/game/InputProcessor.java": {
+      "baseline_sha256": "bc4910e9db1d94e88a38edd31e72aab19497da27412263aa01e04ac331c95b2f",
+      "reviewed_sha256": "ac0fe4ca4b13668359e6769304b253bab200222421ef296588b351ad37904c76",
+      "scope": "Authorized desktop input: WASD and mouse bindings, debounced press/held/release, text-entry isolation, preserving gamepad and mobile controls."
     },
     "src/com/pkmngen/game/PlayMusic.java": {
       "baseline_sha256": "cf5ed190985fb35bf86e25162e73d43401cb51bdf61f653c0d287b1e4a55cba1",
@@ -119,10 +138,15 @@
       "reviewed_sha256": "639c7007ee3b450c43cb4354848303e9059185478dea0945485e89731e22a1e8",
       "scope": "Expanded roster initialization: resolve exact imported Pokemon cry paths."
     },
+    "src/com/pkmngen/game/PlayerStanding.java": {
+      "baseline_sha256": "083a603c0e309d38cf36f74bbd419f16375cd4812a007f588d5d4772670cf42a",
+      "reviewed_sha256": "354452eb6d91644afb27b0a3d3b671c479d833a6479bc5c05014428e393e6471",
+      "scope": "Wild encounter coherence: profile-based habitat/rarity selection and valid natural evolutions; retain encounter rates, levels, scripted branches and original time availability."
+    },
     "src/com/pkmngen/game/Pokemon.java": {
       "baseline_sha256": "5f43cf6453fac92b067819824bc925b0c63115b4a27cdc8aad54149c17fa4265",
-      "reviewed_sha256": "f9452558248a16733d62b103d641ef3e52375b750571710dd0bced4c057cee26",
-      "scope": "Expanded roster initialization: National Dex lookup, imported growth data and 87.5 percent female ratio."
+      "reviewed_sha256": "fb2e205902d38636d706422a88d69627021323ebf3c8ede291051f01b9a672bd",
+      "scope": "Expanded roster initialization: National Dex lookup, imported growth data and 87.5 percent female ratio; keep uncaught aquatic species in water while preserving owned-companion movement."
     },
     "src/com/pkmngen/game/PokemonFrame.java": {
       "baseline_sha256": "b85d254f66ed6b44b08519dc72a6e694ad6c2be9be9606e30007134b26fa18ae",
@@ -131,7 +155,7 @@
     },
     "src/com/pkmngen/game/RegigigasBattle.java": {
       "baseline_sha256": "e3791d4f9fe697426806de3b5bb8aaa0bcc5222c4e76f17464bfec8e238a9ba6",
-      "reviewed_sha256": "05a606ce7b50596ac059fd5b9a115eab43c5f5c6a9a635c8ce576a891185d532",
+      "reviewed_sha256": "349e01f6aedbad6e9a09dc891123f0db648af292b66561f86cb9566291a14c29",
       "scope": "Presentation: modern nested intro and arena drawing; retain battle action progression."
     },
     "src/com/pkmngen/game/Route.java": {
@@ -141,23 +165,38 @@
     },
     "src/com/pkmngen/game/SpecialBattleMegaGengar.java": {
       "baseline_sha256": "1c649b6ab296e03938c184c97503497c66e5b9917081fd40742d7936e60fc58a",
-      "reviewed_sha256": "ae271496750bab2973a4de58132193c0230ca14bc7ae6dc3e733da059ff087f1",
-      "scope": "Presentation: modern special intro frame drawing."
+      "reviewed_sha256": "afc75fe608a9dec972dc0061fc798a6cdab91069c5af497382aa2a0b6adb85d0",
+      "scope": "Presentation: modern special intro, dedicated boss arena, PMD actor and exact Pokemon cry paths; preserve original battle action progression and timing."
     },
     "src/com/pkmngen/game/SpecialBattleMewtwo.java": {
       "baseline_sha256": "a7e2ffd0509f8adde7045e8278d529ae385cab69db599cda0ce6688ef4357a3b",
-      "reviewed_sha256": "3c18b3b689645ed3af3b1920e000770cb1f840b1ebd9a4cc67fa513ee2828a9b",
-      "scope": "Presentation: modern special intro frame drawing."
+      "reviewed_sha256": "7a2dca8a801ce38c52e29f6d2ee1e5d1872f04f129e805f45405a43cb637de71",
+      "scope": "Presentation: modern special intro, boss arena, PMD actor, rocks and ripple; preserve original battle action progression, RNG and timing."
+    },
+    "src/com/pkmngen/game/SpecialMegaGengar1.java": {
+      "baseline_sha256": "6cffc9908a22eb1b26d38e3d0b8e49b848da1904ff9643f716765c265c9cae4e",
+      "reviewed_sha256": "de945e7e4586d044b0a3ac405ea81747ec3bb91163befe6f29d5975fef56ff62",
+      "scope": "Boss resource compatibility: initialize the shipped Mega Gengar boss with a dedicated mgengar identity backed by existing Gengar data; preserve its explicit stats, attacks, display name and battle rules."
     },
     "src/com/pkmngen/game/Specie.java": {
       "baseline_sha256": "960e334339c6b093d11596e5aa96cb00fce3194536c495cc3481e0cad4575fd6",
-      "reviewed_sha256": "d99e2d2b3041af44b1b22e292e8711ec6bfd267e118ee24435dc95f11cb22df8",
-      "scope": "Expanded roster initialization: verified additional species before legacy initialization."
+      "reviewed_sha256": "255dd64666f911fc9a7246b1b2fb325dc8e543479dacde73396d31bd03c832bf",
+      "scope": "Species initialization: verified additional species and the shipped Mega Gengar boss alias before legacy initialization; support fresh-process boss reload without changing serialization."
+    },
+    "src/com/pkmngen/game/ThrowOutPokemon.java": {
+      "baseline_sha256": "88d227b7edf2c69f9fe29fa6f1a45747cb02f6ce935c6920641341ffb941d404",
+      "reviewed_sha256": "e91db4c7ce454f2139bcb2ec506d3890a628505268292a5ef5900e90fa44b381",
+      "scope": "Presentation: replace original RED sliced send-out actor with exact PMD actor and bound its legacy 7x7 crop; retain ball/poof sequence, durations, sounds and next actions."
     },
     "src/com/pkmngen/game/ThrowOutPokemonCrystal.java": {
       "baseline_sha256": "68d34b9b53a10f66eb2c06f944d9bae948e2fff4214c657480b4083a95c65893",
       "reviewed_sha256": "43c5a65ee54c9ec87fb42b3e1fe93b45afa9d2cf924e52e9247e708e56862149",
       "scope": "Presentation: replace sliced actor art in send-out; retain poof and action schedule."
+    },
+    "src/com/pkmngen/game/TrainerTipsTile.java": {
+      "baseline_sha256": "6103689b8a5f002030a7098eb92a728f1d759933e575d24449939917b838e5af",
+      "reviewed_sha256": "63e3035ca6b367c4be7d6a915a10a1c0dac7ae34ab93d1f3adea34f94f5f8df7",
+      "scope": "Desktop tutorial presentation: substitute current binding labels in original sign text; preserve sign identity and interaction mechanics."
     },
     "src/com/pkmngen/game/util/SpriteProxy.java": {
       "baseline_sha256": "f8368e334e08cc6e2141376f47fa8a3dd327eb068c27ac6935258e3436eecde4",
@@ -170,60 +209,92 @@
       "reviewed_sha256": "291b5d03603fdc0cd10e90f698de946d8db89e5270de4a68807883b4232f7907",
       "scope": "Existing optional 3D helper, disabled by the modern sprite launcher."
     },
+    "src/com/pkmngen/game/BiomeProfiles.java": {
+      "reviewed_sha256": "96a7bfb6b687320a9f9bc1641ed794561b09b19e11de6acd5318a14e6da4e1de",
+      "scope": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state."
+    },
     "src/com/pkmngen/game/BwAssets.java": {
-      "reviewed_sha256": "04d3994dd1fca63239310585c6300ba51d308b5bc9f5738cb92a684b9526de02",
-      "scope": "Lazy, disposable Black/White environmental asset access."
+      "reviewed_sha256": "c4b1bfe035b2085b80ab67c6b7ead086dbd1cebeb46aaffc26a13a695dc5fdc7",
+      "scope": "Lazy, disposable local landscape atlas access, biome-specific semantic materials, contextual missing-asset diagnostics and separate Black/White trainer assets."
+    },
+    "src/com/pkmngen/game/DesktopControls.java": {
+      "reviewed_sha256": "4a33318b70b13141930bcbba88219eb4e9d84f218b440750edd04edc70e3e6ae",
+      "scope": "Authorized desktop binding parser, exact legacy-preset migration, text-entry detection and truthful dynamic hints."
     },
     "src/com/pkmngen/game/ExpansionDex.java": {
       "reviewed_sha256": "8f29cdc12fa4a9ea3f842681160b01845084dc3d1ea2bfc4e519315c9abf4141",
       "scope": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration."
     },
     "src/com/pkmngen/game/JohtoBattleRenderer.java": {
-      "reviewed_sha256": "e8c054252a9070c2d541f990fd2ce7943555ae4aec821c97266457fbf05f8f2a",
-      "scope": "Modern battle arena, HUD and preserved-world transition rendering."
+      "reviewed_sha256": "a144814fb1a85afcb6777701abd1e2282d1beb6562ad601b00338a2707278db4",
+      "scope": "Modern biome battle arenas/HUD, full-viewport composition, preserved-world transitions and presentation helpers for special boss actions."
     },
     "src/com/pkmngen/game/JohtoRenderer.java": {
-      "reviewed_sha256": "03d0f2143857dbb1656a7d92cdaef95ddcbdea6d0fbbf695fb9ccfddf89dcd78",
-      "scope": "Perspective terrain, cliffs, vegetation, modern actor sprites and scene lighting."
+      "reviewed_sha256": "31bb6e1b45497a4c44df9c642d01105ce849436e7a9f2c16a975ae8dbe5c3c29",
+      "scope": "Exclusive perspective world drawing with shared derived terrain heights, continuous cliff/ramp geometry and contact shading, coherent biome materials/atmosphere, modern intentional ghost presentation, anchored PMD actors and original field-action feedback; no persisted terrain or collision changes."
     },
     "src/com/pkmngen/game/ModernBatch.java": {
       "reviewed_sha256": "f02a0d0fd3f6e2e2a38a975c2a1a0ada4197770a5371c1d73d08e06474d44cd4",
       "scope": "Suppress legacy draw submissions while original menu actions advance."
     },
     "src/com/pkmngen/game/ModernInventoryUi.java": {
-      "reviewed_sha256": "7dae5a03edcb1b8f5e2385f47c4fdb93ea459f275f815a9b7371730706aef09d",
+      "reviewed_sha256": "7aadf4fbb9801afb80b140c1c8c32e79a3466bf4ef321ccfbd38b412e975e52b",
       "scope": "Modern inventory, item actions, crafting, quantities and guide presentation."
     },
     "src/com/pkmngen/game/ModernPartyUi.java": {
-      "reviewed_sha256": "3f806700f4e67d69b9868c4b811837e2fe52b548dccc88ee24466af790ab72e9",
-      "scope": "Modern setup, party, storage, portraits, statistics and nickname menus."
+      "reviewed_sha256": "c04348c0c0e15ad04c7da124a48b13349398cf74c30c9c5c6f25c6e0bccca746",
+      "scope": "Modern setup/party/storage/nickname UI, full animated summary actors on all three pages and configured control hints."
     },
     "src/com/pkmngen/game/ModernUi.java": {
-      "reviewed_sha256": "b4f4ca7d50fe3f3d62df96a20548a94d8556ae60b09afe649852d314c121f946",
-      "scope": "Modern typography, panels, dialogs, event backgrounds and menu rendering dispatch."
+      "reviewed_sha256": "12c136519ca9391fbbb9a1a9f36d605c93383dc453519a4e6f8c0724db09e2d3",
+      "scope": "Modern typography, shared logical viewport and anchored panel layout, dialogs, event backgrounds and menu rendering dispatch."
     },
     "src/com/pkmngen/game/ModernWorldGenerator.java": {
       "reviewed_sha256": "8154e84b81847c3ebeba5f536fcfa1d03d2eb3fcfc83256b47ed17e5521bff3d",
       "scope": "Authorized deterministic procedural landforms, biome distribution and volcanic terrain."
     },
     "src/com/pkmngen/game/PmdBattleSprites.java": {
-      "reviewed_sha256": "376dba0fa6ec53b37f0429edcceb86456073a8847e16e1771bf047e443f70b65",
-      "scope": "Exact PMD battle/event actors, portraits, transforms and visual effects."
+      "reviewed_sha256": "4c71e6ac66871f44817e535aaac7f1cd2458184bb91e4c945e5af19e6057308b",
+      "scope": "Exact PMD battle/event actors, complete animation-envelope fit and ground anchoring, trimmed trainers, hidden-identity ghost presentation and visual effects."
     },
     "src/com/pkmngen/game/PmdPokemonSprites.java": {
-      "reviewed_sha256": "206f1fbad872a5207249ddbe940aa8dada4f9c1288b2c73accada898b38942ca",
-      "scope": "Pinned PMD portrait/animation loading, original timing/directions and bounded texture cache."
+      "reviewed_sha256": "47d1f1e5a438e5eea91a273e5209b356c31d51232c7646cea06afab1bd4b9543",
+      "scope": "Pinned PMD portrait/animation loading, timing/directions, bounded texture cache and complete animation bounds for uncropped actors."
     },
     "src/com/pkmngen/game/TrainerModel3D.java": {
       "reviewed_sha256": "ec80bc26b0410598ef1a23248ae4cfb58b9391a435de879a28dec6215d0611b3",
       "scope": "Existing optional experimental trainer model helper."
+    },
+    "src/com/pkmngen/game/WildSpawnRules.java": {
+      "reviewed_sha256": "373da8c934976a7f33b0e16fda8f763c84b96465e7b9cef08f408256fdcabe60",
+      "scope": "New-wild habitat filtering/rarity, safe nonempty fallback pools, oasis encounter anchoring and uncaught aquatic movement gating; no saved or owned Pokemon migration."
+    },
+    "src/com/pkmngen/game/WorldBatch.java": {
+      "reviewed_sha256": "a8366b103de0070615a7ed5cdbfcfdfc3ffc2d4d9284f81b36e5132af4500585",
+      "scope": "Drop legacy world draw submissions while preserving original action step execution and state changes."
+    },
+    "src/com/pkmngen/game/WorldElevation.java": {
+      "reviewed_sha256": "1dbd38da983ceaa2d9fce349c1a9a1adf159afaf115930ddd3ade8f2b1662ec9",
+      "scope": "Read-only geometry sidecar derived from saved ledges and ramps; deterministic plateau/boundary constraint resolution, continuous ramp heights, local ambiguity diagnostics and cache invalidation without serialized height fields or gameplay collision edits."
     }
   },
   "review_notes": [
-    "Original Game integration was independently reversed to the exact classic Game.java after removing only four additional disposal calls.",
-    "Original data initialization changes reviewed: additional dex/cry/experience lookup, additional 87.5-percent female ratio, species bootstrap and biome spawn append.",
-    "Generator changes are intentional and authorized; immutable battle/input/save sources are verified separately.",
-    "Native integration and GPU visual tests are separate evidence; source hashes cannot prove semantic equivalence.",
-    "Second renderer-only review: JohtoRenderer handles composite/inner ledges using Tile direction conventions and matching basalt/snow/mountain cells; BwAssets keeps planted/berry states on their exact fallback and uses the tree-top region for decorative shrubs. Only these two sources changed from the prior freeze."
-  ]
+    "Schemas 2, 3 and 4 manifests, verifiers and reports are preserved byte-for-byte under baseline/modernization-v2, modernization-v3 and modernization-v4; verifier pins their immutable digests. The schema 4 archive also records the prior tested JAR and archive input hashes.",
+    "User requested clearer true terrain relief because the existing volcanic ledges read as low walls over a flat surface. This iteration reviews the geometry shared by terrain, ramps, cliff faces, actors and camera, while retaining saved tile/route identity and gameplay collision rules.",
+    "User requested structural biome/environment replacement, corrected night ghost presentation, stable world/ability/battle transitions, full Pokemon summaries, coherent desktop controls/UI and habitat-correct wild encounters.",
+    "Protected original Attack, Battle, Player, Network, Save, CheckMovesLearned, CheckEndOfBattle, PkmnMap and DrawSetupMenu remain byte-identical to the classic 198-source baseline.",
+    "BiomeProfiles is shared by atlas mapping, world atmosphere/geometry, battle scenery and WildSpawnRules. Terrain geometry is a read-only sidecar from existing ledges/ramps; no Tile or serialized network/save height fields are introduced.",
+    "Wild selection changes only new wild paths and natural evolution habitat checks. Intentional empty routes stay empty; explicit safe species are used for nonempty invalid candidate pools. Unique generated oasis Milotic retains identity and is anchored to water if necessary.",
+    "Milotic was missing from the original swim-only species list. Profile-required aquatic species now stay in water when uncaught; previousOwner companions retain original movement. Existing saves are not rewritten or migrated.",
+    "WorldElevation solves stable per-tile weighted constraints with a disjoint-set structure. Saved ledges take priority over ramp and flat continuation evidence; shared corner heights match the renderer triangulation. Only a single-cell walkable opening bounded by immediate, concordant saved ledges gains an inferred ramp. Conflicting terrain constraints are diagnosed locally; no terrain height, collision or save data is written.",
+    "GenIsland1 explicitly rejects and retries a randomly generated mansion layout with no legal endpoint, within the existing four-attempt retry limit. Other exceptions keep their original diagnostics.",
+    "Original map actions still execute; WorldBatch suppresses only their legacy pixel submissions. The night ghost is an intentional game encounter, drawn as a modern wisp without changing spawn timing, encounters or hidden identity.",
+    "Native tests cover actual PlayerStanding wild selection and Pokemon.FollowPath water movement, complete animation bounds, expanded viewport/UI layouts, field actions, scene transitions, procedural generation and save/load. Physical controller hardware and complete playthroughs are not implied.",
+    "Final same-save review: contextual mansion approach materials preserve saved encounter routes; tidal/puddle overlays retain visible shallow beds; grass ledges use ground material. Native regression capture preserves every saved-file hash.",
+    "Schema 5 explicitly reviews only JohtoRenderer and WorldElevation changes against immutable schema 4; all other 214 current Java sources match that prior review. Source-mode native relief QA covers 13 screenshots, 414 frames including 324 original movement-action frames, 32/32 sampled supported ledges, 16/16 sampled ramps, full 0-to-14 opening traversal and zero unsupported wall meshes. Five saved-file hashes remain unchanged. This is source-mode evidence; packaged JAR checks remain separate.",
+    "The final WorldElevation delta after visual QA only adds isWater/isLava to its cache signature. Unit tests verify in-place land/water/lava invalidation, restored full terrace height and unchanged texture/tide caching. The renderer is byte-identical to the visually reviewed version. The frozen manifest/diff bind these exact final sources; normal verification and --inventory never refresh approval hashes."
+  ],
+  "historical_v2": "baseline/modernization-v2/archive.json",
+  "historical_v3": "baseline/modernization-v3/",
+  "historical_v4": "baseline/modernization-v4/archive.json"
 }

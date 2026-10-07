@@ -30764,6 +30764,61 @@
       "portraitComplete": 1
     },
     {
+      "key": "megagengar",
+      "dex": 94,
+      "sourcePath": "0094/0001",
+      "portrait": true,
+      "animations": [
+        "Idle",
+        "Walk",
+        "Attack",
+        "Hurt",
+        "Sleep"
+      ],
+      "missingAnimations": [],
+      "spriteCredit": {
+        "primary": "<@!653416391201783856>",
+        "secondary": [
+          "<@!237286997645983744>",
+          "<@!544245909639397378>"
+        ],
+        "total": 3
+      },
+      "portraitCredit": {
+        "primary": "<@!350050109741858829>",
+        "secondary": [],
+        "total": 1
+      },
+      "spriteComplete": 1,
+      "portraitComplete": 1
+    },
+    {
+      "key": "megagengar#shiny",
+      "dex": 94,
+      "sourcePath": "0094/0001/0001",
+      "portrait": true,
+      "animations": [
+        "Idle",
+        "Walk",
+        "Attack",
+        "Hurt",
+        "Sleep"
+      ],
+      "missingAnimations": [],
+      "spriteCredit": {
+        "primary": "<@!356635814668664832>",
+        "secondary": [],
+        "total": 1
+      },
+      "portraitCredit": {
+        "primary": "<@!356635814668664832>",
+        "secondary": [],
+        "total": 1
+      },
+      "spriteComplete": 1,
+      "portraitComplete": 1
+    },
+    {
       "key": "meganium",
       "dex": 154,
       "sourcePath": "0154",
@@ -58764,7 +58819,7 @@
     "baseSpeciesEntries": 1025,
     "basePortraits": 1025,
     "baseAnimatedSprites": 980,
-    "variants": 2126,
+    "variants": 2128,
     "missingBasePortraits": [],
     "missingBaseSprites": [
       "amoonguss",
@@ -58813,10 +58868,10 @@
       "zarude",
       "zebstrika"
     ],
-    "uniqueAnimationSheets": 10002,
-    "sourceFiles": 34152,
-    "sourceBytes": 161601793,
-    "framesChecked": 412944,
+    "uniqueAnimationSheets": 10012,
+    "sourceFiles": 34186,
+    "sourceBytes": 161769572,
+    "framesChecked": 413348,
     "missingAnchorFrames": 0,
     "emptyFrames": 0
   },
@@ -59576,6 +59631,14 @@
     "portrait/0094/0000/0001/Normal.png": {
       "bytes": 1954,
       "sha256": "3b90d0df75a66b836368764f11ac6ac155406f4d441fdc67cc9596ded897e2dc"
+    },
+    "portrait/0094/0001/0001/Normal.png": {
+      "bytes": 2021,
+      "sha256": "f92a34ec721b6ac6085ace6dca9c84c2113276f8802ea15eeb8cebf75a1b4eb6"
+    },
+    "portrait/0094/0001/Normal.png": {
+      "bytes": 1917,
+      "sha256": "bb0916733cc65e539188e856d560516e5f29bb0eb4bd67d7ae0a2f75e8d78d8d"
     },
     "portrait/0094/Normal.png": {
       "bytes": 1629,
@@ -79384,6 +79447,134 @@
     "sprite/0094/0000/0001/Walk-Shadow.png": {
       "bytes": 535,
       "sha256": "1ec150c932f208ce21ceccbfc72b21ef85a17cd42133734ce2a2e0638c49eed7"
+    },
+    "sprite/0094/0001/0001/AnimData.xml": {
+      "bytes": 6195,
+      "sha256": "af78a30171cd32a2ca1c77f12ff7f05bd2dd3bb3d25137baefbeecae0e752b29"
+    },
+    "sprite/0094/0001/0001/Attack-Anim.png": {
+      "bytes": 29963,
+      "sha256": "006d30cb442fb62fc4062e108de057aca9b066ed98bd770a38fd3210727a1d63"
+    },
+    "sprite/0094/0001/0001/Attack-Offsets.png": {
+      "bytes": 3157,
+      "sha256": "1200f1467b376b44a33a52a8cf8b078bba82c8e1195eff3ff3fad753c1ed209e"
+    },
+    "sprite/0094/0001/0001/Attack-Shadow.png": {
+      "bytes": 5667,
+      "sha256": "5352f8f4204cc59592bcea76c53cf659f77056d6291b4b7d9bf9cf3e09c15fbb"
+    },
+    "sprite/0094/0001/0001/Hurt-Anim.png": {
+      "bytes": 6541,
+      "sha256": "b1f431b8cc07a48629cb352cd74a2b64062f288e226303abc9ae145c64cfbbd5"
+    },
+    "sprite/0094/0001/0001/Hurt-Offsets.png": {
+      "bytes": 419,
+      "sha256": "332a7ac39b46c0df1dd4c45070da93dfd47a5bd8be1293e305403bf3ca430e3c"
+    },
+    "sprite/0094/0001/0001/Hurt-Shadow.png": {
+      "bytes": 803,
+      "sha256": "7cca50e13181556ed1f82330ce64356ed30a804c4788ae240c9ef267cce8f4e9"
+    },
+    "sprite/0094/0001/0001/Idle-Anim.png": {
+      "bytes": 14969,
+      "sha256": "3f2f5c0b100ee636db39ed07837c1c45c2223c7cfe15dbd2aa522ade74a87e52"
+    },
+    "sprite/0094/0001/0001/Idle-Offsets.png": {
+      "bytes": 976,
+      "sha256": "eff95f0318f7ca7ca7b2266a115a30cd4004e2562291d8a1b486de364604ea38"
+    },
+    "sprite/0094/0001/0001/Idle-Shadow.png": {
+      "bytes": 1834,
+      "sha256": "bb252977a98e72e712d161e4a53ef45c555faf7d60c9610e2fe57638b68c677a"
+    },
+    "sprite/0094/0001/0001/Sleep-Anim.png": {
+      "bytes": 1118,
+      "sha256": "062c6a31df97ea7e04dac6e475eecb1b2dadeec0947982ddd2d18ad749b0485a"
+    },
+    "sprite/0094/0001/0001/Sleep-Offsets.png": {
+      "bytes": 122,
+      "sha256": "e44a789b49f871b9a2f3cc070d3ae302eb1d9bda36bfdb7bd77e76e847ef1029"
+    },
+    "sprite/0094/0001/0001/Sleep-Shadow.png": {
+      "bytes": 173,
+      "sha256": "f04d82ef2806089aa6c612bbf29b81e3be8855ee988332065b4f78a0e1a67f45"
+    },
+    "sprite/0094/0001/0001/Walk-Anim.png": {
+      "bytes": 10728,
+      "sha256": "922cacea9fb2090c9b2095cd4bd705a89afde09327ed9c540605991c28fc67d3"
+    },
+    "sprite/0094/0001/0001/Walk-Offsets.png": {
+      "bytes": 579,
+      "sha256": "7cfb377160c5bacb363cb3b996ca44b6c2d12830a1ff8729b5203e56405b612f"
+    },
+    "sprite/0094/0001/0001/Walk-Shadow.png": {
+      "bytes": 647,
+      "sha256": "bdcaecefc615b070e595673f4c20c5f3650958a978c7d24663d61446802d96de"
+    },
+    "sprite/0094/0001/AnimData.xml": {
+      "bytes": 6195,
+      "sha256": "af78a30171cd32a2ca1c77f12ff7f05bd2dd3bb3d25137baefbeecae0e752b29"
+    },
+    "sprite/0094/0001/Attack-Anim.png": {
+      "bytes": 28407,
+      "sha256": "caee0fb68a62ac821aed443e1fbeebac0ba4bc1902632d0c965cc73a629941a1"
+    },
+    "sprite/0094/0001/Attack-Offsets.png": {
+      "bytes": 3157,
+      "sha256": "1200f1467b376b44a33a52a8cf8b078bba82c8e1195eff3ff3fad753c1ed209e"
+    },
+    "sprite/0094/0001/Attack-Shadow.png": {
+      "bytes": 5667,
+      "sha256": "5352f8f4204cc59592bcea76c53cf659f77056d6291b4b7d9bf9cf3e09c15fbb"
+    },
+    "sprite/0094/0001/Hurt-Anim.png": {
+      "bytes": 6202,
+      "sha256": "6593100b93c725306f9a2da63e74d5d1d634cdfde19b3a06b865a6aa3668608d"
+    },
+    "sprite/0094/0001/Hurt-Offsets.png": {
+      "bytes": 419,
+      "sha256": "332a7ac39b46c0df1dd4c45070da93dfd47a5bd8be1293e305403bf3ca430e3c"
+    },
+    "sprite/0094/0001/Hurt-Shadow.png": {
+      "bytes": 803,
+      "sha256": "7cca50e13181556ed1f82330ce64356ed30a804c4788ae240c9ef267cce8f4e9"
+    },
+    "sprite/0094/0001/Idle-Anim.png": {
+      "bytes": 13336,
+      "sha256": "dc2363d19bca1b99385ad44979e411472885b840fb20abad00d75e5991b8c6f6"
+    },
+    "sprite/0094/0001/Idle-Offsets.png": {
+      "bytes": 976,
+      "sha256": "eff95f0318f7ca7ca7b2266a115a30cd4004e2562291d8a1b486de364604ea38"
+    },
+    "sprite/0094/0001/Idle-Shadow.png": {
+      "bytes": 1834,
+      "sha256": "bb252977a98e72e712d161e4a53ef45c555faf7d60c9610e2fe57638b68c677a"
+    },
+    "sprite/0094/0001/Sleep-Anim.png": {
+      "bytes": 1075,
+      "sha256": "f4998edb76b0971f7e539c6e55120279e20c4d22c546052b0acd55204614a1f1"
+    },
+    "sprite/0094/0001/Sleep-Offsets.png": {
+      "bytes": 122,
+      "sha256": "e44a789b49f871b9a2f3cc070d3ae302eb1d9bda36bfdb7bd77e76e847ef1029"
+    },
+    "sprite/0094/0001/Sleep-Shadow.png": {
+      "bytes": 173,
+      "sha256": "f04d82ef2806089aa6c612bbf29b81e3be8855ee988332065b4f78a0e1a67f45"
+    },
+    "sprite/0094/0001/Walk-Anim.png": {
+      "bytes": 10358,
+      "sha256": "83118127c8534287ae2ee88e28b45db9996f61f3ac338a20929eb79313f17fb6"
+    },
+    "sprite/0094/0001/Walk-Offsets.png": {
+      "bytes": 579,
+      "sha256": "7cfb377160c5bacb363cb3b996ca44b6c2d12830a1ff8729b5203e56405b612f"
+    },
+    "sprite/0094/0001/Walk-Shadow.png": {
+      "bytes": 647,
+      "sha256": "bdcaecefc615b070e595673f4c20c5f3650958a978c7d24663d61446802d96de"
     },
     "sprite/0094/AnimData.xml": {
       "bytes": 14111,

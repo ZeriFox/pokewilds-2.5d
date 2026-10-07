@@ -2041,7 +2041,7 @@ public class Pokemon extends OverworldThing {
             boolean isSolid;
             if (!Pokemon.this.inWater) {
                isSolid = this.targetTile == null || this.targetTile.isSolid;
-            } else if (Pokemon.onlySwim.contains(Pokemon.this.specie.name)) {
+            } else if (Pokemon.onlySwim.contains(Pokemon.this.specie.name) || WildSpawnRules.mustStayInWater(Pokemon.this)) {
                isSolid = this.targetTile == null || !this.targetTile.isWater;
             } else {
                isSolid = this.targetTile != null && !this.targetTile.isWater && this.targetTile.isSolid;
@@ -3211,7 +3211,7 @@ public class Pokemon extends OverworldThing {
                            || currTile != null && currTile.isLedge && currTile.ledgeDir().equals("up") && move.equals("up");
                         boolean isSolid;
                         if (Pokemon.this.inWater) {
-                           if (Pokemon.onlySwim.contains(Pokemon.this.specie.name)) {
+                           if (Pokemon.onlySwim.contains(Pokemon.this.specie.name) || WildSpawnRules.mustStayInWater(Pokemon.this)) {
                               isSolid = facingTile == null || !facingTile.isWater;
                            } else {
                               isSolid = facingTile != null && !facingTile.isWater && facingTile.isSolid;
@@ -3760,7 +3760,7 @@ public class Pokemon extends OverworldThing {
 
                            boolean isSolid;
                            if (Pokemon.this.inWater) {
-                              if (Pokemon.onlySwim.contains(Pokemon.this.specie.name)) {
+                              if (Pokemon.onlySwim.contains(Pokemon.this.specie.name) || WildSpawnRules.mustStayInWater(Pokemon.this)) {
                                  isSolid = temp == null || !temp.isWater;
                               } else {
                                  isSolid = temp != null && !temp.isWater && temp.isSolid;

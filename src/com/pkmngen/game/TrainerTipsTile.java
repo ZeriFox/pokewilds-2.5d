@@ -79,7 +79,9 @@ class TrainerTipsTile extends Tile {
             null,
             null,
             new DisplayText.Clear(
-               game, new DisplayText(game, this.message, null, null, new WaitFrames(game, 3, new SetField(game, "playerCanMove", true, null)))
+               game, new DisplayText(game, this.message.equals("Stand still while holding X to stop using a Field Move.")
+                  ? DesktopControls.authoredHint(game, this.message) : this.message,
+                  null, null, new WaitFrames(game, 3, new SetField(game, "playerCanMove", true, null)))
             )
          )
       );

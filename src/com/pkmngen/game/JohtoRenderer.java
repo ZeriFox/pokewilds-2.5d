@@ -14,10 +14,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.FloatArray;
-import com.pkmngen.game.util.SmolSprite;
-import com.pkmngen.game.util.TextureCache;
 import java.lang.reflect.Field;
 import java.nio.FloatBuffer;
 import java.util.IdentityHashMap;
@@ -25,17 +24,18 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * Optional perspective presentation of the existing overworld.
+ * Complete perspective presentation of the world and field actions.
  *
  * Coordinates, tile identity, actors, random generators and action execution belong
  * exclusively to Game. This renderer only reads them after the normal map actions.
  * In particular it must never call Tile.init(), setView(), any draw/step action or
- * any method which advances simulation. Unsupported scenes keep the normal image.
+ * any method which advances simulation. The legacy world batch never submits pixels
+ * in modern mode: this renderer is the world, not an overlay on the old map.
  */
 public final class JohtoRenderer {
    private static final float TILE = 16f;
    private static final float WHITE = Color.WHITE_FLOAT_BITS;
-   private static final int FLOATS_PER_VERTEX = 7;
+   private static final int FLOATS_PER_VERTEX = 8;
    private static final int MAX_VERTICES = 65532;
    private final PerspectiveCamera camera = new PerspectiveCamera(35f, 160f, 144f);
    private final Vector2 lookup = new Vector2();
@@ -50,8 +50,6 @@ public final class JohtoRenderer {
    private float seconds;
    private final TextureRegion spritePart = new TextureRegion();
    private final FloatBuffer originalClearColor = BufferUtils.newFloatBuffer(4);
-   private TextureRegion pickupSprite;
-   private TextureRegion fossilSprite;
    private ShaderProgram shader;
    private Texture whiteTexture;
    private TextureRegion white;
@@ -59,13 +57,22 @@ public final class JohtoRenderer {
    private boolean failed;
    private boolean reported;
    private long renderedFrames;
+   private final float[] lights = new float[8 * 4];
+   private final WorldElevation elevation = new WorldElevation();
+   private float surfaceLift;
+   private float actorPlaneZ;
+   private final Vector3 projectedAnchor = new Vector3();
+   private final Color ambientTint = new Color(Color.WHITE), fogColor = new Color();
+   private float fogDensity, desaturation;
+   private long ghostFrames;
+   private long waterfallFrames;
 
    public JohtoRenderer() {
       camera.near = 1f;
       camera.far = 1800f;
    }
 
-   /** Returns false without clearing the original image when the scene is unsupported. */
+   /** False means no world is available; the modern scene compositor owns that frame. */
    public boolean render(Game game) {
       if (failed || !supports(game)) {
          return false;
@@ -75,11 +82,11 @@ public final class JohtoRenderer {
             initialize();
          }
          clearGeometry();
+         elevation.update(game.map.tiles);
          configureCamera(game);
          seconds += Math.min(0.1f, Math.max(0f, Gdx.graphics.getDeltaTime()));
          collectWorld(game);
-         // Upload all geometry before clearing the original image; allocation and
-         // shader failures therefore retain the already rendered 2D fallback.
+         // Prepare the complete scene before drawing it in one world pass.
          upload(geometry);
          upload(translucent);
          upload(shadows);
@@ -93,7 +100,7 @@ public final class JohtoRenderer {
          return true;
       } catch (RuntimeException ex) {
          failed = true;
-         Gdx.app.error("JohtoRenderer", "Visual renderer disabled after an error. The original renderer resumes; use run.cmd for classic graphics.", ex);
+         Gdx.app.error("JohtoRenderer", "Modern world rendering failed; retaining the modern scene compositor.", ex);
          return false;
       } finally {
          // The following original UI pass uses SpriteBatch and its own projection.
@@ -109,6 +116,10 @@ public final class JohtoRenderer {
    public long getRenderedFrames() {
       return renderedFrames;
    }
+   public WorldElevation getElevation() { return elevation; }
+   public long getGhostFrames() { return ghostFrames; }
+   public long getWaterfallFrames() { return waterfallFrames; }
+   public float getFogDensity() { return fogDensity; }
 
    public long getPlayerModelFrames() { return actorModels.getPlayerModelFrames(); }
    public long getPokemonModelFrames() { return actorModels.getPokemonModelFrames(); }
@@ -119,56 +130,32 @@ public final class JohtoRenderer {
    private boolean supports(Game game) {
       if (game == null || game.map == null || game.player == null || game.cam == null
          || game.map.tiles.isEmpty()
-         || game.player.dontDrawMapDuringBattle || game.cinematic
-         || game.player.isSleeping || game.player.isSitting || game.player.isFishing
-         || game.player.isCrafting || game.player.currPlanting != null
-         || !game.player.currFieldMove.isEmpty()) {
+         || game.player.dontDrawMapDuringBattle) {
          return false;
       }
-      boolean hasMap = false;
-      for (Action action : game.actionStack) {
-         if (action == null) {
-            continue;
-         }
-         if (action instanceof DrawMap) {
-            hasMap = true;
-         }
-         String name = action.getClass().getSimpleName();
-         // Preserve original map-space overlays, touch targeting and transitions.
-         if (action instanceof DrawMiniMap || action instanceof TileEditor
-            || name.startsWith("Battle") || name.startsWith("DrawBattle")
-            || name.startsWith("Special") || name.startsWith("Throw")
-            || name.startsWith("Catch") || name.equals("DrawWhiteScreen")
-            || name.equals("FadeAnim") || name.equals("LightFadeIn")
-            || name.equals("LightFadeOut") || name.equals("GenerateWorld")
-            || name.equals("DrawSetupMenu")) {
-            return false;
-         }
-      }
-      return hasMap && game.player.currSprite != null && game.player.currSprite.getTexture() != null;
+      return game.player.currSprite != null && game.player.currSprite.getTexture() != null;
    }
 
    private void initialize() {
       String vertex = "attribute vec3 a_position;\n"
-         + "attribute vec4 a_color;\nattribute vec2 a_texCoord0;\nattribute float a_style;\n"
-         + "uniform mat4 u_projTrans;\nvarying vec4 v_color;\nvarying vec2 v_texCoords;\nvarying float v_style;\n"
+         + "attribute vec4 a_color;\nattribute vec2 a_texCoord0;\nattribute float a_style;\nattribute float a_anchorDepth;\n"
+         + "uniform mat4 u_projTrans;\nvarying vec4 v_color;\nvarying vec2 v_texCoords;\nvarying float v_style;\nvarying vec2 v_world;\n"
          + "void main(){v_color=a_color;v_color.a*=255.0/254.0;v_texCoords=a_texCoord0;v_style=a_style;"
-         + "gl_Position=u_projTrans*vec4(a_position,1.0);}\n";
+         + "v_world=a_position.xz;gl_Position=u_projTrans*vec4(a_position,1.0);"
+         + "if(a_style>3.5)gl_Position.z=a_anchorDepth*gl_Position.w;}\n";
       String fragment = "#ifdef GL_ES\nprecision mediump float;\n#endif\n"
-         + "uniform sampler2D u_texture;\nuniform vec3 u_tint;\n"
+         + "uniform sampler2D u_texture;\nuniform vec3 u_tint;\nuniform vec4 u_lights[8];\nvarying vec2 v_world;\n"
+         + "uniform vec3 u_fogColor;uniform float u_fogDensity;uniform float u_desaturation;uniform float u_time;\n"
          + "varying vec4 v_color;\nvarying vec2 v_texCoords;\nvarying float v_style;\n"
          + "void main(){vec4 c=texture2D(u_texture,v_texCoords);"
-         // Apply only to explicitly tagged original terrain, never to actors,
-         // objects, new terrain or geometric meshes sharing an atlas texture.
-         + "if(v_style>0.5&&v_style<1.5&&c.g>c.r*1.05&&c.g>c.b*1.12){"
-         + "float t=clamp((c.g-0.18)/0.82,0.0,1.0);"
-         + "c.rgb=mix(vec3(0.15,0.34,0.24),vec3(0.48,0.71,0.35),t);}"
-         + "if(v_style>1.5&&v_style<2.5&&c.b>c.r*1.06&&c.b>c.g*1.08&&min(c.r,c.g)<0.74){"
-         + "float t=clamp((dot(c.rgb,vec3(0.299,0.587,0.114))-0.2)/0.65,0.0,1.0);"
-         + "c.rgb=mix(vec3(0.04,0.33,0.66),vec3(0.24,0.69,0.82),t);}"
-         + "if(v_style>2.5){float t=dot(c.rgb,vec3(0.299,0.587,0.114));c.rgb=mix(vec3(0.48,0.055,0.018),vec3(1.0,0.78,0.16),clamp(t*2.4,0.0,1.0));}"
          + "c*=v_color;"
-         + "if(c.a<0.1)discard;gl_FragColor=vec4(c.rgb*(v_style>2.5?mix(u_tint,vec3(1.0),0.65):u_tint),c.a);}\n";
+         + "float glow=0.0;for(int i=0;i<8;i++){vec4 l=u_lights[i];"
+         + "float f=clamp(1.0-distance(v_world,l.xy)/max(l.z,1.0),0.0,1.0);glow=max(glow,f*f*l.w);}"
+         + "vec3 light=max(u_tint,mix(u_tint,vec3(1.0,.91,.77),glow));"
+         + "if(c.a<0.1)discard;c.rgb*=v_style>2.5&&v_style<3.5?mix(light,vec3(1.0),0.65):light;"
+         + "c.rgb=mix(c.rgb,vec3(dot(c.rgb,vec3(.299,.587,.114))),u_desaturation);"
+         + "float mist=u_fogDensity*(.65+.35*sin(v_world.x*.036+u_time*.21)*sin(v_world.y*.047-u_time*.16));"
+         + "gl_FragColor=vec4(mix(c.rgb,u_fogColor,clamp(mist,0.0,.45)),c.a);}\n";
       shader = new ShaderProgram(vertex, fragment);
       if (!shader.isCompiled()) {
          throw new IllegalStateException("Perspective shader compilation failed: " + shader.getLog());
@@ -180,9 +167,6 @@ public final class JohtoRenderer {
       pixel.dispose();
       white = new TextureRegion(whiteTexture);
       assets = BwAssets.get();
-      // Borrowed item sheets preserve the item identity and pickup rules.
-      pickupSprite = new TextureRegion(TextureCache.get(Gdx.files.internal("tiles/pokeball1.png")));
-      fossilSprite = new TextureRegion(TextureCache.get(Gdx.files.internal("tiles/fossil1.png")), 0, 0, 16, 16);
       initialized = true;
    }
 
@@ -194,10 +178,11 @@ public final class JohtoRenderer {
       // A slightly tighter footprint retains the original simulation's actor range.
       float distance = height * 0.77f / (2f * (float)Math.tan(17.5f * MathUtils.degreesToRadians));
       float angle = 50f * MathUtils.degreesToRadians;
-      camera.position.set(game.cam.position.x, MathUtils.sin(angle) * distance,
+      float heightAtPlayer=elevation.height(game.player.position.x+8,game.player.position.y+8);
+      camera.position.set(game.cam.position.x, heightAtPlayer + MathUtils.sin(angle) * distance,
          -game.cam.position.y + MathUtils.cos(angle) * distance);
       camera.up.set(0f, 1f, 0f);
-      camera.lookAt(game.cam.position.x, 0f, -game.cam.position.y);
+      camera.lookAt(game.cam.position.x, heightAtPlayer, -game.cam.position.y);
       camera.update();
    }
 
@@ -211,21 +196,25 @@ public final class JohtoRenderer {
       for (int row = bottom; row <= top; row++) {
          for (int col = left; col <= right; col++) {
             Tile tile = game.map.tiles.get(lookup.set(col * TILE, row * TILE));
-            if (tile != null && tile.sprite != null) {
+            if (tile != null) {
+               elevation.observe(tile);
+               surfaceLift=elevation.height(tile.position.x+8,tile.position.y+8);
                tile(game, tile);
             }
          }
       }
       for (Pokemon pokemon : game.map.onscreenPokemon) {
+         if (pokemon == game.player.hmPokemon && !game.player.currFieldMove.isEmpty()) continue;
          pokemon(game, pokemon);
       }
       for (Tile tile : game.map.onscreenFossils) {
+         surfaceLift=elevation.height(tile.position.x+8,tile.position.y+8);
          pickup(tile);
       }
       for (Pokemon pokemon : game.map.onscreenBurrowed) {
          pokemon(game, pokemon);
       }
-      if (game.player.hmPokemon != null && !game.map.onscreenPokemon.contains(game.player.hmPokemon)) {
+      if (game.player.hmPokemon != null && game.player.currFieldMove.isEmpty() && !game.map.onscreenPokemon.contains(game.player.hmPokemon)) {
          pokemon(game, game.player.hmPokemon);
       }
       for (Player other : game.players.values()) {
@@ -234,11 +223,14 @@ public final class JohtoRenderer {
             trainer(other, 0f);
          }
       }
-      trainer(game.player, Math.max(0, DrawPlayerUpper.pokemonOffsetY));
+      fieldPlayer(game);
+      fieldTarget(game);
       // Read the same map-action snapshot used in this frame. The original action
       // already advanced its timer; rendering it here must never call step again.
       for (Action action : game.actionStackCopy) {
-         if (action instanceof Pokemon.Emote) {
+         if (action instanceof SpawnGhost || action instanceof DrawGhost || action instanceof DespawnGhost) {
+            ghost(game, action);
+         } else if (action instanceof Pokemon.Emote) {
             Pokemon.Emote emote = (Pokemon.Emote)action;
             Pokemon owner = enclosingOwner(emote, Pokemon.class);
             // Match Emote.step exactly; it does not consult drawThisFrame.
@@ -254,6 +246,7 @@ public final class JohtoRenderer {
    }
 
    private void emote(Sprite sprite, float x, float y) {
+      surfaceLift=elevation.height(x+8,y+8);
       if (sprite == null || sprite.getTexture() == null) return;
       if (!camera.frustum.sphereInFrustum(x + 8f, 28f, -y - 7f, 18f)) return;
       quad(batch(emotes, sprite.getTexture()), x, 20f, -y - 7f,
@@ -289,28 +282,16 @@ public final class JohtoRenderer {
    private void pickup(Tile tile) {
       String item = tile.hasItem;
       if (item == null) return;
-      TextureRegion region;
+      TextureRegion region = null;
       if (item.contains("fossil") || item.equals("old amber")) {
-         int row;
-         switch (item) {
-            case "old amber": row = 0; break;
-            case "helix fossil": row = 1; break;
-            case "dome fossil": row = 2; break;
-            case "root fossil": row = 3; break;
-            case "claw fossil": row = 4; break;
-            case "shield fossil": row = 5; break;
-            case "skull fossil": row = 6; break;
-            default: return;
-         }
-         fossilSprite.setRegion(0, row * 16, 16, 16);
-         region = fossilSprite;
+         region = assets.named("fossil");
       } else {
          if (tile.isSign() || item.equals("secret key") || item.equals("pok\u00e9 ball")) return;
-         region = pickupSprite;
+         ball(tile.position.x+8,tile.position.y+7,item.contains("ultra"));
+         return;
       }
       shadow(tile.position.x + 8f, tile.position.y + 7f, 4f, 2f);
-      upright(region, tile.position.x, tile.position.y + 7f, 0.2f,
-         region.getRegionWidth(), region.getRegionHeight(), WHITE);
+      upright(region, tile.position.x+2, tile.position.y + 7f, 0.2f,12,10,WHITE);
    }
 
    private void tile(Game game, Tile tile) {
@@ -319,37 +300,98 @@ public final class JohtoRenderer {
       String upper = tile.nameUpper == null ? "" : tile.nameUpper;
       String names = (lower + " " + upper).toLowerCase(java.util.Locale.ROOT);
       boolean tree = isTree(tile, lower, upper);
-      TextureRegion ground = assets.terrain(tile);
-      if (ground == null) ground = tile.sprite;
-      if (tile.isLava) ground = assets.cell("water", x + (int)(seconds * 2f) * 16, y);
-      float tint = lower.equals("volcano2") ? color(.66f,.67f,.68f) : WHITE;
-      floor(ground, x, y, TILE, TILE, 0f, tint, geometry, tile.isLava ? 3f : 0f);
+      BiomeProfiles.Profile profile=BiomeProfiles.visualForTile(tile);
+      TextureRegion ground = assets.terrain(tile, seconds);
+      if(assets.namedAnimated(BwAssets.terrainName(tile),seconds)==null)
+         assets.reportMissing(BwAssets.terrainName(tile),tile,game.map.timeOfDay);
+      if (ground == null) ground = assets.cell("grass_light", x, y);
+      if(tile.isLava) {
+         for(int[] direction:new int[][]{{0,-16},{0,16},{-16,0},{16,0}}) {
+            Tile next=game.map.tiles.get(lookup.set(x+direction[0],y+direction[1]));
+            if(next!=null&&!next.isLava){ground=assets.cell(profile.string("fluid","cooledLava","lava_cooled"),x,y,seconds);break;}
+         }
+      }
+      if(!tile.isWaterfall&&!names.contains("lavafall")) terrainSurface(tile,ground);
+      if(!tile.isWater && !tile.isLava && (tile.isTidal || lower.contains("puddle"))) {
+         // High tide is a walkable film over sand, not an opaque deep-water tile.
+         // Read the live tide flag: CycleDayNight changes names before init().
+         TextureRegion shallow=assets.cell(profile.string("fluid","shallow","water_shallow"),x,y,seconds);
+         float inset=tile.isTidal?0:3;
+         floor(shallow,x+inset,y+inset,16-inset*2,16-inset*2,.045f,
+            Color.toFloatBits(.92f,1,1,tile.isTidal?.34f:.45f),translucent);
+      }
       // Coast geometry follows actual wet/dry adjacency; never adds collision.
       if (tile.isWater && !tile.isLava) coast(game, tile);
-      if (ModernWorldGenerator.isRamp(tile)) {
-         floor(assets.named("steps"), x + 2, y + 1, 12, 14, .08f, color(.82f,.82f,.73f), geometry);
-         return;
-      }
+      if(tile.isWaterfall || names.contains("lavafall")) { waterfall(tile,profile);return; }
+      terrainEdges(game,tile,profile);
+      if (ModernWorldGenerator.isRamp(tile) && elevation.isSloped(tile)) ramp(tile,profile);
+      if (ModernWorldGenerator.isRamp(tile)) return;
       if (tile.isLedge && (tile.ledgeDir != null || upper.startsWith("ledges3"))) {
-         cliff(tile, x, y);
          return;
       }
       if (tree) { tree(tile, x + 8f, y + 8f, names); return; }
+      if (staticPokemon(tile, x+8, y+7)) return;
+      if (names.contains("pokeball") || names.contains("ultraball")) { ball(x+8,y+7,names.contains("ultraball")); return; }
       if (building(tile, x, y, names)) return;
-      TextureRegion object = assets.object(tile);
+      TextureRegion object = assets.object(tile, seconds);
+      if(object==null && BwAssets.objectName(tile)!=null)
+         assets.reportMissing(BwAssets.objectName(tile),tile,game.map.timeOfDay);
       if (object != null) {
-         boolean plant = names.contains("grass") || names.contains("flower");
-         float width = names.contains("rock") ? 17f : plant ? 16f : 18f;
+         String identity=BwAssets.objectName(tile);
+         if("warp".equals(identity)||"pressure_plate".equals(identity)||"cracked".equals(identity)||"hole".equals(identity)||"steps".equals(identity)) {
+            floor(object,x,y,16,16,.08f,WHITE,geometry);return;
+         }
+         boolean seedling="seedling".equals(identity)||"plant_growing".equals(identity);
+         boolean plant = names.contains("grass") || names.contains("flower") || seedling;
+         float width = seedling ? Math.min(9f,object.getRegionWidth()) : names.contains("rock") ? 17f : plant ? 16f : 18f;
          float height = Math.min(25f, width * object.getRegionHeight() / Math.max(1f, object.getRegionWidth()));
+         width=height*object.getRegionWidth()/Math.max(1f,object.getRegionHeight());
          if (!plant) shadow(x + 8, y + 7, width * .3f, 2.4f);
          upright(object, x + 8 - width/2, y + 7, .15f, width, height, WHITE);
-      } else if (tile.overSprite != null && tile.overSprite != tile.sprite) {
-         // Unknown interactive machinery, doors, puzzle symbols and rare events
-         // retain their source cue instead of inventing a misleading replacement.
-         SmolSprite sprite = tile.overSprite;
-         if (tile.drawUpperBelowPlayer || names.contains("warp") || names.contains("stairs"))
-            floor(sprite, sprite.getX(), sprite.getY() - tile.yOffset, sprite.getRegionWidth(), sprite.getRegionHeight(), .09f, WHITE, geometry);
-         else upright(sprite, sprite.getX(), y + 7, .1f, sprite.getRegionWidth(), sprite.getRegionHeight(), WHITE);
+      } else if (tile.isSolid && !tile.isLava && !tile.isWater && !names.contains("_hidden") && !names.contains("nosprite")) {
+         // Unknown solid cells still show their real blocked footprint using the
+         // current biome material; old map textures never leak into this pass.
+         prism(x+1,y+1,0,14,14,8,assets.cell(profile.terrain("rock"),x,y),WHITE);
+      }
+   }
+
+   private boolean staticPokemon(Tile tile,float x,float y) {
+      String name=(tile.name+" "+tile.nameUpper).toLowerCase(java.util.Locale.ROOT);
+      if(name.contains("_hidden")) return false;
+      String species=tile.name!=null && tile.name.matches("cave1_regi[123]")?"regigigas":null;
+      for(String candidate:new String[]{"regirock","regice","registeel","regigigas","regidrago","regieleki","volcarona","spiritomb","raikou","entei","suicune","mewtwo","mega_gengar"}) {
+         if(name.contains(candidate)) {species=candidate.equals("mega_gengar")?"mgengar":candidate;break;}
+      }
+      if(species==null)return false;
+      PmdPokemonSprites sprites=PmdPokemonSprites.get();
+      PmdPokemonSprites.Frame frame=sprites.frame(species,"down","Idle",seconds);
+      if(frame==null)return false;
+      PmdPokemonSprites.AnimationBounds bounds=sprites.bounds(species,"down","Idle");
+      float scale=Math.min(.85f,30f/Math.max(bounds.width,bounds.height));
+      shadow(x,y,6,3);
+      anchored(frame.region,x,y,.2f-Math.min(0,bounds.minY)*scale*MathUtils.cosDeg(50),frame.anchorX,frame.anchorY,scale);
+      return true;
+   }
+
+   private void ball(float x,float y,boolean ultra) {
+      shadow(x,y,3.8f,2f);
+      float dark=color(.09f,.13f,.18f);
+      disc(x,y,.25f,4f,dark,dark);
+      disc(x,y-.02f,.25f,3.2f,ultra?color(.94f,.74f,.18f):color(.88f,.21f,.26f),color(.91f,.94f,.95f));
+      upright(white,x-3.7f,y-3.05f,.25f+2.1f,7.4f,1f,dark);
+      disc(x,y-.04f,.25f+1.7f,1.5f,dark,dark);
+      disc(x,y-.06f,.25f+2.1f,1.1f,WHITE,WHITE);
+   }
+
+   private void disc(float x,float y,float base,float radius,float top,float bottom) {
+      Geometry mesh=batch(geometry,whiteTexture);
+      float rise=MathUtils.cosDeg(50),back=MathUtils.sinDeg(50);
+      for(int i=0;i<20;i++) {
+         float a=i*MathUtils.PI2/20,b=(i+1)*MathUtils.PI2/20;
+         float h1=radius+MathUtils.sin(a)*radius,h2=radius+MathUtils.sin(b)*radius;
+         triangle(mesh,x,base+radius*rise,-y-radius*back,
+            x+MathUtils.cos(a)*radius,base+h1*rise,-y-h1*back,
+            x+MathUtils.cos(b)*radius,base+h2*rise,-y-h2*back,i<10?top:bottom);
       }
    }
 
@@ -358,58 +400,155 @@ public final class JohtoRenderer {
       float x = tile.position.x, y = tile.position.y;
       for (int i=0;i<4;i++) {
          Tile next = game.map.tiles.get(lookup.set(x+dirs[i][0],y+dirs[i][1]));
-         if (next == null || next.isWater || next.isLava) continue;
+         if (next == null || next.isWater || next.isWaterfall || next.isLava) continue;
          float sx=x,sy=y,w=16,d=2;
          if(i==1) sy+=14;
          else if(i==2) { w=2;d=16; }
          else if(i==3) { sx+=14;w=2;d=16; }
-         floor(assets.named("water_ripple"),sx,sy,w,d,.035f,Color.toFloatBits(.72f,.95f,.93f,.80f),translucent);
+         BiomeProfiles.Profile land=BiomeProfiles.visualForTile(next);
+         float width=land.number("transition","shoreWidth",2);
+         if(i==0){d=width;}else if(i==1){sy=y+16-width;d=width;}
+         else if(i==2){w=width;}else{sx=x+16-width;w=width;}
+         float depth=BiomeProfiles.visualForTile(tile).number("height","shoreDepth",2);
+         floor(assets.named("water_ripple"),sx,sy,w,d,-depth+.035f,Color.toFloatBits(.72f,.95f,.93f,.80f),translucent);
       }
    }
 
-   /** Only real ledges receive relief. No inferred global height or new barriers. */
-   private void cliff(Tile tile, float x, float y) {
-      boolean volcano = ModernWorldGenerator.isVolcanic(tile);
-      String upper = tile.nameUpper == null ? "" : tile.nameUpper;
-      volcano |= upper.startsWith("ledges3volcano");
-      boolean snow = upper.startsWith("ledges3snow");
-      TextureRegion face = assets.cell(volcano ? "basalt" : "cliff", x, y);
-      TextureRegion cap = assets.cell(volcano ? "basalt" : snow ? "snow" : "mountain", x, y);
-      Geometry mesh = batch(geometry, face.getTexture());
-      float h = 8f, z = -y;
-      String direction = tile.ledgeDir;
-      int edges=0; // N=front/down, S=back/up, E=left, W=right: original Tile convention.
-      if(upper.startsWith("ledges3")) {
-         String[] parts=upper.split("_");
-         if(parts.length>1)for(char c:parts[1].toCharArray())edges|=c=='N'?1:c=='S'?2:c=='E'?4:c=='W'?8:0;
-      } else edges="down".equals(direction)?1:"up".equals(direction)?2:"left".equals(direction)?4:"right".equals(direction)?8:0;
-      if(edges==0) {
-         // The original ledges3_none cell is solid, with no singled-out edge.
-         // Preserve its visible blocked footprint rather than dropping its art.
-         if(tile.isSolid)prism(x,y,0,16,16,h,face,WHITE);
-         return;
+   private void ramp(Tile tile,BiomeProfiles.Profile profile) {
+      float x=tile.position.x,y=tile.position.y,previousLift=surfaceLift;surfaceLift=0;
+      float a=elevation.height(x+.01f,y+.01f),b=elevation.height(x+15.99f,y+.01f);
+      float c=elevation.height(x+15.99f,y+15.99f),d=elevation.height(x+.01f,y+15.99f);
+      // Subtle treads follow the actual incline; a flat tile never gets a staircase.
+      boolean horizontal=Math.abs((b+c)-(a+d))>Math.abs((c+d)-(a+b));
+      for(int step=1;step<5;step++) {
+         float f=step/5f,px=horizontal?x+16*f:x,py=horizontal?y:y+16*f;
+         float ex=px+(horizontal?.45f:16),ey=py+(horizontal?16:.45f);
+         float h0=elevation.height(MathUtils.clamp(px,x+.01f,x+15.99f),MathUtils.clamp(py,y+.01f,y+15.99f));
+         float h1=elevation.height(MathUtils.clamp(ex,x+.01f,x+15.99f),MathUtils.clamp(py,y+.01f,y+15.99f));
+         float h2=elevation.height(MathUtils.clamp(ex,x+.01f,x+15.99f),MathUtils.clamp(ey,y+.01f,y+15.99f));
+         float h3=elevation.height(MathUtils.clamp(px,x+.01f,x+15.99f),MathUtils.clamp(ey,y+.01f,y+15.99f));
+         quad(batch(translucent,whiteTexture),px,h0+.06f,-py,ex,h1+.06f,-py,ex,h2+.06f,-ey,px,h3+.06f,-ey,
+            white,Color.toFloatBits(.72f,.69f,.62f,.34f));
       }
-      // Inner corners only touch a lower diagonal neighbour. A short corner
-      // return preserves that cue while keeping the walkable centre unobscured.
-      boolean inner=upper.contains("_inner");
-      float a=inner?((edges&4)!=0?0:13):0, b=inner?a+3:16;
-      float c=inner?((edges&1)!=0?0:13):0, d=inner?c+3:16;
-      if((edges&1)!=0){
-         quad(mesh,x+a,0,z,x+b,0,z,x+b,h,z,x+a,h,z,face,WHITE);
-         floor(cap,x+a,y,b-a,3,h,WHITE,geometry);
+      surfaceLift=previousLift;
+   }
+
+   private void waterfall(Tile tile,BiomeProfiles.Profile profile) {
+      waterfallFrames++;
+      float x=tile.position.x,y=tile.position.y;
+      String fluid=profile.string("fluid",tile.isLava?"lava":"water",tile.isLava?"lava_bright":"water");
+      TextureRegion art=assets.cell(fluid,x,y,seconds);
+      float dx="left".equals(tile.ledgeDir)?-1:"right".equals(tile.ledgeDir)?1:0;
+      float dy=dx!=0?0:"up".equals(tile.ledgeDir)?1:-1,tx=-dy,ty=dx;
+      float lx=x+8+dx*8,ly=y+8+dy*8,hx=x+8-dx*8,hy=y+8-dy*8;
+      float bottom=elevation.height(lx+dx*.01f,ly+dy*.01f)-surfaceLift
+         -(tile.isLava?0:profile.number("height","shoreDepth",2));
+      float top=elevation.height(hx-dx*.01f,hy-dy*.01f)-surfaceLift;
+      // The falling sheet is upright world geometry; it never becomes a ground decal.
+      quad(batch(geometry,art.getTexture()),lx-tx*8,bottom,-ly+ty*8,lx+tx*8,bottom,-ly-ty*8,
+         hx+tx*8,top,-hy-ty*8,hx-tx*8,top,-hy+ty*8,art,WHITE,tile.isLava?3:0);
+      for(int i=0;i<4;i++) {
+         float travel=(seconds*.7f+i*.25f)%1f;
+         float xx=MathUtils.lerp(hx,lx,travel),yy=MathUtils.lerp(hy,ly,travel),hh=MathUtils.lerp(top,bottom,travel);
+         floor(white,xx-(dx==0?6:.3f),yy-(dx==0?.3f:6),dx==0?12:.6f,dx==0?.6f:12,
+            hh+.12f,Color.toFloatBits(.84f,.96f,1,.35f),translucent);
       }
-      if((edges&2)!=0){
-         quad(mesh,x+b,0,z-16,x+a,0,z-16,x+a,h,z-16,x+b,h,z-16,face,color(.77f,.78f,.80f));
-         floor(cap,x+a,y+13,b-a,3,h,WHITE,geometry);
+      ring(lx+dx,ly+dy,5+.7f*MathUtils.sin(seconds*5),.6f,bottom+.14f,Color.toFloatBits(.76f,.92f,.95f,.4f));
+   }
+
+   /** Read real scripted night encounters; never create an actor as an asset fallback. */
+   private void ghost(Game game,Action action) {
+      if(!game.actionStack.contains(action))return;
+      float x,y,alpha=1;
+      if(action instanceof SpawnGhost) {
+         SpawnGhost spawn=(SpawnGhost)action;x=spawn.position.x+16;y=spawn.position.y+16;
+         alpha=spawn.part1>0?.25f:(1-spawn.part2/40f)*.8f;
+      } else if(action instanceof DespawnGhost) {
+         DespawnGhost despawn=(DespawnGhost)action;x=despawn.position.x+16;y=despawn.position.y+16;alpha=despawn.part1/80f;
+      } else {
+         DrawGhost ghost=(DrawGhost)action;
+         if(ghost.inBattle && ghost.noEncounterTimer%4<2)return;
+         x=ghost.basePos.x+16;y=ghost.basePos.y+16;
       }
-      if((edges&4)!=0){
-         quad(mesh,x,0,z-d,x,0,z-c,x,h,z-c,x,h,z-d,face,color(.82f,.83f,.84f));
-         floor(cap,x,y+c,3,d-c,h,WHITE,geometry);
+      surfaceLift=elevation.height(x,y);ghostFrames++;
+      float bob=6+MathUtils.sin(seconds*3)*1.5f;
+      shadow(x,y,5,2.4f);
+      Geometry mesh=batch(translucent,whiteTexture);
+      for(int layer=0;layer<4;layer++) {
+         float radius=8-layer*1.4f,tint=Color.toFloatBits(.62f+layer*.08f,.69f+layer*.07f,.90f,alpha*(.12f+layer*.05f));
+         for(int i=0;i<24;i++) {
+            float a=i*MathUtils.PI2/24,b=(i+1)*MathUtils.PI2/24;
+            triangle(mesh,x,bob+6,-y-5,x+MathUtils.cos(a)*radius,bob+6+MathUtils.sin(a)*radius,-y-5,
+               x+MathUtils.cos(b)*radius,bob+6+MathUtils.sin(b)*radius,-y-5,tint);
+         }
       }
-      if((edges&8)!=0){
-         quad(mesh,x+16,0,z-c,x+16,0,z-d,x+16,h,z-d,x+16,h,z-c,face,color(.70f,.72f,.75f));
-         floor(cap,x+13,y+c,3,d-c,h,WHITE,geometry);
+      ring(x,y,6+.4f*MathUtils.sin(seconds*4),.6f,.18f,Color.toFloatBits(.57f,.74f,.95f,alpha*.4f));
+   }
+
+   /** A terrain cell is its upper surface, not a flat floor with a wall prop. */
+   private void terrainSurface(Tile tile,TextureRegion ground) {
+      float x=tile.position.x,y=tile.position.y,previous=surfaceLift;surfaceLift=0;
+      TextureRegion art=ground;
+      float a=terrainHeight(tile,x+.01f,y+.01f),b=terrainHeight(tile,x+15.99f,y+.01f);
+      float c=terrainHeight(tile,x+15.99f,y+15.99f),d=terrainHeight(tile,x+.01f,y+15.99f);
+      // Directional light makes the incline legible even when it shares the
+      // plateau's material. Flat ground keeps its original palette.
+      float gx=((b+c)-(a+d))/32f,gy=((c+d)-(a+b))/32f;
+      float sun=(.82f+.30f*gx+.32f*gy)/(float)Math.sqrt(1+gx*gx+gy*gy);
+      float light=tile.isLava?1:MathUtils.clamp(.60f+.40f*sun/.82f,.60f,1f);
+      quad(batch(geometry,art.getTexture()),x,a,-y,x+16,b,-y,x+16,c,-y-16,x,d,-y-16,art,color(light,light,light),tile.isLava?3f:0f);
+      surfaceLift=previous;
+   }
+
+   private float terrainHeight(Tile tile,float x,float y) {
+      return elevation.height(x,y)-(tile.isWater&&!tile.isWaterfall?BiomeProfiles.forTile(tile).number("height","shoreDepth",2):0);
+   }
+
+   /** Stitch the real upper and lower surfaces at every exposed step. Never
+    * extrude a fallback fence when both sides have the same elevation. */
+   private void terrainEdges(Game game,Tile tile,BiomeProfiles.Profile profile) {
+      float x=tile.position.x,y=tile.position.y,previous=surfaceLift;surfaceLift=0;
+      for(int side=0;side<4;side++) {
+         int dx=side==2?-1:side==3?1:0,dy=side==0?-1:side==1?1:0;
+         Tile next=game.map.tiles.get(lookup.set(x+dx*16,y+dy*16));
+         if(next==null||next.isWaterfall||next.name.contains("lavafall"))continue;
+         float x0=side==3?x+16:x,y0=side==1?y+16:y;
+         float x1=side<2?x+16:x0,y1=side<2?y0:y+16;
+         float a=terrainHeight(tile,MathUtils.clamp(x0,x+.01f,x+15.99f),MathUtils.clamp(y0,y+.01f,y+15.99f));
+         float b=terrainHeight(tile,MathUtils.clamp(x1,x+.01f,x+15.99f),MathUtils.clamp(y1,y+.01f,y+15.99f));
+         float lowA=terrainHeight(next,MathUtils.clamp(x0+dx*.02f,next.position.x+.01f,next.position.x+15.99f),
+            MathUtils.clamp(y0+dy*.02f,next.position.y+.01f,next.position.y+15.99f));
+         float lowB=terrainHeight(next,MathUtils.clamp(x1+dx*.02f,next.position.x+.01f,next.position.x+15.99f),
+            MathUtils.clamp(y1+dy*.02f,next.position.y+.01f,next.position.y+15.99f));
+         if(a-lowA<.08f&&b-lowB<.08f)continue;
+         // Two slopes can cross along an edge: emit only the exposed portion.
+         if(a<lowA||b<lowB) {
+            float t=(a-lowA)/((a-lowA)-(b-lowB));
+            float xx=MathUtils.lerp(x0,x1,t),yy=MathUtils.lerp(y0,y1,t),hh=MathUtils.lerp(a,b,t);
+            if(a<lowA){x0=xx;y0=yy;a=lowA=hh;}else{x1=xx;y1=yy;b=lowB=hh;}
+         }
+         TextureRegion face=assets.cell(profile.cliff("front"),x,y);
+         float shade=side==0?.90f:side==1?.66f:side==2?.78f:.64f;
+         quad(batch(geometry,face.getTexture()),x0,lowA,-y0,x1,lowB,-y1,x1,b,-y1,x0,a,-y0,
+            face,color(shade,shade,shade));
+         // A fine edge on the plateau and a contact shadow at the foot give
+         // complementary cues for going up and down, without a thick wall cap.
+         if(Math.max(a-lowA,b-lowB)>3) {
+            float ix=-dx*.65f,iy=-dy*.65f;
+            float ha=terrainHeight(tile,MathUtils.clamp(x0+ix,x+.01f,x+15.99f),MathUtils.clamp(y0+iy,y+.01f,y+15.99f));
+            float hb=terrainHeight(tile,MathUtils.clamp(x1+ix,x+.01f,x+15.99f),MathUtils.clamp(y1+iy,y+.01f,y+15.99f));
+            quad(batch(translucent,whiteTexture),x0,a+.065f,-y0,x1,b+.065f,-y1,
+               x1+ix,hb+.065f,-y1-iy,x0+ix,ha+.065f,-y0-iy,white,Color.toFloatBits(.88f,.87f,.79f,.22f));
+            float ox=dx*1.5f,oy=dy*1.5f;
+            float la=terrainHeight(next,MathUtils.clamp(x0+ox,next.position.x+.01f,next.position.x+15.99f),
+               MathUtils.clamp(y0+oy,next.position.y+.01f,next.position.y+15.99f));
+            float lb=terrainHeight(next,MathUtils.clamp(x1+ox,next.position.x+.01f,next.position.x+15.99f),
+               MathUtils.clamp(y1+oy,next.position.y+.01f,next.position.y+15.99f));
+            quad(batch(translucent,whiteTexture),x0,lowA+.07f,-y0,x1,lowB+.07f,-y1,
+               x1+ox,lb+.07f,-y1-oy,x0+ox,la+.07f,-y0-oy,white,Color.toFloatBits(.05f,.06f,.08f,.30f));
+         }
       }
+      surfaceLift=previous;
    }
 
    private boolean building(Tile tile, float x, float y, String name) {
@@ -442,19 +581,28 @@ public final class JohtoRenderer {
          return true;
       }
       if (name.contains("roof")) {
-         floor(assets.named("brick_floor"),x,y,16,16,12f,color(.65f,.35f,.30f),geometry); return true;
+         floor(assets.named("roof"),x,y,16,16,12f,WHITE,geometry); return true;
       }
-      if (name.contains("door")) {
+      if (name.contains("door") || name.contains("pkmnmansion_ext_locked")) {
          floor(assets.named("steps"),x,y,16,12,.1f,WHITE,geometry);
          // Keep the doorway footprint open; the frame rises on its back edge.
-         upright(assets.named("door_red"),x,y+14,.1f,16,19,WHITE); return true;
+         upright(assets.named(name.contains("locked")?"door_locked":tile.isSolid?"door":"door_open"),x,y+14,.1f,16,19,WHITE); return true;
       }
-      boolean wall = name.contains("wall") || name.matches(".*house[0-9].*")
-         || name.contains("cave") && tile.isSolid && !name.contains("regi");
+      String upper=tile.nameUpper==null?"":tile.nameUpper.toLowerCase(java.util.Locale.ROOT);
+      String lower=tile.name==null?"":tile.name.toLowerCase(java.util.Locale.ROOT);
+      boolean caveWall=lower.startsWith("cave") && upper.isEmpty() && !lower.contains("regi");
+      boolean mansionWall=name.contains("pkmnmansion_ext");
+      boolean wall = upper.contains("wall") || lower.contains("wall") && upper.isEmpty()
+         || upper.matches("house[0-9].*") || lower.matches("house[0-9].*") && upper.isEmpty() || mansionWall || caveWall;
       if (wall && tile.isSolid) {
-         TextureRegion face=assets.named(name.contains("cave") ? "cliff_dark" : name.contains("ruin") ? "ruin_wall" : "wall");
-         float h=name.contains("cave")?14:19;
+         TextureRegion face=assets.named(caveWall ? "cliff_dark" : name.contains("ruin") ? "ruin_wall" : "wall");
+         float h=caveWall?14:19;
          quad(batch(geometry,face.getTexture()),x,0,-y,x+16,0,-y,x+16,h,-y,x,h,-y,face,WHITE);
+         if(name.contains("window")) {
+            TextureRegion window=assets.named("window");
+            quad(batch(geometry,window.getTexture()),x+3,5,-y+.05f,x+13,5,-y+.05f,
+               x+13,16,-y+.05f,x+3,16,-y+.05f,window,WHITE);
+         }
          floor(assets.named("tile_pale"),x,y,16,16,h,color(.87f,.86f,.80f),geometry);
          return true;
       }
@@ -483,6 +631,7 @@ public final class JohtoRenderer {
       boolean following = pokemon.drawLower != null && pokemon.drawLower.following
          || pokemon.drawUpper != null && pokemon.drawUpper.following;
       if (!pokemon.drawThisFrame && !following) return;
+      surfaceLift=elevation.height(pokemon.position.x+8,pokemon.position.y+8);
       boolean moving = moving(pokemon, pokemon.position.x, pokemon.position.y);
       PmdPokemonSprites sprites = PmdPokemonSprites.get();
       PmdPokemonSprites.Frame frame = pokemon.isEgg ? null : sprites.frame(pokemon, pokemon.dirFacing, moving ? "Walk" : "Idle", seconds);
@@ -501,6 +650,8 @@ public final class JohtoRenderer {
          return;
       }
       Sprite source = pokemon.currOwSprite;
+      if(!pokemon.isEgg && !pokemon.isGhost)assets.reportMissing("pokemon/"+pokemon.specie.name,
+         game.map.tiles.get(lookup.set(MathUtils.floor(pokemon.position.x/16)*16,MathUtils.floor(pokemon.position.y/16)*16)),game.map.timeOfDay);
       if (pokemon.inWater && pokemon.drawUpper != null) {
          int height = Math.max(1, source.getRegionHeight() - 8 + pokemon.drawUpper.floatOffset + pokemon.drawUpper.floatOffset2);
          spritePart.setRegion(source);
@@ -517,18 +668,153 @@ public final class JohtoRenderer {
       float width = sprite.getRegionWidth();
       float height = sprite.getRegionHeight();
       shadow(x + width * 0.5f, y + 7f, width * 0.30f, 2.5f);
-      upright(sprite, x, y + 7f, 0.15f + lift, width, height, sprite.getColor().toFloatBits());
+      actorPlaneZ=-y-7f;
+      upright(sprite, x, y + 7f, 0.15f + lift, width, height, sprite.getColor().toFloatBits(),4f);
    }
 
    private void trainer(Player player, float lift) {
+      surfaceLift=elevation.height(player.position.x+8,player.position.y+8);
       TextureRegion region = assets.trainer(player, seconds, moving(player, player.position.x, player.position.y));
       shadow(player.position.x + 8, player.position.y + 7, 4.5f, 2.5f);
       anchored(region, player.position.x + 8, player.position.y + 7, .15f + lift, 16f, 3f, .85f);
    }
 
+   /** Field moves use the same PMD/BW actors as walking, never composite GB sprites. */
+   private void fieldPlayer(Game game) {
+      Player player = game.player;
+      float x = player.position.x + 8, y = player.position.y + 7;
+      surfaceLift=elevation.height(x,y);
+      String move = player.currFieldMove;
+      boolean walking = moving(player, player.position.x, player.position.y);
+      TextureRegion person = assets.trainer(player, seconds, walking);
+      float lift = .15f;
+      Pokemon companion = player.hmPokemon;
+      boolean mount = companion != null && ("SURF".equals(move) || "RIDE".equals(move) || "FLY".equals(move));
+      if (mount) {
+         float altitude = 0f;
+         if ("FLY".equals(move) && player.flyingAction != null) {
+            altitude = Math.max(0, player.flyingAction.yOffset) * .64f;
+            x += player.flyingAction.xOffset;
+         }
+         if ("SURF".equals(move)) {
+            float ripple = 1f + MathUtils.sin(seconds * 4f) * .1f;
+            ring(x,y,11*ripple,.65f,.09f,Color.toFloatBits(.78f,.96f,1f,.5f));
+            ring(x,y,8*ripple,.45f,.1f,Color.toFloatBits(.78f,.96f,1f,.3f));
+            altitude += .6f + MathUtils.sin(seconds * 3f) * .5f;
+         } else shadow(x,y,8f,3f);
+         float height = fieldPokemon(companion,player.dirFacing,x,y,altitude,walking ? "Walk" : "Idle");
+         surfaceLift=elevation.height(x,y);
+         lift += altitude + Math.max(6f, Math.min(13f, height*.38f));
+         // Shorten the rider's lower legs; the entire mount stays visible below.
+         spritePart.setRegion(person);
+         spritePart.setRegionHeight(Math.max(1,person.getRegionHeight()-7));
+         anchored(spritePart,x,y-.7f,lift,16f,0f,.78f);
+         return;
+      }
+      if (companion != null && move != null && !move.isEmpty()) {
+         float side = "left".equals(player.dirFacing) ? 14f : -14f;
+         Tile beside=game.map.tiles.get(lookup.set(MathUtils.floor((x+side)/16)*16,MathUtils.floor(y/16)*16));
+         if(beside==null || beside.isSolid || beside.isWater || beside.isLava) side=-side;
+         fieldPokemon(companion,player.dirFacing,x+side,y+5,.2f,walking ? "Walk" : "Idle");
+         if ("POWER".equals(move) || "FLASH".equals(move)) {
+            float pulse = .45f + .12f*MathUtils.sin(seconds*4);
+            ring(x+side,y+5,7.5f,.65f,.13f,Color.toFloatBits(1f,.83f,.38f,pulse));
+         }
+         surfaceLift=elevation.height(x,y);
+      }
+      if (player.isSleeping) {
+         // A new sleeping bag and the BW head replace the old full-body composite.
+         floor(white,x-7,y-7,14,22,.16f,color(.16f,.32f,.39f),geometry);
+         floor(white,x-6,y+8,12,6,.2f,color(.81f,.86f,.78f),geometry);
+         spritePart.setRegion(person); spritePart.setRegionHeight(Math.min(14,person.getRegionHeight()));
+         anchored(spritePart,x,y+6,.3f,16,0,.85f);
+      } else if (player.isSitting) {
+         spritePart.setRegion(person);spritePart.setRegionHeight(Math.max(1,person.getRegionHeight()-6));
+         anchored(spritePart,x,y,.3f,16,0,.85f);
+      } else {
+         shadow(x,y,4.5f,2.5f);
+         anchored(person,x,y,lift+Math.max(0,DrawPlayerUpper.pokemonOffsetY)*.4f,16,3,.85f);
+      }
+      if (player.isFishing) {
+         Vector2 target=player.facingPos();
+         float endX=target.x+8, endY=target.y+8;
+         line(x+4,9,y,endX,15,endY,.65f,color(.50f,.32f,.16f));
+         line(endX,15,endY,endX,.2f,endY+4,.25f,color(.87f,.92f,.89f));
+         floor(white,endX-1.2f,endY+3,2.4f,2.4f,.2f,color(.98f,.36f,.24f),geometry);
+         ring(endX,endY+4,3f,.35f,.12f,Color.toFloatBits(.8f,.97f,1,.6f));
+      }
+   }
+
+   private float fieldPokemon(Pokemon pokemon,String direction,float x,float y,float lift,String animation) {
+      surfaceLift=elevation.height(x,y);
+      PmdPokemonSprites sprites=PmdPokemonSprites.get();
+      PmdPokemonSprites.Frame frame=sprites.frame(pokemon,direction,animation,seconds);
+      if(frame==null) {
+         if(pokemon.currOwSprite!=null) actor(pokemon.currOwSprite,x-8,y-7,lift);
+         return 24f;
+      }
+      PmdPokemonSprites.AnimationBounds bounds=sprites.bounds(pokemon,direction,animation);
+      float h=bounds==null?frame.height:bounds.height;
+      float w=bounds==null?frame.width:bounds.width;
+      float scale=Math.min(.85f,32f/Math.max(1f,Math.max(w,h)));
+      float bottom=bounds==null?-frame.anchorY:bounds.minY;
+      shadow(x,y,Math.min(8,w*scale*.28f),2.7f);
+      anchored(frame.region,x,y,lift-Math.min(0,bottom)*scale*MathUtils.cosDeg(50),frame.anchorX,frame.anchorY,scale);
+      return h*scale;
+   }
+
+   /** Reads the existing validator's result; collision, costs and placement stay in DrawBuildTile. */
+   private void fieldTarget(Game game) {
+      Player player=game.player;
+      boolean build="BUILD".equals(player.currFieldMove) || "DIG".equals(player.currFieldMove);
+      if(!build && player.currPlanting==null) return;
+      Vector2 pos=player.facingPos();
+      surfaceLift=elevation.height(pos.x+8,pos.y+8);
+      Color tint=game.mapBatch instanceof WorldBatch?((WorldBatch)game.mapBatch).getTargetTint():Color.WHITE;
+      float packed=tint.toFloatBits();
+      floor(white,pos.x+.5f,pos.y+.5f,15,15,.16f,Color.toFloatBits(tint.r,tint.g,tint.b,.18f),translucent);
+      floor(white,pos.x+.5f,pos.y+.5f,15,.7f,.2f,packed,translucent);
+      floor(white,pos.x+.5f,pos.y+14.8f,15,.7f,.2f,packed,translucent);
+      floor(white,pos.x+.5f,pos.y+.5f,.7f,15,.2f,packed,translucent);
+      floor(white,pos.x+14.8f,pos.y+.5f,.7f,15,.2f,packed,translucent);
+      TextureRegion preview=null;
+      if(build && player.currBuildTile!=null) {
+         preview=assets.object(player.currBuildTile,seconds);
+         if(preview==null) {
+            TextureRegion ground=assets.terrain(player.currBuildTile,seconds);
+            floor(ground,pos.x+2,pos.y+2,12,12,.18f,packed,translucent);
+         }
+      } else preview=assets.named("seedling");
+      if(preview!=null) {
+         float size=Math.min(1f,22f/Math.max(preview.getRegionWidth(),preview.getRegionHeight()));
+         upright(preview,pos.x+8-preview.getRegionWidth()*size/2,pos.y+8,.25f,
+            preview.getRegionWidth()*size,preview.getRegionHeight()*size,packed);
+      }
+   }
+
+   private void ring(float x,float y,float radius,float thickness,float elevation,float tint) {
+      Geometry mesh=batch(translucent,whiteTexture);
+      for(int i=0;i<24;i++) {
+         float a=i*MathUtils.PI2/24,b=(i+1)*MathUtils.PI2/24,inner=radius-thickness;
+         quad(mesh,x+MathUtils.cos(a)*inner,elevation,-y+MathUtils.sin(a)*inner,
+            x+MathUtils.cos(a)*radius,elevation,-y+MathUtils.sin(a)*radius,
+            x+MathUtils.cos(b)*radius,elevation,-y+MathUtils.sin(b)*radius,
+            x+MathUtils.cos(b)*inner,elevation,-y+MathUtils.sin(b)*inner,white,tint);
+      }
+   }
+
+   private void line(float x1,float h1,float y1,float x2,float h2,float y2,float width,float tint) {
+      quad(batch(geometry,whiteTexture),x1-width,h1,-y1,x1+width,h1,-y1,
+         x2+width,h2,-y2,x2-width,h2,-y2,white,tint);
+   }
+
    private void anchored(TextureRegion region, float groundX, float groundY, float lift, float anchorX, float anchorY, float scale) {
+      // Keep pixel proportions camera-facing, but test depth against a vertical
+      // plane through the feet. Slopes and cliffs behind cannot slice the body;
+      // terrain and props actually in front can still occlude it.
+      actorPlaneZ=-groundY;
       upright(region, groundX - anchorX * scale, groundY - anchorY * scale * MathUtils.sinDeg(50f),
-         lift - anchorY * scale * MathUtils.cosDeg(50f), region.getRegionWidth() * scale, region.getRegionHeight() * scale, WHITE);
+         lift - anchorY * scale * MathUtils.cosDeg(50f), region.getRegionWidth() * scale, region.getRegionHeight() * scale, WHITE,4f);
    }
 
    private boolean moving(Object actor, float x, float y) {
@@ -546,10 +832,12 @@ public final class JohtoRenderer {
 
    private void tree(Tile tile, float x, float y, String name) {
       if (name.contains("nosprite")) return; // Additional collision cell of a multi-tile tree.
-      String key = name.contains("tree4") || name.contains("snow") ? "tree_snow"
+      BiomeProfiles.Profile profile=BiomeProfiles.visualForTile(tile);
+      String key = profile.id.equals("volcano")||profile.id.equals("graveyard")||profile.id.equals("desert") ? profile.decor("tree")
+         : name.contains("tree4") || name.contains("snow") ? "tree_snow"
          : name.contains("savanna") ? "tree_dry" : name.contains("tree2") ? "tree_pine" : "tree";
       TextureRegion sprite = assets.named(key);
-      float height = name.contains("large") ? 38 : 31;
+      float height = key.contains("dead") || key.contains("charred")?36:name.contains("large") ? 62 : key.equals("tree_pine") || key.equals("tree_snow") ? 46 : 42;
       float width = height * sprite.getRegionWidth() / sprite.getRegionHeight();
       shadow(x,y,Math.min(width*.35f,10f),4);
       upright(sprite,x-width/2,y,.2f,width,height,WHITE);
@@ -600,13 +888,13 @@ public final class JohtoRenderer {
       return batch;
    }
 
-   private static void quad(Geometry mesh,
+   private void quad(Geometry mesh,
       float x0, float y0, float z0, float x1, float y1, float z1,
       float x2, float y2, float z2, float x3, float y3, float z3, TextureRegion uv, float tint) {
       quad(mesh, x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3, uv, tint, 0f);
    }
 
-   private static void quad(Geometry mesh,
+   private void quad(Geometry mesh,
       float x0, float y0, float z0, float x1, float y1, float z1,
       float x2, float y2, float z2, float x3, float y3, float z3, TextureRegion uv, float tint, float style) {
       vertex(mesh, x0, y0, z0, tint, uv.getU(), uv.getV2(), style);
@@ -617,21 +905,22 @@ public final class JohtoRenderer {
       vertex(mesh, x0, y0, z0, tint, uv.getU(), uv.getV2(), style);
    }
 
-   private static void triangle(Geometry mesh, float x0, float y0, float z0,
+   private void triangle(Geometry mesh, float x0, float y0, float z0,
       float x1, float y1, float z1, float x2, float y2, float z2, float tint) {
       vertex(mesh, x0, y0, z0, tint, 0.5f, 0.5f, 0f);
       vertex(mesh, x1, y1, z1, tint, 0.5f, 0.5f, 0f);
       vertex(mesh, x2, y2, z2, tint, 0.5f, 0.5f, 0f);
    }
 
-   private static void vertex(Geometry mesh, float x, float y, float z, float color, float u, float v, float style) {
+   private void vertex(Geometry mesh, float x, float y, float z, float color, float u, float v, float style) {
       mesh.vertices.add(x);
-      mesh.vertices.add(y);
+      mesh.vertices.add(y+surfaceLift);
       mesh.vertices.add(z);
       mesh.vertices.add(color);
       mesh.vertices.add(u);
       mesh.vertices.add(v);
       mesh.vertices.add(style);
+      mesh.vertices.add(style>3.5f?projectedAnchor.set(x,y+surfaceLift+.12f,actorPlaneZ).prj(camera.combined).z:0f);
    }
 
    private void clearGeometry() {
@@ -665,7 +954,8 @@ public final class JohtoRenderer {
                   new VertexAttribute(Usage.Position, 3, "a_position"),
                   new VertexAttribute(Usage.ColorPacked, 4, "a_color"),
                   new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
-                  new VertexAttribute(Usage.Generic, 1, "a_style"));
+                  new VertexAttribute(Usage.Generic, 1, "a_style"),
+                  new VertexAttribute(Usage.Generic, 1, "a_anchorDepth"));
                geometry.meshes[i] = mesh;
             }
             mesh.setVertices(geometry.vertices.items, i * MAX_VERTICES * FLOATS_PER_VERTEX, vertices * FLOATS_PER_VERTEX);
@@ -673,11 +963,69 @@ public final class JohtoRenderer {
       }
    }
 
+   private void collectLights(Game game) {
+      java.util.Arrays.fill(lights,0f);
+      int index=0;
+      Pokemon hm=game.player.hmPokemon;
+      if(hm!=null && hm.hms.contains("FLASH")) {
+         Vector2 pos=game.player.currFieldMove.isEmpty()?hm.position:game.player.position;
+         index=light(index,pos.x+8,pos.y+8,86,1f);
+      }
+      for(Pokemon pokemon:game.map.onscreenPokemon) {
+         if(index>=8)break;
+         if(pokemon!=hm && pokemon.mapTiles==game.map.tiles && pokemon.hms.contains("FLASH"))
+            index=light(index,pokemon.position.x+8,pokemon.position.y+8,75,.95f);
+      }
+      for(Tile tile:game.map.onscreenTiles) {
+         if(index>=8)break;
+         boolean fire="campfire1".equals(tile.nameUpper) || "volcarona".equals(tile.nameUpper);
+         if(fire || tile.isTorch)index=light(index,tile.position.x+8,tile.position.y+8,fire?65:42,.88f+.05f*MathUtils.sin(seconds*7));
+      }
+      // Cluster lava illumination on a stable world lattice; do not spend every slot on one pool.
+      for(Tile tile:game.map.onscreenTiles) {
+         if(index>=8)break;
+         if(tile.isLava && Math.floorMod((int)tile.position.x/16,3)==0 && Math.floorMod((int)tile.position.y/16,3)==0)
+            index=light(index,tile.position.x+8,tile.position.y+8,35,
+               BiomeProfiles.visualForTile(tile).number("ambient","glow",.42f)+.05f*MathUtils.sin(seconds*2));
+      }
+   }
+
+   private void atmosphere(Game game) {
+      ambientTint.set(0,0,0,1);fogColor.set(0,0,0,1);fogDensity=desaturation=0;float total=0;
+      for(int dy=-2;dy<=2;dy++)for(int dx=-2;dx<=2;dx++) {
+         float x=MathUtils.floor(game.player.position.x/16)*16+dx*16,y=MathUtils.floor(game.player.position.y/16)*16+dy*16;
+         Tile tile=game.map.tiles.get(lookup.set(x,y));if(tile==null)continue;
+         BiomeProfiles.Profile profile=BiomeProfiles.visualForTile(tile);float weight=1f/(1+dx*dx+dy*dy);
+         Color tint=Color.valueOf(profile.string("ambient","tint","ffffff"));
+         Color fog=Color.valueOf(profile.string("ambient","fogColor","a5b5b0"));
+         ambientTint.r+=tint.r*weight;ambientTint.g+=tint.g*weight;ambientTint.b+=tint.b*weight;
+         fogColor.r+=fog.r*weight;fogColor.g+=fog.g*weight;fogColor.b+=fog.b*weight;
+         fogDensity+=profile.number("ambient","fogDensity",0)*weight;
+         desaturation+=profile.number("ambient","desaturation",0)*weight;total+=weight;
+      }
+      if(total==0){ambientTint.set(Color.WHITE);return;}
+      ambientTint.mul(1/total);fogColor.mul(1/total);fogDensity/=total;desaturation/=total;
+   }
+
+   private void shaderAtmosphere() {
+      shader.setUniformf("u_fogColor",fogColor.r,fogColor.g,fogColor.b);
+      shader.setUniformf("u_fogDensity",fogDensity);shader.setUniformf("u_desaturation",desaturation);shader.setUniformf("u_time",seconds);
+   }
+
+   private int light(int index,float x,float y,float radius,float strength) {
+      int at=index*4;lights[at]=x;lights[at+1]=-y;lights[at+2]=radius;lights[at+3]=strength;
+      return index+1;
+   }
+
    private void draw(Game game) {
+      collectLights(game);
+      atmosphere(game);
       Color tint = game.mapBatch.getColor();
-      float r = tint.r;
-      float g = tint.g;
-      float b = tint.b;
+      float r = tint.r*ambientTint.r;
+      float g = tint.g*ambientTint.g;
+      float b = tint.b*ambientTint.b;
+      // Fog retains the scene's day/night illumination instead of whitening the night.
+      fogColor.mul(r,g,b,1);
       originalClearColor.clear();
       Gdx.gl.glGetFloatv(GL20.GL_COLOR_CLEAR_VALUE, originalClearColor);
       boolean shaderBegun = false;
@@ -695,6 +1043,8 @@ public final class JohtoRenderer {
          shader.setUniformMatrix("u_projTrans", camera.combined);
          shader.setUniformi("u_texture", 0);
          shader.setUniformf("u_tint", r, g, b);
+         shader.setUniform4fv("u_lights", lights, 0, lights.length);
+         shaderAtmosphere();
          renderGroups(geometry);
          shader.end();
          shaderBegun = false;
@@ -712,6 +1062,8 @@ public final class JohtoRenderer {
          shader.setUniformMatrix("u_projTrans", camera.combined);
          shader.setUniformi("u_texture", 0);
          shader.setUniformf("u_tint", r, g, b);
+         shader.setUniform4fv("u_lights", lights, 0, lights.length);
+         shaderAtmosphere();
          // Water overlays and shadows blend only after the opaque ground. They
          // never write depth; texture-group iteration cannot erase the ground.
          Gdx.gl.glDepthMask(false);

@@ -130,6 +130,7 @@ public final class WorldSmokeTest {
                     map.minimap.setColor(0, 0, 0, 1);
                     map.minimap.fill();
                     if (map.tiles.size() < 1000 || player.pokemon.isEmpty()) throw new IllegalStateException("Generation incomplete");
+                    if (JOHTO) verifyGeneratedElevation();
                     ready = true;
                     System.out.println("WORLD: generated " + map.tiles.size() + " tiles, party=" + player.pokemon.size()
                         + ", spawn=" + player.position + ", seconds=" + (System.nanoTime() - startedAt) / 1e9);
@@ -137,6 +138,34 @@ public final class WorldSmokeTest {
             }, "world-smoke-generation");
             generation.setDaemon(true);
             generation.start();
+        }
+
+        private void verifyGeneratedElevation() {
+            WorldElevation derived = new WorldElevation();
+            long before = ModernWorldGenerator.fingerprint(map.tiles);
+            derived.update(map.tiles);
+            int elevated = 0, ramps = 0, slopedRamps = 0, milotic = 0;
+            float min = 0, max = 0;
+            for (Tile tile : map.tiles.values()) {
+                float height = derived.tileHeight(tile);
+                if (Math.abs(height) > .1f) elevated++;
+                min = Math.min(min, height); max = Math.max(max, height);
+                if (ModernWorldGenerator.isRamp(tile)) {
+                    ramps++;
+                    if (derived.raised(tile)) slopedRamps++;
+                }
+            }
+            for (Pokemon pokemon : map.pokemon.values()) if ("milotic".equals(pokemon.specie.name) && pokemon.mapTiles == map.overworldTiles) {
+                milotic++;
+                if (!WildSpawnRules.isWater(map.tiles.get(pokemon.position)))
+                    throw new IllegalStateException("Generated oasis Milotic on dry ground: " + pokemon.position);
+            }
+            if (ModernWorldGenerator.fingerprint(map.tiles) != before)
+                throw new IllegalStateException("Derived elevations changed generated topology");
+            if (elevated < 100 || slopedRamps == 0)
+                throw new IllegalStateException("Generated island lost its height structure: elevated=" + elevated + ", slopes=" + slopedRamps);
+            System.out.println("WORLD elevation: elevated=" + elevated + "/" + map.tiles.size() + ", range=" + min + ".." + max
+                + ", slopedRamps=" + slopedRamps + "/" + ramps + ", contradictions=" + derived.getConflicts() + ", waterMilotic=" + milotic);
         }
 
         @Override public void render() {
@@ -211,9 +240,59 @@ public final class WorldSmokeTest {
                     return;
                 }
                 screenshot("world-loaded.png");
+                if (JOHTO) {
+                    previewCaldera();
+                    phase = 5; phaseFrames = 0;
+                } else {
+                    completed = true;
+                    Gdx.app.exit();
+                }
+            } else if (phase == 5 && phaseFrames >= 25) {
+                if (!johtoFrameActive) {
+                    if (phaseFrames >= 90) throw new IllegalStateException("No active Johto frame for caldera preview");
+                    return;
+                }
+                screenshot("world-caldera.png");
                 completed = true;
                 Gdx.app.exit();
             }
+        }
+
+        /** Presentation fixture only, after all original save/load assertions.
+         * Select existing traversable volcanic ground; no terrain edit or save. */
+        private void previewCaldera() {
+            Tile chosen = null;
+            int bestScore = -1;
+            Vector2 probe = new Vector2();
+            for (Tile tile : map.tiles.values()) {
+                String name = tile.name == null ? "" : tile.name;
+                if (!("volcano".equals(tile.biome) || name.startsWith("volcano"))
+                        || tile.isSolid || tile.isWater || tile.isLava || tile.isLedge
+                        || map.pokemon.containsKey(tile.position)) continue;
+                int score = 0, nearbyLava = 0;
+                for (int dy = -64; dy <= 64; dy += 16) for (int dx = -64; dx <= 64; dx += 16) {
+                    Tile neighbor = map.tiles.get(probe.set(tile.position.x + dx, tile.position.y + dy));
+                    if (neighbor == null) continue;
+                    if (neighbor.isLava || neighbor.name != null && neighbor.name.startsWith("lava")) {
+                        score += 3;
+                        if (Math.abs(dx) <= 32 && Math.abs(dy) <= 32) { score += 8; nearbyLava++; }
+                    }
+                    if (neighbor.isLedge) score++;
+                }
+                if (nearbyLava == 0) continue;
+                if (chosen == null || score > bestScore || score == bestScore
+                        && (tile.position.x < chosen.position.x || tile.position.x == chosen.position.x
+                        && tile.position.y < chosen.position.y)) {
+                    chosen = tile; bestScore = score;
+                }
+            }
+            if (chosen == null) throw new IllegalStateException("No walkable caldera cell near lava for preview");
+            pressedKey = -1;
+            player.position.set(chosen.position);
+            cam.position.set(chosen.position.x + 8, chosen.position.y + 8, 0);
+            map.refreshCache = true;
+            System.out.println("WORLD: caldera preview at " + chosen.position + ", ground=" + chosen.name
+                + ", nearby-lava score=" + bestScore + "; movement is fixture-only, no additional save");
         }
 
         private void beginMovement() {

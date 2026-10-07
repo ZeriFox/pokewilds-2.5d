@@ -73,7 +73,7 @@ class DrawControls extends Action {
       }
 
       if (!this.displayControls) {
-         char[] textArray = this.currTrainerTip.toCharArray();
+         char[] textArray = DesktopControls.hints(this.currTrainerTip).toCharArray();
          int i = 0;
          int j = 0;
 
@@ -93,7 +93,8 @@ class DrawControls extends Action {
                }
             }
 
-            Sprite letterSprite = game.transparentDict.get(character);
+            Sprite letterSprite = game.transparentDict.getOrDefault(character, game.transparentDict.get('?'));
+            if (letterSprite == null) continue;
             letterSprite.setPosition(8 * i, 128 - 16 * j);
             letterSprite.draw(game.uiBatch, this.alpha);
             if (++i > 20) {
@@ -107,47 +108,53 @@ class DrawControls extends Action {
                char[] textArray = "   - Controls -".toCharArray();
 
                for (int i = 0; i < textArray.length; i++) {
-                  Sprite letterSprite = game.transparentDict.get(textArray[i]);
+                  Sprite letterSprite = game.transparentDict.getOrDefault(textArray[i], game.transparentDict.get('?'));
+                  if (letterSprite == null) continue;
                   letterSprite.setPosition(8 + 8 * i, 128 - 16 * j);
                   letterSprite.draw(game.uiBatch, this.alpha);
                }
             } else if (j == 1) {
-               char[] textArray = "Arrows  - Movement".toCharArray();
+               char[] textArray = (DesktopControls.movement().replace('/', ' ') + " - Move").toCharArray();
 
                for (int i = 0; i < textArray.length; i++) {
-                  Sprite letterSprite = game.transparentDict.get(textArray[i]);
+                  Sprite letterSprite = game.transparentDict.getOrDefault(textArray[i], game.transparentDict.get('?'));
+                  if (letterSprite == null) continue;
                   letterSprite.setPosition(8 + 8 * i, 128 - 16 * j);
                   letterSprite.draw(game.uiBatch, this.alpha);
                }
             } else if (j == 2) {
-               char[] textArray = "Z       - A button".toCharArray();
+               char[] textArray = (DesktopControls.confirm() + " - Confirm").toCharArray();
 
                for (int i = 0; i < textArray.length; i++) {
-                  Sprite letterSprite = game.transparentDict.get(textArray[i]);
+                  Sprite letterSprite = game.transparentDict.getOrDefault(textArray[i], game.transparentDict.get('?'));
+                  if (letterSprite == null) continue;
                   letterSprite.setPosition(8 + 8 * i, 128 - 16 * j);
                   letterSprite.draw(game.uiBatch, this.alpha);
                }
             } else if (j == 3) {
-               char[] textArray = "X       - B button".toCharArray();
+               char[] textArray = (DesktopControls.back() + " - Back").toCharArray();
 
                for (int i = 0; i < textArray.length; i++) {
-                  Sprite letterSprite = game.transparentDict.get(textArray[i]);
+                  Sprite letterSprite = game.transparentDict.getOrDefault(textArray[i], game.transparentDict.get('?'));
+                  if (letterSprite == null) continue;
                   letterSprite.setPosition(8 + 8 * i, 128 - 16 * j);
                   letterSprite.draw(game.uiBatch, this.alpha);
                }
             } else if (j == 4) {
-               char[] textArray = "Enter   - Menu".toCharArray();
+               char[] textArray = (DesktopControls.label(InputProcessor.keyboardStart) + " - Menu").toCharArray();
 
                for (int i = 0; i < textArray.length; i++) {
-                  Sprite letterSprite = game.transparentDict.get(textArray[i]);
+                  Sprite letterSprite = game.transparentDict.getOrDefault(textArray[i], game.transparentDict.get('?'));
+                  if (letterSprite == null) continue;
                   letterSprite.setPosition(8 + 8 * i, 128 - 16 * j);
                   letterSprite.draw(game.uiBatch, this.alpha);
                }
             } else if (j == 5) {
-               char[] textArray = "Hold X to run".toCharArray();
+               char[] textArray = ("Hold " + DesktopControls.back() + " to run").toCharArray();
 
                for (int i = 0; i < textArray.length; i++) {
-                  Sprite letterSprite = game.transparentDict.get(textArray[i]);
+                  Sprite letterSprite = game.transparentDict.getOrDefault(textArray[i], game.transparentDict.get('?'));
+                  if (letterSprite == null) continue;
                   letterSprite.setPosition(8 + 8 * i, 128 - 16 * j);
                   letterSprite.draw(game.uiBatch, this.alpha);
                }

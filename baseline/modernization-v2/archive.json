@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "purpose": "Immutable archive of released johto.2 / scope schema 2 before authorized local desktop input and exclusive 2.5D rendering work.",
+  "files_sha256": {
+    "baseline/modernization-v2/modernization-scope.json": "f978edd535ac4440d6ce01924bc98135105a718e3a57faf9838827cd3ebf2343",
+    "baseline/modernization-v2/verify_visual_scope.py": "20aa2d3c1257379ecc5168b66693bc0f076c3c0bfdc09cab762a7e3c38ce727b",
+    "baseline/modernization-v2/VERIFICA.txt": "ddcc0a7f24914d6d0d91fa28abadb9367f61de9d601dd2f1e038e6187e5b1a82"
+  }
+}

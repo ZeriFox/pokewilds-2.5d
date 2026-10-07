@@ -240,7 +240,9 @@ class SpecialBattleMewtwo extends Action {
 
       @Override
       public void step(Game game) {
-         if (shouldDrawOppPokemon) {
+         JohtoBattleRenderer modern=JohtoBattleRenderer.get(game);
+         if(modern!=null)modern.drawBossBackground(game);
+         if (modern==null && shouldDrawOppPokemon) {
             game.battle.oppPokemon.sprite.draw(game.uiBatch);
          }
 
@@ -287,10 +289,11 @@ class SpecialBattleMewtwo extends Action {
 
          if (DrawBattle.shouldDrawOppPokemon) {
             this.mewtwo.breathingSprite.setPosition(this.mewtwo.sprite.getX(), this.mewtwo.sprite.getY() + this.offsetY);
-            this.mewtwo.breathingSprite.draw(game.uiBatch);
+            Sprite actor=new Sprite(this.mewtwo.sprite);actor.translateY(this.offsetY);
+            if(!PmdBattleSprites.draw(game,this.mewtwo,actor,false,"Idle"))this.mewtwo.breathingSprite.draw(game.uiBatch);
          }
 
-         for (int i = -1; i < 2; i++) {
+         if(JohtoBattleRenderer.get(game)==null)for (int i = -1; i < 2; i++) {
             for (int j = -1; j < 2; j++) {
                if (i != 0 || j != 0) {
                   game.uiBatch.draw(this.bgSprite2, 160 * i, 144 * j);
@@ -454,7 +457,9 @@ class SpecialBattleMewtwo extends Action {
 
       @Override
       public void step(Game game) {
-         if (this.yPos <= 144) {
+         JohtoBattleRenderer modern=JohtoBattleRenderer.get(game);
+         if(modern!=null)modern.drawBossRipple(game,this.yPos,this.offsets);
+         if (modern==null && this.yPos <= 144) {
             this.pixmap = ScreenUtils.getFrameBufferPixmap(0, this.yPos * 3, 480, 48);
 
             for (int j = 0; j < 16; j++) {
@@ -561,11 +566,12 @@ class SpecialBattleMewtwo extends Action {
                this.sprites[i].setPosition(160.0F, this.rand.nextInt(144) - 32);
             }
 
-            this.sprites[i].draw(game.uiBatch);
+            JohtoBattleRenderer modern=JohtoBattleRenderer.get(game);
+            if(modern!=null)modern.drawBossRock(game,this.sprites[i]);else this.sprites[i].draw(game.uiBatch);
          }
 
          this.whichVelocity = (this.whichVelocity + 1) % 2;
-         this.textboxSprite.draw(game.uiBatch);
+         if(JohtoBattleRenderer.get(game)==null)this.textboxSprite.draw(game.uiBatch);
          if (game.battle.drawAction == null) {
             game.actionStack.remove(this);
          }
@@ -869,7 +875,8 @@ class SpecialBattleMewtwo extends Action {
 
       @Override
       public void step(Game game) {
-         this.bgSprite.draw(game.uiBatch);
+         JohtoBattleRenderer modern=JohtoBattleRenderer.get(game);
+         if(modern!=null)modern.drawBossBackground(game);else this.bgSprite.draw(game.uiBatch);
          if (drawRocks) {
             for (int i = 0; i < 10; i++) {
                if (this.velocities2[i] <= 0) {
@@ -897,11 +904,11 @@ class SpecialBattleMewtwo extends Action {
                   this.sprites[i].setRotation(this.rand.nextInt(4) * 90);
                }
 
-               this.sprites[i].draw(game.uiBatch);
+               if(modern!=null)modern.drawBossRock(game,this.sprites[i]);else this.sprites[i].draw(game.uiBatch);
             }
 
             this.whichVelocity = (this.whichVelocity + 1) % 2;
-            this.bgSprite2.draw(game.uiBatch);
+            if(modern==null)this.bgSprite2.draw(game.uiBatch);
          }
 
          if (game.battle.drawAction == null) {

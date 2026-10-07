@@ -95,8 +95,8 @@ class PlayerStanding extends Action {
                return null;
             }
 
-            int index = game.map.rand.nextInt(eligiblePokemon.size());
-            String name = eligiblePokemon.get(index);
+            String name = WildSpawnRules.choose(currTile, game.map.tiles, game.map.timeOfDay, eligiblePokemon, game.map.rand);
+            if (name == null) return null;
             int level = currTile.routeBelongsTo.level + Game.rand.nextInt(3);
             if (game.levelScalingEnabled && !currTile.routeBelongsTo.isDungeon) {
                int averageLevel = 0;
@@ -166,6 +166,8 @@ class PlayerStanding extends Action {
                      hasEvo = !Specie.gen2Evos.get(name).isEmpty();
                   } while (!isBaseSpecies && !hasEvo);
 
+                  if (!currTile.routeBelongsTo.isDungeon && !WildSpawnRules.allows(evos.get(evo),
+                     WildSpawnRules.habitat(currTile, game.map.tiles, game.map.timeOfDay))) continue;
                   try {
                      int evoLevel = Integer.valueOf(evo);
                      if (evoLevel <= pokemon.level + extraLevel && Game.rand.nextInt(256) >= 128) {

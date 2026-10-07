@@ -26,12 +26,12 @@ def main() -> int:
     java, javac = find_jdk()
     sources = [ROOT / "tools" / "ModernWorldGenerationTest.java", ROOT / "tools" / "WorldSmokeTest.java"]
     if args.sources:
-        sources += [ROOT / "src/com/pkmngen/game" / name for name in ("ModernWorldGenerator.java", "GenIsland1.java")]
+        sources += [ROOT / "src/com/pkmngen/game" / name for name in ("ModernWorldGenerator.java", "GenIsland1.java", "BiomeProfiles.java", "WildSpawnRules.java", "Pokemon.java", "WorldElevation.java")]
     log_path = destination / "modern-world.log"
     commands = [[javac, "--release", "17", "-encoding", "UTF-8", "-proc:none", "-classpath", str(JAR),
                  "-d", str(classes), *map(str, sources)]]
     base = [java, "-Xmx2g", "-Dfile.encoding=UTF-8", "-Dpokewilds.visual=johto", "-Dpokewilds.models=off",
-            "-classpath", os.pathsep.join((str(classes), str(JAR)))]
+            "-classpath", os.pathsep.join([str(classes)] + ([str(ROOT / "resources")] if args.sources else []) + [str(JAR)])]
     commands.append(base + ["com.pkmngen.game.ModernWorldGenerationTest"])
     if not args.fixtures_only:
         commands.append(base + ["com.pkmngen.game.WorldSmokeTest"])

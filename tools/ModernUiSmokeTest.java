@@ -81,8 +81,12 @@ public final class ModernUiSmokeTest {
             super.create();
             nativeInput=Gdx.input;
             controlledInput=(Input)Proxy.newProxyInstance(Input.class.getClassLoader(),new Class<?>[]{Input.class},(proxy,method,args)->{
-                if (method.getName().equals("isKeyPressed")) return (Integer)args[0]==pressed;
-                if (method.getName().equals("isKeyJustPressed")) return (Integer)args[0]==justPressed;
+                if (method.getName().equals("isKeyPressed")) return pressed>=0 && (Integer)args[0]==pressed;
+                if (method.getName().equals("isKeyJustPressed")) return justPressed>=0 && (Integer)args[0]==justPressed;
+                if (method.getName().equals("isButtonPressed")) return (Integer)args[0]==Input.Buttons.LEFT
+                    ? pressed==DesktopControls.MOUSE_LEFT : (Integer)args[0]==Input.Buttons.RIGHT && pressed==DesktopControls.MOUSE_RIGHT;
+                if (method.getName().equals("isButtonJustPressed")) return (Integer)args[0]==Input.Buttons.LEFT
+                    ? justPressed==DesktopControls.MOUSE_LEFT : (Integer)args[0]==Input.Buttons.RIGHT && justPressed==DesktopControls.MOUSE_RIGHT;
                 if (method.getName().equals("isTouched")) return false;
                 try { return method.invoke(nativeInput,args); } catch(InvocationTargetException e) { throw e.getCause(); }
             });

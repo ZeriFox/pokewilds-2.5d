@@ -11,6 +11,10 @@ import java.util.Map;
 import java.util.Random;
 
 class GenIsland1 extends Action {
+   /** A random floor can have no legal statue/stair endpoint; discard only that draft. */
+   private static final class MansionLayoutRejected extends RuntimeException {
+      MansionLayoutRejected() { super("No safe mansion endpoint", null, false, false); }
+   }
    public Action.Layer layer = Action.Layer.map_0;
    ArrayList<Vector2> freePositions;
    HashMap<Vector2, Tile> tilesToAdd;
@@ -543,6 +547,11 @@ class GenIsland1 extends Action {
                            }
                         }
                         break;
+                     } catch (MansionLayoutRejected rejected) {
+                        System.out.println("Mansion layout has no safe endpoint; generating another layout.");
+                        mansionExteriorTiles.clear();
+                        mansionInteriorTiles.clear();
+                        triesx++;
                      } catch (Exception e) {
                         System.out.println("Failed to generate mansion: " + e.getMessage());
                         System.out.println("Retrying...");
@@ -852,7 +861,8 @@ class GenIsland1 extends Action {
                }
 
                if (this.rand.nextInt(512) >= baseChance) {
-                  String name = tile.routeBelongsTo.allowedPokemon().get(this.rand.nextInt(tile.routeBelongsTo.allowedPokemon().size()));
+                  String name = WildSpawnRules.choose(tile, this.tilesToAdd, game.map.timeOfDay, tile.routeBelongsTo.allowedPokemon(), this.rand);
+                  if (name == null) continue;
                   int level = tile.routeBelongsTo.level + Game.rand.nextInt(3);
                   Pokemon pokemon = new Pokemon(name, level, Pokemon.Generation.CRYSTAL);
                   String evolveTo = null;
@@ -974,7 +984,7 @@ class GenIsland1 extends Action {
                      requirementsMet = !hasEvo || pokemon.specie.name.equals("sneasel") || pokemon.specie.name.equals("piloswine");
                   }
 
-                  if (requirementsMet) {
+                  if (requirementsMet && WildSpawnRules.allows(pokemon.specie.name, WildSpawnRules.habitat(tile, this.tilesToAdd, game.map.timeOfDay))) {
                      pokemon.position = tile.position.cpy();
                      pokemon.mapTiles = game.map.overworldTiles;
                      pokemon.standingAction = pokemon.new Standing();
@@ -992,7 +1002,8 @@ class GenIsland1 extends Action {
                   }
                }
             } else if (this.rand.nextInt(512) >= 511) {
-               String name = tile.routeBelongsTo.allowedPokemon().get(this.rand.nextInt(tile.routeBelongsTo.allowedPokemon().size()));
+               String name = WildSpawnRules.choose(tile, this.tilesToAdd, game.map.timeOfDay, tile.routeBelongsTo.allowedPokemon(), this.rand);
+               if (name == null) continue;
                int level = tile.routeBelongsTo.level + Game.rand.nextInt(3);
                if (name.equals("numel") || name.equals("kangaskhan") || name.equals("cubone")) {
                   level = 10;
@@ -1009,6 +1020,8 @@ class GenIsland1 extends Action {
             }
          }
       }
+
+      WildSpawnRules.anchorOasisEncounter(this.tilesToAdd, this.pokemonToAdd);
 
       ArrayList<TrainerTipsTile> signTiles = new ArrayList<>();
 
@@ -5605,6 +5618,7 @@ class GenIsland1 extends Action {
                      }
                   }
 
+                  if (endPoints.isEmpty()) throw new MansionLayoutRejected();
                   Vector2 pos3 = endPoints.get(endPoints.size() - 1);
 
                   while (endPoints.size() > 0) {
@@ -5700,6 +5714,7 @@ class GenIsland1 extends Action {
                      }
                   }
 
+                  if (endPoints.isEmpty()) throw new MansionLayoutRejected();
                   if (endPoints.size() > 4) {
                      pos3 = endPoints.remove(this.rand.nextInt(5) + endPoints.size() - 5);
                   } else {

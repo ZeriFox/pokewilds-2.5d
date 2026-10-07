@@ -51,8 +51,8 @@ class ThrowOutPokemon extends Action {
       TextureRegion[][] tempRegion = temp.split(4, 4);
       Sprite[][] temp2 = new Sprite[7][7];
 
-      for (int i = 0; i < tempRegion.length; i++) {
-         for (int j = 0; j < tempRegion[i].length; j++) {
+      for (int i = 0; i < temp2.length; i++) {
+         for (int j = 0; j < temp2[i].length; j++) {
             temp2[i][j] = new Sprite(tempRegion[6 - j][i]);
             temp2[i][j].setScale(2.0F);
          }
@@ -139,7 +139,8 @@ class ThrowOutPokemon extends Action {
 
       this.sprite = this.sprites.get(0);
       if (!this.positions.isEmpty() && !this.sprites.isEmpty()) {
-         if (this.sprite != null) {
+         boolean modernActor=this.sprites.size()<=4 && PmdBattleSprites.sendOut(game,this.position.x,this.position.y,this.sprites.size()+3);
+         if (this.sprite != null && !modernActor) {
             for (int i = 0; i < this.sprite.length; i++) {
                for (int j = 0; j < this.sprite[i].length; j++) {
                   if (this.sprite[i][j] != null) {
@@ -182,7 +183,7 @@ class ThrowOutPokemon extends Action {
             game.insertAction(this);
          }
 
-         for (int i = 0; i < this.sprite.length; i++) {
+         if(!PmdBattleSprites.draw(game,game.player.currPokemon,game.player.currPokemon.backSprite,true,"Idle"))for (int i = 0; i < this.sprite.length; i++) {
             for (int j = 0; j < this.sprite[i].length; j++) {
                this.sprite[i][j].draw(game.uiBatch);
             }

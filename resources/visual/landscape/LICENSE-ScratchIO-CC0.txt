@@ -1,0 +1,7 @@
+Desert Level Decorations (Pixel-Art) by ScratchIO
+https://opengameart.org/content/desert-level-decorations-pixel-art
+Published 2020-11-30; license verified 2026-10-07.
+CC0 1.0 Universal public-domain dedication
+https://creativecommons.org/publicdomain/zero/1.0/
+Source image: https://opengameart.org/sites/default/files/desert_decorations_0.png
+One cactus crop is used with the documented dry-vegetation palette.

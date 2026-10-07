@@ -75,6 +75,7 @@ def targets(tracker):
         key = aliases.get(slug(node["name"]), slug(node["name"]))
         entries[key] = (f"{dex:04d}", node, dex, node["name"])
     exact_forms = {
+        "megagengar": (94, ["0001"]),
         "araichu": (26, ["0001"]), "aexeggutor": (103, ["0001"]),
         "amarowak": (105, ["0001"]), "gcorsola": (222, ["0001"]),
         "gdarumaka": (554, ["0001"]), "gyamask": (562, ["0001"]),
@@ -247,7 +248,7 @@ def main():
                 inspected[(path, source_name)] = inspect_animation(path, source_name, animation)
             if animation:
                 runtime_animations[name] = dict(inspected[(path, source_name)], sourceAnimation=source_name)
-        (OUT / "sprite" / path / "metadata.json").write_text(json.dumps(runtime_animations, separators=(",", ":")), encoding="utf-8")
+        (OUT / "sprite" / path / "metadata.json").write_text(json.dumps(runtime_animations, separators=(",", ":")), encoding="utf-8", newline="\n")
     provenance = dict(docs, assets=[], coverage={}, files={})
     for key, (path, node, dex, display_name) in sorted(selected.items()):
         item = {"dex": dex, "displayName": display_name, "sourcePath": path, "portrait": None, "animations": {}}
@@ -287,15 +288,15 @@ def main():
         "emptyFrames": sum(x["emptyFrames"] for x in inspected.values()),
     }
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "catalog.json").write_text(json.dumps(catalog, separators=(",", ":")), encoding="utf-8")
-    (ROOT / "PMD-PROVENANCE.json").write_text(json.dumps(provenance, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    (OUT / "catalog.json").write_text(json.dumps(catalog, separators=(",", ":")), encoding="utf-8", newline="\n")
+    (ROOT / "PMD-PROVENANCE.json").write_text(json.dumps(provenance, indent=2, ensure_ascii=True) + "\n", encoding="utf-8", newline="\n")
     (licenses / "PMD-README.txt").write_text(
         "PMDCollab SpriteCollab assets\nSource: https://sprites.pmdcollab.org/\nRepository: https://github.com/PMDCollab/SpriteCollab\nCommit: " + COMMIT +
         "\nCustom graphics: CC BY-NC 4.0 https://creativecommons.org/licenses/by-nc/4.0/\n"
         "Full unmodified upstream attribution: PMD-spritebot-credits.txt. Source policy: PMD-SpriteCollab-README.md.\n"
         "Official game graphics credited to CHUNSOFT are not relicensed as our original artwork.\n"
         "Original PNG and XML files are unchanged. Runtime only selects animation cells and clips transparent margins; no palette changes.\n"
-        "Exact per-variant authors, source paths, SHA256 hashes and coverage: ../PMD-PROVENANCE.json.\n", encoding="utf-8")
+        "Exact per-variant authors, source paths, SHA256 hashes and coverage: ../PMD-PROVENANCE.json.\n", encoding="utf-8", newline="\n")
     print(json.dumps(provenance["coverage"], indent=2), flush=True)
 
 

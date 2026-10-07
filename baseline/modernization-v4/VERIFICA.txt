@@ -1,0 +1,113 @@
+VERIFICA — aggiornamento locale biomi e interfaccia, 2026-10-07
+
+STATO DELLA CONSEGNA
+PASS: 15 suite native ripetute sul JAR qui identificato, senza --sources,
+--classes-override o classi di produzione sovrapposte. I wrapper compilano
+soltanto gli harness. Le prove intermedie non certificano questo artifact.
+Nessun commit, push o nuova release GitHub; johto.2 resta precedente.
+Avvio: collegamento desktop PokeWilds 2.5D - Prova locale oppure
+AVVIA-POKEWILDS.cmd. Java e JAR sono inclusi: non serve build.cmd/Python.
+
+JAR: dist/pokewilds-rebuilt.jar
+SHA-256: 7c32ffd8709ddf3561a21d1730e8542c460587a0b754ceff80269f0a17c54b17
+Dimensione: 297827413 byte; 108906 voci ZIP.
+Java 17: 216 sorgenti, 456 classi compilate, 36792 risorse locali.
+Zero classi di gioco copiate dal runtime upstream; modelli GLB esclusi.
+CRC ZIP e classi compilate verificati da build.py. Tutti gli hash dei
+sorgenti, delle classi e delle risorse coincidono tra file, report e JAR.
+Ambiente delle prove: Windows x64, Temurin 17.0.20.1, NVIDIA RTX 4060.
+Evidenze: build/build-report.json, build/scope-negative/build-alignment.txt.
+build/local-verification.json registra hash e risultato di tutti i 15 log.
+
+AMBITO E REVISIONE
+verify_visual_scope.py PASS: 216 sorgenti = 161 originali byte-identici,
+37 originali modificati con ambito esplicito e 18 aggiunte.
+Attack, Battle, Player, PkmnMap, Network, Save, CheckMovesLearned,
+CheckEndOfBattle e DrawSetupMenu restano identici alla base protetta.
+Manifest schema 4 congelato SHA-256:
+8171c83e110e6bdae3380832dc1c6eafaab24a10ead7a11cbcc8862f674b7de5
+Digest sorgenti:
+f24cfcdb7837a4d28798e93d4586dc9be6d1cd3f1fde5b3d4fba6e0668af6154
+verify_scope_test.py PASS: 14 mutazioni respinte in copie isolate.
+Gli audit storici schema 2 e 3 sono preservati sotto baseline/.
+La verifica dell'ambito non dimostra equivalenza completa del gameplay.
+
+A. BUG TECNICI, LOTTE E AZIONI
+field_scene_test.py PASS: 405 frame moderni, 128761 draw legacy scartati,
+zero inviati. Attivazioni POWER/BUILD/DIG/SURF/FLY originali, vero Surf,
+preview di costruzione, luce e pose. Step e timer originali avanzano.
+modern_ui_smoke_test.py PASS: 6803 frame, 20 schermate, 76 PNG;
+4065 frame di lotta, 4413 di transizione, 4642 con snapshot moderno.
+Menu, crafting, incontro NPC, turni, fuga, cattura, livello, nickname,
+salvataggio/caricamento e ritorno al mondo. Zero modelli 3D caricati.
+battle_viewport_test.py PASS: 5 finestre, 6 biomi, 5 zoom, 82 PNG,
+170 frame di uscita, 12154480 pixel ai margini; fallback senza snapshot opaco.
+pmd_battle_visual_test.py PASS: 18 PNG, azioni originali faint/send-out,
+evoluzione/schiusa, shiny/alpha/scala e mistero/rivelazione del fantasma.
+boss_battle_visual_test.py PASS: 18 PNG; Mewtwo 641 frame, Mega Gengar 391,
+Regigigas 201; caricamento separato mgengar, effetti originali e cleanup.
+
+Il fantasma notturno era un incontro reale SpawnGhost/DrawGhost/DespawnGhost,
+non un placeholder. La sua nuova apparizione conserva le condizioni originali.
+Asset mancanti: fallback controllati e log deduplicati con bioma/tile/orario.
+
+B. UI E COMANDI
+ui_layout_test.py PASS: 63 PNG, 9 schermate su 7 dimensioni; tutorial,
+comandi e riepilogo verificati visivamente. Scaling uniforme del canvas.
+desktop_controls_test.py PASS: preset WASD/LMB/RMB/Invio, migrazione del
+solo preset classico, personalizzazioni conservate, press/hold/release,
+digitazione WASD nei nomi, polling gamepad e tutorial. Nove PNG riepilogo:
+Machop/Gyarados/Sprigatito su tre pagine, portrait e figura Idle intera.
+
+C. BIOMI, ALTEZZE E MATERIALI
+verify_landscape_assets.py PASS: 202 regioni, 6 animazioni, 47 materiali
+opachi, 34 oggetti trasparenti e riferimenti completi dei 14 profili.
+Deserto, vulcano e cimitero hanno famiglie dedicate; lava organica a 16 frame,
+palette vulcanica, lapidi, vegetazione secca, nebbia e desaturazione.
+Fonti/licenze e trasformazioni in resources/visual/landscape/PROVENANCE.json,
+CREDITS.txt e ASSET-RESEARCH.json. Pokemon e portrait PMD mantenuti.
+landscape_smoke_test.py PASS: 415 frame, 10 PNG; giorno/notte, rilievi,
+caldera, interni, vero ingresso/uscita da edificio e oggetti funzionali.
+biome_scene_test.py PASS: 663 frame, 17 PNG. Rampa continua 0->14,
+corpo intero sulla rampa e testa davanti al cliff, cascata da waterfallify.
+Alta marea guadabile con fondo leggibile, bassa asciutta e pozzanghere locali;
+Tile.init reale, geometria e alpha controllati. Nessuna modifica alle maree.
+Fantasma: 170 frame comparsa, 20 inseguimento, 81 scomparsa; 269 draw moderni,
+zero residui dopo. Fog: deserto 0, cimitero 0.14, vulcano 0.035.
+world_elevation_test.py --saved-island PASS: terrazze annidate, rampe larghe,
+crateri, angoli, ordine/reload, invalidazione e vincoli contraddittori.
+world_reload_visual_test.py PASS: 75 frame sulla stessa isola di regressione;
+11 celle del sentiero della villa nel vulcano corrette SOLO visivamente,
+route snow1 e incontri originali intatti. Tutti i 5 file del save invariati.
+modern_world_test.py PASS: 8 seed di fixture, impronta invariata, terrazze
+raggiungibili, lava solida e landmark protetti; isola S reale generata,
+movimento e salvataggio/ricaricamento, 257 frame moderni, zero fallback.
+Misure della nuova isola: elevated=14738/200260, range=-12.0..42.0, slopedRamps=159/358, contradictions=190, waterMilotic=0
+Le anteprime del mondo/vulcano mostrano la fixture salvata della villa,
+ricaricata senza riscriverla; le altre provengono dai test nativi sopra.
+
+D. HABITAT E POKEDEX
+biome_habitat_test.py PASS: 14 profili, 20000 scelte pesate, acqua/profondita'/
+orario, veri percorsi PlayerStanding e FollowPath. Milotic dell'oasi ancorato
+all'acqua senza eliminarlo; acquatici selvatici vincolati all'acqua, owned esclusi.
+expansion_dex_test.py PASS: tutte le 552 specie aggiunte e 227 aggiunte ai pool;
+dati, sprite, audio, cattura, livello/evoluzione/uovo e vero save/load.
+Resta il totale di 962 specie nazionali giocabili e i limiti del Pokedex
+documentati in POKEDEX-ESPANSO.txt. L'intero catalogo PMD non e' stato
+riesaminato in questa iterazione; sono stati testati i percorsi e campioni sopra.
+smoke_test.py PASS: avvio/menu classico 120 frame e chiusura pulita.
+
+LIMITI E SALVATAGGI
+Le prove usano solo cartelle build/ isolate. Kiri.sav non e' stato aperto
+o riscritto; il collegamento desktop punta al launcher locale verificato.
+Le quote sono derivate dai dirupi salvati, non nuovi dati persistenti o fisica
+3D. I bordi contraddittori sono risolti deterministicamente e conteggiati.
+Nuove regole di generazione/habitat incidono su nuove aree e nuovi incontri;
+non teletrasportano Pokemon gia' salvati e non riscrivono il terreno caricato.
+100/125/150% sono risoluzioni equivalenti, non cambi del DPI hardware.
+La finestra alle dimensioni del desktop non certifica ogni cambio fullscreen;
+gamepad simulato, non dispositivo fisico. Nessun benchmark Nintendo 3DS.
+Alcuni effetti e segnali funzionali conservano risorse originali. Forme PMD
+mancanti e mosse/evoluzioni non supportate restano documentate.
+Non sono state provate tutte le mosse, combinazioni, periferiche o multiplayer.
+Documento master e indice delle funzioni: AGGIORNAMENTO-BIOMI.txt.

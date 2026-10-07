@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "archived_schema": 4,
+  "purpose": "Immutable prior local biome/UI scope, verifier and verification report before altitude readability work. Does not claim verification of subsequent changes.",
+  "jar_sha256": "7c32ffd8709ddf3561a21d1730e8542c460587a0b754ceff80269f0a17c54b17",
+  "files": {
+    "modernization-scope.json": {
+      "source": "baseline/modernization-scope.json",
+      "sha256": "8171c83e110e6bdae3380832dc1c6eafaab24a10ead7a11cbcc8862f674b7de5",
+      "bytes": 23101
+    },
+    "verify_visual_scope.py": {
+      "source": "tools/verify_visual_scope.py",
+      "sha256": "2b181884511149c8355ad62ddbf175d17b20d766ce9fc6551698d247ce030cab",
+      "bytes": 18180
+    },
+    "VERIFICA.txt": {
+      "source": "VERIFICA.txt",
+      "sha256": "454c76557b823134030b26f055738ee07828b15e67e6520f6714725b2b709ab4",
+      "bytes": 7137
+    }
+  }
+}

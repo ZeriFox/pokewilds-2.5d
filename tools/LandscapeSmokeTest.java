@@ -43,6 +43,25 @@ public final class LandscapeSmokeTest {
          Tile tile=new Tile(ground,upper,new Vector2(x,y),true);
          tile.biome=biome;map.tiles.put(tile.position,tile);
       }
+      void semanticFixture() {
+         for(int y=112;y<=288;y+=16)for(int x=-272;x<=-96;x+=16)put("green1","",x,y,"grassland");
+         put("cave1_floor1","rock1",-224,192,"cave");
+         put("cave1_floor1","chest1",-208,192,"cave");
+         put("cave1_floor1","building1_fossilreviver1",-192,192,"cave");
+         put("sand1","pkmnmansion_ext",-224,224,"grassland");
+         put("sand1","pkmnmansion_ext_windows",-208,224,"grassland");
+         put("sand1","pkmnmansion_ext_locked",-192,224,"grassland");
+         put("green1","house5_middle1",-160,224,"grassland");
+         put("cave1_regi1","",-144,224,"cave");
+         put("green1","warp_tile1",-224,160,"grassland");
+         put("green1","onpress_above",-208,160,"grassland");
+         put("desert6","desert4_cracked",-192,160,"desert");
+         put("green1","grass_planted",-160,160,"grassland");
+         put("green1","berrytree_cheri_empty",-144,160,"grassland");
+         put("green1","berrytree_cheri_full",-128,160,"grassland");
+         cameraAt(-176,192);
+         System.out.println("LANDSCAPE semantic fixture: cave rock/chest/machine, mansion/window/locked door, upper house, Regigigas, floor cues, planting");
+      }
       void fixture() {
          actionStack.removeIf(a->a instanceof DrawSetupMenu);
          Gdx.input.setInputProcessor(null);server=new Server();Network.register(server);
@@ -102,11 +121,15 @@ public final class LandscapeSmokeTest {
          if(frame==290){require(map.tiles==interior,"EnterBuilding failed map switch");screenshot("06-interior.png");}
          if(frame==305)insertAction(new EnterBuilding(this,"exit",map.overworldTiles,new PlayerStanding(this)));
          if(frame==310)screenshot("07-exit-fade.png");
-         if(frame==355){require(map.tiles==map.overworldTiles,"Exit failed map switch");screenshot("08-exterior-return.png");
+         if(frame==355){require(map.tiles==map.overworldTiles,"Exit failed map switch");screenshot("08-exterior-return.png");}
+         if(frame==365)semanticFixture();
+         if(frame==400)screenshot("09-semantic-objects.png");
+         if(frame==405)cameraAt(-176,144);
+         if(frame==435){screenshot("10-planting-floor-cues.png");
             require(renderer().getLoadedSpeciesCount()==0,"Unexpected 3D assets");
             require(PmdPokemonSprites.get().getLoadedTextureCount()>0,"PMD world sprite was not loaded");
             System.out.println("LANDSCAPE frames="+renderer().getRenderedFrames()+", PMD sheets="+PmdPokemonSprites.get().getLoadedTextureCount());complete=true;Gdx.app.exit();}
-         if(frame>400)throw new IllegalStateException("Landscape timeout");
+         if(frame>480)throw new IllegalStateException("Landscape timeout");
       }
       void screenshot(String name){
          byte[] rgba=ScreenUtils.getFrameBufferPixels(0,0,640,576,false);BufferedImage image=new BufferedImage(640,576,BufferedImage.TYPE_INT_RGB);Set<Integer> colors=new HashSet<>();

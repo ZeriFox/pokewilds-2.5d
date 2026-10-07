@@ -1,0 +1,7 @@
+Forest / Graveyard tileset by marionline
+https://opengameart.org/content/forest-graveyard-tileset
+Published 2018-01-14; license verified 2026-10-07.
+CC0 1.0 Universal public-domain dedication
+https://creativecommons.org/publicdomain/zero/1.0/
+Source image: https://opengameart.org/sites/default/files/tileset_48.png
+Two gravestone crops are used with transparent black and a documented gray-green palette.
