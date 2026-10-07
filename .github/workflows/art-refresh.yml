@@ -1,0 +1,29 @@
+name: Requested art acquisition
+on:
+  push:
+    branches: [feature/stardew-world-frlg-ui]
+    paths:
+      - tools/import_requested_art.py
+      - .github/workflows/art-refresh.yml
+permissions:
+  contents: write
+concurrency:
+  group: requested-art-acquisition
+  cancel-in-progress: false
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Retrieve requested public sprite sheets
+        run: python tools/import_requested_art.py
+      - name: Commit source images and provenance on the working branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add resources/visual/stardew/
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record requested Stardew and FRLG source sheets with hashes and credits'
+            git push origin HEAD:feature/stardew-world-frlg-ui
+          fi
