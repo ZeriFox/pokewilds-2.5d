@@ -1,0 +1,1690 @@
+{
+  "version": 2,
+  "atlasSha256": "c8da61934dfe4f6cfa7f7c668c154be85c8d1c5701534e4a39bd948953672071",
+  "metadataSha256": "a22164eeaaa242786f9efd3efba3787c5f39e945917e46474eab6228b8bebafb",
+  "baseAtlasSha256": "10b4a5c31d9e01261a5a6b965845e8475c5ea131e7a574ae3909f4c68c35cc37",
+  "baseMetadataSha256": "ddcb38b29a146b174e06f39a3e32b2c935fe056a8ad417d3631f47f27ad80cb2",
+  "referenceManifestSha256": "bf66d4c3a7c1d1c3bbe76732bbaacd6bb35760436c59f719e572a1ab725f0004",
+  "redistribution": "Reference downloads are not grants of redistribution rights; see project rights review.",
+  "regions": {
+    "grass": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        48,
+        208,
+        16,
+        16
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "path": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        224,
+        368,
+        16,
+        16
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "dirt": {
+      "aliasOf": "path"
+    },
+    "snow": {
+      "source": "winter",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88665/",
+      "sourceSha256": "8b3df72486cd76e50e18664d482f2cb7b4c329b8251e7495d370a80f914e83de",
+      "crop": [
+        48,
+        208,
+        16,
+        16
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "sand": {
+      "aliasOf": "desert_path"
+    },
+    "stone_floor": {
+      "source": "flooring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/169045/",
+      "sourceSha256": "ce54b4d4bfff51f928fdba4a7a8903b986b4cbd09450dfd7aa42e2f451681615",
+      "crop": [
+        80,
+        16,
+        16,
+        16
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "mountain": {
+      "source": "mines",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/84485/",
+      "sourceSha256": "41bb97eca03cc7cc3dd5f2c6d028811c926ca7418175643a5e7572f4e1ad58a8",
+      "crop": [
+        128,
+        144,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#4e4b41",
+            "#95856a"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "cliff": {
+      "source": "mines",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/84485/",
+      "sourceSha256": "41bb97eca03cc7cc3dd5f2c6d028811c926ca7418175643a5e7572f4e1ad58a8",
+      "crop": [
+        144,
+        80,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#454035",
+            "#a18d65"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "cliff_earth": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "cliff_earth"
+    },
+    "cliff_dark": {
+      "source": "mines",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/84485/",
+      "sourceSha256": "41bb97eca03cc7cc3dd5f2c6d028811c926ca7418175643a5e7572f4e1ad58a8",
+      "crop": [
+        656,
+        80,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#20202c",
+            "#686070"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "cave_floor": {
+      "source": "mines",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/84485/",
+      "sourceSha256": "41bb97eca03cc7cc3dd5f2c6d028811c926ca7418175643a5e7572f4e1ad58a8",
+      "crop": [
+        640,
+        144,
+        32,
+        32
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "wood_floor": {
+      "source": "flooring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/169045/",
+      "sourceSha256": "ce54b4d4bfff51f928fdba4a7a8903b986b4cbd09450dfd7aa42e2f451681615",
+      "crop": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "tile_floor": {
+      "source": "flooring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/169045/",
+      "sourceSha256": "ce54b4d4bfff51f928fdba4a7a8903b986b4cbd09450dfd7aa42e2f451681615",
+      "crop": [
+        208,
+        16,
+        16,
+        16
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "wall": {
+      "source": "walls_floors",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88659/",
+      "sourceSha256": "2f2f5a717ec6aa5053537d83a01abecb1b71965c53ebf2ca98408c32bbdef263",
+      "crop": [
+        0,
+        0,
+        16,
+        45
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "wall_wood": {
+      "source": "walls_floors",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88659/",
+      "sourceSha256": "2f2f5a717ec6aa5053537d83a01abecb1b71965c53ebf2ca98408c32bbdef263",
+      "crop": [
+        176,
+        0,
+        16,
+        45
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "roof": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "roof"
+    },
+    "roof_green": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "roof_green"
+    },
+    "rug": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "rug"
+    },
+    "steps": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "steps"
+    },
+    "grass_light": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        48,
+        208,
+        16,
+        16
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#315631",
+            "#94b756"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "grass_dry": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        48,
+        208,
+        16,
+        16
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#76633a",
+            "#bea965"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "basalt": {
+      "aliasOf": "volcanic_basalt"
+    },
+    "cliff_volcano": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "cliff_volcano"
+    },
+    "volcano_path": {
+      "aliasOf": "volcanic_ash"
+    },
+    "volcano": {
+      "aliasOf": "volcanic_basalt"
+    },
+    "cliff_cap": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "cliff_cap"
+    },
+    "cliff_grass": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "cliff_grass"
+    },
+    "ramp": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "ramp"
+    },
+    "ruin_floor": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "ruin_floor"
+    },
+    "ruin_wall": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "ruin_wall"
+    },
+    "tile_pale": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "tile_pale"
+    },
+    "brick_floor": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "brick_floor"
+    },
+    "sand_shore": {
+      "aliasOf": "desert_path"
+    },
+    "path_dry": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "path_dry"
+    },
+    "bridge": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "bridge"
+    },
+    "water_0": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "water_0"
+    },
+    "water_shallow_0": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "water_shallow_0"
+    },
+    "lava_0": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_0"
+    },
+    "water_1": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "water_1"
+    },
+    "water_shallow_1": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "water_shallow_1"
+    },
+    "lava_1": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_1"
+    },
+    "water_2": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "water_2"
+    },
+    "water_shallow_2": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "water_shallow_2"
+    },
+    "lava_2": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_2"
+    },
+    "water_3": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "water_3"
+    },
+    "water_shallow_3": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "water_shallow_3"
+    },
+    "lava_3": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_3"
+    },
+    "water": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "water"
+    },
+    "water_shallow": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "water_shallow"
+    },
+    "lava": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava"
+    },
+    "river": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "river"
+    },
+    "water_ripple": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "water_ripple"
+    },
+    "desert_ground": {
+      "source": "desert",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88594/",
+      "sourceSha256": "34a44a2b5e385dc6c5c1e9e2ba454e9454dabae0095c00d999a35e921e7ccbd5",
+      "crop": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "desert_path": {
+      "source": "desert",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88594/",
+      "sourceSha256": "34a44a2b5e385dc6c5c1e9e2ba454e9454dabae0095c00d999a35e921e7ccbd5",
+      "crop": [
+        16,
+        64,
+        16,
+        16
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "desert_cliff": {
+      "source": "desert",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88594/",
+      "sourceSha256": "34a44a2b5e385dc6c5c1e9e2ba454e9454dabae0095c00d999a35e921e7ccbd5",
+      "crop": [
+        128,
+        48,
+        32,
+        48
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "desert_cliff_cap": {
+      "aliasOf": "desert_ground"
+    },
+    "desert_ramp": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "desert_ramp"
+    },
+    "volcanic_basalt": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        16,
+        0,
+        16,
+        16
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "volcanic_cracked": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        32,
+        0,
+        16,
+        16
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "volcanic_ash": {
+      "source": "mines",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/84485/",
+      "sourceSha256": "41bb97eca03cc7cc3dd5f2c6d028811c926ca7418175643a5e7572f4e1ad58a8",
+      "crop": [
+        640,
+        144,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#514e57",
+            "#86808a"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "volcanic_obsidian": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        16,
+        0,
+        16,
+        16
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#171722",
+            "#33303e"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "volcanic_cliff": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        64,
+        160,
+        16,
+        32
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "volcanic_cliff_cap": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "volcanic_cliff_cap"
+    },
+    "volcanic_ramp": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "volcanic_ramp"
+    },
+    "graveyard_ground": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        48,
+        208,
+        16,
+        16
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#48534c",
+            "#818775"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "graveyard_path": {
+      "source": "desert",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88594/",
+      "sourceSha256": "34a44a2b5e385dc6c5c1e9e2ba454e9454dabae0095c00d999a35e921e7ccbd5",
+      "crop": [
+        16,
+        64,
+        16,
+        16
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#656d62",
+            "#929780"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "graveyard_cliff": {
+      "source": "mines",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/84485/",
+      "sourceSha256": "41bb97eca03cc7cc3dd5f2c6d028811c926ca7418175643a5e7572f4e1ad58a8",
+      "crop": [
+        144,
+        80,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#3e4a45",
+            "#828a77"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "graveyard_cliff_cap": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "graveyard_cliff_cap"
+    },
+    "graveyard_ramp": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "graveyard_ramp"
+    },
+    "cliff_snow": {
+      "source": "mines",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/84485/",
+      "sourceSha256": "41bb97eca03cc7cc3dd5f2c6d028811c926ca7418175643a5e7572f4e1ad58a8",
+      "crop": [
+        400,
+        80,
+        32,
+        32
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "lava_bright_0": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_0"
+    },
+    "lava_cooled_0": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_0"
+    },
+    "lava_bright_1": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_1"
+    },
+    "lava_cooled_1": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_1"
+    },
+    "lava_bright_2": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_2"
+    },
+    "lava_cooled_2": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_2"
+    },
+    "lava_bright_3": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_3"
+    },
+    "lava_cooled_3": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_3"
+    },
+    "lava_bright_4": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_4"
+    },
+    "lava_cooled_4": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_4"
+    },
+    "lava_bright_5": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_5"
+    },
+    "lava_cooled_5": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_5"
+    },
+    "lava_bright_6": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_6"
+    },
+    "lava_cooled_6": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_6"
+    },
+    "lava_bright_7": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_7"
+    },
+    "lava_cooled_7": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_7"
+    },
+    "lava_bright_8": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_8"
+    },
+    "lava_cooled_8": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_8"
+    },
+    "lava_bright_9": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_9"
+    },
+    "lava_cooled_9": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_9"
+    },
+    "lava_bright_10": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_10"
+    },
+    "lava_cooled_10": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_10"
+    },
+    "lava_bright_11": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_11"
+    },
+    "lava_cooled_11": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_11"
+    },
+    "lava_bright_12": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_12"
+    },
+    "lava_cooled_12": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_12"
+    },
+    "lava_bright_13": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_13"
+    },
+    "lava_cooled_13": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_13"
+    },
+    "lava_bright_14": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_14"
+    },
+    "lava_cooled_14": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_14"
+    },
+    "lava_bright_15": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_bright_15"
+    },
+    "lava_cooled_15": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lava_cooled_15"
+    },
+    "lava_bright": {
+      "aliasOf": "stardew_lava_0"
+    },
+    "lava_cooled": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        0,
+        320,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#391924",
+            "#b45b27"
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "tree": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        48,
+        0,
+        48,
+        96
+      ],
+      "transformations": [
+        {
+          "connectedSheetIsland": {
+            "seed": [
+              24,
+              48
+            ],
+            "connectivity": 8
+          }
+        },
+        {
+          "preserveCanvas": [
+            48,
+            96
+          ],
+          "visibleBounds": [
+            0,
+            6,
+            47,
+            96
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "tree_small": {
+      "aliasOf": "tree"
+    },
+    "tree_pine": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        160,
+        0,
+        48,
+        96
+      ],
+      "transformations": [
+        {
+          "connectedSheetIsland": {
+            "seed": [
+              24,
+              48
+            ],
+            "connectivity": 8
+          }
+        },
+        {
+          "preserveCanvas": [
+            48,
+            96
+          ],
+          "visibleBounds": [
+            0,
+            5,
+            48,
+            96
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "tree_dry": {
+      "source": "desert",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88594/",
+      "sourceSha256": "34a44a2b5e385dc6c5c1e9e2ba454e9454dabae0095c00d999a35e921e7ccbd5",
+      "crop": [
+        0,
+        112,
+        48,
+        80
+      ],
+      "transformations": [
+        {
+          "connectedSheetIsland": {
+            "seed": [
+              24,
+              48
+            ],
+            "connectivity": 8
+          }
+        },
+        {
+          "preserveCanvas": [
+            48,
+            80
+          ],
+          "visibleBounds": [
+            1,
+            4,
+            46,
+            80
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "tree_snow": {
+      "source": "winter",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88665/",
+      "sourceSha256": "8b3df72486cd76e50e18664d482f2cb7b4c329b8251e7495d370a80f914e83de",
+      "crop": [
+        160,
+        0,
+        48,
+        96
+      ],
+      "transformations": [
+        {
+          "connectedSheetIsland": {
+            "seed": [
+              24,
+              48
+            ],
+            "connectivity": 8
+          }
+        },
+        {
+          "preserveCanvas": [
+            48,
+            96
+          ],
+          "visibleBounds": [
+            0,
+            5,
+            48,
+            96
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "tree_oak": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "tree_oak"
+    },
+    "bush": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        208,
+        0,
+        48,
+        48
+      ],
+      "transformations": [
+        {
+          "preserveCanvas": [
+            48,
+            48
+          ],
+          "visibleBounds": [
+            0,
+            4,
+            48,
+            48
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "bush_dry": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "bush_dry"
+    },
+    "tree_dead": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "tree_dead"
+    },
+    "cactus": {
+      "aliasOf": "desert_cactus"
+    },
+    "aloe": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "aloe"
+    },
+    "rock": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        528,
+        32,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "preserveCanvas": [
+            32,
+            32
+          ],
+          "visibleBounds": [
+            0,
+            0,
+            32,
+            32
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "rock_small": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "rock_small"
+    },
+    "rock_ice": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        528,
+        32,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#326b9e",
+            "#d0f9ff"
+          ]
+        },
+        {
+          "preserveCanvas": [
+            32,
+            32
+          ],
+          "visibleBounds": [
+            0,
+            0,
+            32,
+            32
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "grass_tuft": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "grass_tuft"
+    },
+    "grass_dry_tuft": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "grass_dry_tuft"
+    },
+    "flowers": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "flowers"
+    },
+    "flowers_fairy": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "flowers_fairy"
+    },
+    "mushroom": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "mushroom"
+    },
+    "seedling": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "seedling"
+    },
+    "plant_growing": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "plant_growing"
+    },
+    "berry_fruit": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "berry_fruit"
+    },
+    "stump": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "stump"
+    },
+    "cave_stalagmite": {
+      "aliasOf": "volcanic_rock"
+    },
+    "cave_crystal": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "cave_crystal"
+    },
+    "fence_wood": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "fence_wood"
+    },
+    "door": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "door"
+    },
+    "door_locked": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "door_locked"
+    },
+    "door_open": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "door_open"
+    },
+    "window": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "window"
+    },
+    "window_dark": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "window_dark"
+    },
+    "chair": {
+      "source": "furniture",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/126521/",
+      "sourceSha256": "5016a03bc073935845600769381cec187e98aa3fbcfe8fcaa048b8aa540b6011",
+      "crop": [
+        0,
+        0,
+        16,
+        32
+      ],
+      "transformations": [
+        {
+          "preserveCanvas": [
+            16,
+            32
+          ],
+          "visibleBounds": [
+            0,
+            0,
+            16,
+            32
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "desk": {
+      "source": "furniture",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/126521/",
+      "sourceSha256": "5016a03bc073935845600769381cec187e98aa3fbcfe8fcaa048b8aa540b6011",
+      "crop": [
+        0,
+        352,
+        32,
+        48
+      ],
+      "transformations": [
+        {
+          "preserveCanvas": [
+            32,
+            48
+          ],
+          "visibleBounds": [
+            0,
+            4,
+            32,
+            32
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "table": {
+      "source": "furniture",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/126521/",
+      "sourceSha256": "5016a03bc073935845600769381cec187e98aa3fbcfe8fcaa048b8aa540b6011",
+      "crop": [
+        224,
+        400,
+        80,
+        48
+      ],
+      "transformations": [
+        {
+          "preserveCanvas": [
+            80,
+            48
+          ],
+          "visibleBounds": [
+            0,
+            4,
+            80,
+            48
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "bench": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "bench"
+    },
+    "bed": {
+      "source": "furniture",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/126521/",
+      "sourceSha256": "5016a03bc073935845600769381cec187e98aa3fbcfe8fcaa048b8aa540b6011",
+      "crop": [
+        512,
+        312,
+        48,
+        56
+      ],
+      "transformations": [
+        {
+          "preserveCanvas": [
+            48,
+            56
+          ],
+          "visibleBounds": [
+            2,
+            0,
+            48,
+            56
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "couch": {
+      "source": "furniture",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/126521/",
+      "sourceSha256": "5016a03bc073935845600769381cec187e98aa3fbcfe8fcaa048b8aa540b6011",
+      "crop": [
+        0,
+        208,
+        48,
+        32
+      ],
+      "transformations": [
+        {
+          "preserveCanvas": [
+            48,
+            32
+          ],
+          "visibleBounds": [
+            0,
+            0,
+            47,
+            32
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "shelf": {
+      "source": "furniture",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/126521/",
+      "sourceSha256": "5016a03bc073935845600769381cec187e98aa3fbcfe8fcaa048b8aa540b6011",
+      "crop": [
+        592,
+        0,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "preserveCanvas": [
+            32,
+            32
+          ],
+          "visibleBounds": [
+            2,
+            0,
+            32,
+            32
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "wardrobe": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "wardrobe"
+    },
+    "pot": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "pot"
+    },
+    "chest": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "chest"
+    },
+    "machine": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "machine"
+    },
+    "machine_active": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "machine_active"
+    },
+    "kiln": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "kiln"
+    },
+    "sign": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "sign"
+    },
+    "lamp": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "lamp"
+    },
+    "key": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "key"
+    },
+    "item": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "item"
+    },
+    "fossil": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "fossil"
+    },
+    "ruin_gate": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "ruin_gate"
+    },
+    "spikes": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "spikes"
+    },
+    "hole": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "hole"
+    },
+    "forest_tree": {
+      "aliasOf": "tree"
+    },
+    "forest_tree_willow": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "forest_tree_willow"
+    },
+    "alternate_tree": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "alternate_tree"
+    },
+    "alternate_tree_small": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "alternate_tree_small"
+    },
+    "alternate_tree_pine": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "alternate_tree_pine"
+    },
+    "alternate_tree_dry": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "alternate_tree_dry"
+    },
+    "alternate_tree_snow": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "alternate_tree_snow"
+    },
+    "desert_rock": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        528,
+        32,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#705035",
+            "#cca071"
+          ]
+        },
+        {
+          "preserveCanvas": [
+            32,
+            32
+          ],
+          "visibleBounds": [
+            0,
+            0,
+            32,
+            32
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "desert_decor": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "desert_decor"
+    },
+    "desert_cactus": {
+      "source": "desert",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88594/",
+      "sourceSha256": "34a44a2b5e385dc6c5c1e9e2ba454e9454dabae0095c00d999a35e921e7ccbd5",
+      "crop": [
+        64,
+        112,
+        16,
+        48
+      ],
+      "transformations": [
+        {
+          "preserveCanvas": [
+            16,
+            48
+          ],
+          "visibleBounds": [
+            0,
+            7,
+            16,
+            48
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "desert_dead_tree": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "desert_dead_tree"
+    },
+    "volcanic_rock": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        48,
+        32,
+        16,
+        32
+      ],
+      "transformations": [
+        {
+          "preserveCanvas": [
+            16,
+            32
+          ],
+          "visibleBounds": [
+            0,
+            0,
+            16,
+            32
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "volcanic_crystal": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "volcanic_crystal"
+    },
+    "volcanic_charred_tree": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "volcanic_charred_tree"
+    },
+    "volcanic_dead_shrub": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "volcanic_dead_shrub"
+    },
+    "graveyard_rock": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        528,
+        32,
+        32,
+        32
+      ],
+      "transformations": [
+        {
+          "grayscaleColorMap": [
+            "#44524d",
+            "#858d77"
+          ]
+        },
+        {
+          "preserveCanvas": [
+            32,
+            32
+          ],
+          "visibleBounds": [
+            0,
+            0,
+            32,
+            32
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "graveyard_dead_tree": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "graveyard_dead_tree"
+    },
+    "graveyard_weeds": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "graveyard_weeds"
+    },
+    "graveyard_tomb": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "graveyard_tomb"
+    },
+    "graveyard_tomb_square": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "graveyard_tomb_square"
+    },
+    "grass_patch": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "grass_patch"
+    },
+    "warp": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "warp"
+    },
+    "pressure_plate": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "pressure_plate"
+    },
+    "cracked": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "cracked"
+    },
+    "statue": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "statue"
+    },
+    "tree_top": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "tree_top"
+    },
+    "plant": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "plant"
+    },
+    "palm_top": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "palm_top"
+    },
+    "palm_trunk": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "palm_trunk"
+    },
+    "fence": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "fence"
+    },
+    "door_red": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "door_red"
+    },
+    "cushion": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "cushion"
+    },
+    "gravestone": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "gravestone"
+    },
+    "pedestal": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "pedestal"
+    },
+    "doll": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "doll"
+    },
+    "switch": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "switch"
+    },
+    "pokeball": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "pokeball"
+    },
+    "ultraball": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "ultraball"
+    },
+    "berry_empty": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "berry_empty"
+    },
+    "berry_growing": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "berry_growing"
+    },
+    "berry_full": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "berry_full"
+    },
+    "fire_0": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "fire_0"
+    },
+    "fire_1": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "fire_1"
+    },
+    "fire_2": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "fire_2"
+    },
+    "fire_3": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "fire_3"
+    },
+    "fire": {
+      "retainedFrom": "visual/landscape/world-atlas.json",
+      "region": "fire"
+    },
+    "stardew_lava_0": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        0,
+        320,
+        32,
+        32
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "stardew_lava_1": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        32,
+        320,
+        32,
+        32
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "stardew_lava_2": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        64,
+        320,
+        32,
+        32
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "stardew_lava_3": {
+      "source": "volcano",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+      "sourceSha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+      "crop": [
+        96,
+        320,
+        32,
+        32
+      ],
+      "transformations": [],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "forest_bush": {
+      "aliasOf": "bush"
+    },
+    "deep_forest_bush": {
+      "aliasOf": "bush"
+    },
+    "deep_forest_tree": {
+      "source": "spring",
+      "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+      "sourceSha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+      "crop": [
+        96,
+        0,
+        64,
+        112
+      ],
+      "transformations": [
+        {
+          "connectedSheetIsland": {
+            "seed": [
+              32,
+              48
+            ],
+            "connectivity": 8
+          }
+        },
+        {
+          "preserveCanvas": [
+            64,
+            112
+          ],
+          "visibleBounds": [
+            2,
+            1,
+            63,
+            112
+          ]
+        }
+      ],
+      "rights": "ConcernedApe / Stardew Valley"
+    },
+    "wall_cap": {
+      "aliasOf": "wood_floor"
+    },
+    "ui_frlg_background": {
+      "source": "party",
+      "page": "https://www.spriters-resource.com/game_boy_advance/pokemonfireredleafgreen/asset/3854/",
+      "sourceSha256": "266cdea4ff7093d5ef9e9ebab1394360b557a4ee6eb37f448d5febfd71e45cb9",
+      "crop": [
+        22,
+        12,
+        220,
+        145
+      ],
+      "transformations": [],
+      "rights": "Nintendo / Game Freak / Pokemon FireRed LeafGreen; sheet credit Redzagoon"
+    },
+    "ui_frlg_row": {
+      "source": "party",
+      "page": "https://www.spriters-resource.com/game_boy_advance/pokemonfireredleafgreen/asset/3854/",
+      "sourceSha256": "266cdea4ff7093d5ef9e9ebab1394360b557a4ee6eb37f448d5febfd71e45cb9",
+      "crop": [
+        347,
+        16,
+        140,
+        19
+      ],
+      "transformations": [],
+      "rights": "Nintendo / Game Freak / Pokemon FireRed LeafGreen; sheet credit Redzagoon"
+    },
+    "ui_frlg_leader": {
+      "source": "party",
+      "page": "https://www.spriters-resource.com/game_boy_advance/pokemonfireredleafgreen/asset/3854/",
+      "sourceSha256": "266cdea4ff7093d5ef9e9ebab1394360b557a4ee6eb37f448d5febfd71e45cb9",
+      "crop": [
+        261,
+        32,
+        73,
+        46
+      ],
+      "transformations": [],
+      "rights": "Nintendo / Game Freak / Pokemon FireRed LeafGreen; sheet credit Redzagoon"
+    }
+  }
+}

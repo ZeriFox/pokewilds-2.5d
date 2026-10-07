@@ -1,0 +1,2263 @@
+{
+  "schemaVersion": 2,
+  "coordinateContract": {
+    "crop": "source pixels; x/y from top-left; width/height positive",
+    "sample": "source pixels; exact divisors; whole canvas for objects and UI",
+    "anchor": "source pixels from left/bottom; converted by BwAssets.pixelAnchor",
+    "worldSize": "world units; independent of source resolution",
+    "offset": "world units; applied after anchor conversion",
+    "padding": "2 pixels of edge extrusion, including corners; nearest filtering",
+    "legacy": "unversioned built-in landscape anchors remain pixels; custom anchors remain normalized"
+  },
+  "regions": {
+    "grass": {
+      "x": 113,
+      "y": 118,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "path": {
+      "x": 1304,
+      "y": 218,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "dirt": {
+      "x": 1529,
+      "y": 2,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "snow": {
+      "x": 1942,
+      "y": 218,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "sand": {
+      "x": 1825,
+      "y": 218,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "stone_floor": {
+      "x": 147,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "mountain": {
+      "x": 1086,
+      "y": 218,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "cliff": {
+      "x": 764,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "cliff_earth": {
+      "x": 872,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "cliff_dark": {
+      "x": 836,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "cave_floor": {
+      "x": 658,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "wood_floor": {
+      "x": 28,
+      "y": 493,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "tile_floor": {
+      "x": 310,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "wall": {
+      "x": 1643,
+      "y": 344,
+      "width": 16,
+      "height": 45,
+      "sampleWidth": 16,
+      "sampleHeight": 45,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        45
+      ]
+    },
+    "wall_wood": {
+      "x": 1683,
+      "y": 344,
+      "width": 16,
+      "height": 45,
+      "sampleWidth": 16,
+      "sampleHeight": 45,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        45
+      ]
+    },
+    "roof": {
+      "x": 1609,
+      "y": 218,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "roof_green": {
+      "x": 1645,
+      "y": 218,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "rug": {
+      "x": 1681,
+      "y": 218,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "steps": {
+      "x": 127,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "grass_light": {
+      "x": 171,
+      "y": 118,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "grass_dry": {
+      "x": 133,
+      "y": 118,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "basalt": {
+      "x": 227,
+      "y": 2,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "cliff_volcano": {
+      "x": 980,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcano_path": {
+      "x": 1607,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "volcano": {
+      "x": 1587,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "cliff_cap": {
+      "x": 800,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "cliff_grass": {
+      "x": 908,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "ramp": {
+      "x": 1479,
+      "y": 218,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "ruin_floor": {
+      "x": 1717,
+      "y": 218,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "ruin_wall": {
+      "x": 1789,
+      "y": 218,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "tile_pale": {
+      "x": 330,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "brick_floor": {
+      "x": 465,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "sand_shore": {
+      "x": 1845,
+      "y": 218,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "path_dry": {
+      "x": 1324,
+      "y": 218,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "bridge": {
+      "x": 501,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "water_0": {
+      "x": 1811,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_shallow_0": {
+      "x": 1931,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "lava_0": {
+      "x": 715,
+      "y": 118,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_1": {
+      "x": 1831,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_shallow_1": {
+      "x": 1951,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "lava_1": {
+      "x": 735,
+      "y": 118,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_2": {
+      "x": 1851,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_shallow_2": {
+      "x": 1971,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "lava_2": {
+      "x": 755,
+      "y": 118,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_3": {
+      "x": 1871,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_shallow_3": {
+      "x": 1991,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "lava_3": {
+      "x": 775,
+      "y": 118,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water": {
+      "x": 1791,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_shallow": {
+      "x": 1911,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "lava": {
+      "x": 695,
+      "y": 118,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "river": {
+      "x": 1499,
+      "y": 218,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "water_ripple": {
+      "x": 1891,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "desert_ground": {
+      "x": 1381,
+      "y": 2,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "desert_path": {
+      "x": 1401,
+      "y": 2,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "desert_cliff": {
+      "x": 1264,
+      "y": 2,
+      "width": 32,
+      "height": 48,
+      "sampleWidth": 32,
+      "sampleHeight": 48,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        48
+      ]
+    },
+    "desert_cliff_cap": {
+      "x": 1300,
+      "y": 2,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "desert_ramp": {
+      "x": 1421,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcanic_basalt": {
+      "x": 1318,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "volcanic_cracked": {
+      "x": 1437,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "volcanic_ash": {
+      "x": 1282,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "volcanic_obsidian": {
+      "x": 1511,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "volcanic_cliff": {
+      "x": 1381,
+      "y": 344,
+      "width": 16,
+      "height": 32,
+      "sampleWidth": 16,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        32
+      ]
+    },
+    "volcanic_cliff_cap": {
+      "x": 1401,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "volcanic_ramp": {
+      "x": 1531,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "graveyard_ground": {
+      "x": 377,
+      "y": 118,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "graveyard_path": {
+      "x": 397,
+      "y": 118,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "graveyard_cliff": {
+      "x": 262,
+      "y": 118,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "graveyard_cliff_cap": {
+      "x": 298,
+      "y": 118,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "graveyard_ramp": {
+      "x": 417,
+      "y": 118,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "cliff_snow": {
+      "x": 944,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "lava_bright_0": {
+      "x": 831,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_0": {
+      "x": 1955,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_1": {
+      "x": 899,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_1": {
+      "x": 2,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_2": {
+      "x": 1375,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_2": {
+      "x": 478,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_3": {
+      "x": 1443,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_3": {
+      "x": 546,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_4": {
+      "x": 1511,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_4": {
+      "x": 614,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_5": {
+      "x": 1579,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_5": {
+      "x": 682,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_6": {
+      "x": 1647,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_6": {
+      "x": 750,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_7": {
+      "x": 1715,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_7": {
+      "x": 818,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_8": {
+      "x": 1783,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_8": {
+      "x": 886,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_9": {
+      "x": 1851,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_9": {
+      "x": 954,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_10": {
+      "x": 967,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_10": {
+      "x": 70,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_11": {
+      "x": 1035,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_11": {
+      "x": 138,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_12": {
+      "x": 1103,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_12": {
+      "x": 206,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_13": {
+      "x": 1171,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_13": {
+      "x": 274,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_14": {
+      "x": 1239,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_14": {
+      "x": 342,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright_15": {
+      "x": 1307,
+      "y": 118,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_cooled_15": {
+      "x": 410,
+      "y": 218,
+      "width": 64,
+      "height": 64,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "lava_bright": {
+      "x": 795,
+      "y": 118,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "lava_cooled": {
+      "x": 1919,
+      "y": 118,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "tree": {
+      "x": 366,
+      "y": 344,
+      "width": 48,
+      "height": 96,
+      "sampleWidth": 48,
+      "sampleHeight": 96,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        48,
+        96
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0,
+      "worldWidth": 24.0,
+      "worldHeight": 48.0
+    },
+    "tree_small": {
+      "x": 690,
+      "y": 344,
+      "width": 48,
+      "height": 96,
+      "sampleWidth": 48,
+      "sampleHeight": 96,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        48,
+        96
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0,
+      "worldWidth": 24.0,
+      "worldHeight": 48.0
+    },
+    "tree_pine": {
+      "x": 638,
+      "y": 344,
+      "width": 48,
+      "height": 96,
+      "sampleWidth": 48,
+      "sampleHeight": 96,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        48,
+        96
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0,
+      "worldWidth": 22.0,
+      "worldHeight": 44.0
+    },
+    "tree_dry": {
+      "x": 456,
+      "y": 344,
+      "width": 48,
+      "height": 80,
+      "sampleWidth": 48,
+      "sampleHeight": 80,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        48,
+        80
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0,
+      "worldWidth": 27.0,
+      "worldHeight": 45.0
+    },
+    "tree_snow": {
+      "x": 742,
+      "y": 344,
+      "width": 48,
+      "height": 96,
+      "sampleWidth": 48,
+      "sampleHeight": 96,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        48,
+        96
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0,
+      "worldWidth": 22.0,
+      "worldHeight": 44.0
+    },
+    "tree_oak": {
+      "x": 508,
+      "y": 344,
+      "width": 126,
+      "height": 122,
+      "anchorX": 63.0,
+      "anchorY": 0
+    },
+    "bush": {
+      "x": 537,
+      "y": 2,
+      "width": 48,
+      "height": 48,
+      "sampleWidth": 48,
+      "sampleHeight": 48,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        48,
+        48
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0,
+      "worldWidth": 19.0,
+      "worldHeight": 19.0
+    },
+    "bush_dry": {
+      "x": 589,
+      "y": 2,
+      "width": 29,
+      "height": 27,
+      "anchorX": 14.5,
+      "anchorY": 0
+    },
+    "tree_dead": {
+      "x": 418,
+      "y": 344,
+      "width": 34,
+      "height": 31,
+      "anchorX": 17.0,
+      "anchorY": 0
+    },
+    "cactus": {
+      "x": 622,
+      "y": 2,
+      "width": 16,
+      "height": 48,
+      "sampleWidth": 16,
+      "sampleHeight": 48,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        48
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0,
+      "worldWidth": 10.0,
+      "worldHeight": 30.0
+    },
+    "aloe": {
+      "x": 2,
+      "y": 2,
+      "width": 31,
+      "height": 25,
+      "anchorX": 15.5,
+      "anchorY": 0
+    },
+    "rock": {
+      "x": 1519,
+      "y": 218,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0,
+      "worldWidth": 18.0,
+      "worldHeight": 18.0
+    },
+    "rock_small": {
+      "x": 1591,
+      "y": 218,
+      "width": 14,
+      "height": 11,
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "rock_ice": {
+      "x": 1555,
+      "y": 218,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0,
+      "worldWidth": 18.0,
+      "worldHeight": 18.0
+    },
+    "grass_tuft": {
+      "x": 227,
+      "y": 118,
+      "width": 14,
+      "height": 12,
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "grass_dry_tuft": {
+      "x": 153,
+      "y": 118,
+      "width": 14,
+      "height": 15,
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "flowers": {
+      "x": 1865,
+      "y": 2,
+      "width": 14,
+      "height": 10,
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "flowers_fairy": {
+      "x": 1883,
+      "y": 2,
+      "width": 11,
+      "height": 10,
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "mushroom": {
+      "x": 1122,
+      "y": 218,
+      "width": 10,
+      "height": 9,
+      "anchorX": 5.0,
+      "anchorY": 0
+    },
+    "seedling": {
+      "x": 1865,
+      "y": 218,
+      "width": 5,
+      "height": 8,
+      "anchorX": 2.5,
+      "anchorY": 0
+    },
+    "plant_growing": {
+      "x": 1410,
+      "y": 218,
+      "width": 11,
+      "height": 13,
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "berry_fruit": {
+      "x": 384,
+      "y": 2,
+      "width": 11,
+      "height": 14,
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "stump": {
+      "x": 167,
+      "y": 344,
+      "width": 19,
+      "height": 16,
+      "anchorX": 9.5,
+      "anchorY": 0
+    },
+    "cave_stalagmite": {
+      "x": 694,
+      "y": 2,
+      "width": 16,
+      "height": 32,
+      "sampleWidth": 16,
+      "sampleHeight": 32,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        32
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0,
+      "worldWidth": 14.0,
+      "worldHeight": 28.0
+    },
+    "cave_crystal": {
+      "x": 642,
+      "y": 2,
+      "width": 12,
+      "height": 25,
+      "anchorX": 6.0,
+      "anchorY": 0
+    },
+    "fence_wood": {
+      "x": 1690,
+      "y": 2,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "door": {
+      "x": 1564,
+      "y": 2,
+      "width": 20,
+      "height": 39,
+      "anchorX": 10.0,
+      "anchorY": 0
+    },
+    "door_locked": {
+      "x": 1588,
+      "y": 2,
+      "width": 20,
+      "height": 37,
+      "anchorX": 10.0,
+      "anchorY": 0
+    },
+    "door_open": {
+      "x": 1612,
+      "y": 2,
+      "width": 30,
+      "height": 44,
+      "anchorX": 15.0,
+      "anchorY": 0
+    },
+    "window": {
+      "x": 2011,
+      "y": 344,
+      "width": 22,
+      "height": 32,
+      "anchorX": 11.0,
+      "anchorY": 0
+    },
+    "window_dark": {
+      "x": 2,
+      "y": 493,
+      "width": 22,
+      "height": 32,
+      "anchorX": 11.0,
+      "anchorY": 0
+    },
+    "chair": {
+      "x": 714,
+      "y": 2,
+      "width": 16,
+      "height": 32,
+      "sampleWidth": 16,
+      "sampleHeight": 32,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        32
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0,
+      "worldWidth": 11.5,
+      "worldHeight": 23.0
+    },
+    "desk": {
+      "x": 1493,
+      "y": 2,
+      "width": 32,
+      "height": 48,
+      "sampleWidth": 32,
+      "sampleHeight": 48,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        48
+      ],
+      "anchorX": 16.0,
+      "anchorY": 16,
+      "worldWidth": 18.666666666666668,
+      "worldHeight": 28.0
+    },
+    "table": {
+      "x": 226,
+      "y": 344,
+      "width": 80,
+      "height": 48,
+      "sampleWidth": 80,
+      "sampleHeight": 48,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        80,
+        48
+      ],
+      "anchorX": 40.0,
+      "anchorY": 0,
+      "worldWidth": 32.0,
+      "worldHeight": 19.200000000000003
+    },
+    "bench": {
+      "x": 299,
+      "y": 2,
+      "width": 30,
+      "height": 12,
+      "anchorX": 15.0,
+      "anchorY": 0
+    },
+    "bed": {
+      "x": 247,
+      "y": 2,
+      "width": 48,
+      "height": 56,
+      "sampleWidth": 48,
+      "sampleHeight": 56,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        48,
+        56
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0,
+      "worldWidth": 24.0,
+      "worldHeight": 28.0
+    },
+    "couch": {
+      "x": 1016,
+      "y": 2,
+      "width": 48,
+      "height": 32,
+      "sampleWidth": 48,
+      "sampleHeight": 32,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        48,
+        32
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0,
+      "worldWidth": 28.5,
+      "worldHeight": 19.0
+    },
+    "shelf": {
+      "x": 1874,
+      "y": 218,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0,
+      "worldWidth": 20.0,
+      "worldHeight": 20.0
+    },
+    "wardrobe": {
+      "x": 1703,
+      "y": 344,
+      "width": 64,
+      "height": 41,
+      "anchorX": 32.0,
+      "anchorY": 0
+    },
+    "pot": {
+      "x": 1440,
+      "y": 218,
+      "width": 15,
+      "height": 24,
+      "anchorX": 7.5,
+      "anchorY": 0
+    },
+    "chest": {
+      "x": 734,
+      "y": 2,
+      "width": 26,
+      "height": 20,
+      "anchorX": 13.0,
+      "anchorY": 0
+    },
+    "machine": {
+      "x": 1022,
+      "y": 218,
+      "width": 24,
+      "height": 48,
+      "anchorX": 12.0,
+      "anchorY": 0
+    },
+    "machine_active": {
+      "x": 1050,
+      "y": 218,
+      "width": 32,
+      "height": 48,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "kiln": {
+      "x": 611,
+      "y": 118,
+      "width": 48,
+      "height": 96,
+      "anchorX": 24.0,
+      "anchorY": 0
+    },
+    "sign": {
+      "x": 1910,
+      "y": 218,
+      "width": 28,
+      "height": 23,
+      "anchorX": 14.0,
+      "anchorY": 0
+    },
+    "lamp": {
+      "x": 663,
+      "y": 118,
+      "width": 28,
+      "height": 45,
+      "anchorX": 14.0,
+      "anchorY": 0
+    },
+    "key": {
+      "x": 595,
+      "y": 118,
+      "width": 12,
+      "height": 7,
+      "anchorX": 6.0,
+      "anchorY": 0
+    },
+    "item": {
+      "x": 585,
+      "y": 118,
+      "width": 6,
+      "height": 9,
+      "anchorX": 3.0,
+      "anchorY": 0
+    },
+    "fossil": {
+      "x": 79,
+      "y": 118,
+      "width": 30,
+      "height": 26,
+      "anchorX": 15.0,
+      "anchorY": 0
+    },
+    "ruin_gate": {
+      "x": 1753,
+      "y": 218,
+      "width": 32,
+      "height": 48,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "spikes": {
+      "x": 1962,
+      "y": 218,
+      "width": 16,
+      "height": 39,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "hole": {
+      "x": 549,
+      "y": 118,
+      "width": 32,
+      "height": 48,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "forest_tree": {
+      "x": 1950,
+      "y": 2,
+      "width": 48,
+      "height": 96,
+      "sampleWidth": 48,
+      "sampleHeight": 96,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        48,
+        96
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0,
+      "worldWidth": 24.0,
+      "worldHeight": 48.0
+    },
+    "forest_tree_willow": {
+      "x": 2,
+      "y": 118,
+      "width": 73,
+      "height": 82,
+      "anchorX": 36.5,
+      "anchorY": 0
+    },
+    "alternate_tree": {
+      "x": 37,
+      "y": 2,
+      "width": 59,
+      "height": 70,
+      "anchorX": 29.5,
+      "anchorY": 0
+    },
+    "alternate_tree_small": {
+      "x": 165,
+      "y": 2,
+      "width": 28,
+      "height": 36,
+      "anchorX": 14.0,
+      "anchorY": 0
+    },
+    "alternate_tree_pine": {
+      "x": 136,
+      "y": 2,
+      "width": 25,
+      "height": 31,
+      "anchorX": 12.5,
+      "anchorY": 0
+    },
+    "alternate_tree_dry": {
+      "x": 100,
+      "y": 2,
+      "width": 32,
+      "height": 62,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "alternate_tree_snow": {
+      "x": 197,
+      "y": 2,
+      "width": 26,
+      "height": 46,
+      "anchorX": 13.0,
+      "anchorY": 0
+    },
+    "desert_rock": {
+      "x": 1457,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0,
+      "worldWidth": 18.0,
+      "worldHeight": 18.0
+    },
+    "desert_decor": {
+      "x": 1363,
+      "y": 2,
+      "width": 14,
+      "height": 15,
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "desert_cactus": {
+      "x": 1244,
+      "y": 2,
+      "width": 16,
+      "height": 48,
+      "sampleWidth": 16,
+      "sampleHeight": 48,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        48
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0,
+      "worldWidth": 10.0,
+      "worldHeight": 30.0
+    },
+    "desert_dead_tree": {
+      "x": 1320,
+      "y": 2,
+      "width": 39,
+      "height": 46,
+      "anchorX": 19.5,
+      "anchorY": 0
+    },
+    "volcanic_rock": {
+      "x": 1567,
+      "y": 344,
+      "width": 16,
+      "height": 32,
+      "sampleWidth": 16,
+      "sampleHeight": 32,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        32
+      ],
+      "anchorX": 8.0,
+      "anchorY": 0,
+      "worldWidth": 14.0,
+      "worldHeight": 28.0
+    },
+    "volcanic_crystal": {
+      "x": 1457,
+      "y": 344,
+      "width": 12,
+      "height": 25,
+      "anchorX": 6.0,
+      "anchorY": 0
+    },
+    "volcanic_charred_tree": {
+      "x": 1338,
+      "y": 344,
+      "width": 39,
+      "height": 46,
+      "anchorX": 19.5,
+      "anchorY": 0
+    },
+    "volcanic_dead_shrub": {
+      "x": 1473,
+      "y": 344,
+      "width": 34,
+      "height": 31,
+      "anchorX": 17.0,
+      "anchorY": 0
+    },
+    "graveyard_rock": {
+      "x": 453,
+      "y": 118,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ],
+      "anchorX": 16.0,
+      "anchorY": 0,
+      "worldWidth": 18.0,
+      "worldHeight": 18.0
+    },
+    "graveyard_dead_tree": {
+      "x": 334,
+      "y": 118,
+      "width": 39,
+      "height": 46,
+      "anchorX": 19.5,
+      "anchorY": 0
+    },
+    "graveyard_weeds": {
+      "x": 531,
+      "y": 118,
+      "width": 14,
+      "height": 15,
+      "anchorX": 7.0,
+      "anchorY": 0
+    },
+    "graveyard_tomb": {
+      "x": 489,
+      "y": 118,
+      "width": 17,
+      "height": 19,
+      "anchorX": 8.5,
+      "anchorY": 0
+    },
+    "graveyard_tomb_square": {
+      "x": 510,
+      "y": 118,
+      "width": 17,
+      "height": 16,
+      "anchorX": 8.5,
+      "anchorY": 0
+    },
+    "grass_patch": {
+      "x": 191,
+      "y": 118,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "warp": {
+      "x": 1771,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "pressure_plate": {
+      "x": 1459,
+      "y": 218,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "cracked": {
+      "x": 1068,
+      "y": 2,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "statue": {
+      "x": 110,
+      "y": 344,
+      "width": 13,
+      "height": 28,
+      "anchorX": 6.5,
+      "anchorY": 0
+    },
+    "tree_top": {
+      "x": 794,
+      "y": 344,
+      "width": 29,
+      "height": 27,
+      "anchorX": 14.5,
+      "anchorY": 0
+    },
+    "plant": {
+      "x": 1377,
+      "y": 218,
+      "width": 29,
+      "height": 27,
+      "anchorX": 14.5,
+      "anchorY": 0
+    },
+    "palm_top": {
+      "x": 1136,
+      "y": 218,
+      "width": 126,
+      "height": 122,
+      "anchorX": 63.0,
+      "anchorY": 0
+    },
+    "palm_trunk": {
+      "x": 1266,
+      "y": 218,
+      "width": 34,
+      "height": 31,
+      "anchorX": 17.0,
+      "anchorY": 0
+    },
+    "fence": {
+      "x": 1670,
+      "y": 2,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8.0,
+      "anchorY": 0
+    },
+    "door_red": {
+      "x": 1646,
+      "y": 2,
+      "width": 20,
+      "height": 37,
+      "anchorX": 10.0,
+      "anchorY": 0
+    },
+    "cushion": {
+      "x": 1088,
+      "y": 2,
+      "width": 32,
+      "height": 32,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "gravestone": {
+      "x": 245,
+      "y": 118,
+      "width": 13,
+      "height": 28,
+      "anchorX": 6.5,
+      "anchorY": 0
+    },
+    "pedestal": {
+      "x": 1360,
+      "y": 218,
+      "width": 13,
+      "height": 28,
+      "anchorX": 6.5,
+      "anchorY": 0
+    },
+    "doll": {
+      "x": 1549,
+      "y": 2,
+      "width": 11,
+      "height": 14,
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "switch": {
+      "x": 190,
+      "y": 344,
+      "width": 32,
+      "height": 48,
+      "anchorX": 16.0,
+      "anchorY": 0
+    },
+    "pokeball": {
+      "x": 1425,
+      "y": 218,
+      "width": 11,
+      "height": 14,
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "ultraball": {
+      "x": 1272,
+      "y": 344,
+      "width": 6,
+      "height": 9,
+      "anchorX": 3.0,
+      "anchorY": 0
+    },
+    "berry_empty": {
+      "x": 333,
+      "y": 2,
+      "width": 47,
+      "height": 60,
+      "anchorX": 23.5,
+      "anchorY": 0
+    },
+    "berry_growing": {
+      "x": 450,
+      "y": 2,
+      "width": 11,
+      "height": 13,
+      "anchorX": 5.5,
+      "anchorY": 0
+    },
+    "berry_full": {
+      "x": 399,
+      "y": 2,
+      "width": 47,
+      "height": 60,
+      "anchorX": 23.5,
+      "anchorY": 0
+    },
+    "fire_0": {
+      "x": 1741,
+      "y": 2,
+      "width": 27,
+      "height": 36,
+      "anchorX": 13.5,
+      "anchorY": 0
+    },
+    "fire_1": {
+      "x": 1772,
+      "y": 2,
+      "width": 27,
+      "height": 36,
+      "anchorX": 13.5,
+      "anchorY": 0
+    },
+    "fire_2": {
+      "x": 1803,
+      "y": 2,
+      "width": 27,
+      "height": 36,
+      "anchorX": 13.5,
+      "anchorY": 0
+    },
+    "fire_3": {
+      "x": 1834,
+      "y": 2,
+      "width": 27,
+      "height": 36,
+      "anchorX": 13.5,
+      "anchorY": 0
+    },
+    "fire": {
+      "x": 1710,
+      "y": 2,
+      "width": 27,
+      "height": 36,
+      "anchorX": 13.5,
+      "anchorY": 0
+    },
+    "stardew_lava_0": {
+      "x": 1982,
+      "y": 218,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "stardew_lava_1": {
+      "x": 2,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "stardew_lava_2": {
+      "x": 38,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "stardew_lava_3": {
+      "x": 74,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 32,
+      "sampleHeight": 32,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "forest_bush": {
+      "x": 1898,
+      "y": 2,
+      "width": 48,
+      "height": 48,
+      "sampleWidth": 48,
+      "sampleHeight": 48,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        48,
+        48
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0,
+      "worldWidth": 19.0,
+      "worldHeight": 19.0
+    },
+    "deep_forest_bush": {
+      "x": 1124,
+      "y": 2,
+      "width": 48,
+      "height": 48,
+      "sampleWidth": 48,
+      "sampleHeight": 48,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        48,
+        48
+      ],
+      "anchorX": 24.0,
+      "anchorY": 0,
+      "worldWidth": 19.0,
+      "worldHeight": 19.0
+    },
+    "deep_forest_tree": {
+      "x": 1176,
+      "y": 2,
+      "width": 64,
+      "height": 112,
+      "sampleWidth": 64,
+      "sampleHeight": 112,
+      "kind": "object",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        64,
+        112
+      ],
+      "anchorX": 32.0,
+      "anchorY": 0,
+      "worldWidth": 29.142857142857142,
+      "worldHeight": 51.0
+    },
+    "wall_cap": {
+      "x": 1663,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "ui_frlg_background": {
+      "x": 827,
+      "y": 344,
+      "width": 220,
+      "height": 145,
+      "sampleWidth": 220,
+      "sampleHeight": 145,
+      "kind": "ui",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        220,
+        145
+      ]
+    },
+    "ui_frlg_row": {
+      "x": 1128,
+      "y": 344,
+      "width": 140,
+      "height": 19,
+      "sampleWidth": 140,
+      "sampleHeight": 19,
+      "kind": "ui",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        140,
+        19
+      ]
+    },
+    "ui_frlg_leader": {
+      "x": 1051,
+      "y": 344,
+      "width": 73,
+      "height": 46,
+      "sampleWidth": 73,
+      "sampleHeight": 46,
+      "kind": "ui",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        73,
+        46
+      ]
+    }
+  },
+  "animations": {
+    "water": {
+      "fps": 5,
+      "frames": [
+        "water_0",
+        "water_1",
+        "water_2",
+        "water_3"
+      ]
+    },
+    "water_shallow": {
+      "fps": 5,
+      "frames": [
+        "water_shallow_0",
+        "water_shallow_1",
+        "water_shallow_2",
+        "water_shallow_3"
+      ]
+    },
+    "lava": {
+      "fps": 5,
+      "frames": [
+        "lava_0",
+        "lava_1",
+        "lava_2",
+        "lava_3"
+      ]
+    },
+    "fire": {
+      "fps": 8,
+      "frames": [
+        "fire_0",
+        "fire_1",
+        "fire_2",
+        "fire_3"
+      ]
+    },
+    "lava_bright": {
+      "frames": [
+        "stardew_lava_0",
+        "stardew_lava_1",
+        "stardew_lava_2",
+        "stardew_lava_3"
+      ],
+      "fps": 4
+    }
+  }
+}

@@ -5,6 +5,7 @@ Does not download, change simulation data or silently replace missing sprites.
 Unchanged mechanical assets retain the audited landscape atlas and its credits.
 """
 from pathlib import Path
+from collections import deque
 import hashlib
 import json
 from PIL import Image, ImageOps
@@ -12,13 +13,65 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'art-source/reference'
 OUTPUT = ROOT / 'resources/visual/stardew'
+CONTRACT = {
+    'crop': 'source pixels; x/y from top-left; width/height positive',
+    'sample': 'source pixels; exact divisors; whole canvas for objects and UI',
+    'anchor': 'source pixels from left/bottom; converted by BwAssets.pixelAnchor',
+    'worldSize': 'world units; independent of source resolution',
+    'offset': 'world units; applied after anchor conversion',
+    'padding': '2 pixels of edge extrusion, including corners; nearest filtering',
+    'legacy': 'unversioned built-in landscape anchors remain pixels; custom anchors remain normalized',
+}
+
+
+def isolated_component(image, seed):
+    """Select one explicitly identified sheet island, without changing its origin.
+
+    This is not a color key: all RGBA values of the chosen connected silhouette
+    remain exact. It removes separate sheet decorations accidentally in its cell.
+    """
+    x, y = seed
+    if not (0 <= x < image.width and 0 <= y < image.height) or not image.getpixel(seed)[3]:
+        raise ValueError('Component seed must identify visible artwork')
+    pixels = image.load()
+    selected = set()
+    todo = deque([seed])
+    while todo:
+        x, y = todo.popleft()
+        if (x, y) in selected or not (0 <= x < image.width and 0 <= y < image.height):
+            continue
+        if not pixels[x, y][3]:
+            continue
+        selected.add((x, y))
+        todo.extend((x + dx, y + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1) if dx or dy)
+    result = Image.new('RGBA', image.size)
+    target = result.load()
+    for pixel in selected:
+        target[pixel] = pixels[pixel]
+    return result
+
+
+def extruded(art, padding=2):
+    """Duplicate all edge pixels, including corners, without resampling art."""
+    result = Image.new('RGBA', (art.width + padding * 2, art.height + padding * 2))
+    result.paste(art, (padding, padding))
+    for y in range(result.height):
+        for x in range(result.width):
+            if x < padding or x >= art.width + padding or y < padding or y >= art.height + padding:
+                result.putpixel((x, y), art.getpixel((max(0, min(art.width - 1, x - padding)),
+                                                     max(0, min(art.height - 1, y - padding)))))
+    return result
 
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def prepare():
+def write_text(path, value):
+    path.write_text(value, encoding='utf-8', newline='\n')
+
+
+def prepare(output=OUTPUT):
     manifest = json.loads((SOURCE / 'manifest.json').read_text())
     images = {}
     for name, info in manifest.items():
@@ -41,15 +94,15 @@ def prepare():
         provenance[key] = {'retainedFrom': 'visual/landscape/world-atlas.json', 'region': key}
     animations = dict(original.get('animations', {}))
 
-    def add(key, source, box, *, prop=False, size=None, tint=None, sample=None):
+    def add(key, source, box, *, prop=False, size=None, tint=None, sample=None, component=None):
         x, y, w, h = box
         if min(x, y) < 0 or min(w, h) <= 0 or x+w > images[source].width or y+h > images[source].height:
             raise ValueError('Out of bounds crop: ' + key)
         art = images[source].crop((x, y, x+w, y+h))
-        if source == 'party':
-            pixels = list(art.getdata())
-            art.putdata([(r,g,b,0 if (r,g,b)==(0,128,0) else a) for r,g,b,a in pixels])
         transformations = []
+        if component is not None:
+            art = isolated_component(art, component)
+            transformations.append({'connectedSheetIsland': {'seed': list(component), 'connectivity': 8}})
         if tint:
             alpha = art.getchannel('A')
             gray = ImageOps.grayscale(art)
@@ -60,19 +113,26 @@ def prepare():
             bounds = art.getchannel('A').getbbox()
             if bounds is None:
                 raise ValueError('Empty prop: ' + key)
-            art = art.crop(bounds)
-            transformations.append({'alphaTrim': list(bounds)})
+            # Preserve the original source canvas/origin. Per-frame alpha trimming
+            # previously changed both size and contact point unpredictably.
+            transformations.append({'preserveCanvas': [w, h], 'visibleBounds': list(bounds)})
         elif art.getchannel('A').getextrema() != (255,255) and source != 'party':
             raise ValueError('Surface crop contains holes: ' + key)
         materials[key] = art
         # Every replacement explicitly defines sampling. Props always retain
         # their WHOLE trimmed region, including rectangular/high-resolution PNGs.
         metadata[key] = {'sampleWidth': sample[0] if sample else art.width,
-                         'sampleHeight': sample[1] if sample else art.height}
+                         'sampleHeight': sample[1] if sample else art.height,
+                         'kind': 'object' if prop else 'ui' if source == 'party' else 'surface',
+                         'anchorUnits': 'pixels', 'sourceCanvas': [w, h]}
+        if any(value <= 0 or extent % value for value, extent in
+               zip((metadata[key]['sampleWidth'], metadata[key]['sampleHeight']), art.size)):
+            raise ValueError('Sampling must divide the full region: ' + key)
         if prop:
-            metadata[key].update(anchorX=art.width/2, anchorY=0)
+            metadata[key].update(anchorX=w/2, anchorY=h-bounds[3])
         if size:
-            metadata[key].update(worldWidth=size[0], worldHeight=size[1])
+            scale = min(size[0]/w, size[1]/h)
+            metadata[key].update(worldWidth=w*scale, worldHeight=h*scale)
         animations.pop(key, None)
         provenance[key] = {'source': source, 'page': manifest[source]['page'],
                            'sourceSha256': manifest[source]['sha256'], 'crop': list(box),
@@ -119,40 +179,44 @@ def prepare():
     add('graveyard_path', 'desert', (16,64,16,16), tint=('#656d62','#929780'))
     add('graveyard_cliff', 'mines', (144,80,32,32), tint=('#3e4a45','#828a77'))
 
-    # Crop distinct props from isolated sheet islands, trim alpha, keep proportions.
-    add('tree','spring',(0,0,48,112),prop=True,size=(24,48))
-    add('tree_pine','spring',(160,0,48,112),prop=True,size=(22,46))
-    add('tree_snow','winter',(160,0,48,112),prop=True,size=(22,46))
-    add('tree_dry','desert',(0,112,48,48),prop=True,size=(27,34))
+    # Full isolated props: exclude adjacent terrain/props, preserve source canvas.
+    add('tree','spring',(48,0,48,96),prop=True,size=(24,48),component=(24,48))
+    add('tree_pine','spring',(160,0,48,96),prop=True,size=(22,46),component=(24,48))
+    add('tree_snow','winter',(160,0,48,96),prop=True,size=(22,46),component=(24,48))
+    add('tree_dry','desert',(0,112,48,80),prop=True,size=(27,45),component=(24,48))
     add('bush','spring',(208,0,48,48),prop=True,size=(19,19))
     add('rock','spring',(528,32,32,32),prop=True,size=(18,19))
     add('desert_rock','spring',(528,32,32,32),prop=True,size=(18,19),tint=('#705035','#cca071'))
     add('graveyard_rock','spring',(528,32,32,32),prop=True,size=(18,19),tint=('#44524d','#858d77'))
     add('rock_ice','spring',(528,32,32,32),prop=True,size=(18,19),tint=('#326b9e','#d0f9ff'))
-    add('volcanic_rock','volcano',(32,32,32,32),prop=True,size=(19,24))
+    add('volcanic_rock','volcano',(48,32,16,32),prop=True,size=(14,28))
     alias('cave_stalagmite','volcanic_rock')
-    add('desert_cactus','desert',(48,112,32,48),prop=True,size=(18,27))
+    add('desert_cactus','desert',(64,112,16,48),prop=True,size=(12,30))
     alias('cactus','desert_cactus')
     for key in ('forest_tree','tree_small'):
         alias(key,'tree')
     for key in ('forest_bush','deep_forest_bush'):
         alias(key,'bush')
-    add('deep_forest_tree','spring',(96,0,64,112),prop=True,size=(35,51))
+    add('deep_forest_tree','spring',(96,0,64,112),prop=True,size=(35,51),component=(32,48))
 
     # House materials and full furniture silhouettes, not artificial cube skins.
     add('wood_floor','flooring',(16,16,16,16))
     add('tile_floor','flooring',(208,16,16,16))
     add('stone_floor','flooring',(80,16,16,16))
-    add('wall','walls_floors',(0,0,16,48))
-    add('wall_wood','walls_floors',(32,0,16,48))
+    # Each 48px wallpaper cell includes three rows of cast shadow beneath its
+    # opaque 45px face (alpha 101,55,20). They are NOT part of a solid wall face.
+    # Crop the actual face and baseboard; keep strict opacity validation above.
+    add('wall','walls_floors',(0,0,16,45))
+    add('wall_wood','walls_floors',(176,0,16,45))
     alias('wall_cap','wood_floor')
     add('chair','furniture',(0,0,16,32),prop=True,size=(12,23))
     add('couch','furniture',(0,208,48,32),prop=True,size=(29,19))
-    add('desk','furniture',(0,352,32,32),prop=True,size=(22,22))
+    add('desk','furniture',(0,352,32,48),prop=True,size=(22,28))
     add('table','furniture',(224,400,80,48),prop=True,size=(32,20))
-    add('bed','furniture',(512,320,32,48),prop=True,size=(20,30))
+    add('bed','furniture',(512,312,48,56),prop=True,size=(24,28))
     add('shelf','furniture',(592,0,32,32),prop=True,size=(20,26))
-    add('wardrobe','furniture',(512,368,32,32),prop=True,size=(18,27))
+    # Retain the audited landscape wardrobe: the previous (512,368,32,32)
+    # Stardew crop was a cut-off door, not a wardrobe.
 
     # This sheet is Pokemon Menu (party), not the FRLG bag. Use its reusable
     # frames for both interfaces without baking labels, HP values or Pokemon.
@@ -180,24 +244,29 @@ def prepare():
     regions={}
     for key, art in materials.items():
         x,y,w,h=layout[key]
-        canvas.paste(art,(x,y))
-        canvas.paste(art.crop((0,0,1,h)).resize((2,h)),(x-2,y))
-        canvas.paste(art.crop((w-1,0,w,h)).resize((2,h)),(x+w,y))
-        canvas.paste(art.crop((0,0,w,1)).resize((w,2)),(x,y-2))
-        canvas.paste(art.crop((0,h-1,w,h)).resize((w,2)),(x,y+h))
+        canvas.paste(extruded(art), (x-2,y-2))
         regions[key]={'x':x,'y':y,'width':w,'height':h,**metadata[key]}
     for name, sequence in animations.items():
-        if any(frame not in regions for frame in sequence['frames']):
+        frames = sequence.get('frames', [])
+        if not frames or any(frame not in regions for frame in frames):
             raise ValueError('Broken animation: ' + name)
-    OUTPUT.mkdir(parents=True,exist_ok=True)
-    canvas.save(OUTPUT/'world-atlas.png',optimize=True)
-    (OUTPUT/'world-atlas.json').write_text(json.dumps({'regions':regions,'animations':animations},indent=2)+'\n')
-    (OUTPUT/'PROVENANCE.json').write_text(json.dumps({'version':1,'atlasSha256':digest(OUTPUT/'world-atlas.png'),
-        'baseAtlasSha256':digest(base_dir/'world-atlas.png'),'regions':provenance},indent=2)+'\n')
-    (OUTPUT/'CREDITS.txt').write_text('Selected environment tiles: Stardew Valley / ConcernedApe.\n'
+        if sequence.get('fps', 0) <= 0 or len({materials[frame].size for frame in frames}) != 1:
+            raise ValueError('Invalid animation speed or unstable canvas: ' + name)
+    output.mkdir(parents=True,exist_ok=True)
+    canvas.save(output/'world-atlas.png',optimize=True)
+    write_text(output/'world-atlas.json', json.dumps({'schemaVersion':2, 'coordinateContract':CONTRACT,
+        'regions':regions,'animations':animations},indent=2)+'\n')
+    write_text(output/'PROVENANCE.json',json.dumps({'version':2,'atlasSha256':digest(output/'world-atlas.png'),
+        'metadataSha256':digest(output/'world-atlas.json'),
+        'baseAtlasSha256':digest(base_dir/'world-atlas.png'),
+        'baseMetadataSha256':digest(base_dir/'world-atlas.json'),
+        'referenceManifestSha256':digest(SOURCE/'manifest.json'),
+        'redistribution': 'Reference downloads are not grants of redistribution rights; see project rights review.',
+        'regions':provenance},indent=2)+'\n')
+    write_text(output/'CREDITS.txt','Selected environment tiles: Stardew Valley / ConcernedApe.\n'
         'Menu frames: Pokemon FireRed / LeafGreen, Nintendo / Game Freak; sheet credit Redzagoon.\n'
         'Sources: The Spriters Resource pages and exact hashes in PROVENANCE.json and art-source/reference/manifest.json.\n'
-        'Adaptations: explicit crops, alpha-only trimming, palette mapping and atlas packing.\n'
+        'Adaptations: explicit crops, identified connected sheet islands, preserved canvases, palette mapping and edge-extruded atlas packing.\n'
         'These materials are not original project artwork, CC0 or MIT. All original rights remain with their holders.\n'
         'Retained mechanical assets: see visual/landscape/CREDITS.txt and its provenance.\n')
     print('REFERENCE ATLAS:',len(regions),'regions;',sum('source' in p for p in provenance.values()),'source crops;',canvas.size)

@@ -1,0 +1,6 @@
+Selected environment tiles: Stardew Valley / ConcernedApe.
+Menu frames: Pokemon FireRed / LeafGreen, Nintendo / Game Freak; sheet credit Redzagoon.
+Sources: The Spriters Resource pages and exact hashes in PROVENANCE.json and art-source/reference/manifest.json.
+Adaptations: explicit crops, identified connected sheet islands, preserved canvases, palette mapping and edge-extruded atlas packing.
+These materials are not original project artwork, CC0 or MIT. All original rights remain with their holders.
+Retained mechanical assets: see visual/landscape/CREDITS.txt and its provenance.
