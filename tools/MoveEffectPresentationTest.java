@@ -151,6 +151,17 @@ public final class MoveEffectPresentationTest {
       void verifyOrientation(Pixmap baseline) {
          MoveEffectPresentation identity=new MoveEffectPresentation("surf_player_gsc");
          identity.drawMetadata(this,animation,"screenshot:0,0,160,144 row_copy:60,60");
+         // Isolate capture rasterization from the later screen composite without changing production.
+         uiBatch.flush();
+         int previousFramebuffer=gl(GL20.GL_FRAMEBUFFER_BINDING,1)[0];
+         try {
+            java.lang.reflect.Field snapshotField=MoveEffectPresentation.class.getDeclaredField("snapshot");snapshotField.setAccessible(true);
+            com.badlogic.gdx.graphics.glutils.FrameBuffer captured=(com.badlogic.gdx.graphics.glutils.FrameBuffer)snapshotField.get(identity);
+            Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER,captured.getFramebufferHandle());
+            Pixmap captureShot=ScreenUtils.getFrameBufferPixmap(0,0,W,H);
+            save(captureShot,"identity-captured-fbo.png");captureShot.dispose();
+         } catch(ReflectiveOperationException failure) {throw new RuntimeException(failure);}
+         finally {Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER,previousFramebuffer);}
          com.badlogic.gdx.graphics.g2d.Sprite empty=new com.badlogic.gdx.graphics.g2d.Sprite(
             com.pkmngen.game.util.TextureCache.get(Gdx.files.internal("attacks/surf_player_gsc/output/frame-001.png")));
          Pixmap transparent=new Pixmap(Gdx.files.internal("attacks/surf_player_gsc/output/frame-001.png"));
