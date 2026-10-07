@@ -9,6 +9,7 @@ import unittest
 from PIL import Image
 
 from prepare_pmd_compatibility import PINNED, ROOT, prepare
+from deterministic_png import ENCODING
 
 
 class PmdCompatibilityTest(unittest.TestCase):
@@ -17,6 +18,8 @@ class PmdCompatibilityTest(unittest.TestCase):
             first, second = Path(temporary) / 'first', Path(temporary) / 'second'
             provenance = prepare(first)
             prepare(second)
+            self.assertEqual(provenance["pngEncoding"], ENCODING)
+            self.assertEqual(provenance["encoderSha256"], hashlib.sha256((ROOT / "tools/deterministic_png.py").read_bytes()).hexdigest())
             signatures = set()
             for species, (dex, expected, crop) in PINNED.items():
                 name = species + '_overw1.png'
@@ -31,6 +34,7 @@ class PmdCompatibilityTest(unittest.TestCase):
                 self.assertEqual(bounds[3], 16, species)
                 self.assertEqual(art.getchannel('A').getextrema(), (0, 255), species)
                 signatures.add(art.tobytes())
+                self.assertEqual(provenance['files'][name]['rgbaSha256'], hashlib.sha256(art.tobytes()).hexdigest())
                 self.assertEqual(provenance['files'][name]['sourceSha256'], expected)
                 self.assertEqual(provenance['files'][name]['sha256'], hashlib.sha256((first / name).read_bytes()).hexdigest())
             self.assertEqual(len(signatures), 3, 'Different species must never share a generic replacement')

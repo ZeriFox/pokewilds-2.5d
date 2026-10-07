@@ -60,3 +60,11 @@ Actual framebuffer PNGs were inspected. Isolated effect fixtures deliberately pa
 The earlier vertical-slice visibility check accepted any 40 changed pixels and therefore passed a player with only its head visible. On the intact `f5a817d5…` JAR, the strengthened test fails: feet **0/1,301**, torso **1,309/2,406**, head **3,840/3,840**. A test-only counterfactual replacing just the front wall row with floor restores the full silhouette and establishes the wall cap as the cause. The production map and collision remain intact. Logs and the before/reference PNGs are retained under `build/interior-occlusion-before/`.
 
 Acceptance now requires at least 70% of both feet and torso reference pixels to remain recognizable, using an explicit color tolerance for transparency. The final renderer correction must pass this check and retain original wall collision and save identities. The previous weak visibility PASS is not evidence that R13 was complete.
+
+## Complete Windows acceptance — ce84efaa
+
+All **21 native checks**, deterministic asset preparation, all eight pure checks and the complete 220-source build passed from clean commit `ce84efaa431cdaef0c9efb97993af9c38c1eb5b0`. Tested Windows JAR: `b5fd0df0b00f3b8025273958d3f9bc1cd14ba66787f3f25a9166811d47e6d245`. Receipts/logs are preserved in `build/rework-verification-ce84/` before subsequent acceptance runs.
+
+The corrected interior preserves **1,301/1,301 feet pixels and 2,406/2,406 torso pixels** within the documented tolerance. Original wall collision and save identities pass. The genuine Surf capture now records authored frame 100, showing the wave and row displacement rather than its initial transparent frame.
+
+Linux CI on this commit failed **before compilation**, during byte-deterministic asset preparation. Diagnostic commit `a44cf0f7` proved that `world-atlas.png` and `suicune_overw1.png` have identical dimensions and RGBA hashes on Linux and Windows, but different compressed bytes; their two provenance files consequently differ too. Pillow versions alone do not explain it: isolated Windows Pillow 11.1 and 11.3 produce identical outputs. Linux reports zlib 1.3, Windows zlib 1.3.1.zlib-ng. The PNG encoder correction must retain every pixel and restore exact cross-platform bytes before the final CI/package acceptance.

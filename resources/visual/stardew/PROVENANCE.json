@@ -1,6 +1,14 @@
 {
   "version": 2,
-  "atlasSha256": "7e0b72fdd434030974b5a79974b33a9402f944bec9ee8ecc4aa70a3dcb23cca4",
+  "atlasSha256": "1b64507908d8488816e88a8f9bb1dcbfdf8bc3fa587df93228fd663bea3c3fc4",
+  "atlasRgbaSha256": "4a7b9725517cea4aade0ed4020cc2be67de935e4d6517bceeb101da4d048da38",
+  "pngEncoding": {
+    "name": "RGBA8-filter0-stored-deflate",
+    "version": 1,
+    "blockBytes": 65535,
+    "implementation": "tools/deterministic_png.py"
+  },
+  "encoderSha256": "fb6044da64082e548b4e28189d045a23c68894ab29659e2f2f7d380f8835ee6c",
   "metadataSha256": "059761e6ff6845418553bc74cf550dc87e6b8e59736c76207fa3e9ee07e7bdbf",
   "baseAtlasSha256": "10b4a5c31d9e01261a5a6b965845e8475c5ea131e7a574ae3909f4c68c35cc37",
   "baseMetadataSha256": "ddcb38b29a146b174e06f39a3e32b2c935fe056a8ad417d3631f47f27ad80cb2",

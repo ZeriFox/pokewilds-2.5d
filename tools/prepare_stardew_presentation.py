@@ -9,6 +9,7 @@ from collections import deque
 import hashlib
 import json
 from PIL import Image, ImageOps
+from deterministic_png import ENCODING, save_rgba_png
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'art-source/reference'
@@ -271,10 +272,12 @@ def prepare(output=OUTPUT):
         if sequence.get('fps', 0) <= 0 or len({materials[frame].size for frame in frames}) != 1:
             raise ValueError('Invalid animation speed or unstable canvas: ' + name)
     output.mkdir(parents=True,exist_ok=True)
-    canvas.save(output/'world-atlas.png',optimize=True)
+    save_rgba_png(canvas, output/'world-atlas.png')
     write_text(output/'world-atlas.json', json.dumps({'schemaVersion':2, 'coordinateContract':CONTRACT,
         'regions':regions,'animations':animations},indent=2)+'\n')
     write_text(output/'PROVENANCE.json',json.dumps({'version':2,'atlasSha256':digest(output/'world-atlas.png'),
+        'atlasRgbaSha256':hashlib.sha256(canvas.tobytes()).hexdigest(),
+        'pngEncoding':ENCODING, 'encoderSha256':digest(ROOT/'tools/deterministic_png.py'),
         'metadataSha256':digest(output/'world-atlas.json'),
         'baseAtlasSha256':digest(base_dir/'world-atlas.png'),
         'baseMetadataSha256':digest(base_dir/'world-atlas.json'),

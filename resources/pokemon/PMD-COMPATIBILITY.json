@@ -1,6 +1,13 @@
 {
   "version": 1,
   "sourceProvenance": "PMD-PROVENANCE.json",
+  "pngEncoding": {
+    "name": "RGBA8-filter0-stored-deflate",
+    "version": 1,
+    "blockBytes": 65535,
+    "implementation": "tools/deterministic_png.py"
+  },
+  "encoderSha256": "fb6044da64082e548b4e28189d045a23c68894ab29659e2f2f7d380f8835ee6c",
   "rights": "Existing PMDCollab credits and rights remain applicable; no new rights grant.",
   "modernRendering": "Original PMD sheets and metadata remain unchanged.",
   "files": {
@@ -24,7 +31,8 @@
         16
       ],
       "anchor": "bottom center",
-      "sha256": "4a3ba21d67aa895fa5a0a7992a5405c1b461b01fce4d362eb2da903b338bf96d"
+      "rgbaSha256": "c025062633256180c6c86066100fac1fc136f9c684f015f50c9b578620b84c1b",
+      "sha256": "355c5ac36c45fcdbe78743004297ae8230e440f363e5d91aab0d606336f79fc3"
     },
     "entei_overw1.png": {
       "source": "resources/visual/pmd/sprite/0244/Idle-Anim.png",
@@ -46,7 +54,8 @@
         16
       ],
       "anchor": "bottom center",
-      "sha256": "d0d6a60235354e36ecc63518a88fafb51462964be638e836c769cf88939b42ee"
+      "rgbaSha256": "f78ded9a88f1a2629bed6de2a8e1ddc717dca6a1c219afee1044521ad9569edf",
+      "sha256": "1417d7f3bf24959d1c7f175add129e5e5d9a292c5558c43028e1c8b78e3c1fa7"
     },
     "suicune_overw1.png": {
       "source": "resources/visual/pmd/sprite/0245/Idle-Anim.png",
@@ -68,7 +77,8 @@
         16
       ],
       "anchor": "bottom center",
-      "sha256": "89928d59a4059302c34df9786543627bd2f48e72d14d21e8c69bc218f7095111"
+      "rgbaSha256": "582706bf64358536348a9a0e8c7ff74b1eec315661bcc76596965f86a807f165",
+      "sha256": "86e94b7d40da9fe61fc83c6707be13723fbc3f2ddad7aeaeb5afbfa3ca45af4f"
     }
   }
 }

@@ -23,6 +23,7 @@ PURE = [
     "tools/verify_visual_scope.py", "tools/verify_scope_test.py",
     "tools/verify_landscape_assets.py",
     "tools/test_stardew_assets.py",
+    "tools/test_deterministic_png.py",
     "tools/test_pmd_compatibility.py",
     "tools/test_packaging.py",
 ]

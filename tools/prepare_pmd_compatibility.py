@@ -8,6 +8,7 @@ import hashlib
 import json
 from pathlib import Path
 from PIL import Image
+from deterministic_png import ENCODING, save_rgba_png
 
 ROOT = Path(__file__).resolve().parents[1]
 PINNED = {
@@ -21,6 +22,8 @@ def prepare(output=None):
     output = output or ROOT / 'resources/pokemon'
     output.mkdir(parents=True, exist_ok=True)
     provenance = {'version': 1, 'sourceProvenance': 'PMD-PROVENANCE.json',
+                  'pngEncoding': ENCODING,
+                  'encoderSha256': hashlib.sha256((ROOT/'tools/deterministic_png.py').read_bytes()).hexdigest(),
                   'rights': 'Existing PMDCollab credits and rights remain applicable; no new rights grant.',
                   'modernRendering': 'Original PMD sheets and metadata remain unchanged.', 'files': {}}
     for species, (dex, expected, crop) in PINNED.items():
@@ -39,11 +42,12 @@ def prepare(output=None):
         miniature = Image.new('RGBA', (16, 16))
         miniature.paste(art, ((16 - art.width) // 2, 16 - art.height))
         destination = output / (species + '_overw1.png')
-        miniature.save(destination, optimize=True)
+        save_rgba_png(miniature, destination)
         provenance['files'][destination.name] = {
             'source': str(source.relative_to(ROOT)).replace('\\', '/'), 'sourceSha256': digest,
             'pose': 'Idle, down, frame 0', 'crop': crop, 'scaledTo': list(resized),
             'filter': 'nearest', 'canvas': [16, 16], 'anchor': 'bottom center',
+            'rgbaSha256': hashlib.sha256(miniature.tobytes()).hexdigest(),
             'sha256': hashlib.sha256(destination.read_bytes()).hexdigest()}
     (output / 'PMD-COMPATIBILITY.json').write_text(json.dumps(provenance, indent=2) + '\n', encoding='utf-8', newline='\n')
     print('PMD compatibility: 3 species-specific full silhouettes; original PMD assets unchanged')
