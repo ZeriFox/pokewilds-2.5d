@@ -1,0 +1,72 @@
+{
+  "desert": {
+    "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88594/",
+    "image": "https://www.spriters-resource.com/media/assets/85/88594.png?updated=1755475330",
+    "sha256": "34a44a2b5e385dc6c5c1e9e2ba454e9454dabae0095c00d999a35e921e7ccbd5",
+    "width": 304,
+    "height": 368,
+    "bytes": 33170,
+    "status": "downloaded",
+    "rights": "ConcernedApe / Stardew Valley"
+  },
+  "spring": {
+    "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88632/",
+    "image": "https://www.spriters-resource.com/media/assets/85/88632.png?updated=1755475338",
+    "sha256": "ef25a73afa0ee5ef7391cbad0f283fd0926df6eda66c862fbb46e3e204f4f611",
+    "width": 656,
+    "height": 1664,
+    "bytes": 309578,
+    "status": "downloaded",
+    "rights": "ConcernedApe / Stardew Valley"
+  },
+  "interiors": {
+    "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88658/",
+    "image": "https://www.spriters-resource.com/media/assets/86/88658.png?updated=1755475341",
+    "sha256": "601c150e12e41c881f6a17a26403a49fc7d4b38b95cf752a4910f5975650e867",
+    "width": 512,
+    "height": 1744,
+    "bytes": 288923,
+    "status": "downloaded",
+    "rights": "ConcernedApe / Stardew Valley"
+  },
+  "walls_floors": {
+    "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88659/",
+    "image": "https://www.spriters-resource.com/media/assets/86/88659.png?updated=1755475341",
+    "sha256": "2f2f5a717ec6aa5053537d83a01abecb1b71965c53ebf2ca98408c32bbdef263",
+    "width": 256,
+    "height": 848,
+    "bytes": 71614,
+    "status": "downloaded",
+    "rights": "ConcernedApe / Stardew Valley"
+  },
+  "mines": {
+    "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/84485/",
+    "image": "https://www.spriters-resource.com/media/assets/81/84485.png?updated=1755474896",
+    "sha256": "41bb97eca03cc7cc3dd5f2c6d028811c926ca7418175643a5e7572f4e1ad58a8",
+    "width": 1280,
+    "height": 1248,
+    "bytes": 589151,
+    "status": "downloaded",
+    "rights": "ConcernedApe / Stardew Valley"
+  },
+  "volcano": {
+    "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/223937/",
+    "image": "https://www.spriters-resource.com/media/assets/221/223937.png?updated=1755490527",
+    "sha256": "a32550cd11bc8b285a3544f045695168630d1e56e31e7c0ce5c807333f66dad0",
+    "width": 400,
+    "height": 576,
+    "bytes": 60511,
+    "status": "downloaded",
+    "rights": "ConcernedApe / Stardew Valley"
+  },
+  "party": {
+    "page": "https://www.spriters-resource.com/game_boy_advance/pokemonfireredleafgreen/asset/3854/",
+    "image": "https://www.spriters-resource.com/media/assets/4/3854.png?updated=1755472417",
+    "sha256": "266cdea4ff7093d5ef9e9ebab1394360b557a4ee6eb37f448d5febfd71e45cb9",
+    "width": 495,
+    "height": 288,
+    "bytes": 9381,
+    "status": "downloaded",
+    "rights": "Nintendo / Game Freak / Pokemon FireRed LeafGreen; sheet credit Redzagoon"
+  }
+}
