@@ -25,7 +25,7 @@ public final class DesktopControlsTest {
       config.setForegroundFPS(60); config.useVsync(false);
       new Lwjgl3Application(game, config);
       require(game.complete, "Native test did not complete");
-      System.out.println("DESKTOP PASS: settings migration/custom preservation, mouse press/hold/release, no desktop touch D-pad, WASD text entry, gamepad polling, full animated stats on all pages");
+      System.out.println("DESKTOP PASS: versioned settings migration/custom preservation, mouse press/hold/release, focus loss and release barrier, no desktop touch D-pad, WASD text entry, gamepad polling, full animated stats on all pages");
       System.exit(0);
    }
 
@@ -79,7 +79,9 @@ public final class DesktopControlsTest {
          legacy.put("keyboard-Up", "Up"); legacy.put("keyboard-Down", "Down");
          legacy.put("keyboard-Left", "Left"); legacy.put("keyboard-Right", "Right");
          legacy.put("keyboard-Start", "Enter"); legacy.put("keyboard-L", "C"); legacy.put("keyboard-R", "V");
+         legacy.remove(DesktopControls.VERSION_KEY);
          require(DesktopControls.loadBindings(legacy), "Legacy preset was not migrated");
+         require(legacy.get(DesktopControls.VERSION_KEY).equals("2"), "Migration decision was not versioned");
          require(InputProcessor.keyboardA == DesktopControls.MOUSE_LEFT && InputProcessor.keyboardB == DesktopControls.MOUSE_RIGHT
             && InputProcessor.keyboardUp == Keys.W && InputProcessor.keyboardLeft == Keys.A, "Default desktop preset incorrect");
          require(!DesktopControls.loadBindings(legacy), "Migration must be idempotent");
@@ -88,17 +90,33 @@ public final class DesktopControlsTest {
          HashMap<String, String> before = new HashMap<>(custom);
          require(!DesktopControls.loadBindings(custom) && before.equals(custom), "Custom binding was overwritten");
          require(InputProcessor.keyboardUp == Keys.I && InputProcessor.keyboardA == Keys.SPACE, "Custom keys were not applied");
+         HashMap<String, String> oldCustom = new HashMap<>(custom);
+         oldCustom.remove(DesktopControls.VERSION_KEY);
+         require(DesktopControls.loadBindings(oldCustom), "Unversioned custom preset was not stamped");
+         require(oldCustom.equals(custom), "Versioning an old custom preset changed its bindings");
+         HashMap<String, String> explicitClassic = new HashMap<>(legacy);
+         explicitClassic.put("keyboard-A", "Z"); explicitClassic.put("keyboard-B", "X");
+         explicitClassic.put("keyboard-Up", "Up"); explicitClassic.put("keyboard-Down", "Down");
+         explicitClassic.put("keyboard-Left", "Left"); explicitClassic.put("keyboard-Right", "Right");
+         HashMap<String, String> explicitBefore = new HashMap<>(explicitClassic);
+         require(!DesktopControls.loadBindings(explicitClassic) && explicitClassic.equals(explicitBefore),
+            "An explicitly chosen current classic preset was migrated again");
+         require(InputProcessor.keyboardA == Keys.Z && InputProcessor.keyboardUp == Keys.UP, "Explicit current bindings ignored");
+         explicitClassic.put(DesktopControls.VERSION_KEY, "99");
+         require(!DesktopControls.loadBindings(explicitClassic) && explicitClassic.get(DesktopControls.VERSION_KEY).equals("99"),
+            "A future settings version was downgraded");
          if (!Boolean.getBoolean("controls.sourceMode")) {
             // Exercise Game's actual parser and persistence on an isolated local fixture.
             legacy.put("keyboard-A", "Z"); legacy.put("keyboard-B", "X");
             legacy.put("keyboard-Up", "Up"); legacy.put("keyboard-Down", "Down");
             legacy.put("keyboard-Left", "Left"); legacy.put("keyboard-Right", "Right");
+            legacy.remove(DesktopControls.VERSION_KEY);
             StringBuilder text = new StringBuilder();
             for (Map.Entry<String, String> pair : legacy.entrySet()) text.append(pair.getKey()).append('=').append(pair.getValue()).append('\n');
             com.badlogic.gdx.files.FileHandle file = Gdx.files.local("migration-fixture.txt");
             file.writeString(text.toString(), false);
             loadSettings(file);
-            require(file.readString().contains("keyboard-A=MouseLeft") && InputProcessor.keyboardDown == Keys.S,
+            require(file.readString().contains("keyboard-A=MouseLeft") && file.readString().contains("controlsVersion=2") && InputProcessor.keyboardDown == Keys.S,
                "Game parser did not persist migrated preset");
             StringBuilder customText = new StringBuilder();
             for (Map.Entry<String, String> pair : custom.entrySet()) customText.append(pair.getKey()).append('=').append(pair.getValue()).append('\n');
@@ -202,7 +220,39 @@ public final class DesktopControlsTest {
          require(!InputProcessor.aJustPressed, "Mouse + gamepad generated duplicate confirm");
          padButtons.clear(); axes[0] = 0; buttons.clear(); processor.step(this);
          require(!InputProcessor.aPressed && !InputProcessor.rightPressed, "Gamepad release regressed");
+         focusLoss(mapping);
          Game.gamepad = null;
+      }
+
+      void focusLoss(ControllerMapping mapping) {
+         buttons.add(Buttons.LEFT); buttons.add(Buttons.RIGHT); keys.add(Keys.W);
+         padButtons.add(mapping.buttonA); axes[0] = .9f; processor.step(this);
+         require(InputProcessor.aPressed && InputProcessor.bPressed && InputProcessor.upPressed && InputProcessor.rightPressed,
+            "Focus fixture did not hold keyboard/mouse/controller");
+         DesktopControls.focusChanged(false);
+         require(!InputProcessor.aPressed && !InputProcessor.bPressed && !InputProcessor.upPressed && !InputProcessor.rightPressed
+            && InputProcessor.aJustReleased && InputProcessor.bJustReleased, "Focus loss did not immediately release input");
+         processor.step(this);
+         require(!InputProcessor.aPressed && !InputProcessor.aJustPressed && !InputProcessor.bPressed && !InputProcessor.upPressed,
+            "Unfocused input activated gameplay");
+         DesktopControls.focusChanged(true); processor.step(this);
+         require(!InputProcessor.aPressed && !InputProcessor.aJustPressed && !InputProcessor.bPressed && !InputProcessor.upPressed
+            && !InputProcessor.rightPressed, "Refocus reused a held input or manufactured a click");
+         // Mouse release alone cannot re-arm Confirm while the controller also holds it.
+         buttons.clear(); processor.step(this); buttons.add(Buttons.LEFT); processor.step(this);
+         require(!InputProcessor.aPressed && !InputProcessor.aJustPressed, "Focus barrier ignored held controller confirm");
+         buttons.clear(); padButtons.clear(); keys.clear(); axes[0] = 0; processor.step(this);
+         buttons.add(Buttons.LEFT); keys.add(Keys.W); processor.step(this);
+         require(InputProcessor.aJustPressed && InputProcessor.upJustPressed, "Fresh input after focus release was lost");
+         buttons.clear(); keys.clear(); processor.step(this);
+         if (!Boolean.getBoolean("controls.sourceMode")) {
+            buttons.add(Buttons.RIGHT); processor.step(this);
+            pause(); require(!InputProcessor.bPressed, "Game.pause kept a held action");
+            resume(); processor.step(this);
+            require(!InputProcessor.bPressed && !InputProcessor.bJustPressed, "Game.resume generated a phantom cancel");
+            buttons.clear(); processor.step(this);
+         }
+         System.out.println("DESKTOP: focus loss releases all actions; refocus requires independent release before new input");
       }
 
       void controlScreen() {

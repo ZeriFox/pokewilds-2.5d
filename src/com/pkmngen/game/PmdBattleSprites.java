@@ -139,7 +139,7 @@ public final class PmdBattleSprites {
          baseScale=Math.min(baseScale,33f/Math.max(1,Math.max(-minX,maxX)));
          scales.put(key, baseScale);
       }
-      float scale = baseScale * source.getWidth() / (back ? 48f : pokemon.specie.sprite.getWidth());
+      float scale = baseScale * source.getWidth() / (back ? 48f : pokemon.specie.sprite.getWidth()) * (back ? 1f : .90f);
       TextureRegion visible = frame.region;
       if (fraction < 1f) {
          // The original faint action removes rows from the bottom of its image.
@@ -151,8 +151,19 @@ public final class PmdBattleSprites {
       Sprite draw = new Sprite(visible);
       float width = frame.width * scale, height = visible.getRegionHeight() * scale;
       float groundY=source.getY()-(back&&game.battle.drawAction instanceof SpecialBattleMegaGengar.DrawBattle1?14:0);
+      PmdPokemonSprites.AnimationBounds contact=PmdPokemonSprites.get().bounds(pokemon,facing,"Idle");
+      float contactLift=contact==null?0:-Math.min(0,contact.minY)*scale;
+      if(fraction>=.99f&&source.getColor().a>0) {
+         ModernUi ui=ModernUi.get(game);
+         float radius=Math.min(back?13:10,Math.max(4,width*.32f));
+         Color shade=new Color(.08f,.12f,.13f,.22f*source.getColor().a);
+         for(int row=0;row<5;row++){
+            float dy=(row-2)/2.5f,half=radius*(float)Math.sqrt(Math.max(0,1-dy*dy));
+            ui.rect(game,source.getX()+source.getWidth()*.5f-half,groundY-.7f+row*.4f,half*2,.4f,shade);
+         }
+      }
       draw.setBounds(source.getX() + source.getWidth()*.5f - frame.anchorX*scale,
-         groundY - frame.anchorY*scale*fraction, width, height);
+         groundY + contactLift - frame.anchorY*scale*fraction, width, height);
       // Move effects retain their original rotation around the PMD ground anchor.
       draw.setOrigin(frame.anchorX*scale,frame.anchorY*scale*fraction); draw.setRotation(source.getRotation());
       draw.setScale(source.getScaleX(), source.getScaleY());

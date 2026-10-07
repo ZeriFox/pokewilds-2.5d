@@ -153,45 +153,80 @@ public final class ModernPartyUi {
       ui.footer(game, DesktopControls.vertical() + " Select   " + confirmBack());
    }
 
+   private static final java.util.IdentityHashMap<TextureRegion, com.badlogic.gdx.graphics.g2d.NinePatch> frlgPatches = new java.util.IdentityHashMap<>();
+
+   static void frlgScreen(ModernUi ui, Game game, String title, String subtitle) {
+      ui.fullScreen(game,title,subtitle);
+      TextureRegion background=BwAssets.get().named("ui_frlg_background");
+      if(background!=null) {
+         Color previous=new Color(game.uiBatch.getColor());
+         game.uiBatch.setColor(Color.WHITE);
+         game.uiBatch.draw(background,4,16,152,102);
+         game.uiBatch.setColor(previous);
+      }
+   }
+
+   static void frlgPanel(ModernUi ui, Game game, float x,float y,float w,float h,boolean selected,boolean leader) {
+      TextureRegion art=BwAssets.get().named(leader?"ui_frlg_leader":"ui_frlg_row");
+      if(art==null) {ui.panel(game,x,y,w,h);return;}
+      com.badlogic.gdx.graphics.g2d.NinePatch patch=frlgPatches.get(art);
+      if(patch==null) {
+         if(frlgPatches.size()>4)frlgPatches.clear();
+         patch=new com.badlogic.gdx.graphics.g2d.NinePatch(art,3,3,3,3);
+         frlgPatches.put(art,patch);
+      }
+      Color previous=new Color(game.uiBatch.getColor());
+      game.uiBatch.setColor(Color.WHITE);
+      if(selected)ui.rect(game,x-.7f,y-.7f,w+1.4f,h+1.4f,ModernUi.GOLD);
+      patch.draw(game.uiBatch,x,y,w,h);
+      ui.rect(game,x+2,y+2,w-4,h-4,selected?new Color(.84f,.95f,.91f,1):new Color(.74f,.88f,.87f,1));
+      game.uiBatch.setColor(previous);
+   }
+
+   static void frlgRow(ModernUi ui,Game game,String label,float x,float y,float w,float h,boolean selected,float reserve) {
+      frlgPanel(ui,game,x,y,w,h,selected,false);
+      ui.fitText(game,label,x+4,y+h-3.5f,Math.min(6f,h*.46f),Math.max(1,w-8-reserve),ModernUi.INK);
+   }
+
    private void party(ModernUi ui, Game game, DrawPokemonMenu menu, int selected, int scroll, int moving) {
-      List<Pokemon> pokemon = DrawPokemonMenu.allPokemon == null ? game.player.pokemon : DrawPokemonMenu.allPokemon;
-      boolean storage = menu.isStorageChest && pokemon != game.player.pokemon;
-      ui.fullScreen(game, storage ? "STORAGE" : "YOUR PARTY", (storage ? "Pokémon at this location" : "Your travelling companions") + "  /  " + pokemon.size());
-      if (pokemon.isEmpty()) {
-         ui.panel(game, 9, 58, 142, 45); ui.text(game, "No Pokémon here yet.", 17, 86, 7, ModernUi.MUTED);
+      List<Pokemon> pokemon=DrawPokemonMenu.allPokemon==null?game.player.pokemon:DrawPokemonMenu.allPokemon;
+      boolean storage=menu.isStorageChest&&pokemon!=game.player.pokemon;
+      frlgScreen(ui,game,storage?"STORAGE":"YOUR PARTY",(storage?"Pokemon at this location":"Choose a Pokemon")+"  /  "+pokemon.size());
+      if(pokemon.isEmpty()) {
+         frlgPanel(ui,game,9,55,142,43,false,true);
+         ui.text(game,"No Pokemon here yet.",17,80,7,ModernUi.INK);
       }
-      for (int i = 0; i < 6 && scroll + i < pokemon.size(); i++) {
-         int index = scroll + i;
-         if (index < 0) continue;
-         Pokemon p = pokemon.get(index);
-         float y = 100 - i * 16;
-         ui.panel(game, 6, y, 148, 15);
-         boolean chosen = i == selected;
-         if (chosen) ui.rect(game, 7, y + 1, 146, 13, SOFT);
-         if (chosen || moving == index) ui.rect(game, 6, y, 2, 15, moving == index ? ModernUi.GOLD : ModernUi.ACCENT);
-         if (PmdBattleSprites.portrait(game, p, 9, y, 17, 15)) {
-            // PMDCollab portrait, independent of battle/overworld sprite transforms.
-         } else if (!p.isEgg && p.sprite != null) {
-            // Use the same original portrait as the summary: some upstream overworld frames
-            // contain placeholder art, while battle portraits consistently identify the species.
-            sprite(game, p.sprite, 9, y, 17, 15, true);
-         } else if (p.avatarSprites != null && !p.avatarSprites.isEmpty()) {
-            int frame = chosen ? avatarFrame(p.avatarSprites.size(), DrawPokemonMenu.avatarAnimCounter) : 0;
-            sprite(game, p.avatarSprites.get(frame), 10, y + 1, 14, 14, false);
+      for(int i=0;i<6&&scroll+i<pokemon.size();i++) {
+         int index=scroll+i;
+         if(index<0)continue;
+         Pokemon p=pokemon.get(index);
+         boolean leader=i==0,chosen=i==selected;
+         float x=leader?6:61,y=leader?45:96-(i-1)*19,w=leader?50:93,h=leader?70:18;
+         frlgPanel(ui,game,x,y,w,h,chosen,leader);
+         if(moving==index)ui.rect(game,x,y,w,1.2f,ModernUi.GOLD);
+         float px=leader?x+10:x+2,py=leader?y+37:y+1,pw=leader?30:16,ph=leader?28:16;
+         if(!PmdBattleSprites.portrait(game,p,px,py,pw,ph)) {
+            if(!p.isEgg&&p.sprite!=null)sprite(game,p.sprite,px,py,pw,ph,true);
+            else if(p.avatarSprites!=null&&!p.avatarSprites.isEmpty())
+               sprite(game,p.avatarSprites.get(chosen?avatarFrame(p.avatarSprites.size(),DrawPokemonMenu.avatarAnimCounter):0),px,py,pw,ph,false);
          }
-         String name = i < menu.ableWords.size() ? menu.ableWords.get(i) : displayName(p);
-         ui.fitText(game, name, 28, y + 12, 6.2f, 72, ModernUi.INK);
-         if (p.isEgg) { ui.text(game, "EGG", 124, y + 10, 5.5f, ModernUi.GOLD); continue; }
-         int hp = stat(p.currentStats, "hp"), max = stat(p.maxStats, "hp");
-         ui.text(game, "Lv " + p.level + (p.isShiny ? "  *" : ""), 28, y + 5, 4.3f, ModernUi.MUTED);
-         String condition = condition(p);
-         if (!condition.equals("OK")) ui.text(game, condition, 64, y + 5, 4.3f, ModernUi.RED);
-         ui.fitText(game, hp + " / " + max, 105, y + 12, 5.1f, 43, ModernUi.MUTED);
-         ui.bar(game, 91, y + 3, 57, 3, max > 0 ? (float)hp / max : 0, healthColor(hp, max));
+         String name=i<menu.ableWords.size()?menu.ableWords.get(i):displayName(p);
+         ui.fitText(game,name,leader?x+4:x+20,leader?y+32:y+13.5f,leader?6:5.5f,leader?w-8:47,ModernUi.INK);
+         if(p.isEgg) {
+            ui.text(game,"EGG",leader?x+4:x+70,leader?y+23:y+6,4.4f,ModernUi.ACCENT);
+            continue;
+         }
+         int hp=stat(p.currentStats,"hp"),max=stat(p.maxStats,"hp");
+         String level="Lv "+p.level+(p.isShiny?" *":"");
+         ui.fitText(game,level,leader?x+4:x+69,leader?y+23:y+13.5f,4.4f,leader?42:21,ModernUi.INK);
+         String status=condition(p);
+         if(!status.equals("OK"))ui.fitText(game,status,leader?x+28:x+20,leader?y+23:y+5,3.8f,20,ModernUi.RED);
+         else if(!leader)ui.fitText(game,hp+"/"+max,x+20,y+5,3.8f,25,ModernUi.INK);
+         ui.bar(game,leader?x+4:x+48,leader?y+13:y+4,leader?42:41,3.4f,max>0?(float)hp/max:0,healthColor(hp,max));
+         if(leader)ui.fitText(game,hp+" / "+max,x+4,y+8,4.4f,42,ModernUi.INK);
       }
-      String navigation = menu.isStorageChest ? DesktopControls.horizontal() + " Party / storage   " : DesktopControls.vertical() + " Select   ";
-      if (pokemon.size() > 6) ui.text(game, (Math.max(0, scroll) + 1) + "–" + Math.min(scroll + 6, pokemon.size()) + " / " + pokemon.size(), 113, 18, 4.1f, ModernUi.MUTED);
-      ui.footer(game, navigation + confirmBack());
+      if(pokemon.size()>6)ui.fitText(game,(Math.max(0,scroll)+1)+" - "+Math.min(scroll+6,pokemon.size())+" / "+pokemon.size(),7,24,4.2f,48,ModernUi.PAPER);
+      ui.footer(game,(menu.isStorageChest?DesktopControls.horizontal()+" Party / storage   ":DesktopControls.vertical()+" Select   ")+confirmBack());
    }
 
    private void stats(ModernUi ui, Game game, DrawStatsScreen menu) {

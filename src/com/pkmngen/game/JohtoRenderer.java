@@ -66,6 +66,11 @@ public final class JohtoRenderer {
    private float fogDensity, desaturation;
    private long ghostFrames;
    private long waterfallFrames;
+   private long fieldEffectFrames;
+   private final Map<Tile, HeadbuttTreeAnim> shakingTrees = new IdentityHashMap<>();
+   private final java.util.Set<Vector2> growingPlants = new java.util.HashSet<>();
+   private final Map<Action, Boolean> diagnosedGhosts = new WeakHashMap<>();
+   private final TextureRegion cutLeft = new TextureRegion(), cutRight = new TextureRegion();
 
    public JohtoRenderer() {
       camera.near = 1f;
@@ -100,8 +105,10 @@ public final class JohtoRenderer {
          return true;
       } catch (RuntimeException ex) {
          failed = true;
-         Gdx.app.error("JohtoRenderer", "Modern world rendering failed; retaining the modern scene compositor.", ex);
-         return false;
+         Gdx.app.error("JohtoRenderer", "Modern world rendering failed.", ex);
+         // A frozen last-good snapshot hid permanent renderer failures. Keep the
+         // error observable to the desktop launcher and native regression tests.
+         throw new IllegalStateException("Modern world rendering failed", ex);
       } finally {
          // The following original UI pass uses SpriteBatch and its own projection.
          Gdx.gl.glDepthMask(true);
@@ -119,6 +126,7 @@ public final class JohtoRenderer {
    public WorldElevation getElevation() { return elevation; }
    public long getGhostFrames() { return ghostFrames; }
    public long getWaterfallFrames() { return waterfallFrames; }
+   public long getFieldEffectFrames() { return fieldEffectFrames; }
    public float getFogDensity() { return fogDensity; }
 
    public long getPlayerModelFrames() { return actorModels.getPlayerModelFrames(); }
@@ -187,6 +195,14 @@ public final class JohtoRenderer {
    }
 
    private void collectWorld(Game game) {
+      shakingTrees.clear();
+      growingPlants.clear();
+      for (Action action : game.actionStack) {
+         if (action instanceof HeadbuttTreeAnim) {
+            HeadbuttTreeAnim shake = (HeadbuttTreeAnim)action;
+            shakingTrees.put(shake.tile, shake);
+         } else if (action instanceof PlantTree) growingPlants.add(((PlantTree)action).pos);
+      }
       float halfWidth = game.cam.viewportWidth * game.cam.zoom * 0.5f;
       float halfHeight = game.cam.viewportHeight * game.cam.zoom * 0.5f;
       int left = MathUtils.floor((game.cam.position.x - halfWidth - 64f) / TILE);
@@ -230,6 +246,8 @@ public final class JohtoRenderer {
       for (Action action : game.actionStackCopy) {
          if (action instanceof SpawnGhost || action instanceof DrawGhost || action instanceof DespawnGhost) {
             ghost(game, action);
+         } else if (action instanceof CutTreeAnim || action instanceof PlantTree) {
+            fieldEffect(game, action);
          } else if (action instanceof Pokemon.Emote) {
             Pokemon.Emote emote = (Pokemon.Emote)action;
             Pokemon owner = enclosingOwner(emote, Pokemon.class);
@@ -326,13 +344,15 @@ public final class JohtoRenderer {
       terrainEdges(game,tile,profile);
       if (ModernWorldGenerator.isRamp(tile) && elevation.isSloped(tile)) ramp(tile,profile);
       if (ModernWorldGenerator.isRamp(tile)) return;
+      // The growing action owns its one animated sprout, not a second static prop.
+      if (growingPlants.contains(tile.position)) return;
       if (tile.isLedge && (tile.ledgeDir != null || upper.startsWith("ledges3"))) {
          return;
       }
       if (tree) { tree(tile, x + 8f, y + 8f, names); return; }
       if (staticPokemon(tile, x+8, y+7)) return;
       if (names.contains("pokeball") || names.contains("ultraball")) { ball(x+8,y+7,names.contains("ultraball")); return; }
-      if (building(tile, x, y, names)) return;
+      if (building(game, tile, x, y, names)) return;
       TextureRegion object = assets.object(tile, seconds);
       if(object==null && BwAssets.objectName(tile)!=null)
          assets.reportMissing(BwAssets.objectName(tile),tile,game.map.timeOfDay);
@@ -460,6 +480,12 @@ public final class JohtoRenderer {
    /** Read real scripted night encounters; never create an actor as an asset fallback. */
    private void ghost(Game game,Action action) {
       if(!game.actionStack.contains(action))return;
+      if (diagnosedGhosts.put(action, Boolean.TRUE) == null) {
+         Gdx.app.log("GhostDiagnostic", "identity=" + action.getClass().getSimpleName()
+            + " source=scripted-encounter isGhost=true asset=procedural-spirit fallback=false"
+            + " biome=" + game.map.currBiome + " time=" + game.map.timeOfDay
+            + " shader=world-atmosphere layer=translucent");
+      }
       float x,y,alpha=1;
       if(action instanceof SpawnGhost) {
          SpawnGhost spawn=(SpawnGhost)action;x=spawn.position.x+16;y=spawn.position.y+16;
@@ -554,65 +580,64 @@ public final class JohtoRenderer {
       surfaceLift=previous;
    }
 
-   private boolean building(Tile tile, float x, float y, String name) {
-      if (name.contains("house_plant")) {
-         prism(x+5,y+5,0,6,6,5,assets.named("wall_wood"),color(.72f,.52f,.35f));
-         upright(assets.named("tree_small"),x+2,y+9,3,12,18,WHITE);
+   private boolean building(Game game, Tile tile, float x, float y, String name) {
+      String identity=BwAssets.objectName(tile);
+      if(identity!=null&&java.util.Arrays.asList("chair","couch","bed","desk","table","shelf","wardrobe","pot").contains(identity)) {
+         TextureRegion art=assets.named(identity);
+         if(art==null)return false;
+         float scale=VisualGeometry.fitScale(art.getRegionWidth(),art.getRegionHeight(),24,29);
+         float width=assets.worldWidth(art,art.getRegionWidth()*scale),height=assets.worldHeight(art,art.getRegionHeight()*scale);
+         assetShadow(art,x+8,y+7,width*.28f,2.4f);
+         upright(art,x+8-width*.5f,y+7,.16f,width,height,WHITE);
          return true;
       }
-      if (name.contains("couch") || name.contains("bed")) {
-         TextureRegion wood=assets.named("wood_floor"), fabric=assets.named("rug");
-         prism(x,y+2,0,16,12,5,wood,color(.78f,.70f,.56f));
-         floor(fabric,x+1,y+3,14,10,5.1f,WHITE,geometry);
-         if(name.contains("bed"))floor(assets.named("tile_pale"),x+2,y+10,12,4,5.2f,WHITE,geometry);
-         else {
-            prism(x,y+13,5,16,3,11,fabric,WHITE);
-            prism(x,y+2,5,2,11,8,wood,WHITE);prism(x+14,y+2,5,2,11,8,wood,WHITE);
-         }
-         return true;
+      if(name.contains("bridge")||name.contains("stairs")) {
+         floor(assets.named(name.contains("stairs")?"steps":"wood_floor"),x,y,16,16,.1f,WHITE,geometry);return true;
       }
-      if (name.contains("bridge")) {
-         floor(assets.named("wood_floor"),x,y,16,16,.1f,WHITE,geometry); return true;
-      }
-      if (name.contains("stairs")) {
-         floor(assets.named("steps"),x,y,16,16,.1f,WHITE,geometry); return true;
-      }
-      if (name.contains("fence") || name.contains("gate")) {
-         // Gates stay open visually when their original collision is open.
-         if (tile.isSolid) upright(assets.named("fence_wood"),x,y+8,.1f,16,12,WHITE);
+      if(name.contains("fence")||name.contains("gate")) {
+         if(tile.isSolid)upright(assets.named("fence_wood"),x,y+8,.1f,16,12,WHITE);
          else floor(assets.named("wood_floor"),x,y,16,16,.1f,WHITE,geometry);
          return true;
       }
-      if (name.contains("roof")) {
-         floor(assets.named("roof"),x,y,16,16,12f,WHITE,geometry); return true;
+      if(name.contains("roof")) {
+         floor(assets.named("roof"),x,y,16,16,22,WHITE,geometry);return true;
       }
-      if (name.contains("door") || name.contains("pkmnmansion_ext_locked")) {
+      if(name.contains("door")||name.contains("pkmnmansion_ext_locked")) {
          floor(assets.named("steps"),x,y,16,12,.1f,WHITE,geometry);
-         // Keep the doorway footprint open; the frame rises on its back edge.
-         upright(assets.named(name.contains("locked")?"door_locked":tile.isSolid?"door":"door_open"),x,y+14,.1f,16,19,WHITE); return true;
+         upright(assets.named(name.contains("locked")?"door_locked":tile.isSolid?"door":"door_open"),x,y+14,.1f,16,22,WHITE);
+         return true;
       }
       String upper=tile.nameUpper==null?"":tile.nameUpper.toLowerCase(java.util.Locale.ROOT);
       String lower=tile.name==null?"":tile.name.toLowerCase(java.util.Locale.ROOT);
-      boolean caveWall=lower.startsWith("cave") && upper.isEmpty() && !lower.contains("regi");
-      boolean mansionWall=name.contains("pkmnmansion_ext");
-      boolean wall = mansionWall || VisualGeometry.buildingWall(upper.isEmpty()?lower:"",upper,tile.isSolid);
-      if (wall && tile.isSolid && assets.object(tile)==null) {
-         TextureRegion face=assets.named(caveWall ? "cliff_dark" : name.contains("ruin") ? "ruin_wall" : "wall");
-         float h=caveWall?14:19;
-         quad(batch(geometry,face.getTexture()),x,0,-y,x+16,0,-y,x+16,h,-y,x,h,-y,face,WHITE);
+      boolean caveWall=lower.startsWith("cave")&&upper.isEmpty()&&!lower.contains("regi");
+      boolean structural=tile.isSolid&&("wall".equals(identity)||"window".equals(identity)||name.contains("pkmnmansion_ext")
+         ||caveWall&&VisualGeometry.buildingWall(lower,upper,true));
+      if(structural) {
+         TextureRegion face=assets.named(caveWall?"cliff_dark":name.contains("ruin")?"ruin_wall":"wall");
+         TextureRegion cap=assets.named(caveWall?"mountain":name.contains("ruin")?"ruin_floor":"wall_cap");
+         if(cap==null)cap=assets.named("wood_floor");
+         float height=caveWall?16:24,z=-y;
+         Geometry mesh=batch(geometry,face.getTexture());
+         if(!structuralNeighbour(game,x,y-16))quad(mesh,x,0,z,x+16,0,z,x+16,height,z,x,height,z,face,WHITE);
+         if(!structuralNeighbour(game,x,y+16))quad(mesh,x+16,0,z-16,x,0,z-16,x,height,z-16,x+16,height,z-16,face,color(.82f,.85f,.87f));
+         if(!structuralNeighbour(game,x-16,y))quad(mesh,x,0,z-16,x,0,z,x,height,z,x,height,z-16,face,color(.88f,.90f,.91f));
+         if(!structuralNeighbour(game,x+16,y))quad(mesh,x+16,0,z,x+16,0,z-16,x+16,height,z-16,x+16,height,z,face,color(.73f,.78f,.81f));
+         floor(cap,x,y,16,16,height,WHITE,geometry);
          if(name.contains("window")) {
             TextureRegion window=assets.named("window");
-            quad(batch(geometry,window.getTexture()),x+3,5,-y+.05f,x+13,5,-y+.05f,
-               x+13,16,-y+.05f,x+3,16,-y+.05f,window,WHITE);
+            if(window!=null)quad(batch(geometry,window.getTexture()),x+3,7,z+.05f,x+13,7,z+.05f,x+13,19,z+.05f,x+3,19,z+.05f,window,WHITE);
          }
-         floor(assets.named(caveWall?"mountain":name.contains("ruin")?"ruin_floor":"tile_pale"),
-            x,y,16,16,h,color(.87f,.86f,.80f),geometry);
          return true;
       }
-      // A known floor is already rendered by terrainSurface, even if an old
-      // save marks it solid; do not replace it with the unknown-object prism.
-      if(upper.isEmpty() && lower.contains("floor"))return true;
+      if(upper.isEmpty()&&lower.contains("floor"))return true;
       return false;
+   }
+
+   private boolean structuralNeighbour(Game game,float x,float y) {
+      Tile tile=game.map.tiles.get(lookup.set(x,y));
+      if(tile==null||!tile.isSolid)return false;
+      String identity=BwAssets.objectName(tile);
+      return "wall".equals(identity)||"window".equals(identity);
    }
 
    private void prism(float x,float y,float base,float width,float depth,float top,TextureRegion face,float tint) {
@@ -858,15 +883,62 @@ public final class JohtoRenderer {
 
    private void tree(Tile tile, float x, float y, String name) {
       if (name.contains("nosprite")) return; // Additional collision cell of a multi-tile tree.
-      BiomeProfiles.Profile profile=BiomeProfiles.visualForTile(tile);
-      String key = profile.id.equals("volcano")||profile.id.equals("graveyard")||profile.id.equals("desert") ? profile.decor("tree")
-         : name.contains("tree4") || name.contains("snow") ? "tree_snow"
-         : name.contains("savanna") ? "tree_dry" : name.contains("tree2") ? "tree_pine" : "tree";
+      String key = treeKey(tile, name);
       TextureRegion sprite = assets.named(key);
+      HeadbuttTreeAnim shake = shakingTrees.get(tile);
+      if (shake != null) {
+         int tick = shake.index - 1;
+         if (tick >= 21 && tick < 48) x += (tick / 3 % 4 == 3 ? 1.6f : tick / 3 % 4 == 1 ? -1.6f : 0);
+         fieldEffectFrames++;
+      }
       float height = assets.worldHeight(sprite,key.contains("dead") || key.contains("charred")?36:name.contains("large") ? 62 : key.equals("tree_pine") || key.equals("tree_snow") ? 46 : 42);
       float width = assets.worldWidth(sprite,height * sprite.getRegionWidth() / sprite.getRegionHeight());
       assetShadow(sprite,x,y,Math.min(width*.35f,10f),4);
       upright(sprite,x-width/2,y,.2f,width,height,WHITE);
+   }
+
+   private String treeKey(Tile tile, String name) {
+      BiomeProfiles.Profile profile=BiomeProfiles.visualForTile(tile);
+      String key = profile.id.equals("volcano")||profile.id.equals("graveyard")||profile.id.equals("desert") ? profile.decor("tree")
+         : name.contains("tree4") || name.contains("snow") ? "tree_snow"
+         : name.contains("savanna") ? "tree_dry" : name.contains("tree2") ? "tree_pine" : "tree";
+      return key;
+   }
+
+   /** Read the original action clock; never execute an action or advance RNG here. */
+   private void fieldEffect(Game game, Action action) {
+      if (!game.actionStack.contains(action)) return;
+      if (action instanceof PlantTree) {
+         PlantTree plant = (PlantTree)action;
+         TextureRegion art = assets.named("seedling");
+         float progress = MathUtils.clamp(plant.timer / 24f, 0, 1);
+         float height = 4 + progress * 10, width = height * art.getRegionWidth() / art.getRegionHeight();
+         surfaceLift = elevation.height(plant.pos.x + 8, plant.pos.y + 8);
+         uprightRaw(art, plant.pos.x + 8 - width/2, plant.pos.y + 7, .2f, width, height, WHITE, 0);
+         fieldEffectFrames++;
+         return;
+      }
+      CutTreeAnim cut = (CutTreeAnim)action;
+      int tick = cut.timer - 1;
+      if (tick < 19 || tick >= 49) return;
+      // Match the original split-and-blink timing after the collision tile is removed.
+      if (tick == 37 || tick == 38 || tick == 41 || tick == 42 || tick == 45 || tick == 46) return;
+      Tile tile = cut.tile;
+      String name = tile.name + " " + tile.nameUpper;
+      TextureRegion art = isTree(tile, tile.name, tile.nameUpper) ? assets.named(treeKey(tile, name)) : assets.object(tile, seconds);
+      if (art == null) art = assets.named("bush");
+      float height = assets.worldHeight(art, Math.min(42, art.getRegionHeight()));
+      float width = assets.worldWidth(art, height * art.getRegionWidth() / art.getRegionHeight());
+      surfaceLift = elevation.height(tile.position.x + 8, tile.position.y + 8);
+      int half = Math.max(1, art.getRegionWidth()/2);
+      cutLeft.setRegion(art,0,0,half,art.getRegionHeight());
+      cutRight.setRegion(art,half,0,art.getRegionWidth()-half,art.getRegionHeight());
+      float spread = tick < 20 ? 0 : 2 + (tick >= 39 ? 2 : 0) + (tick >= 43 ? 2 : 0) + (tick >= 47 ? 2 : 0);
+      float leftWidth = width * half / art.getRegionWidth();
+      float x = tile.position.x + 8 - width/2, y = tile.position.y + 8;
+      uprightRaw(cutLeft,x-spread,y,.2f,leftWidth,height,WHITE,0);
+      uprightRaw(cutRight,x+leftWidth+spread,y,.2f,width-leftWidth,height,WHITE,0);
+      fieldEffectFrames++;
    }
 
    private void assetShadow(TextureRegion region,float x,float y,float width,float depth) {

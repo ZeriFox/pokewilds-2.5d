@@ -6,6 +6,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowAdapter;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration.GLEmulation;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.pkmngen.game.Game;
+import com.pkmngen.game.DesktopControls;
 import com.pkmngen.game.PkmnMap;
 import com.pkmngen.game.util.Dirs;
 import com.pkmngen.leaks.JvmLeakTracer;
@@ -118,6 +119,12 @@ public class DesktopLauncher {
       config.setForegroundFPS(60);
       config.setWindowListener(
          new Lwjgl3WindowAdapter() {
+            @Override
+            public void focusLost() { DesktopControls.focusChanged(false); }
+
+            @Override
+            public void focusGained() { DesktopControls.focusChanged(true); }
+
             @Override
             public boolean closeRequested() {
                if (PkmnMap.PeriodicSave.isSaveOld()

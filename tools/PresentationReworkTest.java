@@ -19,11 +19,14 @@ import java.util.Arrays;
 
 /** Exercises the exact built JAR, never overlays production classes. */
 public final class PresentationReworkTest {
+   private static final int WIDTH = Integer.getInteger("presentation.width",1280);
+   private static final int HEIGHT = Integer.getInteger("presentation.height",720);
    public static void main(String[] args) {
       Game.leakTracer=LeakTracer.NoOp.INSTANCE;
       Sample game=new Sample();
       Lwjgl3ApplicationConfiguration config=new Lwjgl3ApplicationConfiguration();
-      config.setWindowedMode(1280,720);config.setInitialVisible(false);
+      config.setWindowedMode(WIDTH,HEIGHT);config.setInitialVisible(false);
+      config.setDecorated(false);
       config.setForegroundFPS(30);config.useVsync(false);
       try {
          new Lwjgl3Application(game,config);
@@ -39,9 +42,10 @@ public final class PresentationReworkTest {
       SpriteProxy effect;
       Pokemon own,enemy;
       final Matrix4 normalProjection=new Matrix4().setToOrtho2D(0,0,160,144);
-      Sample(){super(new String[]{"skipUpdateCheck"},4);}
+      Sample(){super(new String[0],4);}
       @Override public void create() {
          super.create();actionStack.clear();Gdx.input.setInputProcessor(null);
+         System.out.println("Requested viewport="+WIDTH+"x"+HEIGHT+" actual backbuffer="+Gdx.graphics.getBackBufferWidth()+"x"+Gdx.graphics.getBackBufferHeight());
          server=new Server();Network.register(server);
          map=new PkmnMap("presentation-rework-fixture");
          for(int y=-64;y<=64;y+=16)for(int x=-64;x<=64;x+=16){
@@ -63,14 +67,14 @@ public final class PresentationReworkTest {
          for(String key:new String[]{"grass","desert_ground","desert_rock","volcanic_rock","wall","wall_cap","chair","bed","ui_frlg_row","ui_frlg_leader"})
             require(assets.named(key)!=null,"Missing new region "+key);
          TextureRegion wall=assets.named("wall"),rock=assets.named("desert_rock");
-         require(wall.getRegionHeight()==48,"Wall source was sliced");
+         require(wall.getRegionHeight()==45,"Opaque wall face must exclude the sheet's three-pixel shadow fringe");
          require(rock.getRegionWidth()>16||rock.getRegionHeight()>16,"Rock silhouette was reduced to one tile");
          require(PmdPokemonSprites.get().frame(own,"up-right","Idle",0)!=null,"Missing friendly diagonal pose");
          require(PmdPokemonSprites.get().frame(enemy,"down-left","Idle",0)!=null,"Missing opponent diagonal pose");
       }
       void begin() {
          uiBatch.setProjectionMatrix(normalProjection);
-         Gdx.gl.glViewport(0,0,1280,720);Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+         Gdx.gl.glViewport(0,0,WIDTH,HEIGHT);Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
          ScreenUtils.clear(.06f,.08f,.1f,1);
          johtoBattleRenderer.prepareFrame(this,false);
          uiBatch.setColor(Color.WHITE);uiBatch.begin();johtoBattleRenderer.drawBackground(this);
@@ -78,7 +82,7 @@ public final class PresentationReworkTest {
       void finish(String name) {
          uiBatch.end();johtoBattleRenderer.finishFrame(this);
          require(Arrays.equals(normalProjection.val,uiBatch.getProjectionMatrix().val),"Battle projection leaked into world UI");
-         Pixmap shot=ScreenUtils.getFrameBufferPixmap(0,0,1280,720);
+         Pixmap shot=ScreenUtils.getFrameBufferPixmap(0,0,WIDTH,HEIGHT);
          PixmapIO.PNG png=new PixmapIO.PNG();png.setFlipY(true);
          try{png.write(Gdx.files.local(name),shot);}catch(java.io.IOException e){throw new RuntimeException(e);}
          finally{png.dispose();shot.dispose();}
@@ -94,9 +98,9 @@ public final class PresentationReworkTest {
                effect.draw(uiBatch);finish("effect-full-width.png");
                require(johtoBattleRenderer.getFullScreenEffectDraws()==count+1,"Large effect not expanded");
                require(Arrays.equals(before,effect.getVertices()),"Authored effect vertices mutated");
-               Pixmap shot=ScreenUtils.getFrameBufferPixmap(0,0,1280,720);
-               for(int x:new int[]{4,640,1275}){
-                  Color c=new Color(shot.getPixel(x,360));
+               Pixmap shot=ScreenUtils.getFrameBufferPixmap(0,0,WIDTH,HEIGHT);
+               for(int x:new int[]{4,WIDTH/2,WIDTH-5}){
+                  Color c=new Color(shot.getPixel(x,HEIGHT/2));
                   require(c.g>.7f&&c.r<.2f&&c.b<.35f,"Effect erased at viewport x="+x+" rgba="+c);
                }
                shot.dispose();break;

@@ -90,8 +90,15 @@ public final class PmdBattleVisualTest {
                      require((maxX-minX)*scale<=56.01f&&(maxY-minY)*scale<=46.01f,"Diagonal animation exceeded battle slot size");
                      require(minX*scale>=-33.01f&&maxX*scale<=33.01f&&minY*scale>=-6.01f&&maxY*scale<=44.01f,
                         "Diagonal animation exceeded ground-anchored slot margins");
+                     // The pose origin is stable; the opaque idle feet, rather than
+                     // a transparent canvas origin, now meet the arena contact line.
+                     PmdPokemonSprites.AnimationBounds idle=PmdPokemonSprites.get().bounds(pokemon,direction,"Idle");
+                     float contactLift=-Math.min(0,idle.minY)*scale;
+                     float actualOrigin=capture.vertices[1]+expected.anchorY*scale;
                      require(Math.abs(capture.vertices[0]+expected.anchorX*scale-(proxy.getX()+sourceSize/2))<.001f
-                        &&Math.abs(capture.vertices[1]+expected.anchorY*scale-proxy.getY())<.001f,"PMD ground anchor moved");
+                        &&Math.abs(actualOrigin-proxy.getY()-contactLift)<.001f,"PMD contact origin moved across poses");
+                     require(Math.abs(actualOrigin+Math.min(0,idle.minY)*scale-proxy.getY())<.001f,
+                        "Opaque idle contact missed the ground plane");
                      facingChecks++;
                   }
                   if(friendly) {

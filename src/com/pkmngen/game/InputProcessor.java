@@ -57,14 +57,42 @@ class InputProcessor extends Action {
    public static int gamepadB2;
 
    private int previousHeld;
+   private static boolean windowFocused = true;
+   private static long focusGeneration;
+   private long observedFocusGeneration;
+   private int blockedUntilRelease;
    public static boolean aJustReleased, bJustReleased;
 
    InputProcessor() {
       super();
+      observedFocusGeneration = focusGeneration;
+      if (!windowFocused) blockedUntilRelease = 511;
+   }
+
+   static void setWindowFocused(boolean focused) {
+      if (windowFocused == focused) return;
+      windowFocused = focused;
+      focusGeneration++;
+      // Clear immediately, even while an unfocused window has stopped rendering.
+      aJustReleased = aPressed;
+      bJustReleased = bPressed;
+      upPressed = downPressed = leftPressed = rightPressed = aPressed = bPressed = startPressed = lPressed = rPressed = false;
+      upJustPressed = downJustPressed = leftJustPressed = rightJustPressed = aJustPressed = bJustPressed = startJustPressed = lJustPressed = rJustPressed = false;
    }
 
    @Override
    public void step(Game game) {
+      if (observedFocusGeneration != focusGeneration) {
+         observedFocusGeneration = focusGeneration;
+         previousHeld = 0;
+         // Neither the click which focuses the window nor a held controller/key
+         // may act on the game. Each action becomes usable after its own release.
+         blockedUntilRelease = 511;
+      }
+      if (!windowFocused) {
+         updateState(0);
+         return;
+      }
       boolean mobile = Gdx.app.getType() == ApplicationType.Android || Gdx.app.getType() == ApplicationType.iOS;
       // Desktop mouse clicks must never hit the legacy virtual D-pad rectangles.
       if (mobile && Gdx.input.isTouched()) {
@@ -163,6 +191,8 @@ class InputProcessor extends Action {
       if (DesktopControls.pressed(keyboardStart, typing) || this.gamepadStart || touch(DrawMobileControls.startSprite)) held |= 64;
       if (DesktopControls.pressed(keyboardL, typing) || this.gamepadL) held |= 128;
       if (DesktopControls.pressed(keyboardR, typing) || this.gamepadR) held |= 256;
+      blockedUntilRelease &= held;
+      held &= ~blockedUntilRelease;
       updateState(held);
    }
 

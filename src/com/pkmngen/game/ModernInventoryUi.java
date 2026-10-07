@@ -16,7 +16,7 @@ final class ModernInventoryUi {
       if(a instanceof DrawItemMenuGen2) {
          DrawItemMenuGen2 m=(DrawItemMenuGen2)a;
          String[] categories={"ITEMS","BALLS","MATERIALS","KEY ITEMS","MEDICINE"};
-         ui.fullScreen(game,"BAG",categories[Math.floorMod(m.boxIndex,5)]);
+         ModernPartyUi.frlgScreen(ui,game,"BAG",categories[Math.floorMod(m.boxIndex,5)]);
          for(int i=0;i<5;i++) {
             ui.rect(game,7+i*30,108,27,8,i==m.boxIndex?ModernUi.ACCENT:ModernUi.LINE);
             ui.fitText(game,new String[]{"Items","Balls","Materials","Key","Medicine"}[i],9+i*30,114,5,23,i==m.boxIndex?ModernUi.PAPER:ModernUi.INK);
@@ -30,19 +30,19 @@ final class ModernInventoryUi {
          ui.footer(game,m.isSorting?"Select a destination   "+DesktopControls.back()+" Cancel":DesktopControls.horizontal()+" Pocket   "+DesktopControls.confirm()+" Select   "+DesktopControls.back()+" Back");
       } else if(a instanceof DrawItemMenu) {
          DrawItemMenu m=(DrawItemMenu)a;
-         ui.fullScreen(game,m.isGuideMenu?"FIELD GUIDE":"BAG",m.isGuideMenu?"Explore, build, discover":"Your supplies");
+         ModernPartyUi.frlgScreen(ui,game,m.isGuideMenu?"FIELD GUIDE":"BAG",m.isGuideMenu?"Explore, build, discover":"Your supplies");
          list(ui,game,m.itemsList,m.currIndex,m.cursorPos,110,17,true,m.isSorting,m.sortingIndex);
          ui.footer(game,DesktopControls.vertical()+" Browse   "+DesktopControls.confirm()+" Open   "+DesktopControls.back()+" Back");
       } else if(a instanceof DrawItemMenu.DrawGuideText) {
          DrawItemMenu.DrawGuideText m=(DrawItemMenu.DrawGuideText)a;
-         ui.fullScreen(game,"FIELD GUIDE",at(m.entries,m.index));
+         ModernPartyUi.frlgScreen(ui,game,"FIELD GUIDE",at(m.entries,m.index));
          ui.panel(game,5,16,150,100);
          StringBuilder content=new StringBuilder(); for(char c:m.text) content.append(c);
          ui.wrapped(game,DesktopControls.hints(content.toString()),11,108,5.9f,138,12,ModernUi.INK);
          ui.footer(game,DesktopControls.vertical()+" Topic   "+DesktopControls.back()+" Back");
       } else if(a instanceof DrawCraftsMenu) {
          DrawCraftsMenu m=(DrawCraftsMenu)a;
-         ui.fullScreen(game,"CRAFTING","Make something for your adventure");
+         ModernPartyUi.frlgScreen(ui,game,"CRAFTING","Make something for your adventure");
          list(ui,game,m.craftsList,m.currIndex,m.cursorPos,110,14,false,false,0);
          ui.panel(game,6,16,148,35); ui.text(game,"MATERIALS",11,45,5,ModernUi.MUTED);
          for(int i=0;i<m.craftReqs.size() && i<3;i++) {
@@ -83,9 +83,9 @@ final class ModernInventoryUi {
          String name=entries.get(i+offset); float y=top-(i+1)*rowHeight;
          boolean hasCount=counts && game.player!=null && game.player.hasItem(name);
          // Allocate two columns before text layout; quantities never paint over item names.
-         ui.row(game,(sorting && i+offset==sortingIndex?"* ":"")+name,9,y,142,rowHeight-1,i==cursor,hasCount?24:0);
+         ModernPartyUi.frlgRow(ui,game,(sorting && i+offset==sortingIndex?"* ":"")+name,9,y,142,rowHeight-1,i==cursor,hasCount?24:0);
          if(hasCount) {
-            ui.fitText(game,"x"+game.player.getItemAmount(name),129,y+rowHeight-4,5.8f,19,i==cursor?ModernUi.PAPER:ModernUi.MUTED);
+            ui.fitText(game,"x"+game.player.getItemAmount(name),129,y+rowHeight-4,5.8f,19,ModernUi.INK);
          }
       }
       if(entries.size()>visible) ui.bar(game,153,top-visible*rowHeight,1.5f,visible*rowHeight,(offset+cursor+1f)/entries.size(),ModernUi.ACCENT);

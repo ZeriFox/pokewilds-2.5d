@@ -20,13 +20,14 @@ public final class UiLayoutTest {
       TestGame game=new TestGame();
       Lwjgl3ApplicationConfiguration config=new Lwjgl3ApplicationConfiguration();
       config.setInitialVisible(false); config.setWindowedMode(640,576); config.setForegroundFPS(120); config.useVsync(false);
+      config.setDecorated(false);
       new Lwjgl3Application(game,config);
       require(game.complete,"UI layout run incomplete");
       System.out.println("UI LAYOUT PASS: "+game.captures+" screens; 100/125/150%, widescreen, portrait, ultrawide and desktop-full-size; uniform scale and clear tutorial gutters");
       System.exit(0);
    }
    private static final class TestGame extends Game {
-      final int[][] sizes={{640,576},{800,720},{960,864},{1280,720},{420,840},{1440,400},{0,0}};
+      final int[][] sizes={{640,576},{800,720},{960,864},{1280,720},{1920,1080},{1024,768},{420,840},{1440,400},{0,0}};
       int sizeIndex,scene,wait,frames,captures;
       boolean complete;
       DrawControls controls;
@@ -37,7 +38,7 @@ public final class UiLayoutTest {
       TestGame() { super(new String[0],4); }
       @Override public void create() {
          super.create(); actionStack.clear();
-         sizes[6][0]=Gdx.graphics.getDisplayMode().width; sizes[6][1]=Gdx.graphics.getDisplayMode().height;
+         sizes[sizes.length-1][0]=Gdx.graphics.getDisplayMode().width; sizes[sizes.length-1][1]=Gdx.graphics.getDisplayMode().height;
          defaults(); controls=new DrawControls(); controls.alpha=1;
          Pokemon pokemon=new Pokemon("gyarados",88); pokemon.previousOwner=player;
          pokemon.nickname="A VERY LONG POKEMON SUMMARY TITLE";

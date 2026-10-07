@@ -20,10 +20,22 @@ def main():
         log.write('Exact JAR SHA256: '+sha256(JAR)+'\n');log.flush()
         commands=[
             [javac,'--release','17','-encoding','UTF-8','-proc:none','-cp',str(JAR),'-d',str(classes),str(ROOT/'tools/PresentationReworkTest.java')],
-            [java,'-Xmx2g','-Dfile.encoding=UTF-8','-Dpokewilds.visual=johto','-Dpokewilds.models=off','-cp',cp,'com.pkmngen.game.PresentationReworkTest'],
         ]
         for command in commands:
             completed=subprocess.run(command,cwd=destination,stdout=log,stderr=subprocess.STDOUT,timeout=120,creationflags=CREATE_FLAGS)
+            log.flush()
+            if completed.returncode:
+                print(logpath.read_text(encoding='utf-8'));return completed.returncode
+        for width,height in ((1280,720),(1920,1080),(1024,768),(1600,600)):
+            output=destination/f'{width}x{height}'
+            output.mkdir(exist_ok=True)
+            for previous in output.glob('*.png'):
+                previous.unlink()
+            log.write(f'\nNative viewport: {width}x{height}\n');log.flush()
+            command=[java,'-Xmx2g','-Dfile.encoding=UTF-8','-Dpokewilds.visual=johto','-Dpokewilds.models=off',
+                f'-Dpresentation.width={width}',f'-Dpresentation.height={height}',
+                '-cp',cp,'com.pkmngen.game.PresentationReworkTest']
+            completed=subprocess.run(command,cwd=output,stdout=log,stderr=subprocess.STDOUT,timeout=120,creationflags=CREATE_FLAGS)
             log.flush()
             if completed.returncode:
                 print(logpath.read_text(encoding='utf-8'));return completed.returncode

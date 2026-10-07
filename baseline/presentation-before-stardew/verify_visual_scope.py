@@ -20,7 +20,7 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "409b51ce8398b7f485055f5dce3df14abd1dce10164e1e2b69eb97bb81dc65e7"
+FROZEN_MANIFEST_SHA256 = "73cb6a1c9cd99e9a223df8c2c707ced128283c82e7ac2ac97858f739d90e2f0b"
 PREFIX = "src/com/pkmngen/game/"
 V2_ARCHIVE = {
     "baseline/modernization-v2/modernization-scope.json": "f978edd535ac4440d6ce01924bc98135105a718e3a57faf9838827cd3ebf2343",
@@ -47,7 +47,6 @@ V5_ARCHIVE = {
 
 # Names and review scope are explicit; an edited manifest cannot expand them.
 MODIFIED_SCOPES = {
-    "desktop/DesktopLauncher.java": "Desktop input lifecycle: window focus callbacks release physical bindings and require release before refocus activation; launcher, save location and runtime behavior otherwise retained.",
     "BattleFadeOut.java": "Presentation: replace fade drawing while retaining action timing and dispatch.",
     "BattleIntro.java": "Presentation: preserve the modern world image during the original battle intro.",
     "BattleIntroAnim1.java": "Presentation: replace intro frame and border drawing, retain frame progression.",

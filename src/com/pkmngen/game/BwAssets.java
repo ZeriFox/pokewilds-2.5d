@@ -18,8 +18,8 @@ import java.util.Set;
  * Tile state, collision and saves never change. Landscape credits: visual/landscape;
  * B/W avatars: visual/unova. Cached regions are read-only and owned here. */
 public final class BwAssets {
-   private static final String BASE_TEXTURE = "visual/landscape/world-atlas.png";
-   private static final String BASE_ATLAS = "visual/landscape/world-atlas.json";
+   private static final String BASE_TEXTURE = "visual/stardew/world-atlas.png";
+   private static final String BASE_ATLAS = "visual/stardew/world-atlas.json";
    private static final String TRAINER_TEXTURE = "visual/unova/world-atlas.png";
    private static final String TRAINER_ATLAS = "visual/unova/world-atlas.json";
    private static final String OVERRIDES = "visual/custom/world-overrides.json";

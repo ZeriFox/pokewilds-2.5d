@@ -129,6 +129,7 @@ public class Game extends ApplicationAdapter {
    int temp2;
    int scale = 3;
    public static String[][] defaultSettings = new String[][]{
+      {"controlsVersion", "2"},
       {"keyboard-A", "MouseLeft"},
       {"keyboard-B", "MouseRight"},
       {"keyboard-Left", "A"},
@@ -814,6 +815,7 @@ public class Game extends ApplicationAdapter {
 
    @Override
    public void pause() {
+      DesktopControls.focusChanged(false);
    }
 
    @Override
@@ -1064,6 +1066,7 @@ public class Game extends ApplicationAdapter {
 
    @Override
    public void resume() {
+      DesktopControls.focusChanged(true);
    }
 
    public void start() {
@@ -1132,7 +1135,9 @@ public class Game extends ApplicationAdapter {
          }
 
          reader.close();
-         boolean overwriteFile = false;
+         // Inspect the stored version before defaults are supplied: an absent
+         // marker identifies an old preset, not a current customized layout.
+         boolean overwriteFile = DesktopControls.loadBindings(values);
 
          for (int i = 0; i < defaultSettings.length; i++) {
             String v = values.get(defaultSettings[i][0]);
@@ -1142,7 +1147,6 @@ public class Game extends ApplicationAdapter {
             }
          }
 
-         overwriteFile |= DesktopControls.loadBindings(values);
          musicDisabled = Boolean.valueOf(values.get("muteMusic"));
          specialPhysicalSplitEnabled = Boolean.valueOf(values.get("specPhysSplitEnabled"));
          photosensitiveMode = Boolean.valueOf(values.get("photosensitiveMode"));

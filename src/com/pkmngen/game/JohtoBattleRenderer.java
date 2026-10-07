@@ -79,56 +79,39 @@ public final class JohtoBattleRenderer {
       transitionLengths.keySet().removeIf(action -> !game.actionStack.contains(action));
    }
 
-   /** After uiBatch.end(): contain sliding actors/effects and restore the world UI projection. */
+   /** Restore projection only: painting margins here used to erase screen-wide effects. */
    public void finishFrame(Game game) {
-      if (battleCanvas && lastBattleFrame==frame) {
-         if (snapshotBatch == null) snapshotBatch = new SpriteBatch();
-         if (overlayPixel == null) {
-            Pixmap pixel = new Pixmap(1,1,Pixmap.Format.RGBA8888);
-            pixel.setColor(Color.WHITE); pixel.fill(); overlayPixel = new Texture(pixel); pixel.dispose();
-         }
-         int width=Gdx.graphics.getBackBufferWidth(), height=Gdx.graphics.getBackBufferHeight();
-         float scale=Math.min(width/160f,height/144f);
-         float left=(width-160*scale)*.5f, bottom=(height-144*scale)*.5f;
-         Gdx.gl.glViewport(0,0,width,height);
-         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST); Gdx.gl.glDisable(GL20.GL_CULL_FACE);
-         // Use the exact same projection and UV interpolation as the arena pass;
-         // cropping UVs separately can shift nearest-neighbour sampling by one texel.
-         snapshotBatch.setProjectionMatrix(game.uiBatch.getProjectionMatrix());
-         snapshotBatch.setShader(arenaShader);
-         boolean scissorEnabled=Gdx.gl.glIsEnabled(GL20.GL_SCISSOR_TEST);
-         previousScissor.clear();Gdx.gl.glGetIntegerv(GL20.GL_SCISSOR_BOX,previousScissor);
-         Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST);
-         if (left>0) {
-            paintMargin(0,0,(int)Math.floor(left),height);
-            int right=(int)Math.ceil(width-left);paintMargin(right,0,width-right,height);
-         }
-         if (bottom>0) {
-            paintMargin(0,0,width,(int)Math.floor(bottom));
-            int top=(int)Math.ceil(height-bottom);paintMargin(0,top,width,height-top);
-         }
-         Gdx.gl.glScissor(previousScissor.get(0),previousScissor.get(1),previousScissor.get(2),previousScissor.get(3));
-         if(!scissorEnabled)Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);
-         snapshotBatch.setShader(null);
+      if(projectionSaved) {
+         game.uiBatch.setProjectionMatrix(previousUiProjection);
+         projectionSaved=false;
       }
-      if (projectionSaved) { game.uiBatch.setProjectionMatrix(previousUiProjection); projectionSaved=false; }
    }
 
-   private void paintMargin(int x,int y,int w,int h) {
-      if(w<=0||h<=0)return;
-      Gdx.gl.glScissor(x,y,w,h);
-      snapshotBatch.setColor(Color.WHITE);snapshotBatch.begin();
-      snapshotBatch.draw(arena,(160-canvasWidth)*.5f,(144-canvasHeight)*.5f,canvasWidth,canvasHeight);
-      for(float[] overlay:marginOverlays){
-         snapshotBatch.setColor(overlay[4],overlay[5],overlay[6],overlay[7]);
-         snapshotBatch.draw(overlayPixel,overlay[0],overlay[1],overlay[2],overlay[3]);
+   private final float[] fullScreenVertices=new float[20];
+   private long fullScreenEffectDraws;
+   public long getFullScreenEffectDraws(){return fullScreenEffectDraws;}
+
+   /** Expand authored screen overlays, not targeted particles or Pokemon.
+    * Source vertices, animation state, texture UVs and the original action are read-only. */
+   public boolean drawScreenEffect(com.badlogic.gdx.graphics.g2d.Sprite source,com.badlogic.gdx.graphics.g2d.Batch batch) {
+      Game game=Game.staticGame;
+      if(!battleCanvas||game==null||batch!=game.uiBatch||source==null)return false;
+      if(batch instanceof ModernBatch&&((ModernBatch)batch).suppressed)return true;
+      if(source.getWidth()<128||source.getHeight()<96||source.getX()>16||source.getY()>48
+         ||source.getX()+source.getWidth()<144||source.getY()+source.getHeight()<136)return false;
+      float factor=Math.max(canvasWidth/160f,canvasHeight/144f);
+      System.arraycopy(source.getVertices(),0,fullScreenVertices,0,20);
+      for(int i=0;i<20;i+=5) {
+         fullScreenVertices[i]=80+(fullScreenVertices[i]-80)*factor;
+         fullScreenVertices[i+1]=72+(fullScreenVertices[i+1]-72)*factor;
       }
-      snapshotBatch.end();
+      batch.draw(source.getTexture(),fullScreenVertices,0,20);
+      fullScreenEffectDraws++;
+      return true;
    }
 
-   private void marginOverlay(float x,float y,float w,float h,Color color){
-      marginOverlays.add(new float[]{x,y,w,h,color.r,color.g,color.b,color.a});
-   }
+   // Existing boss/night overlays already draw across the full canvas in order.
+   private void marginOverlay(float x,float y,float w,float h,Color color) {}
 
    private static boolean isSpecialIntro(Action action) {
       return action != null && action.getClass().getSimpleName().equals("BattleIntro1");
@@ -449,7 +432,7 @@ public final class JohtoBattleRenderer {
          tint.set(sky).lerp(horizon,MathUtils.clamp((y-offsetY)/105f,0,1));
          p.setColor(tint); p.drawLine(0,y,width-1,y);
       }
-      Pixmap atlas=new Pixmap(Gdx.files.internal("visual/landscape/world-atlas.png"));
+      Pixmap atlas=new Pixmap(Gdx.files.internal("visual/stardew/world-atlas.png"));
       BwAssets assets=BwAssets.get();
       TextureRegion ground=assets.cell(profile.terrain("ground"),0,0);
       paintGround(p,atlas,ground,horizon);
@@ -502,7 +485,7 @@ public final class JohtoBattleRenderer {
       Color pixel = new Color();
       int offsetY=(destination.getHeight()-288)/2;
       for (int y=76+offsetY;y<destination.getHeight();y++) {
-         float depth=(y-76-offsetY)/212f, perspective=.5f+depth*.9f;
+         float depth=(y-76-offsetY)/212f, perspective=.28f+depth*1.55f;
          int ty=Math.floorMod((int)((y-76-offsetY)/perspective),height);
          for (int x=0;x<destination.getWidth();x++) {
             int tx=Math.floorMod((int)((x-destination.getWidth()/2)/perspective),width);

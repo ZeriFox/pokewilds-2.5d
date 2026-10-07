@@ -143,6 +143,9 @@ public class SpriteProxy extends Sprite {
          texture = this.originalTexture;
       }
 
+      com.pkmngen.game.Game game=com.pkmngen.game.Game.staticGame;
+      if(game!=null&&game.modernUi!=null&&game.johtoBattleRenderer!=null
+         &&game.johtoBattleRenderer.drawScreenEffect(this,batch))return;
       super.draw(batch);
    }
 

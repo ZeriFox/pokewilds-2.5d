@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 public final class DesktopControls {
    public static final int MOUSE_LEFT = -2;
    public static final int MOUSE_RIGHT = -3;
+   public static final int SETTINGS_VERSION = 2;
+   public static final String VERSION_KEY = "controlsVersion";
    private static final String[][] LEGACY = {
       {"keyboard-A", "Z"}, {"keyboard-B", "X"}, {"keyboard-Left", "Left"},
       {"keyboard-Right", "Right"}, {"keyboard-Up", "Up"}, {"keyboard-Down", "Down"},
@@ -21,9 +23,11 @@ public final class DesktopControls {
 
    private DesktopControls() {}
 
-   /** Only the complete untouched preset is migrated; a custom preset keeps every binding. */
+   /** Only an unversioned/v1 untouched preset migrates. Explicit current bindings are user choices. */
    public static boolean loadBindings(Map<String, String> values) {
-      boolean legacy = true;
+      String savedVersion = values.get(VERSION_KEY);
+      boolean oldVersion = savedVersion == null || savedVersion.trim().equals("1");
+      boolean legacy = oldVersion;
       for (String[] entry : LEGACY) {
          String value = values.get(entry[0]);
          if (value == null || !entry[1].equalsIgnoreCase(value.trim())) legacy = false;
@@ -34,6 +38,9 @@ public final class DesktopControls {
          values.put("keyboard-Up", "W"); values.put("keyboard-Down", "S");
          System.out.println("[Controls] Migrated legacy arrow/Z/X preset to WASD and left/right mouse. Custom presets are preserved.");
       }
+      // Record the decision for custom presets too, without changing any binding.
+      // A newer or unknown schema belongs to its writer and is not downgraded.
+      if (oldVersion) values.put(VERSION_KEY, Integer.toString(SETTINGS_VERSION));
       InputProcessor.keyboardA = binding(values.get("keyboard-A"), MOUSE_LEFT);
       InputProcessor.keyboardB = binding(values.get("keyboard-B"), MOUSE_RIGHT);
       InputProcessor.keyboardLeft = binding(values.get("keyboard-Left"), Keys.A);
@@ -43,8 +50,11 @@ public final class DesktopControls {
       InputProcessor.keyboardStart = binding(values.get("keyboard-Start"), Keys.ENTER);
       InputProcessor.keyboardL = binding(values.get("keyboard-L"), Keys.C);
       InputProcessor.keyboardR = binding(values.get("keyboard-R"), Keys.V);
-      return legacy;
+      return oldVersion;
    }
+
+   /** Window callbacks and application pause/resume share the same physical-input barrier. */
+   public static void focusChanged(boolean focused) { InputProcessor.setWindowFocused(focused); }
 
    static int binding(String value, int fallback) {
       if (value == null || value.trim().isEmpty()) return fallback;

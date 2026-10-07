@@ -1,0 +1,32 @@
+{
+  "allowedSources": [
+    "BwAssets.java",
+    "JohtoRenderer.java",
+    "JohtoBattleRenderer.java",
+    "ModernPartyUi.java",
+    "ModernInventoryUi.java",
+    "PmdBattleSprites.java",
+    "util/SpriteProxy.java"
+  ],
+  "before": {
+    "BwAssets.java": "3131070e55d8c46869c1c2c339bca2b6ddaee602e391a2cf6062eb671bd7bb82",
+    "JohtoRenderer.java": "ff30e490725b8c662fb9257f6affe8db1c1e1acc1889aafadea7718e7d8aee93",
+    "JohtoBattleRenderer.java": "a144814fb1a85afcb6777701abd1e2282d1beb6562ad601b00338a2707278db4",
+    "ModernPartyUi.java": "c04348c0c0e15ad04c7da124a48b13349398cf74c30c9c5c6f25c6e0bccca746",
+    "ModernInventoryUi.java": "7aadf4fbb9801afb80b140c1c8c32e79a3466bf4ef321ccfbd38b412e975e52b",
+    "PmdBattleSprites.java": "8d44b54944b6798400d933cb8087b53c4b12db15a91db318978ad08c469f1442",
+    "util/SpriteProxy.java": "466a7b7d4b0236e76e534e91cffce5da196d7a8c4752cba130df24480f024169"
+  },
+  "after": {
+    "BwAssets.java": "119d00cf5aa5d129049ee1f66c75fe18192bfea7114290207f265793db450768",
+    "JohtoRenderer.java": "6eac2167cdea01b760443110e8484caee408cec57de986a35fa071a0ee4e685a",
+    "JohtoBattleRenderer.java": "8baaf3c77f21d12205e8ad907540741fd6b43e6d99fa81d4284465def31515ab",
+    "ModernPartyUi.java": "98545ac219271d50781400a35b84d953e0da7f0e4a75b203771f27f55db1a93f",
+    "ModernInventoryUi.java": "c4de163389c7285dc1ce9923aeb22f2e59671b3493581a5f60e2738fb2004af6",
+    "PmdBattleSprites.java": "f306f8fecfebfa25dc3242f9dcd78564df574ef92d7c9c5c73ea50f42a8cb3e6",
+    "util/SpriteProxy.java": "d02115db6b891ff2690f221771e8402869134cb1ddc4744b63aa6d28a61f516c"
+  },
+  "previousManifestSha256": "73cb6a1c9cd99e9a223df8c2c707ced128283c82e7ac2ac97858f739d90e2f0b",
+  "protectedGameplaySourcesUnchanged": true,
+  "completePatchSha256": "850bc371a40022136d96ea29bbf69abca78f52f10a979b31d35712f62e2c7588"
+}
