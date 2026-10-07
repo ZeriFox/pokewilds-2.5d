@@ -19,6 +19,16 @@
     "status": "downloaded",
     "rights": "ConcernedApe / Stardew Valley"
   },
+  "winter": {
+    "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88665/",
+    "image": "https://www.spriters-resource.com/media/assets/86/88665.png?updated=1755475342",
+    "sha256": "8b3df72486cd76e50e18664d482f2cb7b4c329b8251e7495d370a80f914e83de",
+    "width": 656,
+    "height": 1664,
+    "bytes": 264703,
+    "status": "downloaded",
+    "rights": "ConcernedApe / Stardew Valley"
+  },
   "interiors": {
     "page": "https://www.spriters-resource.com/pc_computer/stardewvalley/asset/88658/",
     "image": "https://www.spriters-resource.com/media/assets/86/88658.png?updated=1755475341",
