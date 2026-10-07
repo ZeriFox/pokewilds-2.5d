@@ -1,5 +1,16 @@
 # Reproducible Windows package
 
+Delivered local version: **v0.8.11-stardew.1**, tagged source commit
+`9066b0674e3343e12d00110b8863937be234c44c`. Its 461,587,802-byte ZIP has SHA-256
+`cb66c990f4acf060300c6883a8719246c8eadfb27f9caff08a9fee131aacac0d`.
+Real Windows extracted `GIOCA.cmd` and the separate packaged native smoke pass;
+all 529 payload files match. Receipt: `build/windows-package-verification/`.
+The release's full 21-suite Windows/Linux acceptance is preserved; additive
+test/documentation commit `53696d3e` passes the new active-move resize check on
+Windows and the complete 22-suite Linux CI. Both use the identical released JAR.
+Use the release tag and matching archived receipt to reproduce that exact
+package; a future checkout requires its own complete acceptance and new version.
+
 These commands compile and test tracked sources. They never run the historical
 `apply_presentation_rework.py` migration and never commit or publish changes.
 Run from the repository root with Python 3.11+ and a complete JDK 17.

@@ -4,7 +4,7 @@ Una ricostruzione PC di PokeWilds 0.8.11 in Java/LibGDX, con mondo prospettico, 
 
 La versione aggiunge **552 specie giocabili** alle 410 della base, per **962 specie totali**, una caldera vulcanica e rampe percorribili tra alcune terrazze montane. La mappa resta procedurale: il nuovo passaggio di generazione modifica davvero terreno e collisioni. La presentazione predefinita usa sprite 2D e la build normale esclude i modelli GLB. È una versione Windows PC x64, non un port Nintendo 3DS.
 
-Stato effettivo, prossimo comando e prove del rework: [REWORK-STATUS.md](docs/REWORK-STATUS.md), [REWORK-TESTS.md](docs/REWORK-TESTS.md), [copertura materiali](docs/ASSET-COVERAGE.md). Le anteprime seguenti sono storiche; gli screenshot del nuovo JAR sono negli artifact di verifica e nella consegna della build.
+Build locale verificata: **v0.8.11-stardew.1**, tag sul commit `9066b067`; `main` include anche la regressione del resize durante le mosse, senza cambiare il JAR consegnato. Stato, hash dello ZIP, prossimo comando e prove: [REWORK-STATUS.md](docs/REWORK-STATUS.md), [REWORK-TESTS.md](docs/REWORK-TESTS.md), [copertura materiali](docs/ASSET-COVERAGE.md). Le anteprime seguenti sono storiche; gli screenshot del nuovo JAR sono negli artifact di verifica e nella consegna della build.
 
 ![Mondo procedurale in 2.5D](anteprima-25d.png)
 
@@ -22,7 +22,7 @@ Stato effettivo, prossimo comando e prove del rework: [REWORK-STATUS.md](docs/RE
 
 ![Comandi e tutorial con colonne allineate](anteprima-comandi.png)
 
-Il ramo **`main`** riunisce le correzioni di johto.3 con **14 profili di bioma**, rilievi ricostruiti dai dirupi reali, nebbia del cimitero, materiali vulcanici e desertici dedicati, regole di habitat per i nuovi incontri e un layout uniforme per i menu. Conserva WASD/mouse, il Pokémon intero animato nelle informazioni e la continuità della vista durante abilità e battaglie. Integra le pose diagonali PMD e il campionamento configurabile degli asset senza sostituire le alture v5. [VERIFICA.txt](VERIFICA.txt) identifica il JAR verificato e i controlli effettivamente conclusi. La panoramica tecnica è in [AGGIORNAMENTO-BIOMI.txt](AGGIORNAMENTO-BIOMI.txt).
+Il ramo **`main`** riunisce le correzioni di johto.3 con **14 profili di bioma**, rilievi ricostruiti dai dirupi reali, nebbia del cimitero, materiali vulcanici e desertici dedicati, regole di habitat per i nuovi incontri e un layout uniforme per i menu. Conserva WASD/mouse, il Pokémon intero animato nelle informazioni e la continuità della vista durante abilità e battaglie. Integra le pose diagonali PMD e il campionamento configurabile degli asset senza sostituire le alture v5. [REWORK-TESTS.md](docs/REWORK-TESTS.md) identifica le verifiche correnti; [VERIFICA.txt](VERIFICA.txt) e [AGGIORNAMENTO-BIOMI.txt](AGGIORNAMENTO-BIOMI.txt) conservano la documentazione delle iterazioni precedenti.
 
 ## Giocare su Windows
 

@@ -9,7 +9,8 @@ Updated: 2026-10-07, Windows x64. Completed evidence and remaining verification 
 - Original main: `7777904bd4c0d7d4ea682edac46967c2fee85df1`, verified ancestor and fetched again before integration. Original clean checkouts and alternate branches preserved; no reset/force-push. No applicable AGENTS.md found.
 - Original CI `37655229267` failed at wall alpha. Three source rows were semitransparent sheet shadows; the corrected opaque 16×45 face preserves validation.
 - Milestones: `b40aba97` wall/assets; `b0ecca37` tracked migration; `73883be6` atlas/PMD compatibility; `17b4a14a` moves/field/habitat; `ce84efaa` interior visibility and complete verification/package tooling; `a44cf0f7` cross-platform diagnosis; `4d3a1d02` canonical PNGs; `9066b067` exact FBO/nearest-boundary regression.
-- **Remote main confirmed at `9066b0674e3343e12d00110b8863937be234c44c`**, normal fast-forward. New annotated tag **`v0.8.11-stardew.1`** resolves to that commit; no existing tag replaced.
+- Release checkpoint `9066b0674e3343e12d00110b8863937be234c44c` was integrated by normal fast-forward. New annotated tag **`v0.8.11-stardew.1`** resolves to that commit; no existing tag replaced.
+- **Remote main subsequently confirmed at `53696d3e1d47701cc64ce884ec5377ce3dc9a274`**, after its complete 22-suite CI passed. This adds the resize regression and documentation only; this final record is a documentation-only follow-up. Production source/resource hashes still match the released JAR.
 
 Java migration is in tracked sources; its historical entrypoint verifies hashes and never rewrites Java. Java/LibGDX and original PMD sources remain. Original simulation/save scope is protected by 17 negative mutation tests.
 
@@ -28,7 +29,7 @@ Java migration is in tracked sources; its historical entrypoint verifies hashes 
 
 Clean packaged commit `9066b067` passes **21/21 native suites on Windows**. Full Linux Xvfb/Mesa [CI 37678950172](https://github.com/ZeriFox/pokewilds-2.5d/actions/runs/37678950172) passes deterministic preparation, nine pure checks, complete compilation and **21/21 native suites**, producing the identical JAR. Windows receipt/logs: `build/rework-verification/`; Linux receipts/artifact: `build/ci-9066b067/`. Historical diagnostics are preserved separately and are not acceptance evidence.
 
-Additional active-move resize passes on this exact JAR: same Surf action completes 348 frames through 1280×720 → 1024×768 → 1600×600, recreates/disposes its FBO and affects the expanded field. Same Tackle action completes 57 frames; 3,384 and 564 opaque authored PNG pixels match the enemy impact after the two resizes. Original clocks, target identity, next action, HUD and GL state pass. Scratch evidence: `build/resize-diagnostic/`. The follow-up tracks this as a 22nd native check; its Windows runner and full Linux CI are pending at this document checkpoint. **No production source, asset or packaged byte changes for this follow-up.**
+Additional active-move resize passes on this exact JAR: same Surf action completes 348 frames through 1280×720 → 1024×768 → 1600×600, recreates/disposes its FBO and affects the expanded field. Same Tackle action completes 57 frames; 3,384 and 564 opaque authored PNG pixels match the enemy impact after the two resizes. Original clocks, target identity, next action, HUD and GL state pass. Its tracked runner passes on clean Windows commit `53696d3e`; receipt: `build/active-move-resize/active-move-resize-verification.json`. Full Linux [CI 37681037801](https://github.com/ZeriFox/pokewilds-2.5d/actions/runs/37681037801) passes preparation, build and **22/22 native suites**. Evidence: `build/ci-53696d3e/`. **No production source, asset or packaged byte changes for this follow-up.**
 
 ## Requirement evidence and explicit limits
 
@@ -60,4 +61,6 @@ Wider redistribution rights remain unresolved for supplied Stardew/FRLG derivati
 
 ## Resume
 
-Next command: `python tools/active_move_resize_test.py`, then inspect full 22-suite CI for the follow-up commit and fast-forward main only after PASS. Release tag/ZIP stay immutable at `9066b067`; subsequent test/documentation commits do not change production bytes. Repeat packaged startup with `python tools/verify_windows_package.py build/release/pokewilds-2.5d-windows-x64-v0.8.11-stardew.1.zip`. Preserve this worktree, original checkouts and ignored evidence.
+Implementation/review delivery M0–M9 is complete within the explicitly recorded coverage limits; no test or packaging gate remains pending. Wider art redistribution remains unverified. Release tag/ZIP stay immutable at `9066b067`; later test/documentation commits do not change production bytes.
+
+Next reproducibility command: `python tools/verify_windows_package.py build/release/pokewilds-2.5d-windows-x64-v0.8.11-stardew.1.zip`. For a future code change, run `python tools/verify_rework.py --stage all` on its clean commit and assign a new package version. Reproducing this exact release requires its tagged checkout and archived matching inputs/receipts. Preserve this worktree, original checkouts and ignored evidence.
