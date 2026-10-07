@@ -58,8 +58,12 @@ segni aderenti al pendio; i raccordi usano il materiale del bioma. La cache
 delle quote segue una firma strutturale dei bordi, indipendente dalle maree
 e dalle sole texture. Non vengono salvate nuove altezze.
 Questa correzione della vista vale anche sulle mappe gia' caricate; non avvia
-ModernWorldGenerator su quei salvataggi. La revisione v5 resta solo locale,
-senza pubblicazione su GitHub o migrazione dei file del giocatore.
+ModernWorldGenerator su quei salvataggi. La versione unificata di main
+conserva la revisione v5 insieme alle correzioni di johto.3, senza migrazione
+dei file del giocatore. Pose diagonali PMD e campionamento configurabile
+degli asset non modificano queste quote o le regole di generazione.
+Il pacchetto binario della release johto.3 precede questa integrazione;
+l'aggiornamento di main non crea una nuova release binaria.
 
 Verifica:
 python tools/modern_world_test.py

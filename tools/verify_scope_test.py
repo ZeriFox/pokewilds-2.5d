@@ -13,13 +13,13 @@ def main() -> int:
     destination = verifier.ROOT / "build" / "scope-negative"
     destination.mkdir(parents=True, exist_ok=True)
     results: list[str] = []
-    with tempfile.TemporaryDirectory(prefix="schema5-", dir=destination) as temporary:
+    with tempfile.TemporaryDirectory(prefix="schema6-", dir=destination) as temporary:
         root = Path(temporary).resolve()
         if not root.is_relative_to(destination.resolve()):
             raise RuntimeError("Test copy escaped the intended temporary directory")
         shutil.copytree(verifier.ROOT / "src", root / "src")
         shutil.copytree(verifier.ROOT / verifier.CLASSIC_SOURCES, root / verifier.CLASSIC_SOURCES)
-        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE]:
+        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE]:
             target = root / source
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / source, target)
@@ -63,6 +63,7 @@ def main() -> int:
         reject("historical v2 changed", "baseline/modernization-v2/modernization-scope.json", append)
         reject("historical v3 changed", "baseline/modernization-v3/modernization-scope.json", append)
         reject("historical v4 changed", "baseline/modernization-v4/modernization-scope.json", append)
+        reject("historical v5 changed", "baseline/modernization-v5/modernization-scope.json", append)
         verifier.audit(root)
     report = destination / "results.txt"
     report.write_text("\n".join(results) + f"\nSCOPE NEGATIVE PASS: {len(results)} mutations rejected\n", encoding="utf-8", newline="\n")

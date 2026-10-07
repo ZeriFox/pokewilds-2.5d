@@ -1,0 +1,79 @@
+VERIFICA — correzione locale dei dislivelli, 2026-10-07
+
+CONSEGNA
+PASS: 8 suite native eseguite sul JAR definitivo sotto identificato, senza
+--sources o classi di produzione sovrapposte. I wrapper compilano solo gli
+harness. Le prove intermedie e quelle storiche non certificano questo JAR.
+Avvio dal collegamento desktop PokeWilds 2.5D - Prova locale oppure
+AVVIA-POKEWILDS.cmd: Java e JAR sono inclusi, non serve build.cmd/Python.
+Nessun commit, push o nuova release GitHub eseguito in questa iterazione.
+
+JAR: dist/pokewilds-rebuilt.jar
+SHA-256: 8b400a224b5350647424dcf32b5a9f4390ac4b320956c86dae39784749bf607d
+Dimensione: 297828086 byte; 108904 voci ZIP.
+Java 17: 216 sorgenti, 454 classi compilate,
+36792 risorse locali. Modelli GLB esclusi.
+Zero classi di gioco copiate dal runtime upstream. CRC ZIP verificati.
+Allineamento sorgenti/classi/risorse al JAR: build/scope-negative/build-alignment.txt.
+Hash dei log delle 8 suite: build/local-verification.json.
+
+CORREZIONE
+Solo WorldElevation.java e JohtoRenderer.java differiscono dai sorgenti v4.
+Le quote vengono ricostruite dai bordi dei dirupi con vincoli locali, senza
+appiattire un intero pianoro quando nel perimetro esiste un'apertura.
+I piani superiori sono sollevati; le facciate uniscono quote realmente diverse.
+Rimosso il fallback che aggiungeva un muro anche fra due superfici alla stessa quota.
+Rampe e raccordi condividono i vertici attraversabili; terreno, piedi e camera
+usano la stessa superficie triangolare. Luce direzionale, bordo sottile e ombra
+al piede aiutano a distinguere il piano superiore da quello inferiore.
+I gradini visivi seguono la pendenza e compaiono solo sulle rampe dichiarate.
+La cache si aggiorna anche quando acqua/lava modificano un varco; sola texture
+e marea non ricostruiscono le quote. Nessuna nuova fisica o modifica al save.
+
+RISULTATI SULLA STESSA CALDERA SALVATA
+Prima: 13/32 bordi sostenevano un dislivello; 0/16 rampe avevano una pendenza.
+Dopo: 32/32 bordi sostengono un dislivello; 16/16 rampe hanno una pendenza.
+Fixture di pianoro aperto: prima quota superiore 0 e 60 triangoli di parete
+sopra entrambi i terreni adiacenti; dopo quota superiore 14 e zero pareti spurie.
+Fixture chiusa e varco vicino all'angolo: percorso continuo 0->14.
+relief_visual_test.py PASS: 414 frame, 13 PNG, 324 frame di PlayerMoving originale;
+camera e piedi continui (massimo 0,875 unita/frame nelle traversate campione).
+Il percorso della caldera scende e risale: escursione 26,25..42, non una
+pretesa differenza fra gli estremi del percorso. Tutti i 5 file del save invariati.
+Evidenza precedente conservata in build/relief-visual/baseline-7c32ffd8/.
+
+REGRESSIONI ESEGUITE SUL JAR DEFINITIVO
+world_elevation_test.py --saved-island: terrazze, crateri, angoli, rampe,
+aperture, ordine/reload, vincoli contraddittori e invalidazione acqua/lava.
+biome_scene_test.py: giorno/notte, pianoro e rampa, continuita del personaggio,
+cascata, maree/pozzanghere e ciclo originale del fantasma notturno.
+world_reload_visual_test.py: stessa isola salvata, sentiero della villa solo
+visivamente adattato; tutti i 5 file del salvataggio conservano gli hash.
+modern_world_test.py: generazione, terreno percorribile e save/load originali.
+field_scene_test.py: attivazioni originali POWER/BUILD/DIG/SURF/FLY, Surf,
+preview, pose e luce; nessun draw del mondo legacy inviato.
+landscape_smoke_test.py: rilievi, caldera, giorno/notte, interni e ingresso/uscita.
+modern_ui_smoke_test.py: menu, crafting, incontro, turni, fuga, cattura,
+salvataggio/caricamento e ritorno dalla lotta al mondo moderno.
+I risultati dettagliati sono registrati nei log indicizzati nel JSON.
+
+AMBITO E REVISIONE
+verify_visual_scope.py PASS: 216 sorgenti = 161 originali byte-identici,
+37 originali modificati e 18 aggiunte. Attack/Battle/Player/PkmnMap/Network/Save
+e le altre classi protette restano identiche alla base.
+Manifest schema 5 congelato SHA-256: ed68a9912360aa7972864acf09358b02b8d126463622f044d44f1bfbff6e4003
+Digest sorgenti: 7b3fbfdada5929515a02420e2201b5bd2933b71735cf7f13585add97a3509ec5
+verify_scope_test.py PASS: 15 mutazioni non autorizzate respinte in copie isolate.
+Le verifiche storiche v2/v3/v4 restano archiviate sotto baseline/.
+Le 15 suite della precedente consegna v4 NON vengono presentate come prove
+ripetute su questo JAR; qui si ripetono le 8 rilevanti per quote e renderer.
+
+SALVATAGGI E LIMITI
+Prove eseguite solo in cartelle build/ isolate; Kiri.sav non aperto o riscritto.
+La correzione si applica visivamente anche a mappe esistenti senza rigenerarle.
+La forma generale dell'isola e le regole di collisione restano quelle salvate;
+contorni irregolari possono produrre raccordi inclinati. I vincoli incompatibili
+sono risolti deterministicamente e conteggiati: non si afferma che ogni terreno
+procedurale possibile sia stato controllato. Non e un test esaustivo di mosse,
+hardware, multiplayer o Nintendo 3DS.
+Backup precedente: build/local-history/pokewilds-before-relief.jar.

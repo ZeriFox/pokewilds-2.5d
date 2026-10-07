@@ -1,0 +1,47 @@
+{
+  "regions": {
+    "grass": {
+      "texture": "visual/custom/grass-64.png",
+      "x": 0,
+      "y": 0,
+      "width": 64,
+      "height": 64,
+      "sampleWidth": 64,
+      "sampleHeight": 64
+    },
+    "grass_light": {
+      "texture": "visual/custom/grass-64.png",
+      "x": 0,
+      "y": 0,
+      "width": 64,
+      "height": 64,
+      "sampleWidth": 64,
+      "sampleHeight": 64
+    },
+    "path": {
+      "texture": "visual/custom/path-128x192.png",
+      "x": 0,
+      "y": 0,
+      "width": 128,
+      "height": 192,
+      "sampleWidth": 64,
+      "sampleHeight": 48
+    },
+    "tree": {
+      "texture": "visual/custom/tree-96x160.png",
+      "x": 0,
+      "y": 0,
+      "width": 96,
+      "height": 160,
+      "sampleWidth": 96,
+      "sampleHeight": 160,
+      "worldWidth": 24,
+      "worldHeight": 40,
+      "anchorX": 0.5,
+      "anchorY": 0,
+      "offsetX": 0,
+      "offsetY": 0,
+      "elevation": 0
+    }
+  }
+}

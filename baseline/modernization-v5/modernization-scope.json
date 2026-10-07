@@ -1,11 +1,11 @@
 {
-  "schema": 6,
+  "schema": 5,
   "status": "frozen",
-  "purpose": "Merge the reviewed local terrain-relief, biome, habitat, desktop and UI modernization with flexible texture sampling and presentation geometry helpers from the published branch. Frozen after explicit source review and coordinated native visual checks; not proof of total gameplay equivalence.",
+  "purpose": "Local structural modernization with reviewed terrain relief: shared derived plateau/ramp heights, native cliff geometry/contact cues, coherent biome presentation, habitat-aware wild encounters and existing desktop/UI/roster work. Frozen after explicit source and native visual review; not proof of total gameplay equivalence.",
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "c5bd017143cbf1cd718296f3b444afc1966f98f42f92596f3bacb4212f559b91",
+  "reviewed_patch_sha256": "61f9d15f08cb7843f1a99333566e2154c4c8e1480fe140b43df32cfd895501a5",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/Battle.java",
@@ -214,8 +214,8 @@
       "scope": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state."
     },
     "src/com/pkmngen/game/BwAssets.java": {
-      "reviewed_sha256": "3131070e55d8c46869c1c2c339bca2b6ddaee602e391a2cf6062eb671bd7bb82",
-      "scope": "Lazy, disposable local landscape atlas access, biome-specific semantic materials, validated optional texture overrides and sampling independent of the simulation grid, contextual missing-asset diagnostics and separate Black/White trainer assets."
+      "reviewed_sha256": "c4b1bfe035b2085b80ab67c6b7ead086dbd1cebeb46aaffc26a13a695dc5fdc7",
+      "scope": "Lazy, disposable local landscape atlas access, biome-specific semantic materials, contextual missing-asset diagnostics and separate Black/White trainer assets."
     },
     "src/com/pkmngen/game/DesktopControls.java": {
       "reviewed_sha256": "4a33318b70b13141930bcbba88219eb4e9d84f218b440750edd04edc70e3e6ae",
@@ -230,8 +230,8 @@
       "scope": "Modern biome battle arenas/HUD, full-viewport composition, preserved-world transitions and presentation helpers for special boss actions."
     },
     "src/com/pkmngen/game/JohtoRenderer.java": {
-      "reviewed_sha256": "ff30e490725b8c662fb9257f6affe8db1c1e1acc1889aafadea7718e7d8aee93",
-      "scope": "Exclusive perspective world drawing with shared derived terrain heights, continuous cliff/ramp geometry and contact shading, coherent biome materials/atmosphere, aspect-preserving decor, configurable sprite dimensions/anchors, proportional trainer crops and building-wall classification, modern intentional ghost presentation, anchored PMD actors and original field-action feedback; no persisted terrain or collision changes."
+      "reviewed_sha256": "31bb6e1b45497a4c44df9c642d01105ce849436e7a9f2c16a975ae8dbe5c3c29",
+      "scope": "Exclusive perspective world drawing with shared derived terrain heights, continuous cliff/ramp geometry and contact shading, coherent biome materials/atmosphere, modern intentional ghost presentation, anchored PMD actors and original field-action feedback; no persisted terrain or collision changes."
     },
     "src/com/pkmngen/game/ModernBatch.java": {
       "reviewed_sha256": "f02a0d0fd3f6e2e2a38a975c2a1a0ada4197770a5371c1d73d08e06474d44cd4",
@@ -254,8 +254,8 @@
       "scope": "Authorized deterministic procedural landforms, biome distribution and volcanic terrain."
     },
     "src/com/pkmngen/game/PmdBattleSprites.java": {
-      "reviewed_sha256": "8d44b54944b6798400d933cb8087b53c4b12db15a91db318978ad08c469f1442",
-      "scope": "Exact PMD battle/event actors with diagonal battle-facing poses, complete animation-envelope fit and ground anchoring, trimmed trainers, hidden-identity ghost presentation and visual effects."
+      "reviewed_sha256": "4c71e6ac66871f44817e535aaac7f1cd2458184bb91e4c945e5af19e6057308b",
+      "scope": "Exact PMD battle/event actors, complete animation-envelope fit and ground anchoring, trimmed trainers, hidden-identity ghost presentation and visual effects."
     },
     "src/com/pkmngen/game/PmdPokemonSprites.java": {
       "reviewed_sha256": "47d1f1e5a438e5eea91a273e5209b356c31d51232c7646cea06afab1bd4b9543",
@@ -264,14 +264,6 @@
     "src/com/pkmngen/game/TrainerModel3D.java": {
       "reviewed_sha256": "ec80bc26b0410598ef1a23248ae4cfb58b9391a435de879a28dec6215d0611b3",
       "scope": "Existing optional experimental trainer model helper."
-    },
-    "src/com/pkmngen/game/VisualGeometry.java": {
-      "reviewed_sha256": "e1e4fd0581a3248abfe88ab6a386da8c8f45a2a0334f8b7e03b8ab0d09a19bb5",
-      "scope": "Pure presentation helpers for diagonal battle-facing poses, uniform sprite fitting, cliff footprint math and building-wall classification; no map or collision writes."
-    },
-    "src/com/pkmngen/game/VisualSampling.java": {
-      "reviewed_sha256": "7ca0b42371d3594ad08ba254c0303da2701e6dc3e05a300ee5ac67a3dd303a77",
-      "scope": "Validated pixel-region sampling independent of the fixed simulation grid, including deterministic signed world coordinates and exact source-cell boundaries."
     },
     "src/com/pkmngen/game/WildSpawnRules.java": {
       "reviewed_sha256": "373da8c934976a7f33b0e16fda8f763c84b96465e7b9cef08f408256fdcabe60",
@@ -287,7 +279,7 @@
     }
   },
   "review_notes": [
-    "Schemas 2 through 5 manifests, verifiers and reports are preserved byte-for-byte under their baseline/modernization-vN directories; the verifier pins their immutable digests. Schema 5 was archived directly from commit 1aefbe4da203115200c0720904ad23bd557974aa and records the previously tested local JAR; this historical evidence does not approve the merge.",
+    "Schemas 2, 3 and 4 manifests, verifiers and reports are preserved byte-for-byte under baseline/modernization-v2, modernization-v3 and modernization-v4; verifier pins their immutable digests. The schema 4 archive also records the prior tested JAR and archive input hashes.",
     "User requested clearer true terrain relief because the existing volcanic ledges read as low walls over a flat surface. This iteration reviews the geometry shared by terrain, ramps, cliff faces, actors and camera, while retaining saved tile/route identity and gameplay collision rules.",
     "User requested structural biome/environment replacement, corrected night ghost presentation, stable world/ability/battle transitions, full Pokemon summaries, coherent desktop controls/UI and habitat-correct wild encounters.",
     "Protected original Attack, Battle, Player, Network, Save, CheckMovesLearned, CheckEndOfBattle, PkmnMap and DrawSetupMenu remain byte-identical to the classic 198-source baseline.",
@@ -299,15 +291,10 @@
     "Original map actions still execute; WorldBatch suppresses only their legacy pixel submissions. The night ghost is an intentional game encounter, drawn as a modern wisp without changing spawn timing, encounters or hidden identity.",
     "Native tests cover actual PlayerStanding wild selection and Pokemon.FollowPath water movement, complete animation bounds, expanded viewport/UI layouts, field actions, scene transitions, procedural generation and save/load. Physical controller hardware and complete playthroughs are not implied.",
     "Final same-save review: contextual mansion approach materials preserve saved encounter routes; tidal/puddle overlays retain visible shallow beds; grass ledges use ground material. Native regression capture preserves every saved-file hash.",
-    "Schema 6 adds VisualSampling and VisualGeometry to the exact source allowlist (218 total sources); it reviews merged BwAssets, JohtoRenderer and PmdBattleSprites against the immutable schema 5 checkpoint. No saved terrain height, collision or battle-rule changes are authorized by this merge.",
-    "VisualSampling validates complete source-cell coverage and maps signed world coordinates to pixel samples independently of the 16-unit simulation grid. VisualGeometry provides diagonal facing, uniform sprite fit, building classification and pure cliff footprint helpers; retaining a helper does not require replacing the reviewed WorldElevation-derived surfaces.",
-    "The complete merge delta against schema 5 is exactly BwAssets, JohtoRenderer and PmdBattleSprites plus the two new helpers. The other 213 previously reviewed sources, including WorldElevation and all protected originals, are unchanged.",
-    "Coordinated source-mode native QA passed terrain relief, biome scenes, 183 PMD battle draws with diagonal-pose bounds, and GPU asset integration (7,967 checks; 202 complete regions; 48 animation frames). Renderer-specific checks passed HD trainer scaling, proportional field-pose crops, normalized anchors and shifted shadows. These source-mode results do not substitute for separate rebuilt-JAR validation.",
-    "The renderer retains WorldElevation-derived surfaces and edge faces; the imported cliff footprint helper does not reinstate the former flat-ground wall approximation. Full cliff artwork is sampled vertically, and known floors/props are classified without replacing them with building walls.",
-    "Normal verification and --inventory never refresh approved hashes. The frozen manifest and complete source patch bind the exact coordinated final sources; source scope alone does not validate resource bytes, packaging or visual behavior."
+    "Schema 5 explicitly reviews only JohtoRenderer and WorldElevation changes against immutable schema 4; all other 214 current Java sources match that prior review. Source-mode native relief QA covers 13 screenshots, 414 frames including 324 original movement-action frames, 32/32 sampled supported ledges, 16/16 sampled ramps, full 0-to-14 opening traversal and zero unsupported wall meshes. Five saved-file hashes remain unchanged. This is source-mode evidence; packaged JAR checks remain separate.",
+    "The final WorldElevation delta after visual QA only adds isWater/isLava to its cache signature. Unit tests verify in-place land/water/lava invalidation, restored full terrace height and unchanged texture/tide caching. The renderer is byte-identical to the visually reviewed version. The frozen manifest/diff bind these exact final sources; normal verification and --inventory never refresh approval hashes."
   ],
   "historical_v2": "baseline/modernization-v2/archive.json",
   "historical_v3": "baseline/modernization-v3/",
-  "historical_v4": "baseline/modernization-v4/archive.json",
-  "historical_v5": "baseline/modernization-v5/archive.json"
+  "historical_v4": "baseline/modernization-v4/archive.json"
 }

@@ -1,25 +1,28 @@
-POKEWILDS 0.8.11 — PC 2.5D, BIOMI E INTERFACCIA — LOCALE 2026-10-07
+POKEWILDS 0.8.11 — PC 2.5D, BIOMI E INTERFACCIA — MAIN 2026-10-07
 
-Queste modifiche locali non sono pubblicate su GitHub. Il link seguente
-identifica la precedente release johto.2. Per giocare usa AVVIA-POKEWILDS.cmd
-oppure run-johto.cmd: non serve eseguire build.cmd. VERIFICA.txt identifica
-il JAR verificato e gli esiti effettivi; AGGIORNAMENTO-BIOMI.txt descrive
+Il ramo main unifica le correzioni di johto.3 con i profili dei biomi, la UI
+e i rilievi v5. La release binaria johto.3 resta precedente a questa integrazione;
+l'aggiornamento del codice non crea una nuova release binaria.
+VERIFICA.txt identifica il JAR verificato e gli esiti effettivi;
+AGGIORNAMENTO-BIOMI.txt descrive
 implementazione e limiti in quattro sezioni: bug, UI, biomi e habitat.
 
 AVVIO SU WINDOWS
-Per la versione pubblicata precedente, estrai pokewilds-2.5d-windows-x64.zip:
-https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.2
+Per il pacchetto Windows della versione binaria precedente:
+https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.3
 Repository e release privati: serve un account GitHub con accesso.
-Code > Download ZIP contiene i sorgenti, non il gioco pronto.
-Questo aggiornamento richiede la cartella locale completa: la vecchia release
-johto.2 non include i nuovi profili, materiali e correzioni.
+Il clone Git e Code > Download ZIP contengono sorgenti e risorse, senza JAR
+compilato o Java incluso: richiedono la ricompilazione descritta sotto.
+La release johto.3 non include tutta l'integrazione attuale di main.
 
-Apri run-johto.cmd oppure run-johto-sprites.cmd. Java 17 Windows x64 e' incluso
-nel pacchetto pronto; non serve cambiare il Java di sistema.
+Nella cartella locale completa gia' compilata, apri AVVIA-POKEWILDS.cmd,
+run-johto.cmd oppure run-johto-sprites.cmd; non serve eseguire build.cmd.
+Questa cartella include il JAR e Java 17 Windows x64; non serve cambiare
+il Java di sistema. Un clone o ZIP dei sorgenti non include questi binari.
 Salvataggi/impostazioni: run-johto/. run.cmd sceglie la presentazione classica
 e usa run/, separata. La scelta grafica non disattiva il Pokedex ampliato o
 la generazione moderna. Conserva insieme le cartelle distribuite.
-Comandi locali: WASD movimento/navigazione, sinistro mouse (LMB) conferma,
+Comandi: WASD movimento/navigazione, sinistro mouse (LMB) conferma,
 destro mouse (RMB) indietro; tieni il destro mentre cammini per correre.
 Invio apre il menu, C/V selezione sul campo, F11 schermo intero.
 Nei nomi WASD digita lettere: frecce su/giu' cambiano campo, Invio conferma
@@ -40,7 +43,7 @@ atmosfera, habitat e transizioni. Deserto, vulcano e cimitero hanno materiali
 dedicati; il cimitero recupera nebbia e toni grigio-verdi. Il fantasma notturno
 e' un incontro originale legittimo, ora visualizzato come apparizione moderna;
 non viene usato come segnaposto di un asset mancante.
-La revisione locale v5 dei rilievi ricostruisce piani superiori davvero alzati.
+La revisione v5 dei rilievi ricostruisce piani superiori davvero alzati.
 WorldElevation risolve i vincoli dei dirupi e delle rampe salvati; gli angoli
 condivisi raccordano i passaggi aperti. Superfici, piedi e camera usano le
 stesse quote. Le pareti collegano solo dislivelli reali, senza muretti quando
@@ -50,7 +53,8 @@ il pendio; i raccordi mantengono il materiale del bioma.
 La cache usa una firma strutturale: maree e sole texture non invalidano il
 rilievo. Anche i mondi caricati ricevono la nuova vista, senza nuove altezze
 salvate, migrazioni dei salvataggi o cambiamenti a collisioni e movimento.
-Questa revisione resta soltanto sul PC locale; non e' pubblicata su GitHub.
+L'integrazione con johto.3 conserva queste quote condivise; i precedenti
+dirupi decorativi non le sostituiscono.
 Maree guadabili e pozzanghere conservano il fondale visibile. I materiali dei
 sentieri mansion seguono l'ambiente vicino anche quando la route originale
 indica neve; la correzione grafica non cambia route o incontri.
@@ -63,6 +67,12 @@ Comandi e tutorial usano righe/colonne, margini e binding attivi. Il canvas UI
 viene scalato uniformemente; testo lungo e quantita' hanno spazi separati.
 Le prove di finestre al 100/125/150% equivalenti e a diversi rapporti non
 certificano ogni monitor o cambio DPI hardware. Dettagli in VERIFICA.txt.
+
+Il campionamento configurabile separa i pixel sorgente dalle celle di 16 unita'
+del mondo; dimensioni visive, ancore e scostamenti possono essere dichiarati
+nei metadati senza cambiare collisioni o salvataggi. In lotta, le vere pose PMD
+guardano a nord-est per l'alleato e sud-ovest per l'avversario. Disegno e
+apparizione usano gli stessi ingombri, mantenendo proporzioni, piedi ed effetti.
 
 552 specie aggiuntive, oltre alle 410 della base, portano il totale a 962.
 Le aggiunte hanno dati reali e risorse compatibili. Le mosse sono
@@ -85,9 +95,9 @@ Scarica pokewilds-2.5d-build-inputs.zip dalla release johto.2 ed estrailo nella
 root del clone, accanto a build.py. Contiene soltanto:
   lib/upstream-runtime.jar
   lib/gltf-2.1.0.jar
-Le risorse PMD, B/W e del Pokedex provengono dal repository. L'integrazione
-landscape e' solo locale e non e' pubblicata: per ricompilare questa iterazione
-usa la cartella locale completa con resources/visual/landscape/.
+Le risorse PMD, B/W, Pokedex, landscape e i profili dei biomi sono nel
+repository. Con le due dipendenze sopra, Python e JDK il clone ha quanto
+serve alla compilazione; non occorrono i download originali dei pack grafici.
 Non servono Git LFS o GLB per compilare la versione corrente.
 
 Esegui build.cmd oppure:
@@ -105,7 +115,7 @@ prepare_pmd_assets.py, prepare_unova_assets.py e prepare_expansion_dex.py
 ricostruiscono risorse/dati dalle fonti registrate. Sono in tools/ e non
 servono per compilare un clone completo. L'importazione PMD richiede Pillow
 e requests; B/W richiede Pillow e sorgenti verificati.
-prepare_landscape_assets.py ricrea offline l'atlante locale dai download
+prepare_landscape_assets.py ricrea offline l'atlante integrato dai download
 fissati dell'utente e dalle fonti aggiuntive registrate; richiede Pillow.
 verify_landscape_assets.py controlla hash, ritagli, opacita', animazioni e
 riferimenti di tutti i profili. I dati del Pokedex
@@ -174,12 +184,12 @@ STRUTTURA
 src/                       Sorgenti Java.
 resources/visual/pmd/       PNG/XML PMD, catalogo e metadati.
 resources/visual/unova/     Trainer B/W e archivio materiali precedenti.
-resources/visual/landscape/ Paesaggio locale, 202 regioni, provenienza e crediti.
+resources/visual/landscape/ Paesaggio, 202 regioni, provenienza e crediti.
 resources/visual/biomes/    14 profili completi e regole delle specie.
 resources/visual/dex/       Dati e grida del Pokedex aggiuntivo.
-lib/                       Dipendenze binarie di compilazione.
-dist/pokewilds-rebuilt.jar  Gioco con librerie e risorse.
-toolchain/jdk-17/           JDK del pacchetto Windows.
+lib/                       Dipendenze binarie dai build-inputs separati.
+dist/pokewilds-rebuilt.jar  Gioco generato dalla build, assente dal clone.
+toolchain/jdk-17/           JDK della cartella Windows completa, non del clone.
 tools/                     Preparazione e test.
 build/                     Classi, log, immagini e partite isolate.
 baseline/                  Base PC e manifest per il confronto.
@@ -220,7 +230,7 @@ Archivio: https://github.com/TryTheSauceBoss/pokewilds-v0.8.11-decompiled-archiv
 Decompilatore: https://github.com/Vineflower/vineflower/releases/tag/1.12.0
 PMD: https://sprites.pmdcollab.org/ e https://github.com/PMDCollab/SpriteCollab
 B/W trainer: https://www.spriters-resource.com/ds_dsi/pokemonblackwhite/
-Paesaggio locale:
+Paesaggio:
   Anokolisa / Pixel Crawler: https://anokolisa.itch.io/free-pixel-art-asset-pack-topdown-tileset-rpg-16x16-sprites
   zedpxl / Woods: https://zedpxl.itch.io/pixelart-forest-asset-pack
   Asset Alliance / Cold Cave: https://gif-superretroworld.itch.io/cold-cave
@@ -243,4 +253,4 @@ resources/visual/landscape/CREDITS.txt, POKEDEX-ESPANSO.txt e licenses/.
 PMDCollab personalizzati: CC BY-NC 4.0; artwork originali: rispettivi titolari.
 B/W: Barubary (trainer attuali), Brom e tsuka (materiali precedenti archiviati),
 Nintendo/Game Freak/The Pokemon Company. Gli originali dei pack paesaggio
-restano fuori progetto; l'atlante e' un'integrazione locale nel gioco. Questo progetto non assegna nuove licenze ad asset altrui.
+restano fuori progetto; l'atlante e' un'integrazione nel gioco. Questo progetto non assegna nuove licenze ad asset altrui.

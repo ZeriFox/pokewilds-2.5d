@@ -1,9 +1,13 @@
-POKEWILDS — PMD + PROFILI DI BIOMA, 2.5D — AGGIORNAMENTO LOCALE 2026-10-07
+POKEWILDS — PMD + PROFILI DI BIOMA, 2.5D — MAIN 2026-10-07
 
 AVVIO
-AVVIA-POKEWILDS.cmd avvia il JAR locale; non serve eseguire build.cmd per giocare.
-Questa iterazione non e' pubblicata su GitHub. Il JAR verificato e i controlli
-conclusi sono identificati in VERIFICA.txt; johto.2 e' una release precedente.
+Nella cartella locale completa gia' compilata, AVVIA-POKEWILDS.cmd avvia il
+JAR senza eseguire build.cmd. Il clone Git e Code > Download ZIP contengono
+sorgenti e risorse, senza JAR compilato o Java: seguire README per la build.
+Main riunisce johto.3 con biomi, UI e rilievi v5. Il pacchetto binario johto.3
+resta precedente a questa integrazione; non viene creata una nuova release
+binaria con l'aggiornamento del codice. Il JAR verificato e i controlli
+effettivamente conclusi sono identificati in VERIFICA.txt.
 run-johto.cmd e run-johto-sprites.cmd: stessa presentazione 2.5D, cartella
 run-johto per impostazioni/salvataggi. Java 17 e' incluso nel pacchetto Windows.
 run.cmd: grafica classica e cartella run separata.
@@ -25,7 +29,7 @@ L'atlante contiene 202 regioni e 6 sequenze animate. I 14 profili nel file
 visual/biomes/profiles.json coordinano materiali, rilievi, fluidi, decorazioni,
 atmosfera, regole habitat e transizioni senza cambiare l'identita' dei tile.
 Arredi e architetture sono composizioni del renderer con tali materiali.
-La revisione locale v5 dei rilievi alza l'intero piano superiore. WorldElevation
+La revisione v5 dei rilievi alza l'intero piano superiore. WorldElevation
 risolve vincoli di quota provenienti da dirupi e rampe salvati e condivide gli
 angoli delle superfici attraversabili per raccordare le aperture. Pavimento,
 piedi degli attori e camera leggono la stessa superficie triangolata.
@@ -37,6 +41,16 @@ Rampe e raccordi conservano il terreno del bioma; le sole rampe dichiarate
 ricevono segni trasversali aderenti al pendio, senza fasce sui piani circostanti.
 E' geometria derivata: anche sulle mappe caricate non salva nuove altezze,
 non migra salvataggi e non cambia collisioni o regole di movimento.
+L'unificazione con johto.3 conserva questa geometria, senza ripristinare i
+precedenti dirupi decorativi di altezza fissa.
+
+VisualSampling separa le dimensioni dei campioni in pixel dalle celle di
+16 unita' del mondo. BwAssets.SpriteLayout legge dimensioni visive, ancore,
+scostamenti ed elevazione dai metadati; in loro assenza conserva il layout
+predefinito. I ritagli devono rientrare nella texture e i campioni custom
+devono dividere esattamente la regione ritagliata. Le ancore del landscape incorporato sono in
+pixel sorgente; quelle del formato custom sono normalizzate da 0 a 1.
+Queste impostazioni grafiche non cambiano tile, collisioni o quote del terreno.
 
 Il deserto usa ground, rock, cliff, cap e ramp dedicati; non prende la parete
 globale. Cactus e ciuffi secchi hanno ritagli corretti e piedi ancorati.
@@ -95,7 +109,12 @@ I test comprendono finestre equivalenti a 100/125/150%, rapporti larghi e
 verticali e dimensioni del desktop. Non sono una certificazione di tutti i
 monitor, driver e cambi DPI fisici del sistema operativo.
 
-Arene composte con gli stessi materiali del paesaggio locale, sprite PMD, pannelli HP/EXP e comandi coordinati.
+Arene composte con gli stessi materiali del paesaggio, sprite PMD, pannelli HP/EXP e comandi coordinati.
+In lotta sono selezionate vere pose diagonali PMD: nord-est per l'alleato,
+sud-ovest per l'avversario. Disegno, ingombri delle animazioni e apparizione
+usano la stessa direzione; scala uniforme e origine ai piedi restano stabili.
+Questa scelta non aggiunge rotazioni artificiali; conserva gli effetti
+originali che ruotano o deformano temporaneamente lo sprite.
 Il panorama si estende ai bordi delle finestre larghe; sprite, effetti e pannelli
 mantengono la propria area utile senza deformazioni. La lista mosse
 mostra dati gia' implementati, senza aggiungere PP o nuove regole. Gli HP
@@ -115,7 +134,7 @@ Autori, hash e copertura: PMD-PROVENANCE.json. Crediti: licenses/PMD-*.
 Artwork personalizzati CC BY-NC 4.0; originali Chunsoft e altri materiali
 mantengono i rispettivi diritti.
 
-PAESAGGIO LOCALE (202 regioni, 6 sequenze animate)
+PAESAGGIO (202 regioni, 6 sequenze animate)
 Anokolisa / Pixel Crawler:
 https://anokolisa.itch.io/free-pixel-art-asset-pack-topdown-tileset-rpg-16x16-sprites
 zedpxl / Woods:
@@ -159,7 +178,7 @@ I vecchi modelli GLB sono esclusi dalla build normale. build.py --include-3d
 include i file opzionali presenti senza riattivare da sola gli attori 3D.
 
 CODICE E VERIFICHE
-JohtoRenderer/BwAssets: mondo e atlante paesaggio locale; trainer B/W separati.
+JohtoRenderer/BwAssets: mondo e atlante paesaggio; trainer B/W separati.
 BiomeProfiles: risoluzione del profilo da terreno, oggetto, bioma e route.
 WorldElevation: vincoli di quota dei dirupi, angoli condivisi e raccordi continui.
 height() usa gli stessi triangoli del renderer; isSloped() distingue i pendii.

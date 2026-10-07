@@ -1,9 +1,12 @@
-POKEWILDS 2.5D — DOCUMENTO MASTER DELL'AGGIORNAMENTO LOCALE
-Data: 2026-10-07 — revisione locale v5 dei rilievi
+POKEWILDS 2.5D — DOCUMENTO MASTER DELLA VERSIONE UNIFICATA
+Data: 2026-10-07 — main, revisione v5 dei rilievi
 
-Questa iterazione resta sul PC locale. Non e' stata pubblicata su GitHub;
-la release privata johto.2 e' precedente. Per giocare si usa il JAR locale
-tramite AVVIA-POKEWILDS.cmd, senza compilare sul computer del giocatore.
+Main riunisce le correzioni di johto.3 con i biomi, la UI e i rilievi v5.
+La release privata binaria johto.3 resta precedente a questa integrazione;
+l'aggiornamento del codice non crea una nuova release binaria.
+La cartella locale completa gia' compilata si avvia tramite AVVIA-POKEWILDS.cmd.
+Clone Git e Code > Download ZIP contengono sorgenti e risorse, senza JAR o Java:
+richiedono la build descritta nei README e i build-inputs della release johto.2.
 VERIFICA.txt identifica il JAR verificato e i test effettivamente conclusi.
 Questo documento descrive l'implementazione: non sostituisce quel rapporto.
 
@@ -43,6 +46,11 @@ ancoraggi coerenti ai piedi, con scala stabile tra i frame. Il panorama della
 lotta copre la finestra; attori e HUD mantengono un'area utile proporzionata.
 Questa soluzione riutilizza metadati e bounds PMD, senza sostituire i Pokemon
 con modelli 3D. Effetti e mosse restano limitati a quelli implementati.
+VisualGeometry.battleFacing() seleziona pose PMD diagonali effettive:
+nord-est per l'alleato, sud-ovest per l'avversario. Il disegno, gli ingombri
+di tutte le animazioni e l'apparizione usano quella stessa direzione.
+L'integrazione mantiene il piede come origine degli effetti originali,
+il trimming del trainer e la presentazione del fantasma prima di SilphScope.
 
 Limiti A
 La soppressione del vecchio disegno non elimina la logica originale del gioco.
@@ -118,6 +126,15 @@ secca e due lapidi leggibili. JohtoRenderer.atmosphere()/shaderAtmosphere()
 applicano tinta, desaturazione e nebbia animata dai profili circostanti.
 collectLights() comprende il bagliore locale della lava.
 
+VisualSampling separa sampleWidth/sampleHeight in pixel dalla cella logica
+di 16 unita'; la risoluzione del campione non ridimensiona il mondo.
+BwAssets.SpriteLayout legge worldWidth/worldHeight, anchorX/anchorY,
+offsetX/offsetY ed elevation. Il formato custom usa ancore normalizzate;
+l'atlante incorporato mantiene le ancore storiche in pixel sorgente.
+Una dimensione visiva sola conserva le proporzioni; campioni e ritagli
+sono validati. In assenza dei campi resta il layout predefinito del renderer.
+Questa configurazione non modifica collisioni, dati dei tile o geometria v5.
+
 C3. Rilievi realmente condivisi
 La v5 corregge il caso in cui il contorno sembrava un muretto mentre il terreno
 su entrambi i lati restava sullo stesso piano. WorldElevation.update() risolve
@@ -144,6 +161,9 @@ il letto locale; guadabilita' e collisioni non dipendono dall'opacita' grafica.
 Non si tratta di nuove altezze salvate: la geometria e' derivata dai tile
 originali. Non vengono cambiate collisioni, salti o regole di movimento
 verticale. I dati di bordo contraddittori sono risolti deterministicamente.
+L'unificazione con johto.3 conserva questo sistema: i precedenti helper di
+dirupi decorativi restano documentati nella storia, non sostituiscono i
+piani rialzati o le pareti costruite sui dislivelli effettivi.
 
 C4. Provenienza e ricostruzione
 prepare_landscape_assets.py ricrea offline l'atlante da originali fissati

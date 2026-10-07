@@ -7,11 +7,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.kryonet.Server;
 import com.pkmngen.game.util.SpriteProxy;
+import com.pkmngen.game.util.ProxyBatch;
 import com.pkmngen.leaks.LeakTracer;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -31,7 +34,7 @@ public final class PmdBattleVisualTest {
 
    static final class TestGame extends Game {
       boolean complete;
-      int phase, captures;
+      int phase, captures, facingChecks;
       Pokemon own, enemy;
       TestGame() { super(new String[0], 4); }
 
@@ -52,7 +55,66 @@ public final class PmdBattleVisualTest {
          own.backSprite.setPosition(16,48); enemy.sprite.setPosition(96,88);
          battle.drawAction = new DrawBattle(this);
          currMusic = com.pkmngen.game.util.audio.AudioLoader.loadMusic("sounds/evolve_fanfare1.ogg");
+         verifyBattleDirections();
       }
+
+      void verifyBattleDirections() {
+         ProxyBatch original=uiBatch;CaptureBatch capture=new CaptureBatch();uiBatch=capture;
+         Pokemon originalOwn=player.currPokemon;
+         try {
+            Field time=PmdBattleSprites.class.getDeclaredField("seconds");time.setAccessible(true);
+            for(String species:new String[]{"machop","pikachu","gyarados"}) {
+               Pokemon pokemon=new Pokemon(species,20);
+               for(boolean friendly:new boolean[]{true,false}) {
+                  String direction=friendly?"up-right":"down-left";
+                  Sprite proxy=new Sprite(friendly?pokemon.backSprite:pokemon.sprite);
+                  float sourceSize=friendly?48:pokemon.specie.sprite.getWidth();proxy.setBounds(20,40,sourceSize,sourceSize);
+                  float minX=0,minY=0,maxX=0,maxY=0,firstScale=-1;
+                  String[] animations={"Idle","Walk","Attack","Hurt","Sleep"};
+                  for(String animation:animations) {
+                     PmdPokemonSprites.AnimationBounds b=PmdPokemonSprites.get().bounds(pokemon,direction,animation);
+                     require(b!=null,"Missing diagonal bounds for "+species+"/"+direction+"/"+animation);
+                     minX=Math.min(minX,b.minX);minY=Math.min(minY,b.minY);maxX=Math.max(maxX,b.maxX);maxY=Math.max(maxY,b.maxY);
+                  }
+                  for(String animation:animations)for(int tick:new int[]{0,7,19,43,79,119}) {
+                     float seconds=tick/60f;time.setFloat(null,seconds);
+                     PmdPokemonSprites.Frame expected=PmdPokemonSprites.get().frame(pokemon,direction,animation,seconds);
+                     require(expected!=null,"Missing diagonal frame");capture.reset();capture.begin();
+                     require(PmdBattleSprites.draw(this,pokemon,proxy,friendly,animation),"Modern battle actor was not drawn");capture.end();
+                     assertFrame(capture,expected.region,species+"/"+direction+"/"+animation);
+                     float width=capture.vertices[10]-capture.vertices[0],height=capture.vertices[6]-capture.vertices[1];
+                     float scale=width/expected.width;
+                     require(Math.abs(scale-height/expected.height)<.0001f,"Battle pose was stretched");
+                     if(firstScale<0)firstScale=scale;
+                     require(Math.abs(firstScale-scale)<.0001f,"Pose changed scale across the animation envelope");
+                     require((maxX-minX)*scale<=56.01f&&(maxY-minY)*scale<=46.01f,"Diagonal animation exceeded battle slot size");
+                     require(minX*scale>=-33.01f&&maxX*scale<=33.01f&&minY*scale>=-6.01f&&maxY*scale<=44.01f,
+                        "Diagonal animation exceeded ground-anchored slot margins");
+                     require(Math.abs(capture.vertices[0]+expected.anchorX*scale-(proxy.getX()+sourceSize/2))<.001f
+                        &&Math.abs(capture.vertices[1]+expected.anchorY*scale-proxy.getY())<.001f,"PMD ground anchor moved");
+                     facingChecks++;
+                  }
+                  if(friendly) {
+                     player.currPokemon=pokemon;time.setFloat(null,0);capture.reset();capture.begin();
+                     require(PmdBattleSprites.sendOut(this,16,48,4),"Send-out fell back to classic art");capture.end();
+                     assertFrame(capture,PmdPokemonSprites.get().frame(pokemon,"up-right","Idle",0).region,species+"/send-out");facingChecks++;
+                  }
+               }
+            }
+            System.out.println("PMD DIAGONAL PASS: "+facingChecks+" actual texture/UV draws; NE/SW animation envelopes, stable uniform scale, ground anchors and send-out");
+         }catch(ReflectiveOperationException ex){throw new IllegalStateException(ex);}
+         finally{player.currPokemon=originalOwn;uiBatch=original;capture.dispose();}
+      }
+
+      void assertFrame(CaptureBatch capture,TextureRegion expected,String label) {
+         require(capture.draws==1&&capture.texture==expected.getTexture(),"Wrong PMD texture/draw count "+label);
+         float minU=Float.POSITIVE_INFINITY,minV=minU,maxU=Float.NEGATIVE_INFINITY,maxV=maxU;
+         for(int i=0;i<20;i+=5){minU=Math.min(minU,capture.vertices[i+3]);maxU=Math.max(maxU,capture.vertices[i+3]);
+            minV=Math.min(minV,capture.vertices[i+4]);maxV=Math.max(maxV,capture.vertices[i+4]);}
+         require(Math.abs(minU-expected.getU())<.00001f&&Math.abs(maxU-expected.getU2())<.00001f
+            &&Math.abs(minV-expected.getV())<.00001f&&Math.abs(maxV-expected.getV2())<.00001f,"Wrong rendered diagonal PMD row "+label);
+      }
+      void require(boolean result,String message){if(!result)throw new IllegalStateException(message);}
 
       @Override public void render() {
          try {
@@ -145,6 +207,14 @@ public final class PmdBattleVisualTest {
       }
       void verifyDifferent(String a, String b, String reason) {
          if (Arrays.equals(Gdx.files.local(a).readBytes(),Gdx.files.local(b).readBytes())) throw new IllegalStateException(reason);
+      }
+   }
+   static final class CaptureBatch extends ProxyBatch {
+      int draws;Texture texture;float[] vertices;
+      void reset(){draws=0;texture=null;vertices=null;}
+      @Override public void draw(Texture texture,float[] vertices,int offset,int count) {
+         this.texture=texture;this.vertices=Arrays.copyOfRange(vertices,offset,offset+count);draws++;
+         super.draw(texture,vertices,offset,count);
       }
    }
 }

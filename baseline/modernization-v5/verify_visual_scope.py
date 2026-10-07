@@ -20,7 +20,7 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "73cb6a1c9cd99e9a223df8c2c707ced128283c82e7ac2ac97858f739d90e2f0b"
+FROZEN_MANIFEST_SHA256 = "ed68a9912360aa7972864acf09358b02b8d126463622f044d44f1bfbff6e4003"
 PREFIX = "src/com/pkmngen/game/"
 V2_ARCHIVE = {
     "baseline/modernization-v2/modernization-scope.json": "f978edd535ac4440d6ce01924bc98135105a718e3a57faf9838827cd3ebf2343",
@@ -37,12 +37,6 @@ V4_ARCHIVE = {
     "baseline/modernization-v4/verify_visual_scope.py": "2b181884511149c8355ad62ddbf175d17b20d766ce9fc6551698d247ce030cab",
     "baseline/modernization-v4/VERIFICA.txt": "454c76557b823134030b26f055738ee07828b15e67e6520f6714725b2b709ab4",
     "baseline/modernization-v4/archive.json": "ec7a08ddded007938b9cfe9464a1b036d8456ebe8242ebc4d42751c7a102830d",
-}
-V5_ARCHIVE = {
-    "baseline/modernization-v5/modernization-scope.json": "ed68a9912360aa7972864acf09358b02b8d126463622f044d44f1bfbff6e4003",
-    "baseline/modernization-v5/verify_visual_scope.py": "8cc684671bacdd3f94b4f4373f6a6f1004de69d4e56e7bf67ef9f8dcd9433e49",
-    "baseline/modernization-v5/VERIFICA.txt": "ec11e79cf8eb0177424156f966bb452e0e7e463565840ae93f48525020568f31",
-    "baseline/modernization-v5/archive.json": "bc32b1a3a40124c457960c34dfc7a7b4126ab96594b67806e7a900098403f4ac",
 }
 
 # Names and review scope are explicit; an edited manifest cannot expand them.
@@ -88,21 +82,19 @@ MODIFIED_SCOPES = {
 ADDED_SCOPES = {
     "ActorModelRenderer.java": "Existing optional 3D helper, disabled by the modern sprite launcher.",
     "BiomeProfiles.java": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state.",
-    "BwAssets.java": "Lazy, disposable local landscape atlas access, biome-specific semantic materials, validated optional texture overrides and sampling independent of the simulation grid, contextual missing-asset diagnostics and separate Black/White trainer assets.",
+    "BwAssets.java": "Lazy, disposable local landscape atlas access, biome-specific semantic materials, contextual missing-asset diagnostics and separate Black/White trainer assets.",
     "DesktopControls.java": "Authorized desktop binding parser, exact legacy-preset migration, text-entry detection and truthful dynamic hints.",
     "ExpansionDex.java": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration.",
     "JohtoBattleRenderer.java": "Modern biome battle arenas/HUD, full-viewport composition, preserved-world transitions and presentation helpers for special boss actions.",
-    "JohtoRenderer.java": "Exclusive perspective world drawing with shared derived terrain heights, continuous cliff/ramp geometry and contact shading, coherent biome materials/atmosphere, aspect-preserving decor, configurable sprite dimensions/anchors, proportional trainer crops and building-wall classification, modern intentional ghost presentation, anchored PMD actors and original field-action feedback; no persisted terrain or collision changes.",
+    "JohtoRenderer.java": "Exclusive perspective world drawing with shared derived terrain heights, continuous cliff/ramp geometry and contact shading, coherent biome materials/atmosphere, modern intentional ghost presentation, anchored PMD actors and original field-action feedback; no persisted terrain or collision changes.",
     "ModernBatch.java": "Suppress legacy draw submissions while original menu actions advance.",
     "ModernInventoryUi.java": "Modern inventory, item actions, crafting, quantities and guide presentation.",
     "ModernPartyUi.java": "Modern setup/party/storage/nickname UI, full animated summary actors on all three pages and configured control hints.",
     "ModernUi.java": "Modern typography, shared logical viewport and anchored panel layout, dialogs, event backgrounds and menu rendering dispatch.",
     "ModernWorldGenerator.java": "Authorized deterministic procedural landforms, biome distribution and volcanic terrain.",
-    "PmdBattleSprites.java": "Exact PMD battle/event actors with diagonal battle-facing poses, complete animation-envelope fit and ground anchoring, trimmed trainers, hidden-identity ghost presentation and visual effects.",
+    "PmdBattleSprites.java": "Exact PMD battle/event actors, complete animation-envelope fit and ground anchoring, trimmed trainers, hidden-identity ghost presentation and visual effects.",
     "PmdPokemonSprites.java": "Pinned PMD portrait/animation loading, timing/directions, bounded texture cache and complete animation bounds for uncropped actors.",
     "TrainerModel3D.java": "Existing optional experimental trainer model helper.",
-    "VisualGeometry.java": "Pure presentation helpers for diagonal battle-facing poses, uniform sprite fitting, cliff footprint math and building-wall classification; no map or collision writes.",
-    "VisualSampling.java": "Validated pixel-region sampling independent of the fixed simulation grid, including deterministic signed world coordinates and exact source-cell boundaries.",
     "WorldBatch.java": "Drop legacy world draw submissions while preserving original action step execution and state changes.",
     "WildSpawnRules.java": "New-wild habitat filtering/rarity, safe nonempty fallback pools, oasis encounter anchoring and uncaught aquatic movement gating; no saved or owned Pokemon migration.",
     "WorldElevation.java": "Read-only geometry sidecar derived from saved ledges and ramps; deterministic plateau/boundary constraint resolution, continuous ramp heights, local ambiguity diagnostics and cache invalidation without serialized height fields or gameplay collision edits.",
@@ -127,9 +119,6 @@ def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
     for archived, expected in V4_ARCHIVE.items():
         if sha256(root / archived) != expected:
             raise RuntimeError("Immutable schema 4 archive changed: " + archived)
-    for archived, expected in V5_ARCHIVE.items():
-        if sha256(root / archived) != expected:
-            raise RuntimeError("Immutable schema 5 archive changed: " + archived)
     if sha256(root / CLASSIC_REPORT) != CLASSIC_REPORT_SHA256:
         raise RuntimeError("Classic baseline report differs from its immutable digest")
     baseline = json.loads((root / CLASSIC_REPORT).read_text(encoding="utf-8"))
@@ -161,8 +150,8 @@ def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
             "missing_additions": sorted(expected_added - set(added)),
         }))
     manifest = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
-    if manifest.get("schema") != 6 or manifest.get("classic_report_sha256") != CLASSIC_REPORT_SHA256:
-        raise RuntimeError("Expected schema 6 manifest bound to classic source baseline")
+    if manifest.get("schema") != 5 or manifest.get("classic_report_sha256") != CLASSIC_REPORT_SHA256:
+        raise RuntimeError("Expected schema 5 manifest bound to classic source baseline")
     if set(manifest.get("modified_original_sources", {})) != expected_changed:
         raise RuntimeError("Manifest changes differ from explicit source allowlist")
     if set(manifest.get("added_sources", {})) != expected_added:
@@ -201,7 +190,7 @@ def audit(root: Path = ROOT, inventory: bool = False) -> tuple[dict, str]:
         raise RuntimeError("Complete source diff differs from reviewed patch digest")
     result = {
         "status": "inventory_not_approved" if inventory else "success",
-        "manifest_schema": 6, "baseline_source_count": len(original), "current_source_count": len(current),
+        "manifest_schema": 5, "baseline_source_count": len(original), "current_source_count": len(current),
         "unchanged_original_sources": len(original) - len(changed),
         "modified_original_sources": changed, "added_sources": added,
         "modified_source_scopes": {PREFIX + key: value for key, value in MODIFIED_SCOPES.items()},

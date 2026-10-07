@@ -33,7 +33,7 @@ import java.util.WeakHashMap;
  * in modern mode: this renderer is the world, not an overlay on the old map.
  */
 public final class JohtoRenderer {
-   private static final float TILE = 16f;
+   private static final float TILE = VisualSampling.WORLD_TILE_SIZE;
    private static final float WHITE = Color.WHITE_FLOAT_BITS;
    private static final int FLOATS_PER_VERTEX = 8;
    private static final int MAX_VERTICES = 65532;
@@ -343,10 +343,11 @@ public final class JohtoRenderer {
          }
          boolean seedling="seedling".equals(identity)||"plant_growing".equals(identity);
          boolean plant = names.contains("grass") || names.contains("flower") || seedling;
-         float width = seedling ? Math.min(9f,object.getRegionWidth()) : names.contains("rock") ? 17f : plant ? 16f : 18f;
-         float height = Math.min(25f, width * object.getRegionHeight() / Math.max(1f, object.getRegionWidth()));
-         width=height*object.getRegionWidth()/Math.max(1f,object.getRegionHeight());
-         if (!plant) shadow(x + 8, y + 7, width * .3f, 2.4f);
+         float maxWidth = seedling ? Math.min(9f,object.getRegionWidth()) : names.contains("rock") ? 17f : plant ? 16f : 18f;
+         float scale = VisualGeometry.fitScale(object.getRegionWidth(), object.getRegionHeight(), maxWidth, 25f);
+         float width = assets.worldWidth(object, object.getRegionWidth() * scale);
+         float height = assets.worldHeight(object, object.getRegionHeight() * scale);
+         if (!plant) assetShadow(object, x + 8, y + 7, width * .3f, 2.4f);
          upright(object, x + 8 - width/2, y + 7, .15f, width, height, WHITE);
       } else if (tile.isSolid && !tile.isLava && !tile.isWater && !names.contains("_hidden") && !names.contains("nosprite")) {
          // Unknown solid cells still show their real blocked footprint using the
@@ -527,7 +528,9 @@ public final class JohtoRenderer {
             float xx=MathUtils.lerp(x0,x1,t),yy=MathUtils.lerp(y0,y1,t),hh=MathUtils.lerp(a,b,t);
             if(a<lowA){x0=xx;y0=yy;a=lowA=hh;}else{x1=xx;y1=yy;b=lowB=hh;}
          }
-         TextureRegion face=assets.cell(profile.cliff("front"),x,y);
+         // A cliff uses its complete vertical artwork; ground sampling must not
+         // cut alternating horizontal strips out of its face.
+         TextureRegion face=assets.named(profile.cliff("front"));
          float shade=side==0?.90f:side==1?.66f:side==2?.78f:.64f;
          quad(batch(geometry,face.getTexture()),x0,lowA,-y0,x1,lowB,-y1,x1,b,-y1,x0,a,-y0,
             face,color(shade,shade,shade));
@@ -592,9 +595,8 @@ public final class JohtoRenderer {
       String lower=tile.name==null?"":tile.name.toLowerCase(java.util.Locale.ROOT);
       boolean caveWall=lower.startsWith("cave") && upper.isEmpty() && !lower.contains("regi");
       boolean mansionWall=name.contains("pkmnmansion_ext");
-      boolean wall = upper.contains("wall") || lower.contains("wall") && upper.isEmpty()
-         || upper.matches("house[0-9].*") || lower.matches("house[0-9].*") && upper.isEmpty() || mansionWall || caveWall;
-      if (wall && tile.isSolid) {
+      boolean wall = mansionWall || VisualGeometry.buildingWall(upper.isEmpty()?lower:"",upper,tile.isSolid);
+      if (wall && tile.isSolid && assets.object(tile)==null) {
          TextureRegion face=assets.named(caveWall ? "cliff_dark" : name.contains("ruin") ? "ruin_wall" : "wall");
          float h=caveWall?14:19;
          quad(batch(geometry,face.getTexture()),x,0,-y,x+16,0,-y,x+16,h,-y,x,h,-y,face,WHITE);
@@ -603,9 +605,13 @@ public final class JohtoRenderer {
             quad(batch(geometry,window.getTexture()),x+3,5,-y+.05f,x+13,5,-y+.05f,
                x+13,16,-y+.05f,x+3,16,-y+.05f,window,WHITE);
          }
-         floor(assets.named("tile_pale"),x,y,16,16,h,color(.87f,.86f,.80f),geometry);
+         floor(assets.named(caveWall?"mountain":name.contains("ruin")?"ruin_floor":"tile_pale"),
+            x,y,16,16,h,color(.87f,.86f,.80f),geometry);
          return true;
       }
+      // A known floor is already rendered by terrainSurface, even if an old
+      // save marks it solid; do not replace it with the unknown-object prism.
+      if(upper.isEmpty() && lower.contains("floor"))return true;
       return false;
    }
 
@@ -675,8 +681,8 @@ public final class JohtoRenderer {
    private void trainer(Player player, float lift) {
       surfaceLift=elevation.height(player.position.x+8,player.position.y+8);
       TextureRegion region = assets.trainer(player, seconds, moving(player, player.position.x, player.position.y));
-      shadow(player.position.x + 8, player.position.y + 7, 4.5f, 2.5f);
-      anchored(region, player.position.x + 8, player.position.y + 7, .15f + lift, 16f, 3f, .85f);
+      assetShadow(region, player.position.x + 8, player.position.y + 7, 4.5f, 2.5f);
+      trainerImage(region,32,player.position.x+8,player.position.y+7,.15f+lift,3,.85f);
    }
 
    /** Field moves use the same PMD/BW actors as walking, never composite GB sprites. */
@@ -706,9 +712,7 @@ public final class JohtoRenderer {
          surfaceLift=elevation.height(x,y);
          lift += altitude + Math.max(6f, Math.min(13f, height*.38f));
          // Shorten the rider's lower legs; the entire mount stays visible below.
-         spritePart.setRegion(person);
-         spritePart.setRegionHeight(Math.max(1,person.getRegionHeight()-7));
-         anchored(spritePart,x,y-.7f,lift,16f,0f,.78f);
+         trainerImage(person,25,x,y-.7f,lift,0,.78f);
          return;
       }
       if (companion != null && move != null && !move.isEmpty()) {
@@ -726,14 +730,12 @@ public final class JohtoRenderer {
          // A new sleeping bag and the BW head replace the old full-body composite.
          floor(white,x-7,y-7,14,22,.16f,color(.16f,.32f,.39f),geometry);
          floor(white,x-6,y+8,12,6,.2f,color(.81f,.86f,.78f),geometry);
-         spritePart.setRegion(person); spritePart.setRegionHeight(Math.min(14,person.getRegionHeight()));
-         anchored(spritePart,x,y+6,.3f,16,0,.85f);
+         trainerImage(person,14,x,y+6,.3f,0,.85f);
       } else if (player.isSitting) {
-         spritePart.setRegion(person);spritePart.setRegionHeight(Math.max(1,person.getRegionHeight()-6));
-         anchored(spritePart,x,y,.3f,16,0,.85f);
+         trainerImage(person,26,x,y,.3f,0,.85f);
       } else {
-         shadow(x,y,4.5f,2.5f);
-         anchored(person,x,y,lift+Math.max(0,DrawPlayerUpper.pokemonOffsetY)*.4f,16,3,.85f);
+         assetShadow(person,x,y,4.5f,2.5f);
+         trainerImage(person,32,x,y,lift+Math.max(0,DrawPlayerUpper.pokemonOffsetY)*.4f,3,.85f);
       }
       if (player.isFishing) {
          Vector2 target=player.facingPos();
@@ -813,8 +815,32 @@ public final class JohtoRenderer {
       // plane through the feet. Slopes and cliffs behind cannot slice the body;
       // terrain and props actually in front can still occlude it.
       actorPlaneZ=-groundY;
-      upright(region, groundX - anchorX * scale, groundY - anchorY * scale * MathUtils.sinDeg(50f),
+      uprightRaw(region, groundX - anchorX * scale, groundY - anchorY * scale * MathUtils.sinDeg(50f),
          lift - anchorY * scale * MathUtils.cosDeg(50f), region.getRegionWidth() * scale, region.getRegionHeight() * scale, WHITE,4f);
+   }
+
+   /** Trainer crops are proportions of the original 32px frame, not source pixels.
+    * Keep field poses and the feet depth plane coherent with HD/custom avatars. */
+   private void trainerImage(TextureRegion full,int rows,float groundX,float groundY,float lift,float anchorY,float scale) {
+      float fullHeight=32f*scale,fullWidth=fullHeight*full.getRegionWidth()/full.getRegionHeight();
+      float ax=.5f,ay=anchorY/32f,ox=0,oy=0,raise=0;
+      BwAssets.SpriteLayout layout=assets.layout(full);
+      if(layout!=null) {
+         fullWidth=layout.width(full,fullWidth);fullHeight=layout.height(full,fullHeight);
+         ax=layout.anchorX(ax);ay=layout.anchorY(ay);
+         ox=layout.offsetX;oy=layout.offsetY;raise=layout.elevation;
+      }
+      TextureRegion visible=full;
+      if(rows<32) {
+         spritePart.setRegion(full);
+         spritePart.setRegionHeight(Math.max(1,Math.round(full.getRegionHeight()*rows/32f)));
+         visible=spritePart;
+      }
+      float fraction=(float)visible.getRegionHeight()/full.getRegionHeight();
+      float height=fullHeight*fraction,feet=Math.max(0,ay-(1-fraction))*fullHeight;
+      actorPlaneZ=-groundY-oy;
+      uprightRaw(visible,groundX+ox-fullWidth*ax,groundY+oy-feet*MathUtils.sinDeg(50f),
+         lift+raise-feet*MathUtils.cosDeg(50f),fullWidth,height,WHITE,4f);
    }
 
    private boolean moving(Object actor, float x, float y) {
@@ -837,10 +863,15 @@ public final class JohtoRenderer {
          : name.contains("tree4") || name.contains("snow") ? "tree_snow"
          : name.contains("savanna") ? "tree_dry" : name.contains("tree2") ? "tree_pine" : "tree";
       TextureRegion sprite = assets.named(key);
-      float height = key.contains("dead") || key.contains("charred")?36:name.contains("large") ? 62 : key.equals("tree_pine") || key.equals("tree_snow") ? 46 : 42;
-      float width = height * sprite.getRegionWidth() / sprite.getRegionHeight();
-      shadow(x,y,Math.min(width*.35f,10f),4);
+      float height = assets.worldHeight(sprite,key.contains("dead") || key.contains("charred")?36:name.contains("large") ? 62 : key.equals("tree_pine") || key.equals("tree_snow") ? 46 : 42);
+      float width = assets.worldWidth(sprite,height * sprite.getRegionWidth() / sprite.getRegionHeight());
+      assetShadow(sprite,x,y,Math.min(width*.35f,10f),4);
       upright(sprite,x-width/2,y,.2f,width,height,WHITE);
+   }
+
+   private void assetShadow(TextureRegion region,float x,float y,float width,float depth) {
+      BwAssets.SpriteLayout layout=assets.layout(region);
+      shadow(x+(layout==null?0:layout.offsetX),y+(layout==null?0:layout.offsetY),width,depth);
    }
 
    private void shadow(float x, float y, float width, float depth) {
@@ -860,6 +891,21 @@ public final class JohtoRenderer {
    }
 
    private void upright(TextureRegion region, float x, float y, float base, float width, float height, float tint, float style) {
+      BwAssets.SpriteLayout layout=assets==null?null:assets.layout(region);
+      if(layout!=null && layout.customized) {
+         float groundX=x+width*.5f,groundY=y;
+         width=layout.width(region,width);height=layout.height(region,height);
+         float anchorX=layout.anchorX(.5f),anchorY=layout.anchorY(0f);
+         if(style>3.5f)actorPlaneZ=-groundY-layout.offsetY;
+         uprightRaw(region,groundX+layout.offsetX-width*anchorX,
+            groundY+layout.offsetY-height*anchorY*MathUtils.sinDeg(50f),
+            base+layout.elevation-height*anchorY*MathUtils.cosDeg(50f),width,height,tint,style);
+         return;
+      }
+      uprightRaw(region,x,y,base,width,height,tint,style);
+   }
+
+   private void uprightRaw(TextureRegion region, float x, float y, float base, float width, float height, float tint, float style) {
       // Camera-facing sprites keep their pixel proportions in the tilted world.
       float rise = height * MathUtils.cosDeg(50f), back = height * MathUtils.sinDeg(50f);
       quad(batch(geometry, region.getTexture()),

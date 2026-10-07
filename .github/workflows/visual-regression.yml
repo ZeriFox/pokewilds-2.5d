@@ -1,0 +1,111 @@
+name: Visual regression
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tools/**'
+      - 'resources/visual/**'
+      - 'baseline/**'
+      - 'build.py'
+      - '.github/workflows/visual-regression.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tools/**'
+      - 'resources/visual/**'
+      - 'baseline/**'
+      - 'build.py'
+      - '.github/workflows/visual-regression.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Sampling regression
+        run: python tools/test_flexible_sampling.py
+      - name: Sprite and cliff geometry regression
+        run: python tools/test_visual_geometry.py
+      - name: Frozen source scope and landscape metadata
+        run: |
+          python -m pip install Pillow==11.3.0
+          python tools/verify_visual_scope.py
+          python tools/verify_scope_test.py
+          python tools/verify_landscape_assets.py
+      - name: Restore pinned build inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v0.8.11-johto.2 --repo ZeriFox/pokewilds-2.5d --pattern pokewilds-2.5d-build-inputs.zip --dir "$RUNNER_TEMP"
+          echo "5692696180a62dc1c8822e2a2d2a324f60647535a821865d7fb556e109b3883f  $RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" -d .
+      - name: Compile the complete game
+        run: python build.py
+      - name: Install software OpenGL test display
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri libglx-mesa0 libasound2t64
+      - name: Native landscape regression
+        env:
+          LIBGL_ALWAYS_SOFTWARE: 'true'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          xvfb-run -a -s '-screen 0 1024x768x24' python tools/landscape_smoke_test.py || { cat build/landscape-smoke/landscape-smoke.log; exit 1; }
+      - name: Native battle presentation regression
+        env:
+          LIBGL_ALWAYS_SOFTWARE: 'true'
+          ALSOFT_DRIVERS: 'null'
+        run: xvfb-run -a -s '-screen 0 1024x768x24' python tools/pmd_battle_visual_test.py
+      - name: Assets, terrain and field actions integration
+        env:
+          LIBGL_ALWAYS_SOFTWARE: 'true'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          xvfb-run -a -s '-screen 0 1024x768x24' python tools/bw_assets_integration_test.py
+          xvfb-run -a -s '-screen 0 1024x768x24' python tools/world_elevation_test.py
+          xvfb-run -a -s '-screen 0 1024x768x24' python tools/biome_scene_test.py
+          xvfb-run -a -s '-screen 0 1024x768x24' python tools/field_scene_test.py
+      - name: Collect reproducible diagnostic inputs
+        if: always()
+        run: |
+          mkdir -p build/diagnostics
+          git archive --format=tar.gz HEAD -o build/diagnostics/source.tar.gz
+          if [ -d lib ]; then tar -czf build/diagnostics/build-inputs.tar.gz lib; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-build-${{ github.sha }}
+          path: |
+            build/build-report.json
+            build/diagnostics/
+            build/landscape-smoke/*.log
+            build/landscape-smoke/*.png
+            build/pmd-battle-visual/*.log
+            build/pmd-battle-visual/*.png
+            build/bw-assets-integration/*.log
+            build/bw-assets-integration/*.png
+            build/world-elevation/*.log
+            build/biome-scenes/*.log
+            build/biome-scenes/*.png
+            build/field-scenes/*.log
+            build/visual-scope.json
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "archived_schema": 5,
+  "source_commit": "1aefbe4da203115200c0720904ad23bd557974aa",
+  "purpose": "Immutable reviewed local terrain-relief scope, verifier and verification report before merging the published flexible-texture and visual-geometry helpers. This archive does not claim verification of subsequent changes.",
+  "jar_sha256": "8b400a224b5350647424dcf32b5a9f4390ac4b320956c86dae39784749bf607d",
+  "files": {
+    "modernization-scope.json": {
+      "source": "baseline/modernization-scope.json",
+      "sha256": "ed68a9912360aa7972864acf09358b02b8d126463622f044d44f1bfbff6e4003",
+      "bytes": 24478
+    },
+    "verify_visual_scope.py": {
+      "source": "tools/verify_visual_scope.py",
+      "sha256": "8cc684671bacdd3f94b4f4373f6a6f1004de69d4e56e7bf67ef9f8dcd9433e49",
+      "bytes": 19019
+    },
+    "VERIFICA.txt": {
+      "source": "VERIFICA.txt",
+      "sha256": "ec11e79cf8eb0177424156f966bb452e0e7e463565840ae93f48525020568f31",
+      "bytes": 4963
+    }
+  }
+}
