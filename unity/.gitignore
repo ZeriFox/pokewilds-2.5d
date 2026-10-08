@@ -1,0 +1,16 @@
+/Library/
+/Temp/
+/Obj/
+/Logs/
+/UserSettings/
+/Builds/
+/MemoryCaptures/
+/Recordings/
+/Assets/PokeWilds/Resources/Imported/
+/Assets/PokeWilds/Resources/Imported.meta
+*.csproj
+*.sln
+*.user
+*.pidb
+*.opendb
+*.VC.db

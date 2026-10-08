@@ -1,0 +1,134 @@
+name: Unity Windows M0 playable build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/unity-port]
+    paths:
+      - '.github/workflows/unity-windows-test.yml'
+      - 'unity/**'
+      - 'tools/prepare_unity_assets.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unity-windows-m0-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows-player:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Check Unity activation prerequisites without exposing secrets
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+          UNITY_LICENSE_SERVER: ${{ secrets.UNITY_LICENSE_SERVER }}
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          ready = bool(os.environ.get('UNITY_LICENSE_SERVER')) or (
+              bool(os.environ.get('UNITY_EMAIL')) and bool(os.environ.get('UNITY_PASSWORD')) and
+              bool(os.environ.get('UNITY_LICENSE') or os.environ.get('UNITY_SERIAL')))
+          out = Path('build/unity-windows-status'); out.mkdir(parents=True, exist_ok=True)
+          receipt = {'sourceCommit': os.environ['GITHUB_SHA'],
+              'status': 'prerequisites-present' if ready else 'blocked-missing-unity-activation',
+              'unityEditorCompilation': 'NOT RUN', 'windowsExecutable': 'NOT PRODUCED',
+              'note': 'Presence check only. No credential values are logged or archived.'}
+          (out/'verification.json').write_text(json.dumps(receipt, indent=2)+'\n')
+          if not ready:
+              print('::error::Unity build blocked: no complete Unity activation configuration is available to this workflow. No Windows executable or playable ZIP has been produced. Activate Unity on a build machine or configure repository Actions secrets through GitHub Settings, never in chat or source files.')
+              sys.exit(2)
+          print('Unity activation configuration is present; actual activation will be attempted by the Editor builder.')
+          PY
+      - name: Prepare real project assets
+        run: |
+          python -m pip install Pillow==11.3.0
+          python tools/test_unity_bridge.py
+          python tools/prepare_unity_assets.py
+          python tools/prepare_unity_assets.py --check
+          git diff --exit-code -- src resources
+      - name: Compile a genuine Windows x64 Unity player
+        uses: game-ci/unity-builder@4423ee75828dff56037d1d1cfdac6b68e3a6ba00
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          projectPath: unity
+          unityVersion: 6000.3.25f1
+          targetPlatform: StandaloneWindows64
+          buildMethod: PokeWilds.EditorPort.PortEditor.BuildWindows
+          unityLicensingServer: ${{ secrets.UNITY_LICENSE_SERVER }}
+          versioning: None
+          allowDirtyBuild: true
+      - name: Package only the compiled Unity player and record exact contents
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, shutil, zipfile
+          from pathlib import Path
+          root = Path('unity/Builds/Windows-M0')
+          exe = root/'PokeWilds-Unity-M0.exe'
+          data = root/'PokeWilds-Unity-M0_Data'
+          for path in (exe, root/'UnityPlayer.dll', data/'globalgamemanagers'):
+              if not path.is_file() or not path.stat().st_size:
+                  raise RuntimeError('Missing compiled Unity player component: '+str(path))
+          with exe.open('rb') as f:
+              if f.read(2) != b'MZ': raise RuntimeError('Output is not a Windows PE executable')
+          if not (root/'MonoBleedingEdge').is_dir() and not (root/'GameAssembly.dll').is_file():
+              raise RuntimeError('Missing Unity scripting runtime')
+          imported = Path('unity/Assets/PokeWilds/Resources/Imported')
+          if (imported/'notices').is_dir():
+              shutil.copytree(imported/'notices', root/'Notices', dirs_exist_ok=True)
+          (root/'GIOCA.cmd').write_bytes(b'@echo off\r\ncd /d "%~dp0"\r\nstart "" "PokeWilds-Unity-M0.exe"\r\n')
+          (root/'LEGGIMI.txt').write_text(
+              'PokeWilds Unity M0 - scena tecnica di collaudo, NON il gioco completo.\n'
+              'Estrai tutto lo ZIP e apri GIOCA.cmd. Java, Python e Unity Editor non servono per giocare.\n'
+              'WASD: movimento. Destro tenuto: corsa. Sinistro: ispeziona il Pokemon vicino. Invio: pausa.\n'
+              'Mappa 32x32 con plateau, rampa e tre Pokemon di prova.\n'
+              'Non sono ancora disponibili battaglie, inventario, generazione originale o salvataggi.\n'
+              'Questa build non legge o modifica le partite Java.\n'
+              'Compilata con Unity; non ancora sottoposta a collaudo grafico su Windows.\n', encoding='utf-8')
+          files = sorted(p for p in root.rglob('*') if p.is_file())
+          for p in files:
+              if p.is_symlink() or p.suffix.lower() in ('.ulf', '.alf'):
+                  raise RuntimeError('Unexpected file in player package: '+str(p))
+          hashes = {p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
+          receipt = {'sourceCommit': os.environ['GITHUB_SHA'], 'unityVersion': '6000.3.25f1',
+              'status': 'compiled-not-runtime-tested', 'unityEditorCompilation': 'PASSED',
+              'windowsExecutable': 'PRODUCED', 'windowsPlayTest': 'NOT RUN', 'payloadSha256': hashes}
+          (root/'BUILD-INFO.json').write_text(json.dumps(receipt, indent=2)+'\n')
+          out = Path('build/unity-windows-download'); out.mkdir(parents=True, exist_ok=True)
+          archive = out/'PokeWilds-Unity-M0-Windows-x64.zip'
+          with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as z:
+              for p in sorted(root.rglob('*')):
+                  if p.is_file(): z.write(p, 'PokeWilds-Unity-M0/'+p.relative_to(root).as_posix())
+          (out/'SHA256SUMS.txt').write_text(hashlib.sha256(archive.read_bytes()).hexdigest()+'  '+archive.name+'\n')
+          Path('build/unity-windows-status/verification.json').write_text(json.dumps(receipt, indent=2)+'\n')
+          print('Compiled Unity player packaged:', archive, archive.stat().st_size, 'bytes')
+          PY
+      - name: Upload Windows player only after successful compilation and packaging
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: unity-windows-m0-${{ github.sha }}
+          path: build/unity-windows-download/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Preserve build status even when prerequisites are missing
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: unity-windows-status-${{ github.run_id }}
+          path: build/unity-windows-status/verification.json
+          if-no-files-found: warn
+          retention-days: 7

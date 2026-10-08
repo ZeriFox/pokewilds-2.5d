@@ -1,0 +1,50 @@
+name: Unity M0 core and asset bridge
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/unity-port]
+    paths: ['unity/**', 'tools/*unity*', 'tests/unity-core/**', '.github/workflows/unity-port-checks.yml']
+  pull_request:
+    paths: ['unity/**', 'tools/*unity*', 'tests/unity-core/**', '.github/workflows/unity-port-checks.yml']
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Compile and test real engine-independent C#
+        run: dotnet run --project tests/unity-core/UnityCoreTests.csproj --configuration Release
+      - name: Import source assets and verify deterministic output
+        run: |
+          python -m pip install Pillow==11.3.0
+          python tools/test_unity_bridge.py
+          python tools/prepare_unity_assets.py
+          python tools/prepare_unity_assets.py --check
+          git diff --exit-code -- src resources
+      - name: Package the Unity project sources, not a playable Windows build
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,zipfile
+          out=Path('build/unity-port');out.mkdir(parents=True,exist_ok=True)
+          receipt={'sourceCommit':os.environ['GITHUB_SHA'],'coreCSharpChecks':'passed','assetBridge':'passed',
+              'unityEditorCompilation':'NOT RUN','unityPlayMode':'NOT RUN','windowsExecutable':'NOT PRODUCED'}
+          (out/'verification.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          with zipfile.ZipFile(out/'PokeWilds-Unity-M0-project.zip','w',zipfile.ZIP_DEFLATED) as z:
+              for p in sorted(Path('unity').rglob('*')):
+                  if p.is_file():z.write(p,'PokeWilds-Unity-M0/'+p.relative_to('unity').as_posix())
+              z.write(out/'verification.json','PokeWilds-Unity-M0/verification.json')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: unity-m0-project-${{ github.sha }}
+          path: build/unity-port/
+          retention-days: 14
+          if-no-files-found: error
