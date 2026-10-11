@@ -56,6 +56,8 @@ for name in ('geometry','translucent','shadows','emotes'):
     s=once(s,'upload('+name+');',name+'.upload();')
     s=once(s,'renderGroups('+name+');',name+'.render(shader);')
 s=s.replace('Map<Texture, Geometry>','WorldMeshBatch')
+# Preserve the wall-occlusion pass selection, including its compact type spelling.
+s=once(s,'Map<Texture,Geometry> groups=alpha<1f?translucent:geometry;','WorldMeshBatch groups=alpha<1f?translucent:geometry;')
 s=re.sub(r'\bbatch\((geometry|translucent|shadows|emotes|groups),\s*',r'\1.buffer(',s)
 s=re.sub(r'\bGeometry\b','Buffer',s)
 for line in ('import com.badlogic.gdx.graphics.Mesh;\n','import com.badlogic.gdx.graphics.VertexAttribute;\n','import com.badlogic.gdx.graphics.VertexAttributes.Usage;\n','import com.badlogic.gdx.utils.FloatArray;\n', '   private static final int FLOATS_PER_VERTEX = 8;\n','   private static final int MAX_VERTICES = 65532;\n'):
