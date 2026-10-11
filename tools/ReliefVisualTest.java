@@ -139,7 +139,9 @@ public final class ReliefVisualTest {
          int unsupported=0;WorldElevation e=renderer().getElevation();
          try {
             Field groups=JohtoRenderer.class.getDeclaredField("geometry");groups.setAccessible(true);
-            for(Object mesh:((Map<?,?>)groups.get(renderer())).values()) {
+            WorldMeshBatch owner=(WorldMeshBatch)groups.get(renderer());
+            Field buffers=WorldMeshBatch.class.getDeclaredField("groups");buffers.setAccessible(true);
+            for(Object mesh:((Map<?,?>)buffers.get(owner)).values()) {
                Field f=mesh.getClass().getDeclaredField("vertices");f.setAccessible(true);FloatArray a=(FloatArray)f.get(mesh);
                for(int i=0;i+23<a.size;i+=24) {
                   if(a.items[i+6]>3.5f)continue;
@@ -161,7 +163,9 @@ public final class ReliefVisualTest {
          float top=Float.NEGATIVE_INFINITY;
          try {
             Field groupsField=JohtoRenderer.class.getDeclaredField("geometry");groupsField.setAccessible(true);
-            for(Object mesh:((Map<?,?>)groupsField.get(renderer())).values()) {
+            WorldMeshBatch owner=(WorldMeshBatch)groupsField.get(renderer());
+            Field buffers=WorldMeshBatch.class.getDeclaredField("groups");buffers.setAccessible(true);
+            for(Object mesh:((Map<?,?>)buffers.get(owner)).values()) {
                Field f=mesh.getClass().getDeclaredField("vertices");f.setAccessible(true);FloatArray a=(FloatArray)f.get(mesh);
                for(int i=0;i+23<a.size;i+=24) {
                   if(a.items[i+6]>3.5f)continue;

@@ -182,7 +182,9 @@ public final class BiomeSceneTest {
          int overlays=0;
          try {
             Field groupsField=JohtoRenderer.class.getDeclaredField("translucent");groupsField.setAccessible(true);
-            Map<?,?> groups=(Map<?,?>)groupsField.get(renderer());
+            WorldMeshBatch owner=(WorldMeshBatch)groupsField.get(renderer());
+            Field buffers=WorldMeshBatch.class.getDeclaredField("groups");buffers.setAccessible(true);
+            Map<?,?> groups=(Map<?,?>)buffers.get(owner);
             for(Object mesh:groups.values()) {
                Field verticesField=mesh.getClass().getDeclaredField("vertices");verticesField.setAccessible(true);
                com.badlogic.gdx.utils.FloatArray array=(com.badlogic.gdx.utils.FloatArray)verticesField.get(mesh);
