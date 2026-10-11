@@ -2,7 +2,13 @@ name: Java mesh extraction checkpoint
 on:
   push:
     branches: [refactor/world-mesh-batch]
-    paths: ['.github/workflows/java-mesh-extraction.yml', '.github/extract_world_mesh.py']
+    paths:
+      - '.github/workflows/java-mesh-extraction.yml'
+      - '.github/extract_world_mesh.py'
+      - 'tools/WorldMeshBatchTest.java'
+      - 'tools/WorldRendererParityTest.java'
+      - 'tools/world_mesh_batch_test.py'
+      - 'src/com/pkmngen/game/WorldMeshBatch.java'
   workflow_dispatch:
 permissions:
   contents: write
