@@ -20,7 +20,7 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "d4a7cb4610478f983a99920ba88b3e0f71ef28dd571528441c0ddce6b8d5a747"
+FROZEN_MANIFEST_SHA256 = "400091117298b225cfa21c5b7174f5da8b514999e8fd11be12d9b6953d66c146"
 PREFIX = "src/com/pkmngen/game/"
 V2_ARCHIVE = {
     "baseline/modernization-v2/modernization-scope.json": "f978edd535ac4440d6ce01924bc98135105a718e3a57faf9838827cd3ebf2343",
@@ -90,6 +90,7 @@ MODIFIED_SCOPES = {
     "util/SpriteProxy.java": "Presentation: intercept known battle actors for PMD rendering; legacy fallback retained.",
 }
 ADDED_SCOPES = {
+    "WorldMeshBatch.java": "CPU vertex storage, identity-based texture grouping, triangle-aligned mesh upload/reuse and GPU ownership extracted from JohtoRenderer; no camera, scene state, shader uniforms, texture ownership, gameplay or saved data.",
     "ActorModelRenderer.java": "Existing optional 3D helper, disabled by the modern sprite launcher.",
     "BiomeProfiles.java": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state.",
     "BwAssets.java": "Lazy, disposable local landscape atlas access, biome-specific semantic materials, validated optional texture overrides and sampling independent of the simulation grid, contextual missing-asset diagnostics and separate Black/White trainer assets.",

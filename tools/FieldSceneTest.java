@@ -329,7 +329,8 @@ public final class FieldSceneTest {
          }
       }
       float[] geometryQuad(TextureRegion region,boolean actor){
-         @SuppressWarnings("unchecked") Map<Texture,Object> groups=(Map<Texture,Object>)field(renderer(),"geometry");
+         WorldMeshBatch owner=(WorldMeshBatch)field(renderer(),"geometry");
+         @SuppressWarnings("unchecked") Map<Texture,Object> groups=(Map<Texture,Object>)field(owner,"groups");
          Object mesh=groups.get(region.getTexture());require(mesh!=null,"No submitted furniture/trainer mesh");
          FloatArray vertices=(FloatArray)field(mesh,"vertices");
          for(int offset=0;offset+47<vertices.size;offset+=48){

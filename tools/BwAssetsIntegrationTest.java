@@ -165,11 +165,10 @@ public final class BwAssetsIntegrationTest extends ApplicationAdapter {
          field(renderer,"surfaceLift").setFloat(renderer,14f);
          Method trainer=JohtoRenderer.class.getDeclaredMethod("trainerImage",TextureRegion.class,int.class,
             float.class,float.class,float.class,float.class,float.class);trainer.setAccessible(true);
-         Method clear=JohtoRenderer.class.getDeclaredMethod("clearGeometry");clear.setAccessible(true);
          TextureRegion frame=assets.trainer("gold","down",0,false);
          check(frame.getRegionHeight()==(custom?64:32),"Trainer source resolution");
          for(int rows:new int[]{32,25,26,14}) {
-            clear.invoke(renderer);float scale=rows==25?.78f:.85f,feet=rows==32?2.55f:0f;
+            clearGeometry(renderer);float scale=rows==25?.78f:.85f,feet=rows==32?2.55f:0f;
             trainer.invoke(renderer,frame,rows,100f,200f,1f,rows==32?3f:0f,scale);
             FloatArray vertices=vertices(renderer,"geometry",frame.getTexture());
             quadSize(vertices,32f*scale,rows*scale,"Trainer "+(custom?64:32)+" crop "+rows);
@@ -185,7 +184,7 @@ public final class BwAssetsIntegrationTest extends ApplicationAdapter {
             }
          }
          if(custom) {
-            clear.invoke(renderer);TextureRegion tree=assets.named("tree");
+            clearGeometry(renderer);TextureRegion tree=assets.named("tree");
             Method upright=JohtoRenderer.class.getDeclaredMethod("upright",TextureRegion.class,float.class,
                float.class,float.class,float.class,float.class,float.class,float.class);upright.setAccessible(true);
             upright.invoke(renderer,tree,100f,200f,1f,30f,50f,Color.WHITE_FLOAT_BITS,4f);
@@ -196,7 +195,7 @@ public final class BwAssetsIntegrationTest extends ApplicationAdapter {
             near(20,vertices.get(1)+30*cos,"Custom prop anchor and elevation");
             near(-198,vertices.get(2)-30*sin,"Custom prop anchor and offset Y");
             near(-198,field(renderer,"actorPlaneZ").getFloat(renderer),"Custom prop feet depth plane");
-            clear.invoke(renderer);
+            clearGeometry(renderer);
             trainer.invoke(renderer,tree,25,100f,200f,1f,0f,.85f);
             vertices=vertices(renderer,"geometry",tree.getTexture());
             quadSize(vertices,24,31.25f,"Custom trainer crop with explicit dimensions");
@@ -214,8 +213,14 @@ public final class BwAssetsIntegrationTest extends ApplicationAdapter {
    private static Field field(Object owner,String name) throws ReflectiveOperationException {
       Field result=owner.getClass().getDeclaredField(name);result.setAccessible(true);return result;
    }
+   private static void clearGeometry(JohtoRenderer renderer) throws ReflectiveOperationException {
+      for(String name:new String[]{"geometry","translucent","shadows","emotes"})
+         ((WorldMeshBatch)field(renderer,name).get(renderer)).clear();
+   }
    private static FloatArray vertices(JohtoRenderer renderer,String group,Object texture) throws ReflectiveOperationException {
-      Map<?,?> geometry=(Map<?,?>)field(renderer,group).get(renderer);Object mesh=geometry.get(texture);
+      WorldMeshBatch owner=(WorldMeshBatch)field(renderer,group).get(renderer);
+      // Inspect only already-emitted buffers; never create a missing group here.
+      Map<?,?> geometry=(Map<?,?>)field(owner,"groups").get(owner);Object mesh=geometry.get(texture);
       check(mesh!=null,"Renderer produced "+group+" mesh");
       return (FloatArray)field(mesh,"vertices").get(mesh);
    }
