@@ -37,7 +37,7 @@ public final class WorldRendererParityTest {
       int frame;
       boolean complete;
       ReferenceJohtoRenderer reference;
-      HashMap<Vector2,Tile> exterior,interior;
+      Map<Vector2,Tile> exterior,interior;
       Probe(){super(new String[0],4);}
       void put(String ground,String upper,int x,int y,String biome) {
          Tile tile=new Tile(ground,upper,new Vector2(x,y),true);tile.biome=biome;map.tiles.put(tile.position,tile);
@@ -84,7 +84,7 @@ public final class WorldRendererParityTest {
          }
          if(frame>90)throw new IllegalStateException("Parity fixture timeout");
       }
-      void compare(String name,HashMap<Vector2,Tile> tiles,float x,boolean night) throws Exception {
+      void compare(String name,Map<Vector2,Tile> tiles,float x,boolean night) throws Exception {
          map.tiles=tiles;map.refreshCache=true;map.timeOfDay=night?"night":"day";
          mapBatch.setColor(night?PkmnMap.nightColor:Color.WHITE);
          player.position.set(x,0);cam.position.set(x+8,8,0);
