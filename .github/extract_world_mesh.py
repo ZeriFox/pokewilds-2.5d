@@ -20,8 +20,8 @@ def sha(path):
 def once(text,old,new):
     if text.count(old)!=1:raise RuntimeError('Unexpected edit anchor: '+old[:100])
     return text.replace(old,new,1)
-def section(text,start,end,new=''):
-    if text.count(start)!=1 or text.count(end)!=1:raise RuntimeError('Ambiguous section: '+start)
+def section(text,start,end,new='',end_count=1):
+    if text.count(start)!=1 or text.count(end)!=end_count:raise RuntimeError('Ambiguous section: '+start)
     a=text.index(start);b=text.index(end,a)
     return text[:a]+new+text[b:]
 
@@ -34,7 +34,8 @@ if set(git('diff','--name-only',BASE,'--','src','resources').splitlines())!={HEL
 archive=ROOT/'baseline/java-mesh-step1';archive.mkdir(parents=True,exist_ok=False)
 raw=(ROOT/RENDERER).read_bytes();(archive/'JohtoRenderer.java').write_bytes(raw)
 s=raw.decode('utf-8').replace('\r\n','\n')
-s=section(s,'   private Geometry batch(', '   private void quad(')
+# Both quad overloads remain intact; only the preceding batch lookup moves.
+s=section(s,'   private Geometry batch(', '   private void quad(',end_count=2)
 s=section(s,'   private void vertex(Geometry mesh,','   private void clearGeometry()', '''   private void vertex(Geometry mesh, float x, float y, float z, float color, float u, float v, float style) {
       // Scene-dependent transforms stay here; storage/upload belong to the batch.
       mesh.vertex(x, y+surfaceLift, z, color, u, v, style,
