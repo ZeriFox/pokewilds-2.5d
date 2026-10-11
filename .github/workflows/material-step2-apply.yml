@@ -1,0 +1,129 @@
+name: Java material roles and restrained ambient verification
+on:
+  push:
+    branches: [fix/material-roles-ambient]
+    paths: ['.github/workflows/material-step2-apply.yml', '.github/material-step2.part*']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: material-step2-checkpoint
+  cancel-in-progress: false
+jobs:
+  verified-checkpoint:
+    if: github.ref == 'refs/heads/fix/material-roles-ambient'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      LIBGL_ALWAYS_SOFTWARE: 'true'
+      ALSOFT_DRIVERS: 'null'
+      LP_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Apply the exact locally reviewed source patch and verify the complete final tree
+        run: |
+          test "$(git ls-remote origin refs/heads/fix/material-roles-ambient | cut -f1)" = "$GITHUB_SHA"
+          python - <<'PY'
+          import gzip, hashlib, json, shutil, subprocess
+          from pathlib import Path
+          base = '392411be7bcb13f19a63948ad4544c36d9cec164'
+          expected = '61b044f903c4f57b26f1b8ed5e24f211e40fe93d'
+          def git(*args):
+              return subprocess.check_output(['git', *args], text=True).strip()
+          if git('diff', '--name-only', base, '--', 'src', 'resources', 'baseline', 'tools', 'docs'):
+              raise RuntimeError('Production changed before the reviewed patch; stop instead of overwriting')
+          parts = [Path('.github/material-step2.part'+str(i)) for i in range(10)]
+          patch = gzip.decompress(b''.join(p.read_bytes() for p in parts))
+          if hashlib.sha256(patch).hexdigest() != 'ad3c55c7c772a45c29a3413892e87cb14a957ca4b7e651198d8f1fb2baed3228':
+              raise RuntimeError('Source transport checksum mismatch')
+          archive = Path('baseline/java-material-step2'); archive.mkdir(exist_ok=False)
+          shutil.copyfile('baseline/modernization-scope.json', archive/'modernization-scope.json')
+          shutil.copyfile('tools/verify_visual_scope.py', archive/'verify_visual_scope.py')
+          subprocess.run(['git', 'apply', '--check', '-'], input=patch, check=True)
+          subprocess.run(['git', 'apply', '-'], input=patch, check=True)
+          for p in parts: p.unlink()
+          Path('.github/workflows/material-step2-apply.yml').unlink()
+          subprocess.run(['git', 'add', '-A'], check=True)
+          subprocess.run(['git', 'diff', '--cached', '--check'], check=True)
+          actual = git('write-tree')
+          if actual != expected:
+              raise RuntimeError('Final tree differs from locally reviewed code: '+actual)
+          git('config', 'user.name', 'github-actions[bot]')
+          git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com')
+          git('commit', '-m', 'Separate world material roles and add restrained depth-tested ambient accents')
+          out = Path('build'); out.mkdir(exist_ok=True)
+          (out/'material-step2-checkpoint.json').write_text(json.dumps({
+              'baseCommit': base, 'verifiedSourceCommit': git('rev-parse','HEAD'),
+              'verifiedSourceTree': actual, 'sourcePatchSha256': hashlib.sha256(patch).hexdigest(),
+              'localTreeMatches': True, 'nativeAcceptance': 'pending'}, indent=2)+'\n')
+          print('Exact source tree verified:', actual, 'commit:', git('rev-parse','HEAD'))
+          PY
+      - name: Restore pinned game libraries and real OpenGL test environment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v0.8.11-johto.2 --repo ZeriFox/pokewilds-2.5d --pattern pokewilds-2.5d-build-inputs.zip --dir "$RUNNER_TEMP"
+          echo "5692696180a62dc1c8822e2a2d2a324f60647535a821865d7fb556e109b3883f  $RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" -d .
+          python -m pip install Pillow==11.3.0
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri libglx-mesa0 libasound2t64
+      - name: Deterministic assets, audited complete Java 17 build and all 24 native runners
+        run: |
+          python tools/verify_rework.py --stage prepare
+          python tools/verify_rework.py --stage build
+          xvfb-run -a -s '-screen 0 2560x1440x24' python tools/verify_rework.py --stage native
+      - name: Publish only the fully verified clean source checkpoint
+        run: |
+          test -z "$(git status --porcelain --untracked-files=all)"
+          test "$(git ls-remote origin refs/heads/fix/material-roles-ambient | cut -f1)" = "$GITHUB_SHA"
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          p = Path('build/material-step2-checkpoint.json'); data = json.loads(p.read_text())
+          head = subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
+          for stage in ('prepare','build','native'):
+              receipt = json.loads(Path('build/rework-verification/'+stage+'.json').read_text())
+              if receipt['status'] != 'passed' or receipt['commit'] != head:
+                  raise RuntimeError('Missing exact-checkpoint acceptance: '+stage)
+          receipt = json.loads(Path('build/rework-verification/native.json').read_text())
+          if len(receipt['checks']) != 24:
+              raise RuntimeError('Expected all 24 native runners')
+          data.update(nativeAcceptance='passed', nativeRunners=24, jarSha256=receipt['jar_sha256'])
+          p.write_text(json.dumps(data, indent=2)+'\n')
+          PY
+          git push origin HEAD:fix/material-roles-ambient
+          echo "Verified checkpoint: $(git rev-parse HEAD)"
+      - name: Preserve checkpoint diff and diagnostic receipts
+        if: always()
+        run: |
+          mkdir -p build
+          git diff 392411be7bcb13f19a63948ad4544c36d9cec164 -- src resources baseline tools docs > build/material-step2-review.patch
+          git rev-parse HEAD > build/material-step2-tested-head.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: material-step2-evidence-${{ github.run_id }}
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            build/material-step2-*.json
+            build/material-step2-*.txt
+            build/material-step2-*.patch
+            build/rework-verification/
+            build/build-report.json
+            build/visual-scope.json
+            build/*/*.log
+            build/*/*.png
+            build/*/receipt.json
