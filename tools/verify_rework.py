@@ -41,6 +41,7 @@ NATIVE = [
     ["tools/move_effect_presentation_test.py"],
     ["tools/active_move_resize_test.py"],
     ["tools/world_mesh_batch_test.py"],
+    ["tools/world_presentation_layers_test.py"],
 ]
 
 

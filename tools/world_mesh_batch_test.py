@@ -3,6 +3,7 @@
 
 Only test classes and a renamed reference renderer precede the built game JAR.
 No production class or loose production asset is compiled as an override.
+New ambient accents are disabled here; world_presentation_layers_test checks them on/off.
 """
 from pathlib import Path
 import hashlib
@@ -37,13 +38,13 @@ def main():
     commands = [
         [javac, '--release', '17', '-encoding', 'UTF-8', '-proc:none', '-cp', str(JAR), '-d', str(classes),
          str(reference), str(ROOT / 'tools/WorldMeshBatchTest.java'), str(ROOT / 'tools/WorldRendererParityTest.java')],
-        [java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off', '-cp', cp,
+        [java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off', '-Dpokewilds.ambientOverlays=off', '-cp', cp,
          'com.pkmngen.game.WorldMeshBatchTest'],
-        [java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off', '-cp', cp,
+        [java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off', '-Dpokewilds.ambientOverlays=off', '-cp', cp,
          'com.pkmngen.game.WorldRendererParityTest'],
     ]
     with log_path.open('w', encoding='utf-8') as log:
-        log.write('JAR SHA256 ' + sha256(JAR) + '\nPinned baseline blob ' + blob + '\n')
+        log.write('JAR SHA256 ' + sha256(JAR) + '\nPinned baseline blob ' + blob + '\nNew ambient accents OFF for historical refactor-only parity; validated on/off separately.\n')
         for command in commands:
             log.flush()
             result = subprocess.run(command, cwd=out, stdout=log, stderr=subprocess.STDOUT,

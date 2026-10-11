@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "enabled": true,
+  "strength": 0.65,
+  "maxParticles": 24,
+  "maxMistPatches": 6,
+  "notes": "World-space accents only, below emotes and UI. Graveyard low mist; lava-bound embers; night forest/wetland fireflies; daylight desert/savanna dust; sparse snow and daylight water glints. No effects inside buildings or caves; no screen tint, bloom, shaking or gameplay RNG. Hard limits: strength 0..1, particles 0..48, mist patches 0..8. Launch with -Dpokewilds.ambientOverlays=off to disable only these accents."
+}
