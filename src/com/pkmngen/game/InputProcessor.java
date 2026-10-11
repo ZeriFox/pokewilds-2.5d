@@ -57,8 +57,15 @@ class InputProcessor extends Action {
    public static int gamepadB2;
 
    private int previousHeld;
+   private boolean previousTyping;
    private static boolean windowFocused = true;
    private static long focusGeneration;
+   /** Consume the input which changes a UI context until each action is released. */
+   static void blockHeldInputs() {
+      focusGeneration++;
+      upPressed=downPressed=leftPressed=rightPressed=aPressed=bPressed=startPressed=lPressed=rPressed=false;
+      upJustPressed=downJustPressed=leftJustPressed=rightJustPressed=aJustPressed=bJustPressed=startJustPressed=lJustPressed=rJustPressed=false;
+   }
    private long observedFocusGeneration;
    private int blockedUntilRelease;
    public static boolean aJustReleased, bJustReleased;
@@ -69,9 +76,11 @@ class InputProcessor extends Action {
       if (!windowFocused) blockedUntilRelease = 511;
    }
 
+   static boolean isWindowFocused(){return windowFocused;}
    static void setWindowFocused(boolean focused) {
       if (windowFocused == focused) return;
       windowFocused = focused;
+      if(!focused && Game.staticGame!=null && Game.staticGame.modernUi!=null)Game.staticGame.modernUi.desktop.blur();
       focusGeneration++;
       // Clear immediately, even while an unfocused window has stopped rendering.
       aJustReleased = aPressed;
@@ -176,21 +185,27 @@ class InputProcessor extends Action {
          }
       }
 
+      if(game.modernUi!=null && !mobile)game.modernUi.desktop.sync(game);
       boolean typing = DesktopControls.textEntry(game);
+      if(previousTyping&&!typing)blockedUntilRelease=511;
+      previousTyping=typing;
+      boolean menu = game.modernUi!=null && game.modernUi.desktop.menuActive(game);
       int held = 0;
       if (DesktopControls.pressed(keyboardUp, typing) || this.gamepadUp || touch(DrawMobileControls.upArrowSprite)
-         || typing && Gdx.input.isKeyPressed(Keys.UP)) held |= 1;
+         || (typing || menu) && Gdx.input.isKeyPressed(Keys.UP)) held |= 1;
       if (DesktopControls.pressed(keyboardDown, typing) || this.gamepadDown || touch(DrawMobileControls.downArrowSprite)
-         || typing && Gdx.input.isKeyPressed(Keys.DOWN)) held |= 2;
+         || (typing || menu) && Gdx.input.isKeyPressed(Keys.DOWN)) held |= 2;
       if (DesktopControls.pressed(keyboardLeft, typing) || this.gamepadLeft || touch(DrawMobileControls.leftArrowSprite)
-         || typing && Gdx.input.isKeyPressed(Keys.LEFT)) held |= 4;
+         || (typing || menu) && Gdx.input.isKeyPressed(Keys.LEFT)) held |= 4;
       if (DesktopControls.pressed(keyboardRight, typing) || this.gamepadRight || touch(DrawMobileControls.rightArrowSprite)
-         || typing && Gdx.input.isKeyPressed(Keys.RIGHT)) held |= 8;
+         || (typing || menu) && Gdx.input.isKeyPressed(Keys.RIGHT)) held |= 8;
       if (DesktopControls.pressed(keyboardA, typing) || this.gamepadA || touch(DrawMobileControls.aSprite)) held |= 16;
+      if (menu && !typing && Gdx.input.isKeyPressed(Keys.ESCAPE)) held |= 32;
       if (DesktopControls.pressed(keyboardB, typing) || this.gamepadB || touch(DrawMobileControls.bSprite)) held |= 32;
       if (DesktopControls.pressed(keyboardStart, typing) || this.gamepadStart || touch(DrawMobileControls.startSprite)) held |= 64;
       if (DesktopControls.pressed(keyboardL, typing) || this.gamepadL) held |= 128;
       if (DesktopControls.pressed(keyboardR, typing) || this.gamepadR) held |= 256;
+      if(game.modernUi!=null && !mobile)held=game.modernUi.desktop.filterHeld(game,held);
       blockedUntilRelease &= held;
       held &= ~blockedUntilRelease;
       updateState(held);

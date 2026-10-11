@@ -43,7 +43,7 @@ public final class PmdBattleSprites {
       boolean clipped=game.johtoBattleRenderer!=null&&game.johtoBattleRenderer.beginActorClip(batch);
       try {
       if (game.player != null && source == game.player.battleSprite) {
-         TextureRegion trainer = BwAssets.get().trainer(game.player.character,"up",seconds,false);
+         TextureRegion trainer = BwAssets.get().trainer(game.player,"up",seconds,false);
          if (trainer == null) return false;
          trainer = trimTrainer(trainer);
          Sprite draw = new Sprite(trainer);

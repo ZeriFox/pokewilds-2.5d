@@ -19,7 +19,7 @@ def main() -> int:
             raise RuntimeError("Test copy escaped the intended temporary directory")
         shutil.copytree(verifier.ROOT / "src", root / "src")
         shutil.copytree(verifier.ROOT / verifier.CLASSIC_SOURCES, root / verifier.CLASSIC_SOURCES)
-        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE]:
+        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE]:
             target = root / source
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / source, target)
@@ -84,6 +84,11 @@ def main() -> int:
         reject("historical v3 changed", "baseline/modernization-v3/modernization-scope.json", append)
         reject("historical v4 changed", "baseline/modernization-v4/modernization-scope.json", append)
         reject("historical v5 changed", "baseline/modernization-v5/modernization-scope.json", append)
+        for name in ("DesktopMenuController.java", "MenuTextSession.java", "TrainerCatalog.java"):
+            reject("interface source changed after review " + name, verifier.PREFIX + name, append)
+        for name in verifier.STEP3_ARCHIVE:
+            reject("pre-interface review archive changed " + name, name, append)
+        reject("original setup launch logic changed", verifier.PREFIX + "DrawSetupMenu.java", append)
         verifier.audit(root)
     report = destination / "results.txt"
     report.write_text("\n".join(results) + f"\nSCOPE NEGATIVE PASS: {len(results)} mutations rejected\n", encoding="utf-8", newline="\n")

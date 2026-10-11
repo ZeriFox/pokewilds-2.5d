@@ -29,7 +29,7 @@ public final class ModernPartyUi {
    }
 
    public void render(ModernUi ui, Game game, Action action) {
-      if (action instanceof DrawSetupMenu) setup(ui, game, (DrawSetupMenu)action);
+      if (action instanceof DrawSetupMenu) ui.renderStartup(game, (DrawSetupMenu)action);
       else if (action instanceof GainExpAnimationGen2.ShowLevelUpStats) levelUp(ui, game, (GainExpAnimationGen2.ShowLevelUpStats)action);
       else if (action instanceof Pokemon.SetNickname) nickname(ui, game, (Pokemon.SetNickname)action);
       else if (action instanceof DrawControls) controls(ui, game, (DrawControls)action);
@@ -73,66 +73,6 @@ public final class ModernPartyUi {
       }
    }
 
-   private void setup(ModernUi ui, Game game, DrawSetupMenu menu) {
-      ui.fullScreen(game, "POKéWILDS", "An island of your own  /  Adventure setup");
-      ArrayList<SetupRow> rows = new ArrayList<>();
-      int offset = menu.offset, offset2 = menu.offset2, offset3 = menu.offset3;
-      for (int j = 0; j < 8; j++) {
-         if (j == 0) rows.add(new SetupRow(j, "Play mode", pick(new String[] {"Local", "Host", "Join"}, menu.localHostJoinIndex), 0));
-         else if (j == 1 + offset) rows.add(new SetupRow(j, "Adventure", menu.newLoadIndex == 0 ? "New island" : "Load save", 0));
-         else if (j == 2 + offset + offset2) {
-            boolean server = menu.localHostJoinIndex == 2;
-            String value = letters(server ? menu.serverIp : menu.mapName);
-            int selectedIndex = j - offset;
-            if (value.isEmpty()) value = server ? "127.0.0.1" : "default";
-            rows.add(new SetupRow(selectedIndex, server ? "Server IP" : "Save name", value, 1));
-         } else if (j == 3 + offset + offset2 && menu.localHostJoinIndex != 2) {
-            String[] sizes = {game.debugInputEnabled ? "Test island" : "Default (S)", "Small", "Medium", "Large", "Extra large", "Vast"};
-            rows.add(new SetupRow(j - offset, "World size", pick(sizes, menu.sizeIndex), 0));
-         } else if (j == 4 + offset + offset2 + offset3) {
-            String name = letters(menu.name);
-            rows.add(new SetupRow(j, "Your name", name.isEmpty() ? "Type your name" : name, 1));
-         } else if (j == 5 + offset + offset2 + offset3 && menu.newLoadIndex != 1) {
-            rows.add(new SetupRow(j, "Trainer", pick(menu.playerTypes, menu.playerTypeIndex), 2));
-         } else if (j == 5 + offset + offset2 + offset3) {
-            rows.add(new SetupRow(j, "Save file", menu.fileNames.isEmpty() ? "No saves found" : pick(menu.fileNames, menu.fileIndex), 0));
-         } else if (j == 6 + offset + offset2 + offset3) {
-            rows.add(new SetupRow(j, "", menu.localHostJoinIndex == 2 ? "Join adventure" : menu.newLoadIndex == 1 ? "Continue adventure" : "Begin adventure", 3));
-         }
-      }
-      float gap = 14f, top = 116f;
-      for (int i = 0; i < rows.size(); i++) {
-         SetupRow row = rows.get(i);
-         float y = top - (i + 1) * gap;
-         boolean selected = DrawSetupMenu.currIndex == row.index;
-         if (row.kind == 3) {
-            ui.row(game, row.value + (selected ? "  →" : ""), 7, y, 146, 12.5f, selected);
-            continue;
-         }
-         ui.panel(game, 7, y, 146, 12.5f);
-         if (selected) { ui.rect(game, 8, y + 1, 144, 10.5f, SOFT); ui.rect(game, 7, y, 2, 12.5f, ModernUi.ACCENT); }
-         ui.text(game, row.label, 12, y + 9.5f, 5.2f, ModernUi.MUTED);
-         String value = row.value;
-         if (selected && row.kind == 1 && DrawSetupMenu.avatarAnimCounter >= 12) value += "_";
-         if (row.kind == 2) {
-            ui.fitText(game, value, 62, y + 9.5f, 5.8f, 52, ModernUi.INK);
-            Color swatch = menu.colors.isEmpty() ? ModernUi.GOLD : menu.colors.get(Math.floorMod(menu.avatarColorIndex, menu.colors.size()));
-            if (selected && menu.playerColorIndex == 1) ui.rect(game, 118, y + 1, 10, 10, ModernUi.GOLD);
-            ui.rect(game, 120, y + 3, 6, 6, swatch);
-            if (selected && menu.playerColorIndex == 2) ui.rect(game, 133, y + 1, 17, 1, ModernUi.GOLD);
-            TextureRegion trainer = BwAssets.get().trainer(value,"down",DrawSetupMenu.avatarAnimCounter/24f,false);
-            if (trainer != null) region(game,trainer,134,y,14,14);
-            else if (!menu.avatarSprites.isEmpty()) sprite(game, menu.avatarSprites.get(avatarFrame(menu.avatarSprites.size(), DrawSetupMenu.avatarAnimCounter)), 136, y + 1, 10, 12, false);
-         } else ui.fitText(game, (selected && row.kind == 0 ? "← " : "") + value + (selected && row.kind == 0 ? " →" : ""), 62, y + 9.5f, 5.8f, 86, ModernUi.INK);
-      }
-      String help = DesktopControls.vertical() + " Select   " + DesktopControls.horizontal() + " Change   " + DesktopControls.confirm() + " Start";
-      for (SetupRow row : rows) if (row.index == DrawSetupMenu.currIndex) {
-         if (row.kind == 1) help = "Type to edit   Backspace Delete   Arrow Up/Down Select";
-         if (row.kind == 2) help = DesktopControls.horizontal() + " Trainer / color   " + DesktopControls.vertical() + " Change   " + key(InputProcessor.keyboardLeft) + " Return";
-      }
-      ui.footer(game, help);
-   }
-
    private void playerMenu(ModernUi ui, Game game, DrawPlayerMenu menu) {
       ui.panel(game, 77, 18, 77, 121);
       ui.rect(game, 78, 116, 75, 22, ModernUi.INK);
@@ -144,13 +84,13 @@ public final class ModernPartyUi {
       }
       ui.panel(game, 7, 91, 63, 47);
       Sprite trainer = game.player.standingSprites.get("down");
-      TextureRegion modernTrainer = BwAssets.get().trainer(game.player.character,"down",0,false);
+      TextureRegion modernTrainer = BwAssets.get().trainer(game.player,"down",0,false);
       if (modernTrainer != null) region(game,modernTrainer,9,100,26,32);
       else sprite(game, trainer, 11, 103, 20, 26, false);
       ui.fitText(game, "FIELD JOURNAL", 34, 129, 4.1f, 32, ModernUi.MUTED);
       ui.text(game, "Party", 35, 117, 5.5f, ModernUi.INK);
       ui.text(game, game.player.pokemon.size() + " / 6", 35, 106, 7, ModernUi.ACCENT);
-      ui.footer(game, DesktopControls.vertical() + " Select   " + confirmBack());
+      ui.footer(game, DesktopControls.vertical() + " Select   " + confirmBack() + "   F1 Settings");
    }
 
    private static final java.util.IdentityHashMap<TextureRegion, com.badlogic.gdx.graphics.g2d.NinePatch> frlgPatches = new java.util.IdentityHashMap<>();

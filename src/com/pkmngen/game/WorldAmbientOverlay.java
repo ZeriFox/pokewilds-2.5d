@@ -58,6 +58,7 @@ final class WorldAmbientOverlay {
          mesh.upload(); return;
       }
       if (settings == null) settings = Settings.load();
+      if (game.modernUi!=null && !game.modernUi.desktop.preferences.ambient) {mesh.upload();return;}
       if (!settings.enabled || settings.strength == 0 || game.map.tiles != game.map.overworldTiles) {
          mesh.upload(); return;
       }

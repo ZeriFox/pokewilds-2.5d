@@ -33,6 +33,7 @@ public final class BwAssets {
    private final Map<String, Float> speeds = new HashMap<>();
    private final Map<String, Float> anchorsX = new HashMap<>();
    private final Map<String, Float> anchorsY = new HashMap<>();
+   private final TrainerCatalog trainers = new TrainerCatalog();
    private final Set<String> missing = new HashSet<>();
 
    private BwAssets() {
@@ -141,6 +142,7 @@ public final class BwAssets {
    }
 
    private void disposeTextures() {
+      trainers.dispose();
       for (Texture texture : textures.values()) texture.dispose();
       textures.clear();
       regions.clear();
@@ -265,9 +267,19 @@ public final class BwAssets {
       return cell(frameName(name, seconds), x, y);
    }
    public TextureRegion trainer(Player player, float seconds, boolean moving) {
-      return trainer(player == null ? "gold" : player.character, player == null ? "down" : player.dirFacing, seconds, moving);
+      return trainer(player, player==null?"down":player.dirFacing,seconds,moving);
    }
+   public TextureRegion trainer(Player player,String direction,float seconds,boolean moving) {
+      if(classicCast() && player!=null) {TextureRegion r=trainers.frame(player.character,direction,seconds,moving,player.color);if(r!=null)return r;}
+      return detailedTrainer(player==null?"gold":player.character,direction,seconds,moving);
+   }
+   public TextureRegion classicTrainer(String character,String direction,float seconds,boolean moving,com.badlogic.gdx.graphics.Color color) { return trainers.frame(character,direction,seconds,moving,color); }
+   private boolean classicCast(){return Game.staticGame!=null&&Game.staticGame.modernUi!=null&&Game.staticGame.modernUi.desktop.preferences.classicCast;}
    public TextureRegion trainer(String character, String direction, float seconds, boolean moving) {
+      if(classicCast()){TextureRegion r=trainers.frame(character,direction,seconds,moving,null);if(r!=null)return r;}
+      return detailedTrainer(character,direction,seconds,moving);
+   }
+   public TextureRegion detailedTrainer(String character, String direction, float seconds, boolean moving) {
       String name = lower(character);
       boolean female = name.equals("kris") || name.equals("lyra") || name.equals("leaf") || name.equals("may")
          || name.equals("dawn") || name.equals("hilda") || name.equals("rosa") || name.equals("serena")

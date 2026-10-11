@@ -182,17 +182,26 @@ public final class DesktopControlsTest {
          actionStack.clear();
          DrawSetupMenu setup = new DrawSetupMenu(this, null); actionStack.add(setup);
          setup.localHostJoinIndex = 0; setup.newLoadIndex = 0;
+         modernUi.desktop.attach(setup);modernUi.desktop.screen=DesktopMenuController.Screen.SETUP;processor.step(this);
          for (int row : new int[]{2, 4}) {
             DrawSetupMenu.currIndex = row;
             for (int key : new int[]{Keys.W, Keys.A, Keys.S, Keys.D}) {
                keys.add(key); processor.step(this);
-               require(!InputProcessor.upPressed && !InputProcessor.downPressed && !InputProcessor.leftPressed && !InputProcessor.rightPressed,
-                  "Typing setup activated navigation");
+               require(key==Keys.W?InputProcessor.upPressed:key==Keys.S?InputProcessor.downPressed:
+                  key==Keys.A?InputProcessor.leftPressed:InputProcessor.rightPressed,"Highlighted field incorrectly entered typing mode");
                keys.clear(); processor.step(this);
             }
-            keys.add(Keys.DOWN); processor.step(this);
-            require(InputProcessor.downJustPressed, "Arrow navigation out of text field is unavailable");
-            keys.clear(); processor.step(this);
+            modernUi.desktop.beginText(new DesktopMenuController.Row(row==2?DesktopMenuController.Field.SAVE:DesktopMenuController.Field.NAME,row));
+            for (int key : new int[]{Keys.W, Keys.A, Keys.S, Keys.D}) {
+               keys.add(key); processor.step(this);
+               require(!InputProcessor.upPressed&&!InputProcessor.downPressed&&!InputProcessor.leftPressed&&!InputProcessor.rightPressed,
+                  "Explicit text focus activated navigation");
+               keys.clear(); processor.step(this);
+            }
+            require(modernUi.desktop.text.commit(),"Text focus could not commit");
+            processor.step(this);keys.add(Keys.S);processor.step(this);
+            require(InputProcessor.downJustPressed,"WASD did not resume after explicitly leaving text focus");
+            keys.clear();processor.step(this);
          }
          setup.newLoadIndex = 1; DrawSetupMenu.currIndex = 1;
          keys.add(Keys.A); processor.step(this);

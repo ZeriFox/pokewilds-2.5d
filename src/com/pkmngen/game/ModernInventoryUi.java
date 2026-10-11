@@ -21,13 +21,38 @@ final class ModernInventoryUi {
             ui.rect(game,7+i*30,108,27,8,i==m.boxIndex?ModernUi.ACCENT:ModernUi.LINE);
             ui.fitText(game,new String[]{"Items","Balls","Materials","Key","Medicine"}[i],9+i*30,114,5,23,i==m.boxIndex?ModernUi.PAPER:ModernUi.INK);
          }
-         list(ui,game,m.itemsList,m.currIndex,m.cursorPos,102,12.2f,true,m.isSorting,m.sortingIndex);
+         ui.panel(game,6,23,89,80);
+         if(m.drawItems || !m.disabled) {
+            for(int i=0;i<5 && m.itemsList!=null && m.currIndex+i<m.itemsList.size();i++) {
+               ModernUi.Box row=bagRow(i);String name=m.itemsList.get(m.currIndex+i);
+               boolean count=game.player!=null&&game.player.hasItem(name);
+               ModernPartyUi.frlgRow(ui,game,(m.isSorting&&m.sortingIndex==m.currIndex+i?"* ":"")+name,
+                  row.x,row.y,row.width,row.height,i==m.cursorPos,count?23:0);
+               if(count)ui.fitText(game,"x"+game.player.getItemAmount(name),row.x+row.width-23,row.y+8.5f,5,21,ModernUi.INK);
+            }
+         } else ui.fitText(game,"Changing pocket...",12,62,5.5f,76,ModernUi.MUTED);
+         if(m.itemsList!=null && m.itemsList.size()>5) {
+            float track=66,thumb=Math.max(5,track*5/m.itemsList.size());
+            float ratio=m.itemsList.size()==5?0:(float)m.currIndex/(m.itemsList.size()-5);
+            ui.rect(game,93,27,1.2f,track,ModernUi.LINE);
+            ui.rect(game,93,27+(track-thumb)*(1-Math.max(0,Math.min(1,ratio))),1.2f,thumb,ModernUi.ACCENT);
+         }
          String selected=at(m.itemsList,m.currIndex+m.cursorPos);
-         ui.panel(game,6,16,148,27);
+         ui.panel(game,98,23,56,80);
+         if(m.bagIcons[Math.floorMod(m.boxIndex,5)]!=null)
+            game.uiBatch.draw(m.bagIcons[Math.floorMod(m.boxIndex,5)],112,84,25,15);
+         ui.wrapped(game,selected,103,79,5.6f,46,2,ModernUi.INK);
+         if(game.player!=null&&game.player.hasItem(selected))ui.fitText(game,"Owned: "+game.player.getItemAmount(selected),103,60,5,46,ModernUi.ACCENT);
          String description=DrawItemMenuGen2.itemDescriptions.get(selected.toLowerCase(Locale.ROOT));
-         if(description==null) description=selected.equalsIgnoreCase("Cancel")?"Return to your adventure.":"Choose an item to use or drop.";
-         ui.wrapped(game,description,11,37,5.5f,138,3,ModernUi.MUTED);
-         ui.footer(game,m.isSorting?"Select a destination   "+DesktopControls.back()+" Cancel":DesktopControls.horizontal()+" Pocket   "+DesktopControls.confirm()+" Select   "+DesktopControls.back()+" Back");
+         if(description==null)description=selected.equalsIgnoreCase("Cancel")?"Return to your adventure.":"Select this item to view available actions.";
+         String identity=m.boxIndex+":"+selected;
+         if(!identity.equals(ui.desktop.detailIdentity)){ui.desktop.detailIdentity=identity;ui.desktop.detailScroll=0;}
+         List<String> lines=detailLines(ui,description,46,4.8f);
+         ui.desktop.detailScroll=Math.max(0,Math.min(Math.max(0,lines.size()-3),ui.desktop.detailScroll));
+         for(int i=0;i<3&&i+ui.desktop.detailScroll<lines.size();i++)ui.text(game,lines.get(i+ui.desktop.detailScroll),103,49-i*7,4.8f,ModernUi.MUTED);
+         if(lines.size()>3)ui.fitText(game,DesktopControls.label(InputProcessor.keyboardL)+"/"+DesktopControls.label(InputProcessor.keyboardR)+" more  "+(ui.desktop.detailScroll+1)+"/"+lines.size(),103,28,3.7f,46,ModernUi.ACCENT);
+         ui.fitText(game,m.isSorting?"Choose where to move this item.":"Click once to select; again to open.",8,18,4.5f,145,ModernUi.MUTED);
+         ui.footer(game,m.isSorting?DesktopControls.confirm()+" Move here   "+DesktopControls.back()+" Cancel reorder":DesktopControls.horizontal()+" Pocket   "+DesktopControls.vertical()+" Select   "+DesktopControls.menu()+" Reorder   "+DesktopControls.back()+" Back");
       } else if(a instanceof DrawItemMenu) {
          DrawItemMenu m=(DrawItemMenu)a;
          ModernPartyUi.frlgScreen(ui,game,m.isGuideMenu?"FIELD GUIDE":"BAG",m.isGuideMenu?"Explore, build, discover":"Your supplies");
@@ -75,6 +100,19 @@ final class ModernInventoryUi {
          }
       }
    }
+   static List<String> detailLines(ModernUi ui,String text,float width,float size) {
+      List<String> result=new ArrayList<>();String line="";
+      for(String word:text.trim().split("\\s+")) {
+         if(!line.isEmpty() && ui.width(line+" "+word,size)>width){result.add(line);line="";}
+         while(ui.width(word,size)>width && word.length()>1) {
+            int cut=1;while(cut<word.length()&&ui.width(word.substring(0,cut+1),size)<=width)cut++;
+            if(!line.isEmpty()){result.add(line);line="";}result.add(word.substring(0,cut));word=word.substring(cut);
+         }
+         line+=line.isEmpty()?word:" "+word;
+      }
+      if(!line.isEmpty())result.add(line);return result;
+   }
+   static ModernUi.Box bagRow(int index) {return new ModernUi.Box(9,84-index*14,82,13);}
    private void list(ModernUi ui,Game game,List<String> entries,int offset,int cursor,float top,float rowHeight,boolean counts,boolean sorting,int sortingIndex) {
       if(entries==null) return;
       int visible=rowHeight==14?4:5;

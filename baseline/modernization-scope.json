@@ -5,7 +5,7 @@
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "4580c5a55864973a84c3c4f9beeac8bc32d90a34c99f1c4da7aa7e4451c51ad7",
+  "reviewed_patch_sha256": "d6e27133c94941a29fe088e2a9383f594d496fc7d2a8cbb6232a4c3a82cefe37",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/CheckEndOfBattle.java",
@@ -124,8 +124,8 @@
     },
     "src/com/pkmngen/game/InputProcessor.java": {
       "baseline_sha256": "bc4910e9db1d94e88a38edd31e72aab19497da27412263aa01e04ac331c95b2f",
-      "reviewed_sha256": "68d50d0131d90f449d822d29e8d5d79d143470e31ea138d3fb7c995b62990acb",
-      "scope": "Authorized desktop input: WASD and mouse bindings, debounced press/held/release, text-entry isolation, preserving gamepad and mobile controls."
+      "reviewed_sha256": "c902e3b2709254af46b937609d3ef7a2af8ec77ca32b36da87f21f8f93637de0",
+      "scope": "Authorized desktop input: WASD and mouse bindings, debounced press/held/release, text-entry isolation, preserving gamepad and mobile controls. Step 3 adds modern UI context routing, permanent menu arrow/Escape aliases and consume-until-release on edit/menu transitions; physical gamepad polling and world movement semantics retained."
     },
     "src/com/pkmngen/game/PlayMusic.java": {
       "baseline_sha256": "cf5ed190985fb35bf86e25162e73d43401cb51bdf61f653c0d287b1e4a55cba1",
@@ -233,12 +233,12 @@
       "scope": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state."
     },
     "src/com/pkmngen/game/BwAssets.java": {
-      "scope": "Lazy, disposable local landscape atlas access, biome-specific semantic materials, validated optional texture overrides and sampling independent of the simulation grid, contextual missing-asset diagnostics and separate Black/White trainer assets.",
-      "reviewed_sha256": "b67d941a8249de2a9fef01c8748b35e11571ae795d5d78b04d28871c7c7e7bf4"
+      "scope": "Lazy, disposable local landscape atlas access, biome-specific semantic materials, validated optional texture overrides and sampling independent of the simulation grid, contextual missing-asset diagnostics and separate Black/White trainer assets. Step 3 delegates opt-in classic trainer presentation to a separate owned catalog with explicit color-aware Player overloads; detailed B/W defaults and existing texture override contracts retained.",
+      "reviewed_sha256": "501521789d34cda4c1d616e8b1b633d3a8904f12e0bc4707b4cb84f070526901"
     },
     "src/com/pkmngen/game/DesktopControls.java": {
-      "reviewed_sha256": "52605456a095ca2cac8043e69e128540e8076285e0cf64a797b76494e48defcb",
-      "scope": "Authorized desktop binding parser, exact legacy-preset migration, text-entry detection and truthful dynamic hints."
+      "reviewed_sha256": "f26c3782ef83d8648c94212dc01bd2e6723815a8dcbdb9e68d65eb381cfc25d5",
+      "scope": "Authorized desktop binding parser, exact legacy-preset migration, text-entry detection and truthful dynamic hints. Step 3 treats only an explicitly active setup edit as text focus; highlighting a row is navigation."
     },
     "src/com/pkmngen/game/ExpansionDex.java": {
       "reviewed_sha256": "c8b34eece8428c76dc8c9c9d8d01dcf23f47ca7257d4232479ddfedd3956b15a",
@@ -249,32 +249,32 @@
       "scope": "Modern biome battle arenas/HUD, full-viewport composition, preserved-world transitions and presentation helpers for special boss actions."
     },
     "src/com/pkmngen/game/JohtoRenderer.java": {
-      "scope": "Exclusive perspective world drawing with shared derived terrain heights, continuous cliff/ramp geometry and contact shading, coherent biome materials/atmosphere, aspect-preserving decor, configurable sprite dimensions/anchors, proportional trainer crops and building-wall classification, modern intentional ghost presentation, anchored PMD actors and original field-action feedback; no persisted terrain or collision changes.",
-      "reviewed_sha256": "fb0a8a628ac6779a2603a51ae301fb42a91047688d8b330bd30e9796a56292c9"
+      "scope": "Exclusive perspective world drawing with shared derived terrain heights, continuous cliff/ramp geometry and contact shading, coherent biome materials/atmosphere, aspect-preserving decor, configurable sprite dimensions/anchors, proportional trainer crops and building-wall classification, modern intentional ghost presentation, anchored PMD actors and original field-action feedback; no persisted terrain or collision changes. Step 3 only changes the sleeping-player trainer lookup to the color-aware overload.",
+      "reviewed_sha256": "537c40ceab89bef1269b8f0060524a7a23f10cf0b3caa74ec1db76cfa56ea42f"
     },
     "src/com/pkmngen/game/ModernBatch.java": {
       "reviewed_sha256": "f02a0d0fd3f6e2e2a38a975c2a1a0ada4197770a5371c1d73d08e06474d44cd4",
       "scope": "Suppress legacy draw submissions while original menu actions advance."
     },
     "src/com/pkmngen/game/ModernInventoryUi.java": {
-      "reviewed_sha256": "c4de163389c7285dc1ce9923aeb22f2e59671b3493581a5f60e2738fb2004af6",
-      "scope": "Modern inventory, item actions, crafting, quantities and guide presentation."
+      "reviewed_sha256": "887c1814b5fbad4f21213756ac0205490602ff852417a9104a389f7b209c832c",
+      "scope": "Modern inventory, item actions, crafting, quantities and guide presentation. Step 3 provides five pocket tabs, quantity-safe list, scrollbar and scrollable item detail pane; game item/crafting rules unchanged."
     },
     "src/com/pkmngen/game/ModernPartyUi.java": {
-      "reviewed_sha256": "98545ac219271d50781400a35b84d953e0da7f0e4a75b203771f27f55db1a93f",
-      "scope": "Modern setup/party/storage/nickname UI, full animated summary actors on all three pages and configured control hints."
+      "reviewed_sha256": "3fb7a7e4ec3b6998ba789450bdc2eed77765bbd2bd7d15421e4f45723021e562",
+      "scope": "Modern setup/party/storage/nickname UI, full animated summary actors on all three pages and configured control hints. Step 3 delegates setup visuals to ModernStartupUi, adds a settings hint and uses the selected color-aware trainer image."
     },
     "src/com/pkmngen/game/ModernUi.java": {
-      "reviewed_sha256": "12c136519ca9391fbbb9a1a9f36d605c93383dc453519a4e6f8c0724db09e2d3",
-      "scope": "Modern typography, shared logical viewport and anchored panel layout, dialogs, event backgrounds and menu rendering dispatch."
+      "reviewed_sha256": "780558baed3e4b7300ad13f74bf0ac92ae2d5c2aac2be7296151dcc221a493fc",
+      "scope": "Modern typography, shared logical viewport and anchored panel layout, dialogs, event backgrounds and menu rendering dispatch. Step 3 coordinates the separate desktop menu controller and startup presenter; unchanged original actions continue outside explicitly handled UI contexts."
     },
     "src/com/pkmngen/game/ModernWorldGenerator.java": {
       "reviewed_sha256": "8154e84b81847c3ebeba5f536fcfa1d03d2eb3fcfc83256b47ed17e5521bff3d",
       "scope": "Authorized deterministic procedural landforms, biome distribution and volcanic terrain."
     },
     "src/com/pkmngen/game/PmdBattleSprites.java": {
-      "reviewed_sha256": "e7c0fdb335d31a2ca47de8738fcd8cc4d5a525871fe9f6027876c4ca2c4c171a",
-      "scope": "Exact PMD battle/event actors with diagonal battle-facing poses, complete animation-envelope fit and ground anchoring, trimmed trainers, hidden-identity ghost presentation and visual effects."
+      "reviewed_sha256": "42bfd778d608589db57411dd23f3c305a249ee6abd0a9a82445190c3ac79f63d",
+      "scope": "Exact PMD battle/event actors with diagonal battle-facing poses, complete animation-envelope fit and ground anchoring, trimmed trainers, hidden-identity ghost presentation and visual effects. Step 3 only passes Player to the trainer-presentation lookup; Pokemon actors and combat formulas unchanged."
     },
     "src/com/pkmngen/game/PmdPokemonSprites.java": {
       "reviewed_sha256": "47d1f1e5a438e5eea91a273e5209b356c31d51232c7646cea06afab1bd4b9543",
@@ -321,8 +321,28 @@
       "reviewed_sha256": "68c5735f567cf2a8a9b46ede5a1d80c3f99556acb1f476f9111434f7c9f7ad84"
     },
     "src/com/pkmngen/game/WorldAmbientOverlay.java": {
-      "scope": "Sparse deterministic world-space mist, embers, fireflies, dust, snow and water glints with strict count/opacity budgets, protected actor focus, depth testing, separate shader ownership and no gameplay RNG or indoor/UI overlays.",
-      "reviewed_sha256": "97b1e108740f323888ef358611a1e4c63a695b564c108a548aff6d5ae196c850"
+      "scope": "Sparse deterministic world-space mist, embers, fireflies, dust, snow and water glints with strict count/opacity budgets, protected actor focus, depth testing, separate shader ownership and no gameplay RNG or indoor/UI overlays. Step 3 also respects the user ambient-accents toggle without changing effect generation.",
+      "reviewed_sha256": "4037ef0e41ba1e3ee61c97226ebf5a6eb4c625dcf96a2d9d6fa5c4d3c93a535d"
+    },
+    "src/com/pkmngen/game/DesktopInterfaceSettings.java": {
+      "scope": "Explicit local UI/control preferences, draft validation, reserved menu keys and duplicate rejection, atomic save with backup; no game-save schema or legacy settings-file rewrite.",
+      "reviewed_sha256": "75df770e8b1918253ee729f8cfc160cb61224bf340cdd4b8422903186cc0af35"
+    },
+    "src/com/pkmngen/game/DesktopMenuController.java": {
+      "scope": "Desktop title/home/setup state, explicit transactional text focus, input-context release barriers, complete trainer/mod selection and F1 options; native Go delegates untouched original setup operations once; pointer inventory selection uses existing action data without item creation or use/toss rule changes.",
+      "reviewed_sha256": "b6fc16b410c20ad98cbaca44f10b6806c54d754cdbe4a2f161f8ec508b4db6d8"
+    },
+    "src/com/pkmngen/game/MenuTextSession.java": {
+      "scope": "Explicit reversible setup text draft with caret/deletion, length/character constraints and IPv4 validation; selection alone never consumes WASD as text.",
+      "reviewed_sha256": "86eccf7738bc82f6669581ae8cd818dc070d64885178819dd84a8e8f24d0ea24"
+    },
+    "src/com/pkmngen/game/ModernStartupUi.java": {
+      "scope": "Skippable animated title scenery from bundled art, home/adventure setup, complete trainer selector and controls/display cards with shared hitboxes and reduced menu motion; no RNG, generated world or battle rules.",
+      "reviewed_sha256": "714d0498199cb9e13813e83d8fe3f9885bdcd59ed812d77fc9def0f280fcec30"
+    },
+    "src/com/pkmngen/game/TrainerCatalog.java": {
+      "scope": "Opt-in existing classic trainer/mod artwork with identity-preserving directional frames, costume color and owned bounded cache; detailed B/W remains available, no new source PNGs or saved Player schema.",
+      "reviewed_sha256": "7d9d7b97c0e712261eb4b6029cc914de4b1a0211359425c108d162a6f6079191"
     }
   },
   "review_notes": [
@@ -352,7 +372,9 @@
     "R15 local row copies now composite only their authored target band and retain the untouched live scene; explicit screen/recolor effects retain full-view composition. Game.dispose releases presentation owned by an active move on early exit. Native regression covers local margins and mid-Surf shutdown.",
     "R13 independent framebuffer review rejected f5a817d5: foreground wall cap hides all foot pixels despite the old head-only visibility assertion. Reviewed JohtoRenderer-only correction ray-tests interior wall bounds against feet/torso and renders intervening faces/cap/window with alpha .12 in the existing translucent pass. Geometry, adjacency, collision, tiles and saves are unchanged; exterior rendering bypasses this rule. The strengthened native test must pass on the new complete JAR before acceptance.",
     "Java structure step 1: reviewed extraction of mesh storage/upload/draw/dispose only, from 3da27238. Preserve the old renderer as a checksum-pinned test reference; original rules, shaders, scene transforms and all PNGs unchanged.",
-    "Step 2 on base 392411be: explicitly reviewed WorldMaterials extraction, typed prop/structure/decal dispatch and source-bound subtle WorldAmbientOverlay. No other production or PNG changes. Historical overlay-OFF mesh parity is retained; new accents are covered by independent ON/OFF native pixel/readability/RNG tests. Prior manifest/verifier archived immutably in baseline/java-material-step2."
+    "Step 2 on base 392411be: explicitly reviewed WorldMaterials extraction, typed prop/structure/decal dispatch and source-bound subtle WorldAmbientOverlay. No other production or PNG changes. Historical overlay-OFF mesh parity is retained; new accents are covered by independent ON/OFF native pixel/readability/RNG tests. Prior manifest/verifier archived immutably in baseline/java-material-step2.",
+    "Step 3 on main 500a9c9c: explicitly reviewed title/setup/options and trainer presentation; transactional text focus fixes WASD editing traps, draft validated controls persist separately, inventory pointer/description navigation retains original item operations. DrawSetupMenu, Player, saves, combat rules and every original PNG remain byte-identical. Prior manifest/verifier archived in baseline/java-interface-step3. Actual acceptance receipts are required before merging or packaging.",
+    "Step 3 pointer safety review: popup rows share the presenter hitboxes; a click on a different choice selects without confirming the old YES/USE selection, a subsequent click delegates the original action. Outside clicks do not act. Keyboard controls remain unchanged."
   ],
   "historical_v2": "baseline/modernization-v2/archive.json",
   "historical_v3": "baseline/modernization-v3/",

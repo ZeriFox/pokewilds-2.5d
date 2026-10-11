@@ -88,8 +88,14 @@ public final class UiLayoutTest {
             modernUi.render(this,controls);
          } else if(scene<=5) { summary.currIndex=scene-3;modernUi.render(this,summary); }
          else if(scene==6) modernUi.render(this,bag);
-         else if(scene==7) modernUi.render(this,setup);
-         else modernUi.render(this,guide);
+         else if(scene==7 || scene>=9) {
+            modernUi.desktop.attach(setup);
+            if(scene!=12){modernUi.desktop.draft=null;modernUi.desktop.optionsOwner=null;}
+            modernUi.desktop.screen=scene==9?DesktopMenuController.Screen.TITLE:scene==10?DesktopMenuController.Screen.HOME:scene==11?DesktopMenuController.Screen.TRAINERS:DesktopMenuController.Screen.SETUP;
+            if(scene==11){modernUi.desktop.trainerIndex=20;modernUi.desktop.trainerPage=2;}
+            if(scene==12&&!modernUi.desktop.optionsOpen())modernUi.desktop.openOptions(setup);
+            modernUi.render(this,setup);
+         } else modernUi.render(this,guide);
          uiBatch.end();
          require(Gdx.gl.glGetError()==0,"GL error while rendering scene "+scene);
          if(++frames%5==0) {
@@ -99,9 +105,9 @@ public final class UiLayoutTest {
             String name="ui-"+sizeIndex+"-"+scene+"-"+Gdx.graphics.getWidth()+"x"+Gdx.graphics.getHeight()+".png";
             try { ImageIO.write(image,"png",new File(name)); } catch(Exception e) {throw new IllegalStateException(e);}
             captures++;scene++;
-            if(scene>=9) {
+            if(scene>=13) {
                System.out.println("UI LAYOUT: requested="+sizes[sizeIndex][0]+"x"+sizes[sizeIndex][1]
-                  +" actual="+Gdx.graphics.getWidth()+"x"+Gdx.graphics.getHeight()+" nine screens passed");
+                  +" actual="+Gdx.graphics.getWidth()+"x"+Gdx.graphics.getHeight()+" thirteen screens passed");
                sizeIndex++;
                if(sizeIndex>=sizes.length) {complete=true;Gdx.app.exit();return;}
                nextSize();
