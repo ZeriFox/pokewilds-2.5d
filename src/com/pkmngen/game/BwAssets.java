@@ -285,36 +285,7 @@ public final class BwAssets {
          tile == null || tile.position == null ? 0 : tile.position.y, seconds);
       return result != null ? result : named("grass_light");
    }
-   public static String terrainName(Tile tile) {
-      if (tile == null) return "grass_light";
-      String name = lower(tile.name);
-      BiomeProfiles.Profile profile = BiomeProfiles.visualForTile(tile);
-      if (name.contains("bridge")) return "wood_floor";
-      if (tile.isLava || name.contains("lava")) return profile.string("fluid", "lava", "lava_bright");
-      // Tidal flats and puddles retain a visible dry bed. The renderer adds their
-      // shallow water separately; isTidal is walkable and is not deep water.
-      if (tile.isWater || name.startsWith("water"))
-         return profile.string("fluid", name.equals("water1") || name.contains("waterfall") ? "water" : "shallow", "water_shallow");
-      if (name.contains("rug") || name.contains("carpet")) return "rug";
-      if (name.contains("pkmnmansion") || name.contains("regi") || name.contains("ruin") || name.contains("dungeon")) return "tile_floor";
-      if (name.contains("floor") || name.contains("interior") || name.startsWith("house") || name.startsWith("building"))
-         return name.contains("cave") ? "cave_floor" : "wood_floor";
-      if (name.contains("snow") || name.startsWith("ice")) return "snow";
-      if (name.startsWith("soot")) return profile.terrain("ash");
-      if (name.startsWith("volcano")) {
-         if (name.equals("volcano2")) return profile.terrain("path");
-         // Coarse, stable patches belong to the material, never to gameplay RNG.
-         int x = tile.position == null ? 0 : Math.floorDiv((int)Math.floor(tile.position.x), 64);
-         int y = tile.position == null ? 0 : Math.floorDiv((int)Math.floor(tile.position.y), 64);
-         int patch = (x * 73428767) ^ (y * 912931);
-         return profile.terrain(Math.floorMod(patch, 5) == 0 ? "path" : "ground");
-      }
-      if (name.startsWith("cave") || name.equals("black1") || name.equals("blank1")) return "cave_floor";
-      if (name.startsWith("ledge_grass")) return profile.terrain("ground");
-      if (name.startsWith("mountain") || name.startsWith("rock") || name.startsWith("ledge")) return profile.terrain("rock");
-      if (name.startsWith("path") || name.startsWith("ground")) return profile.terrain("path");
-      return profile.terrain("ground");
-   }
+   public static String terrainName(Tile tile) { return WorldMaterials.terrainName(tile); }
    public TextureRegion object(Tile tile) { return object(tile, 0f); }
    public TextureRegion object(Tile tile, float seconds) {
       String key = objectName(tile);
@@ -322,62 +293,6 @@ public final class BwAssets {
    }
    /** Visual identity only. Callers still use the original flags for geometry/collision.
     * Null means a pure surface or an intentionally invisible script marker. */
-   public static String objectName(Tile tile) {
-      if (tile == null) return null;
-      String upper = lower(tile.nameUpper), name = upper.isEmpty() ? lower(tile.name) : upper;
-      BiomeProfiles.Profile profile = BiomeProfiles.visualForTile(tile);
-      if (name.equals("solid") || name.contains("_hidden") || name.contains("nosprite")) return null;
-      if (name.contains("berrytree")) return name.contains("full") ? "berry_full" : name.contains("empty") ? "berry_empty" : "berry_growing";
-      if (name.contains("planted")) return "seedling";
-      if (name.contains("mansion_key")) return "key";
-      if (name.contains("ultraball")) return "ultraball";
-      if (name.contains("pokeball")) return "pokeball";
-      if (name.contains("pokedoll") || name.contains("plush")) return "doll";
-      if (name.contains("regi") || name.contains("volcarona") || name.contains("spiritomb") || name.contains("overw")) return "statue";
-      if (name.contains("campfire") || name.contains("torch")) return name.contains("__off") ? "stump" : "fire";
-      if (name.contains("lavafall")) return profile.string("fluid", "lava", "lava_bright");
-      if (name.contains("waterfall")) return profile.string("fluid", "water", "water");
-      if (name.contains("kiln")) return "kiln";
-      if (name.contains("chimney")) return "chimney";
-      if (name.contains("machine") || name.contains("fossilreviver") || name.contains("pokecenter")) return name.contains("__off") ? "machine" : "machine_active";
-      if (name.contains("cables")) return "wall";
-      if (name.contains("warp")) return "warp";
-      if (name.contains("onpress") || name.contains("switch")) return "pressure_plate";
-      if (name.contains("_cracked")) return profile.id.equals("volcano") ? "volcanic_cracked" : "cracked";
-      if (name.contains("stairs") || name.contains("ramp")) return profile.cliff("ramp");
-      if (name.contains("hole") || name.contains("pit")) return "hole";
-      if (name.contains("sign")) return "sign";
-      if (name.contains("chest")) return "chest";
-      if (name.contains("gravestone") || name.contains("keystone")) return profile.decor("gravestone");
-      if (name.contains("statue") || name.contains("pedistal") || name.contains("pedestal")) return "statue";
-      if (name.contains("stalagmite")) return "cave_stalagmite";
-      if (name.contains("rock") || name.contains("rubble") || name.contains("block")) return name.contains("ice") ? "rock_ice" : profile.decor("rock");
-      if (name.contains("cactus")) return profile.id.equals("desert") ? "desert_cactus" : "cactus";
-      if (name.contains("aloe")) return "aloe";
-      if (name.contains("tree")) return name.contains("snow") || name.equals("tree4") ? "tree_snow" : profile.decor("tree");
-      if (name.contains("flower")) return name.contains("fairy") ? "flowers_fairy" : "flowers";
-      if (name.contains("grass")) return profile.decor("grass");
-      if (name.contains("bush")) return profile.decor("bush");
-      if (name.contains("plant") || name.contains("potted") || name.equals("pot1")) return "pot";
-      if (name.contains("stool") || name.contains("chair")) return "chair";
-      if (name.contains("sleeping_bag") || name.contains("bed")) return "bed";
-      if (name.contains("couch")) return "couch";
-      if (name.contains("shelf")) return "shelf";
-      if (name.contains("wardrobe")) return "wardrobe";
-      if (name.contains("desk") || name.contains("vanity") || name.contains("gym")) return "desk";
-      if (name.contains("table")) return "table";
-      if (name.contains("window")) return "window";
-      if (name.contains("picture")) return "sign";
-      if (name.contains("door") || name.contains("locked")) return name.contains("locked") ? "door_locked" : "door_open";
-      if (name.contains("gate")) return "ruin_gate";
-      if (name.contains("fence")) return "fence_wood";
-      if (name.contains("roof")) return "roof";
-      if (name.contains("floor") || name.contains("carpet") || name.contains("rug") || name.contains("bridge") || name.contains("ledge")) return null;
-      if (name.contains("wall") || name.contains("pkmnmansion") || name.contains("house") || name.contains("building") || name.contains("pillar")) return "wall";
-      // Script markers and missing texture identities must not become visible
-      // placeholder ghosts, stones or plates, especially during night effects.
-      if (!upper.isEmpty()) return null;
-      return null;
-   }
+   public static String objectName(Tile tile) { return WorldMaterials.objectName(tile); }
    private static String lower(String value) { return value == null ? "" : value.toLowerCase(Locale.ROOT); }
 }

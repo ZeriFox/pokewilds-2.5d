@@ -1,4 +1,15 @@
-# PokeWilds presentation recovery — live checkpoint
+# Current Java checkpoint — material roles and subtle ambient overlays
+
+Updated: 2026-10-11. Base main: `392411be7bcb13f19a63948ad4544c36d9cec164`.
+Unity is cancelled. Step 1 mesh ownership is integrated. Step 2 is implemented in tracked sources: `WorldMaterials` separates semantic ground/prop/structure roles; `WorldAmbientOverlay` adds bounded, source-bound accents below UI. No PNGs, game rules, inputs, procedural generation or saved fields are changed.
+
+Local full compilation and targeted real-GL tests passed: whole-image/custom asset sampling, biome scenes, historical pixel parity with the new accents OFF, and seven new ON/OFF scenes with unchanged UI/focus pixels and no gameplay RNG consumption. The complete 24-runner CI must pass on a clean checkpoint before integration. Actual receipts under `build/rework-verification` determine the result; a previous pass is not substituted for a new run.
+
+Details and commands: `docs/JAVA-REFACTOR-STEP2.md`. Next command: `python tools/verify_rework.py --stage all` on the clean checkpoint with the pinned Java inputs and an OpenGL display. The existing Windows release remains unchanged; no new Windows runtime verification is claimed here.
+
+---
+
+# Historical presentation recovery record (2026-10-07)
 
 Updated: 2026-10-07, Windows x64. Completed evidence and remaining verification are separate.
 

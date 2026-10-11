@@ -42,6 +42,7 @@ public final class JohtoRenderer {
    private final WorldMeshBatch translucent = new WorldMeshBatch();
    private final WorldMeshBatch shadows = new WorldMeshBatch();
    private final WorldMeshBatch emotes = new WorldMeshBatch();
+   private final WorldAmbientOverlay ambientOverlays = new WorldAmbientOverlay();
    private final Map<Class<?>, Field> emoteOwners = new IdentityHashMap<>();
    private final ActorModelRenderer actorModels = new ActorModelRenderer();
    private final Map<Object, Motion> motion = new WeakHashMap<>();
@@ -96,6 +97,7 @@ public final class JohtoRenderer {
          configureCamera(game);
          seconds += Math.min(0.1f, Math.max(0f, Gdx.graphics.getDeltaTime()));
          collectWorld(game);
+         ambientOverlays.prepare(game, elevation, seconds, whiteTexture);
          // Prepare the complete scene before drawing it in one world pass.
          geometry.upload();
          translucent.upload();
@@ -322,7 +324,8 @@ public final class JohtoRenderer {
       String lower = tile.name == null ? "" : tile.name;
       String upper = tile.nameUpper == null ? "" : tile.nameUpper;
       String names = (lower + " " + upper).toLowerCase(java.util.Locale.ROOT);
-      boolean tree = isTree(tile, lower, upper);
+      String identity = WorldMaterials.objectName(tile);
+      WorldMaterials.Kind kind = WorldMaterials.kind(tile, identity);
       BiomeProfiles.Profile profile=BiomeProfiles.visualForTile(tile);
       TextureRegion ground = assets.terrain(tile, seconds);
       if(assets.namedAnimated(BwAssets.terrainName(tile),seconds)==null)
@@ -354,21 +357,21 @@ public final class JohtoRenderer {
       if (tile.isLedge && (tile.ledgeDir != null || upper.startsWith("ledges3"))) {
          return;
       }
-      if (tree) { tree(tile, x + 8f, y + 8f, names); return; }
+      if (kind == WorldMaterials.Kind.HIDDEN) return;
+      if (kind == WorldMaterials.Kind.TREE) { tree(tile, x + 8f, y + 8f, names); return; }
       if (staticPokemon(tile, x+8, y+7)) return;
       if (names.contains("pokeball") || names.contains("ultraball")) { ball(x+8,y+7,names.contains("ultraball")); return; }
       if (building(game, tile, x, y, names)) return;
-      TextureRegion object = assets.object(tile, seconds);
+      TextureRegion object = identity == null ? null : assets.namedAnimated(identity, seconds);
       if(object==null && BwAssets.objectName(tile)!=null)
          assets.reportMissing(BwAssets.objectName(tile),tile,game.map.timeOfDay);
       if (object != null) {
-         String identity=BwAssets.objectName(tile);
-         if("warp".equals(identity)||"pressure_plate".equals(identity)||"cracked".equals(identity)||"hole".equals(identity)||"steps".equals(identity)) {
+         if (kind == WorldMaterials.Kind.GROUND_DETAIL) {
             floor(object,x,y,16,16,.08f,WHITE,geometry);return;
          }
          boolean seedling="seedling".equals(identity)||"plant_growing".equals(identity);
          boolean plant = names.contains("grass") || names.contains("flower") || seedling;
-         float maxWidth = seedling ? Math.min(9f,object.getRegionWidth()) : names.contains("rock") ? 17f : plant ? 16f : 18f;
+         float maxWidth = seedling ? Math.min(9f,object.getRegionWidth()) : kind == WorldMaterials.Kind.ROCK ? 17f : plant ? 16f : 18f;
          float scale = VisualGeometry.fitScale(object.getRegionWidth(), object.getRegionHeight(), maxWidth, 25f);
          float width = assets.worldWidth(object, object.getRegionWidth() * scale);
          float height = assets.worldHeight(object, object.getRegionHeight() * scale);
@@ -586,8 +589,9 @@ public final class JohtoRenderer {
    }
 
    private boolean building(Game game, Tile tile, float x, float y, String name) {
-      String identity=BwAssets.objectName(tile);
-      if(identity!=null&&java.util.Arrays.asList("chair","couch","bed","desk","table","shelf","wardrobe","pot").contains(identity)) {
+      String identity=WorldMaterials.objectName(tile);
+      WorldMaterials.Kind kind=WorldMaterials.kind(tile,identity);
+      if(kind==WorldMaterials.Kind.FURNITURE) {
          TextureRegion art=assets.named(identity);
          if(art==null)return false;
          float scale=VisualGeometry.fitScale(art.getRegionWidth(),art.getRegionHeight(),24,29);
@@ -596,30 +600,29 @@ public final class JohtoRenderer {
          upright(art,x+8-width*.5f,y+7,.16f,width,height,WHITE);
          return true;
       }
-      if(name.contains("bridge")||name.contains("stairs")) {
-         floor(assets.named(name.contains("stairs")?"steps":"wood_floor"),x,y,16,16,.1f,WHITE,geometry);return true;
+      if(kind==WorldMaterials.Kind.BRIDGE) {
+         floor(assets.named("wood_floor"),x,y,16,16,.1f,WHITE,geometry);return true;
       }
-      if(name.contains("fence")||name.contains("gate")) {
+      if(kind==WorldMaterials.Kind.FENCE) {
          if(tile.isSolid)upright(assets.named("fence_wood"),x,y+8,.1f,16,12,WHITE);
          else floor(assets.named("wood_floor"),x,y,16,16,.1f,WHITE,geometry);
          return true;
       }
-      if(name.contains("roof")) {
+      if(kind==WorldMaterials.Kind.ROOF) {
          floor(assets.named("roof"),x,y,16,16,22,WHITE,geometry);return true;
       }
-      if(name.contains("door")||name.contains("pkmnmansion_ext_locked")) {
+      if(kind==WorldMaterials.Kind.DOOR) {
          floor(assets.named("steps"),x,y,16,12,.1f,WHITE,geometry);
-         upright(assets.named(name.contains("locked")?"door_locked":tile.isSolid?"door":"door_open"),x,y+14,.1f,16,22,WHITE);
+         upright(assets.named("door_locked".equals(identity)?"door_locked":tile.isSolid?"door":"door_open"),x,y+14,.1f,16,22,WHITE);
          return true;
       }
       String upper=tile.nameUpper==null?"":tile.nameUpper.toLowerCase(java.util.Locale.ROOT);
       String lower=tile.name==null?"":tile.name.toLowerCase(java.util.Locale.ROOT);
-      boolean caveWall=lower.startsWith("cave")&&upper.isEmpty()&&!lower.contains("regi");
-      boolean structural=tile.isSolid&&("wall".equals(identity)||"window".equals(identity)||name.contains("pkmnmansion_ext")
-         ||caveWall&&VisualGeometry.buildingWall(lower,upper,true));
+      boolean caveWall=WorldMaterials.caveWall(tile);
+      boolean structural=kind==WorldMaterials.Kind.WALL||kind==WorldMaterials.Kind.WINDOW;
       if(structural) {
-         TextureRegion face=assets.named(caveWall?"cliff_dark":name.contains("ruin")?"ruin_wall":"wall");
-         TextureRegion cap=assets.named(caveWall?"mountain":name.contains("ruin")?"ruin_floor":"wall_cap");
+         TextureRegion face=assets.named(WorldMaterials.wallFace(tile));
+         TextureRegion cap=assets.named(WorldMaterials.wallCap(tile));
          if(cap==null)cap=assets.named("wood_floor");
          float height=caveWall?16:24,z=-y;
          // The cap can cover the actor even when the visible front face is far
@@ -634,7 +637,7 @@ public final class JohtoRenderer {
          if(!structuralNeighbour(game,x-16,y))quad(mesh,x,0,z-16,x,0,z,x,height,z,x,height,z-16,face,Color.toFloatBits(.88f,.90f,.91f,alpha));
          if(!structuralNeighbour(game,x+16,y))quad(mesh,x+16,0,z,x+16,0,z-16,x+16,height,z-16,x+16,height,z,face,Color.toFloatBits(.73f,.78f,.81f,alpha));
          floor(cap,x,y,16,16,height,wallTint,groups);
-         if(name.contains("window")) {
+         if(kind==WorldMaterials.Kind.WINDOW) {
             TextureRegion window=assets.named("window");
             if(window!=null)quad(groups.buffer(window.getTexture()),x+3,7,z+.05f,x+13,7,z+.05f,x+13,19,z+.05f,x+3,19,z+.05f,window,wallTint);
          }
@@ -668,8 +671,8 @@ public final class JohtoRenderer {
    private boolean structuralNeighbour(Game game,float x,float y) {
       Tile tile=game.map.tiles.get(lookup.set(x,y));
       if(tile==null||!tile.isSolid)return false;
-      String identity=BwAssets.objectName(tile);
-      return "wall".equals(identity)||"window".equals(identity);
+      WorldMaterials.Kind kind=WorldMaterials.kind(tile,WorldMaterials.objectName(tile));
+      return kind==WorldMaterials.Kind.WALL||kind==WorldMaterials.Kind.WINDOW;
    }
 
    private void prism(float x,float y,float base,float width,float depth,float top,TextureRegion face,float tint) {
@@ -682,10 +685,7 @@ public final class JohtoRenderer {
    }
 
    private static boolean isTree(Tile tile, String lower, String upper) {
-      if (upper.contains("planted") || upper.contains("berrytree") || upper.contains("stump")) return false;
-      return tile.isTree || lower.matches("tree[1-7]") || lower.startsWith("tree_large")
-         || upper.matches("tree[1-7]") || upper.startsWith("tree_large") || upper.equals("tree_savanna1")
-         || lower.startsWith("tree_fairy") || upper.startsWith("tree_fairy");
+      return WorldMaterials.isTree(tile);
    }
 
    private void pokemon(Game game, Pokemon pokemon) {
@@ -957,13 +957,7 @@ public final class JohtoRenderer {
       upright(sprite,x-width/2,y,.2f,width,height,WHITE);
    }
 
-   private String treeKey(Tile tile, String name) {
-      BiomeProfiles.Profile profile=BiomeProfiles.visualForTile(tile);
-      String key = profile.id.equals("volcano")||profile.id.equals("graveyard")||profile.id.equals("desert") ? profile.decor("tree")
-         : name.contains("tree4") || name.contains("snow") ? "tree_snow"
-         : name.contains("savanna") ? "tree_dry" : name.contains("tree2") ? "tree_pine" : "tree";
-      return key;
-   }
+   private String treeKey(Tile tile, String name) { return WorldMaterials.treeKey(tile); }
 
    /** Read the original action clock; never execute an action or advance RNG here. */
    private void fieldEffect(Game game, Action action) {
@@ -1172,6 +1166,8 @@ public final class JohtoRenderer {
          geometry.render(shader);
          shader.end();
          shaderBegun = false;
+         // World-space accents test terrain/actor depth and never cover UI/emotes.
+         ambientOverlays.render(camera,r,g,b);
          // Actor rendering remains in the same sprite geometry pass.
          // ModelBatch owns a different shader/render context. Restore the state
          // explicitly before continuing our water, shadow and emote passes.
@@ -1210,6 +1206,7 @@ public final class JohtoRenderer {
       translucent.dispose();
       shadows.dispose();
       emotes.dispose();
+      ambientOverlays.dispose();
       emoteOwners.clear();
       actorModels.dispose();
       if (shader != null) shader.dispose();

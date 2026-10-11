@@ -19,7 +19,7 @@ def main() -> int:
             raise RuntimeError("Test copy escaped the intended temporary directory")
         shutil.copytree(verifier.ROOT / "src", root / "src")
         shutil.copytree(verifier.ROOT / verifier.CLASSIC_SOURCES, root / verifier.CLASSIC_SOURCES)
-        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE]:
+        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE]:
             target = root / source
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / source, target)
@@ -66,6 +66,9 @@ def main() -> int:
             battle_path.write_bytes(battle_bytes)
         reject("input changed after freeze", verifier.PREFIX + "InputProcessor.java", append)
         reject("new helper changed after freeze", verifier.PREFIX + "DesktopControls.java", append)
+        reject("material resolver changed after freeze", verifier.PREFIX + "WorldMaterials.java", append)
+        reject("ambient overlay changed after freeze", verifier.PREFIX + "WorldAmbientOverlay.java", append)
+        reject("pre-step-2 review archive changed", "baseline/java-material-step2/modernization-scope.json", append)
         reject("unreviewed original source", verifier.PREFIX + "DrawMap.java", append)
         reject("original source removed", verifier.PREFIX + "Attack.java", lambda p: p.unlink())
         reject("unreviewed class addition", verifier.PREFIX + "UnapprovedClass.java", lambda p: p.write_text("class UnapprovedClass {}\n"))

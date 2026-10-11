@@ -20,7 +20,7 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "400091117298b225cfa21c5b7174f5da8b514999e8fd11be12d9b6953d66c146"
+FROZEN_MANIFEST_SHA256 = "0662c4a3fab0ec871e834ea3e4c185374c75a239c378d325b20d521e6975c3f9"
 PREFIX = "src/com/pkmngen/game/"
 V2_ARCHIVE = {
     "baseline/modernization-v2/modernization-scope.json": "f978edd535ac4440d6ce01924bc98135105a718e3a57faf9838827cd3ebf2343",
@@ -44,6 +44,9 @@ V5_ARCHIVE = {
     "baseline/modernization-v5/VERIFICA.txt": "ec11e79cf8eb0177424156f966bb452e0e7e463565840ae93f48525020568f31",
     "baseline/modernization-v5/archive.json": "bc32b1a3a40124c457960c34dfc7a7b4126ab96594b67806e7a900098403f4ac",
 }
+
+# Immutable pre-step-2 scope; only reviewed presentation helpers are extended.
+STEP2_ARCHIVE = {'baseline/java-material-step2/modernization-scope.json': '400091117298b225cfa21c5b7174f5da8b514999e8fd11be12d9b6953d66c146', 'baseline/java-material-step2/verify_visual_scope.py': '151d33992c895559f0b30d61c58372818aaf810b9f34d2e08697e0f5ab835e06'}
 
 # Names and review scope are explicit; an edited manifest cannot expand them.
 MODIFIED_SCOPES = {
@@ -90,6 +93,8 @@ MODIFIED_SCOPES = {
     "util/SpriteProxy.java": "Presentation: intercept known battle actors for PMD rendering; legacy fallback retained.",
 }
 ADDED_SCOPES = {
+    "WorldMaterials.java": "Presentation-only semantic terrain/prop resolver and explicit geometry kinds; upper objects override floor-name heuristics, whole rocks remain props and volcanic cracks remain flat. No asset ownership, Tile mutations or saved-data changes.",
+    "WorldAmbientOverlay.java": "Sparse deterministic world-space mist, embers, fireflies, dust, snow and water glints with strict count/opacity budgets, protected actor focus, depth testing, separate shader ownership and no gameplay RNG or indoor/UI overlays.",
     "WorldMeshBatch.java": "CPU vertex storage, identity-based texture grouping, triangle-aligned mesh upload/reuse and GPU ownership extracted from JohtoRenderer; no camera, scene state, shader uniforms, texture ownership, gameplay or saved data.",
     "ActorModelRenderer.java": "Existing optional 3D helper, disabled by the modern sprite launcher.",
     "BiomeProfiles.java": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state.",
@@ -125,6 +130,9 @@ def sha256(path: Path) -> str:
 
 
 def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
+    for archived, expected in STEP2_ARCHIVE.items():
+        if sha256(root / archived) != expected:
+            raise RuntimeError("Immutable pre-step-2 review archive changed: " + archived)
     for archived, expected in V2_ARCHIVE.items():
         if sha256(root / archived) != expected:
             raise RuntimeError("Immutable schema 2 archive changed: " + archived)
