@@ -70,7 +70,7 @@ public final class WorldMeshBatchTest {
          Field oldShader=ReferenceJohtoRenderer.class.getDeclaredField("shader");oldShader.setAccessible(true);oldShader.set(original,shader);
          try {
             int[] counts={3,6,65532,65535,131067,3,0,6};
-            Object prior=null; Mesh priorMesh=null;
+            Object prior=null; Mesh priorMesh=null; int priorCapacity=0;
             for(int iteration=0;iteration<counts.length;iteration++) {
                current.clear();
                for(Object group:oldGroups.values())((FloatArray)field(group,"vertices")).clear();
@@ -99,9 +99,9 @@ public final class WorldMeshBatchTest {
                }
                if(counts[iteration]>0) {
                   Object buffer=newGroups.get(a);Mesh mesh=((Mesh[])field(buffer,"meshes"))[0];
-                  if(priorMesh!=null&&priorMesh.getMaxVertices()>=counts[iteration]&&counts[iteration]<=65532)
+                  if(priorMesh!=null&&priorCapacity>=counts[iteration]&&counts[iteration]<=65532)
                      require(priorMesh==mesh,"Reusable mesh was replaced");
-                  prior=buffer;priorMesh=mesh;
+                  prior=buffer;priorMesh=mesh;priorCapacity=mesh.getMaxVertices();
                } else {prior=null;priorMesh=null;require(newGroups.isEmpty(),"Empty frame retained texture keys");}
                byte[] before=capture(shader,()->oldDraw.invoke(original,oldGroups));
                byte[] after=capture(shader,()->current.render(shader));

@@ -40,6 +40,7 @@ NATIVE = [
     ["tools/ghost_diagnostic_test.py"], ["tools/vertical_slice_test.py"],
     ["tools/move_effect_presentation_test.py"],
     ["tools/active_move_resize_test.py"],
+    ["tools/world_mesh_batch_test.py"],
 ]
 
 

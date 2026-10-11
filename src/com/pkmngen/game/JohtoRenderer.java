@@ -1,14 +1,13 @@
 package com.pkmngen.game;
 
+import com.pkmngen.game.WorldMeshBatch.Buffer;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -19,7 +18,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.BufferUtils;
-import com.badlogic.gdx.utils.FloatArray;
 import java.lang.reflect.Field;
 import java.nio.FloatBuffer;
 import java.util.IdentityHashMap;
@@ -38,14 +36,12 @@ import java.util.WeakHashMap;
 public final class JohtoRenderer {
    private static final float TILE = VisualSampling.WORLD_TILE_SIZE;
    private static final float WHITE = Color.WHITE_FLOAT_BITS;
-   private static final int FLOATS_PER_VERTEX = 8;
-   private static final int MAX_VERTICES = 65532;
    private final PerspectiveCamera camera = new PerspectiveCamera(35f, 160f, 144f);
    private final Vector2 lookup = new Vector2();
-   private final Map<Texture, Geometry> geometry = new IdentityHashMap<>();
-   private final Map<Texture, Geometry> translucent = new IdentityHashMap<>();
-   private final Map<Texture, Geometry> shadows = new IdentityHashMap<>();
-   private final Map<Texture, Geometry> emotes = new IdentityHashMap<>();
+   private final WorldMeshBatch geometry = new WorldMeshBatch();
+   private final WorldMeshBatch translucent = new WorldMeshBatch();
+   private final WorldMeshBatch shadows = new WorldMeshBatch();
+   private final WorldMeshBatch emotes = new WorldMeshBatch();
    private final Map<Class<?>, Field> emoteOwners = new IdentityHashMap<>();
    private final ActorModelRenderer actorModels = new ActorModelRenderer();
    private final Map<Object, Motion> motion = new WeakHashMap<>();
@@ -92,16 +88,19 @@ public final class JohtoRenderer {
          if (!initialized) {
             initialize();
          }
-         clearGeometry();
+         geometry.clear();
+         translucent.clear();
+         shadows.clear();
+         emotes.clear();
          elevation.update(game.map.tiles);
          configureCamera(game);
          seconds += Math.min(0.1f, Math.max(0f, Gdx.graphics.getDeltaTime()));
          collectWorld(game);
          // Prepare the complete scene before drawing it in one world pass.
-         upload(geometry);
-         upload(translucent);
-         upload(shadows);
-         upload(emotes);
+         geometry.upload();
+         translucent.upload();
+         shadows.upload();
+         emotes.upload();
          draw(game);
          renderedFrames++;
          if (!reported) {
@@ -273,7 +272,7 @@ public final class JohtoRenderer {
       surfaceLift=elevation.height(x+8,y+8);
       if (sprite == null || sprite.getTexture() == null) return;
       if (!camera.frustum.sphereInFrustum(x + 8f, 28f, -y - 7f, 18f)) return;
-      quad(batch(emotes, sprite.getTexture()), x, 20f, -y - 7f,
+      quad(emotes.buffer(sprite.getTexture()), x, 20f, -y - 7f,
          x + 16f, 20f, -y - 7f, x + 16f, 36f, -y - 7f, x, 36f, -y - 7f,
          sprite, sprite.getColor().toFloatBits());
    }
@@ -411,7 +410,7 @@ public final class JohtoRenderer {
    }
 
    private void disc(float x,float y,float base,float radius,float top,float bottom) {
-      Geometry mesh=batch(geometry,whiteTexture);
+      Buffer mesh=geometry.buffer(whiteTexture);
       float rise=MathUtils.cosDeg(50),back=MathUtils.sinDeg(50);
       for(int i=0;i<20;i++) {
          float a=i*MathUtils.PI2/20,b=(i+1)*MathUtils.PI2/20;
@@ -454,7 +453,7 @@ public final class JohtoRenderer {
          float h1=elevation.height(MathUtils.clamp(ex,x+.01f,x+15.99f),MathUtils.clamp(py,y+.01f,y+15.99f));
          float h2=elevation.height(MathUtils.clamp(ex,x+.01f,x+15.99f),MathUtils.clamp(ey,y+.01f,y+15.99f));
          float h3=elevation.height(MathUtils.clamp(px,x+.01f,x+15.99f),MathUtils.clamp(ey,y+.01f,y+15.99f));
-         quad(batch(translucent,whiteTexture),px,h0+.06f,-py,ex,h1+.06f,-py,ex,h2+.06f,-ey,px,h3+.06f,-ey,
+         quad(translucent.buffer(whiteTexture),px,h0+.06f,-py,ex,h1+.06f,-py,ex,h2+.06f,-ey,px,h3+.06f,-ey,
             white,Color.toFloatBits(.72f,.69f,.62f,.34f));
       }
       surfaceLift=previousLift;
@@ -472,7 +471,7 @@ public final class JohtoRenderer {
          -(tile.isLava?0:profile.number("height","shoreDepth",2));
       float top=elevation.height(hx-dx*.01f,hy-dy*.01f)-surfaceLift;
       // The falling sheet is upright world geometry; it never becomes a ground decal.
-      quad(batch(geometry,art.getTexture()),lx-tx*8,bottom,-ly+ty*8,lx+tx*8,bottom,-ly-ty*8,
+      quad(geometry.buffer(art.getTexture()),lx-tx*8,bottom,-ly+ty*8,lx+tx*8,bottom,-ly-ty*8,
          hx+tx*8,top,-hy-ty*8,hx-tx*8,top,-hy+ty*8,art,WHITE,tile.isLava?3:0);
       for(int i=0;i<4;i++) {
          float travel=(seconds*.7f+i*.25f)%1f;
@@ -506,7 +505,7 @@ public final class JohtoRenderer {
       surfaceLift=elevation.height(x,y);ghostFrames++;
       float bob=6+MathUtils.sin(seconds*3)*1.5f;
       shadow(x,y,5,2.4f);
-      Geometry mesh=batch(translucent,whiteTexture);
+      Buffer mesh=translucent.buffer(whiteTexture);
       for(int layer=0;layer<4;layer++) {
          float radius=8-layer*1.4f,tint=Color.toFloatBits(.62f+layer*.08f,.69f+layer*.07f,.90f,alpha*(.12f+layer*.05f));
          for(int i=0;i<24;i++) {
@@ -529,7 +528,7 @@ public final class JohtoRenderer {
       float gx=((b+c)-(a+d))/32f,gy=((c+d)-(a+b))/32f;
       float sun=(.82f+.30f*gx+.32f*gy)/(float)Math.sqrt(1+gx*gx+gy*gy);
       float light=tile.isLava?1:MathUtils.clamp(.60f+.40f*sun/.82f,.60f,1f);
-      quad(batch(geometry,art.getTexture()),x,a,-y,x+16,b,-y,x+16,c,-y-16,x,d,-y-16,art,color(light,light,light),tile.isLava?3f:0f);
+      quad(geometry.buffer(art.getTexture()),x,a,-y,x+16,b,-y,x+16,c,-y-16,x,d,-y-16,art,color(light,light,light),tile.isLava?3f:0f);
       surfaceLift=previous;
    }
 
@@ -564,7 +563,7 @@ public final class JohtoRenderer {
          // cut alternating horizontal strips out of its face.
          TextureRegion face=assets.named(profile.cliff("front"));
          float shade=side==0?.90f:side==1?.66f:side==2?.78f:.64f;
-         quad(batch(geometry,face.getTexture()),x0,lowA,-y0,x1,lowB,-y1,x1,b,-y1,x0,a,-y0,
+         quad(geometry.buffer(face.getTexture()),x0,lowA,-y0,x1,lowB,-y1,x1,b,-y1,x0,a,-y0,
             face,color(shade,shade,shade));
          // A fine edge on the plateau and a contact shadow at the foot give
          // complementary cues for going up and down, without a thick wall cap.
@@ -572,14 +571,14 @@ public final class JohtoRenderer {
             float ix=-dx*.65f,iy=-dy*.65f;
             float ha=terrainHeight(tile,MathUtils.clamp(x0+ix,x+.01f,x+15.99f),MathUtils.clamp(y0+iy,y+.01f,y+15.99f));
             float hb=terrainHeight(tile,MathUtils.clamp(x1+ix,x+.01f,x+15.99f),MathUtils.clamp(y1+iy,y+.01f,y+15.99f));
-            quad(batch(translucent,whiteTexture),x0,a+.065f,-y0,x1,b+.065f,-y1,
+            quad(translucent.buffer(whiteTexture),x0,a+.065f,-y0,x1,b+.065f,-y1,
                x1+ix,hb+.065f,-y1-iy,x0+ix,ha+.065f,-y0-iy,white,Color.toFloatBits(.88f,.87f,.79f,.22f));
             float ox=dx*1.5f,oy=dy*1.5f;
             float la=terrainHeight(next,MathUtils.clamp(x0+ox,next.position.x+.01f,next.position.x+15.99f),
                MathUtils.clamp(y0+oy,next.position.y+.01f,next.position.y+15.99f));
             float lb=terrainHeight(next,MathUtils.clamp(x1+ox,next.position.x+.01f,next.position.x+15.99f),
                MathUtils.clamp(y1+oy,next.position.y+.01f,next.position.y+15.99f));
-            quad(batch(translucent,whiteTexture),x0,lowA+.07f,-y0,x1,lowB+.07f,-y1,
+            quad(translucent.buffer(whiteTexture),x0,lowA+.07f,-y0,x1,lowB+.07f,-y1,
                x1+ox,lb+.07f,-y1-oy,x0+ox,la+.07f,-y0-oy,white,Color.toFloatBits(.05f,.06f,.08f,.30f));
          }
       }
@@ -627,9 +626,9 @@ public final class JohtoRenderer {
          // below them on screen. Fade the complete intervening wall segment;
          // retain its geometry and neighbour culling, so corners never gain holes.
          float alpha=interiorWallOccludesPlayer(game,x,y,height)?.12f:1f;
-         Map<Texture,Geometry> groups=alpha<1f?translucent:geometry;
+         WorldMeshBatch groups=alpha<1f?translucent:geometry;
          float wallTint=Color.toFloatBits(1,1,1,alpha);
-         Geometry mesh=batch(groups,face.getTexture());
+         Buffer mesh=groups.buffer(face.getTexture());
          if(!structuralNeighbour(game,x,y-16))quad(mesh,x,0,z,x+16,0,z,x+16,height,z,x,height,z,face,wallTint);
          if(!structuralNeighbour(game,x,y+16))quad(mesh,x+16,0,z-16,x,0,z-16,x,height,z-16,x+16,height,z-16,face,Color.toFloatBits(.82f,.85f,.87f,alpha));
          if(!structuralNeighbour(game,x-16,y))quad(mesh,x,0,z-16,x,0,z,x,height,z,x,height,z-16,face,Color.toFloatBits(.88f,.90f,.91f,alpha));
@@ -637,7 +636,7 @@ public final class JohtoRenderer {
          floor(cap,x,y,16,16,height,wallTint,groups);
          if(name.contains("window")) {
             TextureRegion window=assets.named("window");
-            if(window!=null)quad(batch(groups,window.getTexture()),x+3,7,z+.05f,x+13,7,z+.05f,x+13,19,z+.05f,x+3,19,z+.05f,window,wallTint);
+            if(window!=null)quad(groups.buffer(window.getTexture()),x+3,7,z+.05f,x+13,7,z+.05f,x+13,19,z+.05f,x+3,19,z+.05f,window,wallTint);
          }
          return true;
       }
@@ -674,7 +673,7 @@ public final class JohtoRenderer {
    }
 
    private void prism(float x,float y,float base,float width,float depth,float top,TextureRegion face,float tint) {
-      Geometry mesh=batch(geometry,face.getTexture());float z=-y;
+      Buffer mesh=geometry.buffer(face.getTexture());float z=-y;
       quad(mesh,x,base,z,x+width,base,z,x+width,top,z,x,top,z,face,tint);
       quad(mesh,x+width,base,z,x+width,base,z-depth,x+width,top,z-depth,x+width,top,z,face,tint);
       quad(mesh,x,base,z-depth,x,base,z,x,top,z,x,top,z-depth,face,tint);
@@ -881,7 +880,7 @@ public final class JohtoRenderer {
    }
 
    private void ring(float x,float y,float radius,float thickness,float elevation,float tint) {
-      Geometry mesh=batch(translucent,whiteTexture);
+      Buffer mesh=translucent.buffer(whiteTexture);
       for(int i=0;i<24;i++) {
          float a=i*MathUtils.PI2/24,b=(i+1)*MathUtils.PI2/24,inner=radius-thickness;
          quad(mesh,x+MathUtils.cos(a)*inner,elevation,-y+MathUtils.sin(a)*inner,
@@ -892,7 +891,7 @@ public final class JohtoRenderer {
    }
 
    private void line(float x1,float h1,float y1,float x2,float h2,float y2,float width,float tint) {
-      quad(batch(geometry,whiteTexture),x1-width,h1,-y1,x1+width,h1,-y1,
+      quad(geometry.buffer(whiteTexture),x1-width,h1,-y1,x1+width,h1,-y1,
          x2+width,h2,-y2,x2-width,h2,-y2,white,tint);
    }
 
@@ -1008,7 +1007,7 @@ public final class JohtoRenderer {
    }
 
    private void shadow(float x, float y, float width, float depth) {
-      Geometry mesh = batch(shadows, whiteTexture);
+      Buffer mesh = shadows.buffer(whiteTexture);
       float tint = Color.toFloatBits(0.13f, 0.22f, 0.19f, 0.26f);
       for (int i = 0; i < 16; i++) {
          float a = i * MathUtils.PI2 / 16;
@@ -1041,16 +1040,16 @@ public final class JohtoRenderer {
    private void uprightRaw(TextureRegion region, float x, float y, float base, float width, float height, float tint, float style) {
       // Camera-facing sprites keep their pixel proportions in the tilted world.
       float rise = height * MathUtils.cosDeg(50f), back = height * MathUtils.sinDeg(50f);
-      quad(batch(geometry, region.getTexture()),
+      quad(geometry.buffer(region.getTexture()),
          x, base, -y, x + width, base, -y, x + width, base + rise, -y-back, x, base + rise, -y-back, region, tint, style);
    }
 
-   private void floor(TextureRegion region, float x, float y, float width, float depth, float elevation, float tint, Map<Texture, Geometry> groups) {
+   private void floor(TextureRegion region, float x, float y, float width, float depth, float elevation, float tint, WorldMeshBatch groups) {
       floor(region, x, y, width, depth, elevation, tint, groups, 0f);
    }
 
-   private void floor(TextureRegion region, float x, float y, float width, float depth, float elevation, float tint, Map<Texture, Geometry> groups, float style) {
-      quad(batch(groups, region.getTexture()), x, elevation, -y, x + width, elevation, -y,
+   private void floor(TextureRegion region, float x, float y, float width, float depth, float elevation, float tint, WorldMeshBatch groups, float style) {
+      quad(groups.buffer(region.getTexture()), x, elevation, -y, x + width, elevation, -y,
          x + width, elevation, -y - depth, x, elevation, -y - depth, region, tint, style);
    }
 
@@ -1058,22 +1057,13 @@ public final class JohtoRenderer {
       return Color.toFloatBits(r, g, b, 1f);
    }
 
-   private Geometry batch(Map<Texture, Geometry> groups, Texture texture) {
-      Geometry batch = groups.get(texture);
-      if (batch == null) {
-         batch = new Geometry();
-         groups.put(texture, batch);
-      }
-      return batch;
-   }
-
-   private void quad(Geometry mesh,
+   private void quad(Buffer mesh,
       float x0, float y0, float z0, float x1, float y1, float z1,
       float x2, float y2, float z2, float x3, float y3, float z3, TextureRegion uv, float tint) {
       quad(mesh, x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3, uv, tint, 0f);
    }
 
-   private void quad(Geometry mesh,
+   private void quad(Buffer mesh,
       float x0, float y0, float z0, float x1, float y1, float z1,
       float x2, float y2, float z2, float x3, float y3, float z3, TextureRegion uv, float tint, float style) {
       vertex(mesh, x0, y0, z0, tint, uv.getU(), uv.getV2(), style);
@@ -1084,62 +1074,17 @@ public final class JohtoRenderer {
       vertex(mesh, x0, y0, z0, tint, uv.getU(), uv.getV2(), style);
    }
 
-   private void triangle(Geometry mesh, float x0, float y0, float z0,
+   private void triangle(Buffer mesh, float x0, float y0, float z0,
       float x1, float y1, float z1, float x2, float y2, float z2, float tint) {
       vertex(mesh, x0, y0, z0, tint, 0.5f, 0.5f, 0f);
       vertex(mesh, x1, y1, z1, tint, 0.5f, 0.5f, 0f);
       vertex(mesh, x2, y2, z2, tint, 0.5f, 0.5f, 0f);
    }
 
-   private void vertex(Geometry mesh, float x, float y, float z, float color, float u, float v, float style) {
-      mesh.vertices.add(x);
-      mesh.vertices.add(y+surfaceLift);
-      mesh.vertices.add(z);
-      mesh.vertices.add(color);
-      mesh.vertices.add(u);
-      mesh.vertices.add(v);
-      mesh.vertices.add(style);
-      mesh.vertices.add(style>3.5f?projectedAnchor.set(x,y+surfaceLift+.12f,actorPlaneZ).prj(camera.combined).z:0f);
-   }
-
-   private void clearGeometry() {
-      for (Geometry mesh : geometry.values()) mesh.vertices.clear();
-      for (Geometry mesh : translucent.values()) mesh.vertices.clear();
-      for (Geometry mesh : shadows.values()) mesh.vertices.clear();
-      for (Geometry mesh : emotes.values()) mesh.vertices.clear();
-   }
-
-   private static void upload(Map<Texture, Geometry> groups) {
-      java.util.Iterator<Geometry> iterator = groups.values().iterator();
-      while (iterator.hasNext()) {
-         Geometry geometry = iterator.next();
-         int count = geometry.vertices.size / FLOATS_PER_VERTEX;
-         // The PMD atlas cache may evict unseen species. Do not retain mesh and
-         // texture keys for every sheet ever visited by the player.
-         if (count == 0) { geometry.dispose(); iterator.remove(); continue; }
-         // Mesh has no index buffer; chunks keep compatibility with older GL drivers.
-         int chunks = (count + MAX_VERTICES - 1) / MAX_VERTICES;
-         if (geometry.meshes == null || geometry.meshes.length < chunks) {
-            Mesh[] replacement = new Mesh[chunks];
-            if (geometry.meshes != null) System.arraycopy(geometry.meshes, 0, replacement, 0, geometry.meshes.length);
-            geometry.meshes = replacement;
-         }
-         for (int i = 0; i < chunks; i++) {
-            int vertices = Math.min(MAX_VERTICES, count - i * MAX_VERTICES);
-            Mesh mesh = geometry.meshes[i];
-            if (mesh == null || mesh.getMaxVertices() < vertices) {
-               if (mesh != null) mesh.dispose();
-               mesh = new Mesh(false, Math.min(MAX_VERTICES, Math.max(256, vertices * 2)), 0,
-                  new VertexAttribute(Usage.Position, 3, "a_position"),
-                  new VertexAttribute(Usage.ColorPacked, 4, "a_color"),
-                  new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
-                  new VertexAttribute(Usage.Generic, 1, "a_style"),
-                  new VertexAttribute(Usage.Generic, 1, "a_anchorDepth"));
-               geometry.meshes[i] = mesh;
-            }
-            mesh.setVertices(geometry.vertices.items, i * MAX_VERTICES * FLOATS_PER_VERTEX, vertices * FLOATS_PER_VERTEX);
-         }
-      }
+   private void vertex(Buffer mesh, float x, float y, float z, float color, float u, float v, float style) {
+      // Scene-dependent transforms stay here; storage/upload belong to the batch.
+      mesh.vertex(x, y+surfaceLift, z, color, u, v, style,
+         style>3.5f?projectedAnchor.set(x,y+surfaceLift+.12f,actorPlaneZ).prj(camera.combined).z:0f);
    }
 
    private void collectLights(Game game) {
@@ -1224,7 +1169,7 @@ public final class JohtoRenderer {
          shader.setUniformf("u_tint", r, g, b);
          shader.setUniform4fv("u_lights", lights, 0, lights.length);
          shaderAtmosphere();
-         renderGroups(geometry);
+         geometry.render(shader);
          shader.end();
          shaderBegun = false;
          // Actor rendering remains in the same sprite geometry pass.
@@ -1246,12 +1191,12 @@ public final class JohtoRenderer {
          // Water overlays and shadows blend only after the opaque ground. They
          // never write depth; texture-group iteration cannot erase the ground.
          Gdx.gl.glDepthMask(false);
-         renderGroups(translucent);
-         renderGroups(shadows);
+         translucent.render(shader);
+         shadows.render(shader);
          // Alarm/hearts/status balloons are overlays in the original game; keep
          // them readable above foreground crowns without changing their lifetime.
          Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
-         renderGroups(emotes);
+         emotes.render(shader);
       } finally {
          if (shaderBegun) shader.end();
          // Preserve the caller's actual clear color, including special transitions.
@@ -1260,27 +1205,11 @@ public final class JohtoRenderer {
       }
    }
 
-   private void renderGroups(Map<Texture, Geometry> groups) {
-      for (Map.Entry<Texture, Geometry> entry : groups.entrySet()) {
-         Geometry geometry = entry.getValue();
-         int count = geometry.vertices.size / FLOATS_PER_VERTEX;
-         if (count == 0) continue;
-         entry.getKey().bind(0);
-         for (int i = 0; i * MAX_VERTICES < count; i++) {
-            geometry.meshes[i].render(shader, GL20.GL_TRIANGLES, 0, Math.min(MAX_VERTICES, count - i * MAX_VERTICES));
-         }
-      }
-   }
-
    public void dispose() {
-      for (Geometry batch : geometry.values()) batch.dispose();
-      for (Geometry batch : translucent.values()) batch.dispose();
-      for (Geometry batch : shadows.values()) batch.dispose();
-      for (Geometry batch : emotes.values()) batch.dispose();
-      geometry.clear();
-      translucent.clear();
-      shadows.clear();
-      emotes.clear();
+      geometry.dispose();
+      translucent.dispose();
+      shadows.dispose();
+      emotes.dispose();
       emoteOwners.clear();
       actorModels.dispose();
       if (shader != null) shader.dispose();
@@ -1293,12 +1222,4 @@ public final class JohtoRenderer {
       // Textures borrowed from the game caches are deliberately never disposed here.
    }
 
-   private static final class Geometry {
-      final FloatArray vertices = new FloatArray(false, 1536);
-      Mesh[] meshes;
-
-      void dispose() {
-         if (meshes != null) for (Mesh mesh : meshes) if (mesh != null) mesh.dispose();
-      }
-   }
 }
