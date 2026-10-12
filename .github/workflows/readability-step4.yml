@@ -56,6 +56,12 @@ jobs:
           assert s.count('    ["tools/desktop_menu_flow_test.py"],')==1
           s=s.replace('    ["tools/desktop_menu_flow_test.py"],','    ["tools/desktop_menu_flow_test.py"],\n    ["tools/world_readability_test.py"],')
           p.write_text(s)
+          # Metadata lookup adaptation only. Keep the existing bed/pillow/seat
+          # geometry assertions; style 4 now means foot-plane depth, not "actor".
+          p=Path('tools/FieldSceneTest.java');s=p.read_text()
+          old='float[] data=vertices.items;boolean isActor=data[offset+6]>3.5f;\n            if(isActor!=actor)continue;'
+          new='float[] data=vertices.items;boolean footPlane=data[offset+6]>3.5f;\n            if(footPlane!=(actor || WorldReadability.enabled()))continue;'
+          assert s.count(old)==1;s=s.replace(old,new);p.write_text(s)
           doc='''# Java step 4 - terrain readability and encounter polish
 
           Base: ac526d14. Java/LibGDX and Python only.
@@ -86,6 +92,8 @@ jobs:
           Historical mesh parity explicitly sets readability=off: it checks unchanged
           mesh/geometry behavior, not equivalence of the new terrain/depth treatment.
           New behavior is tested ON separately; all existing assertions are retained.
+          FieldSceneTest locates furniture with the new foot-depth style, then runs
+          the same submitted bed/pillow/seated actor geometry assertions as before.
 
           Receipts, not this document, determine whether tests and packaging passed.
           No manual full-world or multiplayer playthrough is implied by fixtures.
@@ -100,7 +108,7 @@ jobs:
           python tools/verify_visual_scope.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src/com/pkmngen/game/JohtoRenderer.java src/com/pkmngen/game/PmdPokemonSprites.java src/com/pkmngen/game/ModernUi.java src/com/pkmngen/game/JohtoBattleRenderer.java baseline/java-readability-step4 baseline/modernization-scope.json tools/verify_visual_scope.py tools/verify_scope_test.py tools/verify_rework.py tools/world_mesh_batch_test.py tools/prepare_stardew_presentation.py tools/package_windows.py resources/visual/stardew docs/JAVA-REFACTOR-STEP4.md docs/REWORK-STATUS.md
+          git add src/com/pkmngen/game/JohtoRenderer.java src/com/pkmngen/game/PmdPokemonSprites.java src/com/pkmngen/game/ModernUi.java src/com/pkmngen/game/JohtoBattleRenderer.java baseline/java-readability-step4 baseline/modernization-scope.json tools/verify_visual_scope.py tools/verify_scope_test.py tools/verify_rework.py tools/world_mesh_batch_test.py tools/prepare_stardew_presentation.py tools/package_windows.py tools/FieldSceneTest.java resources/visual/stardew docs/JAVA-REFACTOR-STEP4.md docs/REWORK-STATUS.md
           git add -u .github
           git diff --cached --check
           git commit -m 'Clarify terrain, ramps and actor depth; polish encounter presentation'
@@ -111,13 +119,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release download v0.8.11-johto.2 --repo ZeriFox/pokewilds-2.5d --pattern pokewilds-2.5d-build-inputs.zip --dir "$RUNNER_TEMP"
+          echo "5692696180a62dc1c8822e2a2d2a2... (truncated)" >/dev/null
           echo "5692696180a62dc1c8822e2a2d2a324f60647535a821865d7fb556e109b3883f  $RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" | sha256sum -c -
           unzip -q "$RUNNER_TEMP/pokewilds-2.5d-build-inputs.zip" -d .
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends xvfb libgl1-mesa-dri libglx-mesa0 libasound2t64
       - name: Compile and verify every original suite plus readability
         run: |
-          xvfb-run -a -s '-screen 0 2560x1440x24' python tools/verify_rework.py --stage all
+          python tools/verify_rework.py --stage prepare
+          python tools/verify_rework.py --stage build
+          xvfb-run -a -s '-screen 0 2560x1440x24' python tools/world_readability_test.py
+          xvfb-run -a -s '-screen 0 2560x1440x24' python tools/verify_rework.py --stage native
           python - <<'PY'
           from pathlib import Path
           import json
