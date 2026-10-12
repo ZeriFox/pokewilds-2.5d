@@ -1,0 +1,145 @@
+name: Windows interface candidate verification
+
+on:
+  push:
+    branches: [ci/interface-step3-windows]
+    paths: ['.github/workflows/interface-windows-candidate.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: interface-step3-windows-candidate
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      GALLIUM_DRIVER: llvmpipe
+      ALSOFT_DRIVERS: 'null'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: d4fb3238ddcbe1107b4e96545158b58e23740a29
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - name: Recover the exact already-built candidate, without rebuilding it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          gh run download 38179356847 --repo ZeriFox/pokewilds-2.5d --name ui-step3-playable --dir build/portable
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate download failed' }
+          $zip = 'build/portable/pokewilds-2.5d-windows-x64-v0.8.11-interface.1.zip'
+          if ((Get-FileHash $zip -Algorithm SHA256).Hash.ToLower() -ne '2605773ccf85b153c64433f22bdf11a49f673432dc98778c758e8aa2a0de3d62') { throw 'Candidate ZIP differs from the reviewed output' }
+      - name: Prepare a checksum-pinned software OpenGL driver for this disposable test only
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build/mesa | Out-Null
+          Invoke-WebRequest 'https://github.com/pal1000/mesa-dist-win/releases/download/26.2.4/mesa3d-26.2.4-release-msvc.7z' -OutFile build/mesa.7z
+          if ((Get-FileHash build/mesa.7z -Algorithm SHA256).Hash.ToLower() -ne '351fc8c8b695878ffb3eaa044b3ead08672a48b1a045e3c3e3975811df0f6695') { throw 'Mesa archive digest mismatch' }
+          7z x build/mesa.7z -obuild/mesa -y
+          if ($LASTEXITCODE -ne 0) { throw 'Mesa extraction failed' }
+      - name: Run the original package verifier plus the real desktop menu fixture
+        shell: python
+        run: |
+          import hashlib, json, os, shutil, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path('tools').resolve()))
+          import verify_windows_package as verifier
+
+          output = Path('build/windows-interface-verification').resolve()
+          output.mkdir(parents=True, exist_ok=True)
+          archive = Path('build/portable/pokewilds-2.5d-windows-x64-v0.8.11-interface.1.zip').resolve()
+          drivers = [p.parent for p in Path('build/mesa').resolve().rglob('opengl32.dll') if p.parent.name.lower() == 'x64']
+          if len(drivers) != 1:
+              raise RuntimeError('Expected exactly one x64 Mesa driver directory')
+          driver = drivers[0]
+          receipt = {'status': 'running', 'sourceCommit': 'd4fb3238ddcbe1107b4e96545158b58e23740a29',
+              'candidateZipSha256': verifier.digest(archive),
+              'testDriver': 'Mesa 26.2.4 MSVC / llvmpipe',
+              'testDriverArchiveSha256': verifier.digest(Path('build/mesa.7z')),
+              'scope': 'Unmodified compiled JAR and GIOCA.cmd; software OpenGL DLLs added only to the verifier temporary extraction; original verifier checks retained.',
+              'limitations': 'Windows Server software GPU, hidden automated windows; not physical GPU, OS DPI or a manual campaign. Test driver is NOT included in the delivered ZIP.'}
+          receipt_path = output / 'test-environment.json'
+          original_launch = verifier.run_owned_launcher
+
+          def launch_with_test_driver(game, environment, log_path):
+              runtime = game / 'toolchain/jdk-17'
+              added = {}
+              for source in sorted(driver.glob('*.dll')):
+                  target = runtime / 'bin' / source.name
+                  if target.exists():
+                      raise RuntimeError('Refuse to overwrite a packaged component: ' + source.name)
+                  shutil.copy2(source, target)
+                  added[source.name] = verifier.digest(target)
+              if 'opengl32.dll' not in added or 'libgallium_wgl.dll' not in added:
+                  raise RuntimeError('Incomplete software OpenGL test driver')
+              receipt['testOnlyAddedDlls'] = added
+              receipt_path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
+              launch = original_launch(game, environment, log_path)
+
+              # The fixture is compiled from the exact source checkpoint and exercises
+              # the packaged game. No production class is replaced in the classpath.
+              fixture = output / 'desktop-menu-flow'
+              classes = fixture / 'classes'
+              classes.mkdir(parents=True, exist_ok=False)
+              jar = game / 'dist/pokewilds-rebuilt.jar'
+              source = Path('tools/DesktopMenuFlowTest.java').resolve()
+              commands = [
+                  [str(runtime/'bin/javac.exe'), '--release', '17', '-encoding', 'UTF-8', '-proc:none', '-cp', str(jar), '-d', str(classes), str(source)],
+                  [str(runtime/'bin/java.exe'), '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off', '-cp', str(classes)+os.pathsep+str(jar), 'com.pkmngen.game.DesktopMenuFlowTest']]
+              fixture_environment = dict(environment)
+              fixture_environment.pop('JAVA_TOOL_OPTIONS', None)
+              menu_log = fixture / 'windows-menu-flow.log'
+              with menu_log.open('w', encoding='utf-8') as log:
+                  for command in commands:
+                      result = subprocess.run(command, cwd=fixture, env=fixture_environment,
+                          stdout=log, stderr=subprocess.STDOUT, timeout=180,
+                          creationflags=subprocess.CREATE_NO_WINDOW)
+                      if result.returncode:
+                          raise RuntimeError('Windows desktop menu fixture failed: ' + str(menu_log))
+              text = menu_log.read_text(encoding='utf-8', errors='replace')
+              if 'DESKTOP MENU FLOW PASS:' not in text or 'llvmpipe' not in text:
+                  raise RuntimeError('Missing menu completion or explicit software-renderer marker')
+              print(text)
+              receipt['desktopMenuFixture'] = {'status':'passed', 'sourceSha256':verifier.digest(source),
+                  'logSha256':verifier.digest(menu_log), 'screenshots':sorted(p.name for p in fixture.glob('*.png'))}
+              return launch
+
+          # Environment adapter only: validation, launcher lifetime, hash checks,
+          # completion markers and smoke-test assertions remain in the original verifier.
+          verifier.run_owned_launcher = launch_with_test_driver
+          try:
+              verifier.verify(archive, output)
+              result = json.loads((output/'windows-package-verification.json').read_text(encoding='utf-8'))
+              if result.get('status') != 'passed' or result.get('commit') != receipt['sourceCommit']:
+                  raise RuntimeError('Package verification receipt does not match the candidate')
+              if verifier.digest(archive) != receipt['candidateZipSha256']:
+                  raise RuntimeError('The delivered ZIP changed during verification')
+              receipt['status'] = 'passed'
+          except Exception as error:
+              receipt.update(status='failed', error=str(error))
+              raise
+          finally:
+              receipt_path.write_text(json.dumps(receipt, indent=2)+'\n', encoding='utf-8')
+              print(json.dumps(receipt, indent=2))
+      - name: Preserve Windows evidence, including failure details
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: interface-windows-verification-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            build/windows-interface-verification/*.json
+            build/windows-interface-verification/*.log
+            build/windows-interface-verification/*.png
+            build/windows-interface-verification/desktop-menu-flow/*.png
+            build/windows-interface-verification/desktop-menu-flow/*.log
