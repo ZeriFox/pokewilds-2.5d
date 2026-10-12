@@ -1,6 +1,16 @@
 # Reproducible Windows package
 
-Delivered local version: **v0.8.11-stardew.1**, tagged source commit
+Current packaging target: **v0.8.11-johto.4**. Its exact source commit, JAR and
+verification results are recorded in the generated `BUILD-INFO.json` and
+receipts accompanying the candidate ZIP. The commands below require the complete
+current native suite to pass; results from an earlier release do not approve it.
+See the [release page](https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.4)
+for the Windows archive and its accompanying evidence.
+
+## Historical package evidence
+
+The following paragraph records the earlier local **v0.8.11-stardew.1** package,
+not the current candidate. Its tagged source commit was
 `9066b0674e3343e12d00110b8863937be234c44c`. Its 461,587,802-byte ZIP has SHA-256
 `cb66c990f4acf060300c6883a8719246c8eadfb27f9caff08a9fee131aacac0d`.
 Real Windows extracted `GIOCA.cmd` and the separate packaged native smoke pass;

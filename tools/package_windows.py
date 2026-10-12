@@ -109,7 +109,8 @@ def make_package(version: str, destination: Path, receipts: list[Path]) -> Path:
             add(path, "documentazione/" + path.relative_to(ROOT / "resources").as_posix())
     add(ROOT / "art-source/reference/manifest.json", "documentazione/reference-manifest.json")
     add(ROOT / "docs/ASSET-RIGHTS.md", "documentazione/ASSET-RIGHTS.md")
-    for name in ("REWORK-STATUS.md", "ASSET-COVERAGE.md", "REWORK-TESTS.md", "PACKAGING.md", "VERTICAL-SLICE.md", "JAVA-REFACTOR-STEP3.md"):
+    for name in ("REWORK-STATUS.md", "ASSET-COVERAGE.md", "REWORK-TESTS.md", "PACKAGING.md", "VERTICAL-SLICE.md", "JAVA-REFACTOR-STEP3.md",
+                 "CINEMATIC-CUSTOMIZATION.md", "TRAINERS-BW.md", "LIVING-WORLD.md", "CINEMATIC-NATURE.md"):
         path = ROOT / "docs" / name
         if path.is_file():
             add(path, "documentazione/" + name)
@@ -133,9 +134,15 @@ Nei campi nome/salvataggio: seleziona con WASD, conferma per scrivere,
 Invio salva la modifica, Esc la annulla. Non serve passare alle frecce.
 Inventario: primo clic seleziona, secondo apre; rotella scorre; C/V
 scorrono le descrizioni lunghe. Il tasto destro annulla il riordino.
-Personaggi: due presentazioni dettagliate B/W e 19 set classici completi.
-I set classici non sono nuovi sprite HD. Anteprima e colore sono separati
-prima di confermare. Impostazioni interfaccia in interface-settings.json.
+Personaggi: 19 allenatori in stile B/W; 17 ridisegnati e i due protagonisti
+con gli sprite B/W gia presenti. Per il guardaroba scegli Customize oppure
+premi Maiusc+Invio nel selettore allenatori. In partita: menu > F1 >
+Customize character. Cambia vestito, zaino, scarpe, cappello, capelli e
+colori; Tab gira l'anteprima, Apply appearance conferma, Esc annulla.
+La conferma salta la scena iniziale; premila di nuovo per aprire il menu.
+Puoi disattivare l'apertura o attivare il movimento ridotto nelle impostazioni.
+Dettagli: documentazione/CINEMATIC-CUSTOMIZATION.md.
+Impostazioni interfaccia in interface-settings.json.
 
 SALVATAGGI E AGGIORNAMENTO
 La cartella run-johto viene creata accanto a GIOCA.cmd al primo avvio.
@@ -143,6 +150,9 @@ Contiene impostazioni e cartelle *.sav. Chiudi sempre il gioco prima
 di copiare o spostare una partita. Conserva una copia della vecchia
 run-johto, poi copiala accanto al nuovo GIOCA.cmd. Non sovrascrivere
 partite nuove senza backup. Il pacchetto non contiene partite personali.
+Il guardaroba e salvato in run-johto/appearance-profiles.json: conserva
+anche questo file per trasferire la personalizzazione su un altro PC.
+La personalizzazione non viene sincronizzata con altri client multiplayer.
 Il renderer usa anche le isole salvate: non le rigenera automaticamente.
 Le modifiche alla generazione interessano soltanto nuove isole/aree;
 consulta documentazione/REWORK-STATUS.md per i limiti verificati.

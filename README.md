@@ -4,7 +4,7 @@ Una ricostruzione PC di PokeWilds 0.8.11 in Java/LibGDX, con mondo prospettico, 
 
 La versione aggiunge **552 specie giocabili** alle 410 della base, per **962 specie totali**, una caldera vulcanica e rampe percorribili tra alcune terrazze montane. La mappa resta procedurale: il nuovo passaggio di generazione modifica davvero terreno e collisioni. La presentazione predefinita usa sprite 2D e la build normale esclude i modelli GLB. È una versione Windows PC x64, non un port Nintendo 3DS.
 
-La lavorazione locale corrente prosegue dal commit `ac200935`: [arene prospettiche, apertura e guardaroba](docs/CINEMATIC-CUSTOMIZATION.md), [cast giocabile in stile Bianco e Nero](docs/TRAINERS-BW.md), [mare, chiome e scenari di battaglia](docs/CINEMATIC-NATURE.md), [ricevuta della build e verifiche](VERIFICA.txt). Avvia **AVVIA-POKEWILDS.cmd** nella cartella completa. I nuovi sprite e gli effetti funzionano anche sui mondi salvati. La precedente [ricostruzione del terreno](docs/LIVING-WORLD.md) richiede invece una nuova avventura/isola per vedere la diversa disposizione strutturale. Questa lavorazione non crea una release GitHub. Il precedente pacchetto **v0.8.11-stardew.1** e le anteprime seguenti sono storici; [REWORK-STATUS.md](docs/REWORK-STATUS.md) ne conserva lo stato e gli hash.
+La versione **v0.8.11-johto.4** prosegue dal commit `ac200935`: [arene prospettiche, apertura e guardaroba](docs/CINEMATIC-CUSTOMIZATION.md), [cast giocabile in stile Bianco e Nero](docs/TRAINERS-BW.md), [mare, chiome e scenari di battaglia](docs/CINEMATIC-NATURE.md), [ricevuta della build e verifiche](VERIFICA.txt). I nuovi sprite e gli effetti funzionano anche sui mondi salvati. La precedente [ricostruzione del terreno](docs/LIVING-WORLD.md) richiede invece una nuova avventura/isola per vedere la diversa disposizione strutturale. Il precedente pacchetto **v0.8.11-stardew.1** e le anteprime seguenti sono storici; [REWORK-STATUS.md](docs/REWORK-STATUS.md) ne conserva lo stato e gli hash.
 
 ![Mondo procedurale in 2.5D](anteprima-25d.png)
 
@@ -26,13 +26,17 @@ Il ramo **`main`** riunisce le correzioni di johto.3 con **14 profili di bioma**
 
 ## Giocare su Windows
 
-Nel nuovo pacchetto Windows estratto apri **`GIOCA.cmd`** oppure **`run-johto.cmd`**: non serve `build.cmd`. In quella cartella Java 17 e il JAR compilato sono già inclusi. Mantieni insieme launcher, `dist/` e `toolchain/`; non spostare soltanto il file di avvio.
+1. Apri la [release v0.8.11-johto.4](https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.4).
+2. Nella sezione **Assets** scarica **`pokewilds-2.5d-windows-x64-v0.8.11-johto.4.zip`**.
+3. Usa **Estrai tutto** in una cartella scrivibile, poi apri **`PokeWilds-2.5D/GIOCA.cmd`**.
 
-Il pacchetto Stardew viene assemblato e verificato da [tools/package_windows.py](tools/package_windows.py) e [tools/verify_windows_package.py](tools/verify_windows_package.py), con runtime incluso e ricevuta legata all’hash dello ZIP. La pubblicazione automatica degli asset di riferimento non è attiva; la consegna locale è distinta dai sorgenti.
+Il pacchetto include **Java 17, gioco compilato e risorse**: non occorrono Python, Git, Java installato o `build.cmd`. Funziona anche offline. Mantieni insieme launcher, `dist/` e `toolchain/`; non avviare il launcher dentro lo ZIP e non spostarlo da solo. Anche **`run-johto.cmd`** avvia la stessa versione.
 
-Il pacchetto Windows della [release privata v0.8.11-johto.3](https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.3) resta la **versione binaria precedente**: richiede un account con accesso e non comprende tutta questa integrazione di `main`. L'aggiornamento del codice non crea una nuova release binaria.
+Il pacchetto viene assemblato da [tools/package_windows.py](tools/package_windows.py) e controllato da [tools/verify_windows_package.py](tools/verify_windows_package.py). `BUILD-INFO.json` identifica il commit e il JAR; la ricevuta Windows allegata alla release identifica lo ZIP effettivamente provato. Le [attribuzioni e condizioni degli asset](docs/ASSET-RIGHTS.md) accompagnano il pacchetto. La [release v0.8.11-johto.3](https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.3) rimane una versione precedente.
 
-**Il clone Git e Code → Download ZIP contengono sorgenti e risorse, senza JAR compilato o Java incluso.** Per avviarli occorre seguire la sezione «Ricompilare dai sorgenti»; non equivalgono alla cartella locale completa o al pacchetto Windows della release.
+**Code → Download ZIP e gli archivi “Source code” della release contengono i sorgenti, senza JAR compilato o Java incluso.** Per giocare scegli il file Windows indicato sopra. Per ricompilare un clone Git segui invece la sezione «Ricompilare dai sorgenti».
+
+Per aggiornare una partita, chiudi il gioco e conserva una copia della vecchia cartella `run-johto/`, poi copiala accanto al nuovo `GIOCA.cmd`. Include salvataggi, impostazioni e `appearance-profiles.json` del guardaroba. Il pacchetto distribuito non contiene partite personali.
 
 Comandi: **WASD** per muoversi e navigare, **clic sinistro (LMB)** per confermare/interagire, **clic destro (RMB)** per tornare indietro; mantieni il destro premuto mentre cammini per correre. **Invio** apre il menu, **C/V** cambia la selezione sul campo, **F11** attiva lo schermo intero. Nei campi nome WASD digita lettere: usa le frecce su/giù per cambiare campo e Invio per confermare un soprannome. Il gamepad conserva i comandi precedenti. Salvataggi e impostazioni sono in `run-johto/`. `run-johto-sprites.cmd` avvia la stessa presentazione. `run.cmd` usa la grafica classica e una cartella `run/` separata; la scelta grafica non disattiva il Pokédex ampliato o la nuova generazione.
 
