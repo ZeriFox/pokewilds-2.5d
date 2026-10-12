@@ -44,6 +44,19 @@ final class WorldNatureMotion {
       String material=WorldMaterials.terrainName(tile);
       return material.equals("sand")||material.startsWith("sand_");
    }
+   /** Live tide connections are presentation only. Puddles stay separate pools.
+    * Bits describe the real same-height wet neighbours: down, up, left, right. */
+   static int tidalConnections(Map<Vector2,Tile> tiles,Tile source,WorldElevation elevation,Vector2 lookup) {
+      if(source==null||!source.isTidal)return 0;
+      int mask=0;float level=elevation.tileHeight(source);
+      for(int side=0;side<4;side++) {
+         int dx=side==2?-16:side==3?16:0,dy=side==0?-16:side==1?16:0;
+         Tile next=tiles.get(lookup.set(source.position.x+dx,source.position.y+dy));
+         if(next!=null&&!next.isLava&&!next.isWaterfall&&!next.isLedge&&!ModernWorldGenerator.isRamp(next)
+            &&(next.isTidal||water(next))&&Math.abs(elevation.tileHeight(next)-level)<=.35f)mask|=1<<side;
+      }
+      return mask;
+   }
    static boolean flexible(String identity) {
       if(identity==null)return false;
       return !identity.contains("cactus")&&!identity.contains("aloe")&&!identity.contains("dead")
@@ -70,6 +83,7 @@ final class WorldNatureMotion {
       }
    }
    boolean hasShore(){return count>0;}
+   boolean hasBeach(){for(int i=0;i<count;i++)if(beach[i])return true;return false;}
    float distance(float x,float y) {
       return distance(x,y,false);
    }

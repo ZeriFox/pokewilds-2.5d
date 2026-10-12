@@ -76,9 +76,10 @@ public final class BattleEntryTest {
          for(int frame=0;frame<74;frame++) {
             draw(intro);require(intro.frames.size()==73-frame,"Intro action skipped or repeated a frame");
             Pixmap pixels=read();covered(pixels);
-            // Far from the title strip, the snapshot darkens monotonically;
-            // repeated bright pulses would violate this at the exact framebuffer pixel.
-            float luminance=luminance(pixels.getPixel(pixels.getWidth()/3,pixels.getHeight()/8));
+            // The reduced-motion capture stays stationary. With the lens push,
+            // a pixel can cross a bright leaf; measure the outer bands together
+            // so actual full-window bright pulses still fail the regression.
+            float luminance=reduced?luminance(pixels.getPixel(pixels.getWidth()/3,pixels.getHeight()/8)):outerLuminance(pixels);
             require(luminance<=lastDim+.012f,"Encounter intro flashed brighter at frame "+frame);
             lastDim=luminance;
             if(frame==0||frame==25||frame==65||frame==73)capture(pixels,"entry-"+sizeIndex+"-"+mode+"-intro-"+frame+".png");
@@ -140,6 +141,14 @@ public final class BattleEntryTest {
                throw new IllegalStateException("Transition boundary has a gap at "+x+","+y);
       }
       float luminance(int rgba){return (rgba>>>24&255)*.2126f/255+(rgba>>>16&255)*.7152f/255+(rgba>>>8&255)*.0722f/255;}
+      float outerLuminance(Pixmap pixels) {
+         float sum=0;int count=0;
+         for(int y=0;y<pixels.getHeight();y+=4) {
+            if(y>pixels.getHeight()/4&&y<pixels.getHeight()*3/4)continue;
+            for(int x=0;x<pixels.getWidth();x+=4){sum+=luminance(pixels.getPixel(x,y));count++;}
+         }
+         return sum/Math.max(1,count);
+      }
       void capture(Pixmap pixels,String path) {
          PixmapIO.PNG png=new PixmapIO.PNG();png.setFlipY(true);
          try{png.write(Gdx.files.local(path),pixels);}catch(java.io.IOException e){throw new IllegalStateException(e);}finally{png.dispose();}

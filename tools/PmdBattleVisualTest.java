@@ -56,6 +56,7 @@ public final class PmdBattleVisualTest {
          battle.drawAction = new DrawBattle(this);
          currMusic = com.pkmngen.game.util.audio.AudioLoader.loadMusic("sounds/evolve_fanfare1.ogg");
          verifyTrainerTrimming();
+         verifyCustomizedTrainer();
          verifyBattleDirections();
       }
 
@@ -85,6 +86,26 @@ public final class PmdBattleVisualTest {
       void assertCrop(TextureRegion region,Texture texture,int x,int y,int width,int height,String reason) {
          require(region.getTexture()==texture&&region.getRegionX()==x&&region.getRegionY()==y
             &&region.getRegionWidth()==width&&region.getRegionHeight()==height,reason+" read wrong alpha bounds or cache identity");
+      }
+
+      void verifyCustomizedTrainer() {
+         String name=player.name,character=player.character;ProxyBatch original=uiBatch;
+         Sprite before=new Sprite(player.battleSprite);CaptureBatch capture=new CaptureBatch();
+         try {
+            CharacterAppearance appearance=new CharacterAppearance();
+            appearance.styles[0]=2;appearance.styles[1]=1;appearance.styles[3]=2;
+            appearance.colors[0]=2;appearance.colors[1]=5;appearance.colors[3]=6;
+            CharacterAppearance.save("Battle canary","gold",appearance);
+            player.name="Battle canary";player.character="gold";
+            TextureRegion expected=BwAssets.get().trainer(player,"up",0,false);
+            java.lang.reflect.Method trim=PmdBattleSprites.class.getDeclaredMethod("trimTrainer",TextureRegion.class);trim.setAccessible(true);
+            require(trim.invoke(null,expected)==expected,"Composed trainer did not preserve the complete normalized frame");
+            uiBatch=capture;capture.reset();capture.begin();player.battleSprite.setBounds(16,48,48,48);
+            require(PmdBattleSprites.drawKnown(player.battleSprite,capture),"Customized entry trainer fell back to old art");capture.end();
+            assertFrame(capture,expected,"customized battle-entry trainer");
+            System.out.println("PMD WARDROBE TRAINER PASS: released CPU Pixmap, complete normalized frame, actual battle-entry draw route and texture/UV identity");
+         }catch(Exception e){throw new IllegalStateException(e);}
+         finally{uiBatch=original;player.name=name;player.character=character;player.battleSprite.set(before);capture.dispose();}
       }
 
       void verifyBattleDirections() {
@@ -218,6 +239,12 @@ public final class PmdBattleVisualTest {
                if(!enemy.isGhost)throw new IllegalStateException("Presentation revealed hidden species");break;
             case 17:
                enemy.revealGhost();enemy.sprite.setPosition(96,88);background();enemy.sprite.draw(uiBatch);finish("18-night-revealed.png");break;
+            case 18: {
+               String name=player.name,character=player.character;Sprite before=new Sprite(player.battleSprite);
+               try{player.name="Battle canary";player.character="gold";player.battleSprite.setBounds(16,48,48,48);
+                  background();player.battleSprite.draw(uiBatch);enemy.sprite.draw(uiBatch);finish("19-customized-entry-trainer.png");}
+               finally{player.name=name;player.character=character;player.battleSprite.set(before);}break;
+            }
             default:
                verifyDifferent("08-reveal-normal.png","09-reveal-shiny.png","Shiny reveal rendered normal appearance");
                verifyDifferent("13-effect-normal.png","14-effect-lighten.png","Lighten battle effect was ignored");

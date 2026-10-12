@@ -167,28 +167,47 @@ public final class JohtoRenderer {
    private void initialize() {
       String vertex = "attribute vec3 a_position;\n"
          + "attribute vec4 a_color;\nattribute vec2 a_texCoord0;\nattribute float a_style;\nattribute float a_anchorDepth;\n"
-         + "uniform mat4 u_projTrans;\nvarying vec4 v_color;\nvarying vec2 v_texCoords;\nvarying float v_style;\nvarying vec2 v_world;\nvarying float v_shore;\n"
+         + "uniform mat4 u_projTrans;\nvarying vec4 v_color;\nvarying vec2 v_texCoords;\nvarying float v_style;\nvarying vec2 v_world;\nvarying vec3 v_position;\nvarying float v_shore;\n"
          + "void main(){v_color=a_color;v_color.a*=255.0/254.0;v_texCoords=a_texCoord0;v_style=a_style;"
-         + "v_world=a_position.xz;v_shore=a_anchorDepth;gl_Position=u_projTrans*vec4(a_position,1.0);"
+         + "v_world=a_position.xz;v_position=a_position;v_shore=a_anchorDepth;gl_Position=u_projTrans*vec4(a_position,1.0);"
          + "if(a_style>3.5)gl_Position.z=a_anchorDepth*gl_Position.w;}\n";
       String fragment = "#ifdef GL_ES\nprecision mediump float;\n#endif\n"
-         + "uniform sampler2D u_texture;\nuniform vec3 u_tint;\nuniform vec4 u_lights[8];\nvarying vec2 v_world;\n"
+         + "uniform sampler2D u_texture;\nuniform vec3 u_tint;\nuniform vec4 u_lights[8];uniform vec3 u_cameraPosition;uniform float u_daylight;\nvarying vec2 v_world;varying vec3 v_position;\n"
          + "uniform vec3 u_fogColor;uniform float u_fogDensity;uniform float u_desaturation;uniform float u_time;\n"
          + "varying vec4 v_color;\nvarying vec2 v_texCoords;\nvarying float v_style;\nvarying float v_shore;\n"
          + "void main(){vec4 c=texture2D(u_texture,v_texCoords);"
-         + "c*=v_color;"
+         + "c*=v_color;vec3 materialNormal=vec3(0.0,1.0,0.0);float wetness=0.0;"
+         + "vec3 viewDirection=normalize(u_cameraPosition-v_position);"
          + "if(v_style>.5&&v_style<1.5){float l=dot(c.rgb,vec3(.299,.587,.114));"
          + "c.rgb=mix(mix(c.rgb,vec3(l),.30),vec3(.37,.49,.28),.42);}"
          + "if(v_style>4.5){float l=dot(c.rgb,vec3(.299,.587,.114));c.rgb=mix(c.rgb,vec3(l),.20);}"
          // Negative styles are actual fluid/beach surfaces. A single world-space
          // field continues across atlas cells; no UV scrolling crosses sprite bounds.
-         + "if(v_style<-.5){vec2 p=vec2(v_world.x,-v_world.y);"
+         + "if(v_style<-2.5){vec2 p=vec2(v_world.x,-v_world.y);vec2 local=mod(p,16.0)-8.0;"
+         + "float mask=0.0;float wave=sin(dot(p,vec2(.24,.16))-u_time*1.45);"
+         + "float noise=.30*sin(dot(p,vec2(.19,.31)))+.20*sin(dot(p,vec2(-.37,.14)));"
+         + "if(v_style>-3.6){float bits=floor((-v_style-3.0)*32.0+.1);"
+         + "float left=mod(floor(bits/4.0),2.0),right=mod(floor(bits/8.0),2.0);"
+         + "float down=mod(bits,2.0),up=mod(floor(bits/2.0),2.0);"
+         + "vec2 q=abs(local)-5.2;"
+         + "if((local.x<0.0&&left>.5)||(local.x>=0.0&&right>.5))q.x=-2.8;"
+         + "if((local.y<0.0&&down>.5)||(local.y>=0.0&&up>.5))q.y=-2.8;"
+         + "float edge=length(max(q,0.0))+min(max(q.x,q.y),0.0)-2.8;"
+         + "mask=1.0-smoothstep(-1.45,.05,edge+noise);"
+         + "float lip=1.0-smoothstep(.10,.55,abs(edge+1.0+.35*wave));"
+         + "c.rgb=mix(c.rgb,vec3(.82,.93,.89),lip*.28);"
+         + "}else{vec2 bank=local+vec2(.90*sin(dot(p,vec2(.41,.29))),.70*sin(dot(p,vec2(-.33,.47))));vec2 oval=bank/vec2(6.2,4.7);"
+         + "float edge=dot(oval,oval)+noise*.38;mask=1.0-smoothstep(.64,1.0,edge);"
+         + "c.rgb=mix(c.rgb,vec3(.77,.89,.88),smoothstep(.89,.98,sin(length(local)*2.6-u_time*1.8))*.16);}"
+         + "c.rgb=mix(c.rgb,vec3(.22,.53,.59),.23);c.a*=mask*(.84+.10*wave);"
+         + "materialNormal=normalize(vec3(-.12*cos(p.x*.24-u_time),1.0,.10*sin(p.y*.27+u_time)));wetness=.72;"
+         + "}else if(v_style<-.5){vec2 p=vec2(v_world.x,-v_world.y);"
          + "float bend=.92*sin(dot(p,vec2(.032,.021)))+.38*sin(p.y*.043-p.x*.013-u_time*.11);"
          + "float swell=sin(dot(p,vec2(.13,.085))+bend-u_time*1.35);"
          + "float small=sin(dot(p,vec2(-.067,.19))+.35*sin(p.x*.043)+u_time*.75);"
          + "float reach=.65+2.45*sin(u_time*.92+sin(dot(p,vec2(.016,.013)))*.32);"
-         + "float signedShore=v_style> -1.5?-v_shore:v_shore;"
-         + "float foam=(1.0-smoothstep(.14,.68,abs(signedShore-reach)))"
+         + "float signedShore=v_style> -1.5?-v_shore:v_shore;float surfBend=.72*sin(dot(p,vec2(.083,.057)))+.28*sin(dot(p,vec2(-.17,.13)));"
+         + "float foam=(1.0-smoothstep(.14,.68,abs(signedShore-reach+surfBend)))"
          + "*(.58+.42*smoothstep(-.6,.7,small));"
          + "if(v_style> -1.5){float offshore=smoothstep(2.0,16.0,v_shore);"
          // Long swells carry crossed ripples instead of repeating a flat atlas
@@ -200,7 +219,7 @@ public final class JohtoRenderer {
          + "float ocean=sin(longA)*.62+sin(longB)*.38;"
          + "vec2 slope=vec2(.55,.35)*cos(longA)+vec2(-.20,.42)*cos(longB)"
          + "+vec2(.22,.14)*cos(rippleA)+vec2(-.10,.23)*cos(rippleB);"
-         + "vec3 normal=normalize(vec3(-slope.x*.54,1.0,-slope.y*.54));"
+         + "vec3 normal=normalize(vec3(-slope.x*.54,1.0,-slope.y*.54));materialNormal=normal;wetness=1.0;"
          + "float diffuse=dot(normal,normalize(vec3(-.42,.85,.32)));"
          + "float sparkle=pow(max(0.0,dot(normal,normalize(vec3(-.12,.98,.14)))),30.0);"
          + "float crest=smoothstep(.84,.998,sin(rippleA))*smoothstep(.05,.85,sin(rippleB));"
@@ -209,20 +228,34 @@ public final class JohtoRenderer {
          + "c.rgb*=.79+diffuse*.21+ocean*(.045+offshore*.095);"
          + "c.rgb=mix(c.rgb,vec3(.62,.83,.87),sparkle*(.10+offshore*.24));"
          + "c.rgb=mix(c.rgb,vec3(.53,.80,.84),crest*(.10+offshore*.09));"
+         + "float fresnel=.12+.36*pow(1.0-max(0.0,dot(normal,viewDirection)),3.0);"
+         + "vec3 sky=mix(vec3(.29,.57,.71),vec3(.73,.84,.87),clamp(normal.z*.9+.45,0.0,1.0));"
+         + "float cloud=smoothstep(.30,.82,sin(p.x*.013+p.y*.019+u_time*.025)+.28*sin(p.x*.035-p.y*.011));"
+         + "sky=mix(sky,vec3(.78,.86,.87),cloud*.24);c.rgb=mix(c.rgb,sky,fresnel);"
+         + "float sunGlint=pow(max(0.0,dot(reflect(normalize(vec3(.38,-.84,-.30)),normal),viewDirection)),38.0);"
+         + "c.rgb+=vec3(1.0,.92,.72)*sunGlint*(.14+.23*u_daylight);"
          + "float breaker=smoothstep(.87,.99,sin(v_shore*.68+u_time*1.05+bend*.32))*(1.0-smoothstep(2.0,11.0,v_shore));"
          + "c.rgb=mix(c.rgb,vec3(.82,.94,.92),max(foam*.68,breaker*.18));}"
          + "else{float wet=1.0-smoothstep(.4,5.0,v_shore);"
          + "c.rgb*=mix(1.0,.77,wet);float wash=(1.0-smoothstep(reach-.35,reach+.35,v_shore))*.20;"
-         + "c.rgb=mix(c.rgb,vec3(.30,.57,.59),wash);c.rgb=mix(c.rgb,vec3(.87,.95,.92),foam*.52);}}"
-         + "float glow=0.0;for(int i=0;i<8;i++){vec4 l=u_lights[i];"
-         + "float f=clamp(1.0-distance(v_world,l.xy)/max(l.z,1.0),0.0,1.0);glow=max(glow,f*f*l.w);}"
+         + "c.rgb=mix(c.rgb,vec3(.30,.57,.59),wash);c.rgb=mix(c.rgb,vec3(.87,.95,.92),foam*.52);}"
+         // Both sides of a sandy coast meet in the same wet-sand/wash colour.
+         // This hides the old square texture boundary without moving collision.
+         + "if(v_style< -1.05){float seam=1.0-smoothstep(.0,5.5,v_shore);float wash=smoothstep(-2.2,3.4,reach-signedShore-surfBend);vec3 strand=mix(vec3(.69,.66,.48),vec3(.27,.57,.60),wash);strand*=.98+.025*sin(p.x*1.17+p.y*.91);strand=mix(strand,vec3(.86,.94,.90),foam*.58);c.rgb=mix(c.rgb,strand,seam);}}"
+         + "float glow=0.0,lightReflection=0.0;for(int i=0;i<8;i++){vec4 l=u_lights[i];"
+         + "float f=clamp(1.0-distance(v_world,l.xy)/max(l.z,1.0),0.0,1.0);glow=max(glow,f*f*l.w);"
+         + "vec3 toward=normalize(vec3(l.x-v_position.x,20.0,l.y-v_position.z));"
+         + "float highlight=pow(max(0.0,dot(materialNormal,normalize(toward+viewDirection))),26.0);"
+         + "lightReflection+=highlight*f*f*l.w*wetness*.38;}"
          + "vec3 light=max(u_tint,mix(u_tint,vec3(1.14,1.03,.82),clamp(glow,0.0,1.0)));"
          // Crown shadows remain translucent and local illumination opens them
          // up. Actor/UI colours never receive the ground's shadow multiplier.
          + "bool crownShadow=v_style>1.5&&v_style<2.5;"
          + "if(crownShadow){c.rgb=vec3(.04,.075,.12);c.a*=1.0-clamp(glow*.72,0.0,.72);}"
-         + "if(c.a<(crownShadow?.003:.1))discard;"
+         + "if(c.a<((crownShadow||v_style<-2.5)?.003:.1))discard;"
          + "c.rgb*=v_style>2.5&&v_style<3.5?mix(light,vec3(1.0),0.65):light;"
+         + "c.rgb+=vec3(1.0,.74,.36)*min(lightReflection,.42);"
+         + "if(v_style>5.5)c.rgb=max(c.rgb,texture2D(u_texture,v_texCoords).rgb*.48);"
          + "c.rgb=mix(c.rgb,vec3(dot(c.rgb,vec3(.299,.587,.114))),u_desaturation);"
          + "float mist=u_fogDensity*(.65+.35*sin(v_world.x*.036+u_time*.21)*sin(v_world.y*.047-u_time*.16));"
          + "gl_FragColor=vec4(mix(c.rgb,u_fogColor,clamp(mist,0.0,.45)),c.a);}\n";
@@ -404,9 +437,12 @@ public final class JohtoRenderer {
          // High tide is a walkable film over sand, not an opaque deep-water tile.
          // Read the live tide flag: CycleDayNight changes names before init().
          TextureRegion shallow=assets.cell(profile.string("fluid","shallow","water_shallow"),x,y,natureSeconds);
-         float inset=tile.isTidal?0:3;
-         floor(shallow,x+inset,y+inset,16-inset*2,16-inset*2,.045f,
-            Color.toFloatBits(.92f,1,1,tile.isTidal?.34f:.45f),translucent);
+         // Round only exposed margins; neighbouring tidal cells share one film.
+         // The pool's soft shape lives in world coordinates, never an opaque square.
+         int connected=WorldNatureMotion.tidalConnections(game.map.tiles,tile,elevation,lookup);
+         float style=tile.isTidal?-3f-connected/32f:-4f;
+         floor(shallow,x,y,16,16,.045f,
+            Color.toFloatBits(.92f,1,1,tile.isTidal?.38f:.48f),translucent,style);
       }
       if(tile.isWaterfall || names.contains("lavafall")) { waterfall(tile,profile);return; }
       terrainEdges(game,tile,profile);
@@ -591,7 +627,7 @@ public final class JohtoRenderer {
       if(!game.actionStack.contains(action))return;
       if (diagnosedGhosts.put(action, Boolean.TRUE) == null) {
          Gdx.app.log("GhostDiagnostic", "identity=" + action.getClass().getSimpleName()
-            + " source=scripted-encounter isGhost=not-a-Pokemon asset=procedural-spirit fallback=false"
+            + " source=scripted-encounter isGhost=not-a-Pokemon asset=lavender-spirit fallback=false"
             + " biome=" + game.map.currBiome + " time=" + game.map.timeOfDay
             + " shader=world-atmosphere layer=translucent");
       }
@@ -607,18 +643,18 @@ public final class JohtoRenderer {
          x=ghost.basePos.x+16;y=ghost.basePos.y+16;
       }
       surfaceLift=elevation.height(x,y);ghostFrames++;
-      float bob=6+MathUtils.sin(seconds*3)*1.5f;
+      alpha=MathUtils.clamp(alpha,0,1);
+      if(alpha<=.001f)return;
+      float bob=6+MathUtils.sin(natureSeconds*3)*1.5f;
       shadow(x,y,5,2.4f);
-      Buffer mesh=translucent.buffer(whiteTexture);
-      for(int layer=0;layer<4;layer++) {
-         float radius=8-layer*1.4f,tint=Color.toFloatBits(.62f+layer*.08f,.69f+layer*.07f,.90f,alpha*(.12f+layer*.05f));
-         for(int i=0;i<24;i++) {
-            float a=i*MathUtils.PI2/24,b=(i+1)*MathUtils.PI2/24;
-            triangle(mesh,x,bob+6,-y-5,x+MathUtils.cos(a)*radius,bob+6+MathUtils.sin(a)*radius,-y-5,
-               x+MathUtils.cos(b)*radius,bob+6+MathUtils.sin(b)*radius,-y-5,tint);
-         }
-      }
-      ring(x,y,6+.4f*MathUtils.sin(seconds*4),.6f,.18f,Color.toFloatBits(.57f,.74f,.95f,alpha*.4f));
+      TextureRegion spirit=GhostVisualAssets.get().frame(natureSeconds);
+      float height=32,width=height*spirit.getRegionWidth()/spirit.getRegionHeight();
+      float rise=height*MathUtils.cosDeg(50),back=height*MathUtils.sinDeg(50);
+      actorPlaneZ=-y;
+      quad(translucent.buffer(spirit.getTexture()),x-width*.5f,bob,-y,x+width*.5f,bob,-y,
+         x+width*.5f,bob+rise,-y-back,x-width*.5f,bob+rise,-y-back,
+         spirit,Color.toFloatBits(1,1,1,alpha),6f);
+      ring(x,y,6+.4f*MathUtils.sin(natureSeconds*4),.6f,.18f,Color.toFloatBits(.57f,.74f,.95f,alpha*.4f));
    }
 
    /** A terrain cell is its upper surface, not a flat floor with a wall prop. */
@@ -633,16 +669,60 @@ public final class JohtoRenderer {
       float sun=(.82f+.30f*gx+.32f*gy)/(float)Math.sqrt(1+gx*gx+gy*gy);
       float light=tile.isLava?1:MathUtils.clamp(.60f+.40f*sun/.82f,.60f,1f);
       shore.prepare(game.map.tiles,tile,elevation);
-      float style=tile.isLava?3f:WorldNatureMotion.water(tile)?-1f
+      float style=tile.isLava?3f:WorldNatureMotion.water(tile)?(shore.hasBeach()?-1.125f:-1f)
          :WorldNatureMotion.sand(tile)&&shore.hasShore()?-2f:WorldMaterials.softGrass(WorldMaterials.terrainName(tile))?1f:0f;
       if(style<-.5f&&shore.hasShore()) {
          // Only coastal cells need extra samples. The same world coordinate has
          // the same shore distance on either side of a tile/biome boundary.
-         for(int iy=0;iy<2;iy++)for(int ix=0;ix<2;ix++)
-            surfacePatch(tile,art,x+ix*8,y+iy*8,x+(ix+1)*8,y+(iy+1)*8,0,
+         for(int iy=0;iy<4;iy++)for(int ix=0;ix<4;ix++)
+            surfacePatch(tile,art,x+ix*4,y+iy*4,x+(ix+1)*4,y+(iy+1)*4,0,
                color(light,light,light),color(light,light,light),color(light,light,light),color(light,light,light),geometry,style);
-      } else quad(geometry.buffer(art.getTexture()),x,a,-y,x+16,b,-y,x+16,c,-y-16,x,d,-y-16,art,color(light,light,light),style);
+      } else if(hasCliffBevel(tile)) plateauSurface(tile,art,light,style);
+      else quad(geometry.buffer(art.getTexture()),x,a,-y,x+16,b,-y,x+16,c,-y-16,x,d,-y-16,art,color(light,light,light),style);
       surfaceLift=previous;
+   }
+
+   /** Small convex rock chamfers stay inside the old cell footprint. Slopes,
+    * shores and concave joins retain their exact shared-corner surface. */
+   private boolean cliffBevel(Tile tile,int corner) {
+      if(tile==null||tile.isWater||tile.isLava||tile.isWaterfall||ModernWorldGenerator.isRamp(tile))return false;
+      float x=tile.position.x,y=tile.position.y,h=elevation.tileHeight(tile);
+      if(Math.abs(terrainHeight(tile,x+.01f,y+.01f)-h)>.03f||Math.abs(terrainHeight(tile,x+15.99f,y+.01f)-h)>.03f
+         ||Math.abs(terrainHeight(tile,x+15.99f,y+15.99f)-h)>.03f||Math.abs(terrainHeight(tile,x+.01f,y+15.99f)-h)>.03f)return false;
+      int dx=corner==0||corner==3?-16:16,dy=corner<2?-16:16;
+      Tile sideX=natureTiles.get(lookup.set(x+dx,y)),sideY=natureTiles.get(lookup.set(x,y+dy));
+      return sideX!=null&&sideY!=null&&!ModernWorldGenerator.isRamp(sideX)&&!ModernWorldGenerator.isRamp(sideY)
+         &&!sideX.isWaterfall&&!sideY.isWaterfall
+         &&h-elevation.tileHeight(sideX)>3&&h-elevation.tileHeight(sideY)>3
+         &&Math.abs(elevation.tileHeight(sideX)-elevation.tileHeight(sideY))<.1f;
+   }
+   private boolean hasCliffBevel(Tile tile) {
+      return cliffBevel(tile,0)||cliffBevel(tile,1)||cliffBevel(tile,2)||cliffBevel(tile,3);
+   }
+   private void plateauSurface(Tile tile,TextureRegion art,float light,float style) {
+      float x=tile.position.x,y=tile.position.y,h=terrainHeight(tile,x+8,y+8),tint=color(light,light,light);
+      float[] points=new float[16];int count=0;
+      for(int corner=0;corner<4;corner++) {
+         float cx=corner==0||corner==3?0:16,cy=corner<2?0:16;
+         if(cliffBevel(tile,corner)) {
+            // Counter-clockwise incoming/outgoing points, 1.3 world pixels from the corner.
+            points[count++]=cx+(corner==0?0:corner==1?-1.3f:corner==2?0:1.3f);
+            points[count++]=cy+(corner==0?1.3f:corner==1?0:corner==2?-1.3f:0);
+            points[count++]=cx+(corner==0?1.3f:corner==1?0:corner==2?-1.3f:0);
+            points[count++]=cy+(corner==0?0:corner==1?1.3f:corner==2?0:-1.3f);
+         } else {points[count++]=cx;points[count++]=cy;}
+      }
+      Buffer mesh=geometry.buffer(art.getTexture());
+      for(int i=0;i<count;i+=2) {
+         int next=(i+2)%count;
+         plateauVertex(mesh,art,x,y,h,8,8,tint,style);
+         plateauVertex(mesh,art,x,y,h,points[i],points[i+1],tint,style);
+         plateauVertex(mesh,art,x,y,h,points[next],points[next+1],tint,style);
+      }
+   }
+   private void plateauVertex(Buffer mesh,TextureRegion art,float x,float y,float h,float px,float py,float tint,float style) {
+      vertex(mesh,x+px,h,-y-py,tint,MathUtils.lerp(art.getU(),art.getU2(),px/16),
+         MathUtils.lerp(art.getV2(),art.getV(),py/16),style);
    }
 
    private float terrainHeight(Tile tile,float x,float y) {
@@ -684,26 +764,84 @@ public final class JohtoRenderer {
          // cut alternating horizontal strips out of its face.
          TextureRegion face=assets.named(profile.cliff("front"));
          float shade=side==0?.90f:side==1?.66f:side==2?.78f:.64f;
-         quad(geometry.buffer(face.getTexture()),x0,lowA,-y0,x1,lowB,-y1,x1,b,-y1,x0,a,-y0,
-            face,color(shade,shade,shade));
+         int cornerA=side==0?0:side==1?3:side==2?0:1;
+         int cornerB=side==0?1:side==1?2:side==2?3:2;
+         if(cliffBevel(tile,cornerA)){if(side<2)x0+=1.3f;else y0+=1.3f;}
+         if(cliffBevel(tile,cornerB)){if(side<2)x1-=1.3f;else y1-=1.3f;}
+         cliffFace(tile,face,side,x0,y0,x1,y1,lowA,lowB,a,b,shade);
          // A fine edge on the plateau and a contact shadow at the foot give
          // complementary cues for going up and down, without a thick wall cap.
          if(Math.max(a-lowA,b-lowB)>3) {
-            float ix=-dx*.65f,iy=-dy*.65f;
+            float ix=-dx*.9f,iy=-dy*.9f;
             float ha=terrainHeight(tile,MathUtils.clamp(x0+ix,x+.01f,x+15.99f),MathUtils.clamp(y0+iy,y+.01f,y+15.99f));
             float hb=terrainHeight(tile,MathUtils.clamp(x1+ix,x+.01f,x+15.99f),MathUtils.clamp(y1+iy,y+.01f,y+15.99f));
             quad(translucent.buffer(whiteTexture),x0,a+.065f,-y0,x1,b+.065f,-y1,
                x1+ix,hb+.065f,-y1-iy,x0+ix,ha+.065f,-y0-iy,white,Color.toFloatBits(.88f,.87f,.79f,.22f));
-            float ox=dx*1.5f,oy=dy*1.5f;
+            float ox=dx*2.7f,oy=dy*2.7f;
             float la=terrainHeight(next,MathUtils.clamp(x0+ox,next.position.x+.01f,next.position.x+15.99f),
                MathUtils.clamp(y0+oy,next.position.y+.01f,next.position.y+15.99f));
             float lb=terrainHeight(next,MathUtils.clamp(x1+ox,next.position.x+.01f,next.position.x+15.99f),
                MathUtils.clamp(y1+oy,next.position.y+.01f,next.position.y+15.99f));
-            quad(translucent.buffer(whiteTexture),x0,lowA+.07f,-y0,x1,lowB+.07f,-y1,
-               x1+ox,lb+.07f,-y1-oy,x0+ox,la+.07f,-y0-oy,white,Color.toFloatBits(.05f,.06f,.08f,.30f));
+            Buffer contact=shadows.buffer(whiteTexture);
+            float dark=Color.toFloatBits(.06f,.075f,.11f,.28f),clear=Color.toFloatBits(.06f,.075f,.11f,0);
+            vertex(contact,x0,lowA+.07f,-y0,dark,.5f,.5f,2);
+            vertex(contact,x1,lowB+.07f,-y1,dark,.5f,.5f,2);
+            vertex(contact,x1+ox,lb+.07f,-y1-oy,clear,.5f,.5f,2);
+            vertex(contact,x1+ox,lb+.07f,-y1-oy,clear,.5f,.5f,2);
+            vertex(contact,x0+ox,la+.07f,-y0-oy,clear,.5f,.5f,2);
+            vertex(contact,x0,lowA+.07f,-y0,dark,.5f,.5f,2);
          }
       }
+      for(int corner=0;corner<4;corner++)if(cliffBevel(tile,corner)) {
+         float cx=x+(corner==0||corner==3?0:16),cy=y+(corner<2?0:16);
+         float sx=corner==0||corner==3?1:-1,sy=corner<2?1:-1;
+         Tile low=natureTiles.get(lookup.set(x-sx*16,y));
+         float bottom=elevation.tileHeight(low),top=terrainHeight(tile,x+8,y+8);
+         TextureRegion face=assets.named(profile.cliff("front"));
+         float shade=((corner<2?.90f:.66f)+(corner==0||corner==3?.78f:.64f))*.5f;
+         cliffFace(tile,face,corner<2?0:1,cx+sx*1.3f,cy,cx,cy+sy*1.3f,bottom,bottom,top,top,shade);
+      }
       surfaceLift=previous;
+   }
+
+   /** Corner lighting bridges adjacent rock faces instead of drawing a dark seam.
+    * The four face strips preserve the actual high/low contour and source artwork. */
+   private void cliffFace(Tile tile,TextureRegion art,int side,float x0,float y0,float x1,float y1,
+         float lowA,float lowB,float highA,float highB,float shade) {
+      float start=cliffCornerLight(tile,side,x0,y0,shade),end=cliffCornerLight(tile,side,x1,y1,shade);
+      Buffer mesh=geometry.buffer(art.getTexture());
+      for(int col=0;col<4;col++) {
+         float f0=col==0?0:col==1?.12f:col==2?.50f:.88f;
+         float f1=col==0?.12f:col==1?.50f:col==2?.88f:1;
+         float a=col==0?start:shade,b=col==3?end:shade;
+         float ax=MathUtils.lerp(x0,x1,f0),ay=MathUtils.lerp(y0,y1,f0);
+         float bx=MathUtils.lerp(x0,x1,f1),by=MathUtils.lerp(y0,y1,f1);
+         float bottomA=MathUtils.lerp(lowA,lowB,f0),bottomB=MathUtils.lerp(lowA,lowB,f1);
+         float topA=MathUtils.lerp(highA,highB,f0),topB=MathUtils.lerp(highA,highB,f1);
+         for(int row=0;row<3;row++) {
+            float t0=row==0?0:row==1?.28f:.86f,t1=row==0?.28f:row==1?.86f:1;
+            float shade0=row==0?.69f:row==1?.91f:1.06f,shade1=row==0?.91f:row==1?1.06f:1.12f;
+            float ha0=MathUtils.lerp(bottomA,topA,t0),ha1=MathUtils.lerp(bottomA,topA,t1);
+            float hb0=MathUtils.lerp(bottomB,topB,t0),hb1=MathUtils.lerp(bottomB,topB,t1);
+            float u0=MathUtils.lerp(art.getU(),art.getU2(),f0),u1=MathUtils.lerp(art.getU(),art.getU2(),f1);
+            float v0=MathUtils.lerp(art.getV2(),art.getV(),t0),v1=MathUtils.lerp(art.getV2(),art.getV(),t1);
+            float c00=rockLight(a*shade0),c10=rockLight(b*shade0),c11=rockLight(b*shade1),c01=rockLight(a*shade1);
+            vertex(mesh,ax,ha0,-ay,c00,u0,v0,0);vertex(mesh,bx,hb0,-by,c10,u1,v0,0);vertex(mesh,bx,hb1,-by,c11,u1,v1,0);
+            vertex(mesh,bx,hb1,-by,c11,u1,v1,0);vertex(mesh,ax,ha1,-ay,c01,u0,v1,0);vertex(mesh,ax,ha0,-ay,c00,u0,v0,0);
+         }
+      }
+   }
+   private static float rockLight(float light) {
+      light=MathUtils.clamp(light,0,1);
+      return color(light,light*.99f,light*.95f);
+   }
+   private float cliffCornerLight(Tile tile,int side,float x,float y,float original) {
+      int perpendicular=side<2?(x<tile.position.x+8?2:3):(y<tile.position.y+8?0:1);
+      int dx=perpendicular==2?-16:perpendicular==3?16:0,dy=perpendicular==0?-16:perpendicular==1?16:0;
+      Tile next=natureTiles==null?null:natureTiles.get(lookup.set(tile.position.x+dx,tile.position.y+dy));
+      if(next==null||elevation.tileHeight(tile)-elevation.tileHeight(next)<3)return original;
+      float adjacent=perpendicular==0?.90f:perpendicular==1?.66f:perpendicular==2?.78f:.64f;
+      return (original+adjacent)*.5f;
    }
 
    private boolean building(Game game, Tile tile, float x, float y, String name) {
@@ -1294,7 +1432,7 @@ public final class JohtoRenderer {
    private void vertex(Buffer mesh, float x, float y, float z, float color, float u, float v, float style) {
       // Scene-dependent transforms stay here; storage/upload belong to the batch.
       float depth=style>3.5f?projectedAnchor.set(x,y+surfaceLift+.12f,actorPlaneZ).prj(camera.combined).z:0f;
-      if(style<-.5f)depth=shore.distance(x,-z);
+      if(style<-.5f&&style> -2.5f)depth=shore.distance(x,-z);
       if(style>3.5f&&matchBedDepth) {
          float screenY=projectedAnchor.set(x,y+surfaceLift,z).prj(camera.combined).y;
          depth=MathUtils.lerp(bedBottomDepth,bedTopDepth,(screenY-bedBottomScreenY)/(bedTopScreenY-bedBottomScreenY))-.000001f;
@@ -1348,6 +1486,7 @@ public final class JohtoRenderer {
 
    private void shaderAtmosphere() {
       shader.setUniformf("u_fogColor",fogColor.r,fogColor.g,fogColor.b);
+      shader.setUniformf("u_cameraPosition",camera.position);shader.setUniformf("u_daylight",daylight);
       shader.setUniformf("u_fogDensity",fogDensity);shader.setUniformf("u_desaturation",desaturation);shader.setUniformf("u_time",natureSeconds);
    }
 
@@ -1430,6 +1569,7 @@ public final class JohtoRenderer {
       ambientOverlays.dispose();
       emoteOwners.clear();
       actorModels.dispose();
+      GhostVisualAssets.disposeShared();
       if (shader != null) shader.dispose();
       if (whiteTexture != null) whiteTexture.dispose();
       shader = null;

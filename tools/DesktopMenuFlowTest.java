@@ -53,7 +53,8 @@ public final class DesktopMenuFlowTest {
          if(frame++!=3)return;
          try {
             Gdx.input=fake;DesktopControls.focusChanged(true);modernUi.applyViewport(this,960,540);step();capture("01-title.png");
-            press(Keys.ENTER);check(modernUi.desktop.screen==DesktopMenuController.Screen.HOME,"Title did not open home");release();capture("02-home.png");
+            press(Keys.ENTER);check(modernUi.desktop.screen==DesktopMenuController.Screen.TITLE&&!StartupCinematic.active(modernUi.desktop),"First Enter did not skip only the cinematic");release();
+            press(Keys.ENTER);check(modernUi.desktop.screen==DesktopMenuController.Screen.HOME,"Title did not open home after skipping the cinematic");release();capture("02-home.png");
             modernUi.desktop.homeIndex=1;press(Keys.ENTER);check(modernUi.desktop.screen==DesktopMenuController.Screen.HOME&&!modernUi.desktop.message.isEmpty(),"Empty Continue not guarded");release();
             modernUi.desktop.homeIndex=0;press(Keys.ENTER);release();check(modernUi.desktop.screen==DesktopMenuController.Screen.SETUP,"New setup not opened");
             for(int i=1;i<=6;i++){press(Keys.S);typed('s');check(DrawSetupMenu.currIndex==i,"S navigation stopped at row "+i+" actual="+DrawSetupMenu.currIndex+" screen="+modernUi.desktop.screen+" down="+InputProcessor.downPressed+" just="+InputProcessor.downJustPressed+" binding="+InputProcessor.keyboardDown);check(setup.name.isEmpty()&&setup.mapName.isEmpty(),"Navigation typed into a field");release();}

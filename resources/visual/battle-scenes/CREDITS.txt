@@ -1,0 +1,1 @@
+Seven original AI-created battle background illustrations generated with built-in image_gen, using the user-supplied forest reference for style and composition. These are not ripped official Pokemon backgrounds. Generated sources, prompts and SHA256 provenance are preserved in sources/ and PROVENANCE.json. Runtime preparation: nearest-neighbor resize to 768x432 only.

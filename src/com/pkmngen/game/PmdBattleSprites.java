@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector3;
 import com.pkmngen.game.util.SpriteProxy;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -67,13 +68,17 @@ public final class PmdBattleSprites {
    /** The B/W avatar cell contains transparent padding; fit its complete visible body. */
    private static TextureRegion trimTrainer(TextureRegion source) {
       String key=source.getRegionX()+":"+source.getRegionY()+":"+source.getRegionWidth()+":"+source.getRegionHeight();
-      Map<String,TextureRegion> byRegion=trainerRegions.computeIfAbsent(source.getTexture(),ignored->new HashMap<>());
-      TextureRegion cached=byRegion.get(key);
+      Map<String,TextureRegion> byRegion=trainerRegions.get(source.getTexture());
+      TextureRegion cached=byRegion==null?null:byRegion.get(key);
       if(cached!=null)return cached;
       TextureData data=source.getTexture().getTextureData();
       if(data.getType()!=TextureData.TextureDataType.Pixmap)return source;
       if(!data.isPrepared())data.prepare();
       Pixmap atlas=data.consumePixmap();
+      // Composed/normalized trainers upload a 32x32 frame and release their
+      // CPU Pixmap immediately. Preserve that complete frame; reading its
+      // released native pixels is unsafe. File-backed custom art still trims.
+      if(atlas==null||atlas.isDisposed())return source;
       int left=source.getRegionWidth(),top=source.getRegionHeight(),right=-1,bottom=-1;
       for(int y=0;y<source.getRegionHeight();y++)for(int x=0;x<source.getRegionWidth();x++){
          if((atlas.getPixel(source.getRegionX()+x,source.getRegionY()+y)&255)==0)continue;
@@ -81,6 +86,7 @@ public final class PmdBattleSprites {
       }
       if(data.disposePixmap())atlas.dispose();
       cached=right<left?source:new TextureRegion(source,left,top,right-left+1,bottom-top+1);
+      if(byRegion==null){byRegion=new HashMap<>();trainerRegions.put(source.getTexture(),byRegion);}
       byRegion.put(key,cached);return cached;
    }
 
@@ -116,27 +122,27 @@ public final class PmdBattleSprites {
       if (pokemon.isGhost) {
          if (diagnosedGhosts.put(pokemon, Boolean.TRUE) == null)
             Gdx.app.log("GhostPresentation", "entity=Pokemon species=" + pokemon.specie.name
-               + " isGhost=true requested=hidden-identity asset=procedural-spirit fallback=false"
+               + " isGhost=true requested=hidden-identity asset=lavender-spirit fallback=false"
                + " time=" + (game.map == null ? "none" : game.map.timeOfDay)
                + " shader=ui-default layer=battle-actor");
-         // The night encounter intentionally hides its species until Silph Scope.
-         // Present it as the same luminous wisp used in the modern world, never
-         // as a missing-art fallback or as an early reveal of the real Pokemon.
-         ModernUi ui=ModernUi.get(game);float ratio=source.getWidth()/Math.max(1,pokemon.specie.sprite.getWidth());
-         float cx=source.getX()+source.getWidth()*.5f,cy=source.getY()+17*ratio;
-         for(int layer=0;layer<4;layer++) {
-            float radius=(17-layer*2.5f)*ratio;
-            Color color=new Color(.64f+layer*.07f,.71f+layer*.06f,.94f,source.getColor().a*(.15f+layer*.05f));
-            for(float y=-radius;y<=radius;y+=Math.max(.5f,ratio)) {
-               float half=(float)Math.sqrt(Math.max(0,radius*radius-y*y));
-               ui.rect(game,cx-half,cy+y,half*2,Math.max(.5f,ratio),color);
-            }
-         }
+         // Concealed encounters share the explicit mystery sprite with the world;
+         // the species frame is never requested before identification.
+         float ratio=source.getWidth()/Math.max(1,pokemon.specie.sprite.getWidth());
+         float cx=source.getX()+source.getWidth()*.5f,ground=source.getY();
+         Vector3 anchor=game.johtoBattleRenderer==null?new Vector3(cx,ground,1):
+            game.johtoBattleRenderer.projectActor(game,cx,ground,new Vector3());
+         float ghostTime=ModernUi.get(game).reducedMotion()?0:seconds;
+         TextureRegion spirit=GhostVisualAssets.get().frame(ghostTime);
+         Sprite ghost=new Sprite(spirit);float scale=38*ratio*anchor.z/Math.max(spirit.getRegionWidth(),spirit.getRegionHeight());
+         float width=spirit.getRegionWidth()*scale,height=spirit.getRegionHeight()*scale;
+         ghost.setBounds(anchor.x-width*.5f,anchor.y,width,height);
+         ghost.setColor(source.getColor());ghost.setOrigin(width*.5f,0);
+         ghost.setScale(source.getScaleX(),source.getScaleY());ghost.setRotation(source.getRotation());ghost.draw(game.uiBatch);
          return true;
       }
       // The arena slots are diagonal. North/south frames made both actors look
       // past each other. Use real NE/SW art for idle, attacks, hurt and sleep.
-      String facing = VisualGeometry.battleFacing(back);
+      String facing = game.johtoBattleRenderer==null?VisualGeometry.battleFacing(back):game.johtoBattleRenderer.actorFacing(game,back);
       PmdPokemonSprites.Frame frame = PmdPokemonSprites.get().frame(pokemon, facing, animation, seconds);
       if (frame == null) return false;
       float originalHeight = back ? 48f : pokemon.specie.sprite.getWidth();
@@ -149,8 +155,9 @@ public final class PmdBattleSprites {
          // Fit the complete animation envelope once; individual trimmed frames
          // may be larger or offset by jumps, tails and attack movement.
          float minX=0,minY=0,maxX=0,maxY=0;
+         for(String orientation:new String[]{"up","up-right","right","down-right","down","down-left","left","up-left"})
          for (String name : new String[]{"Idle","Walk","Attack","Hurt","Sleep"}) {
-            PmdPokemonSprites.AnimationBounds bounds=PmdPokemonSprites.get().bounds(pokemon,facing,name);
+            PmdPokemonSprites.AnimationBounds bounds=PmdPokemonSprites.get().bounds(pokemon,orientation,name);
             if (bounds == null) continue;
             minX=Math.min(minX,bounds.minX); minY=Math.min(minY,bounds.minY);
             maxX=Math.max(maxX,bounds.maxX); maxY=Math.max(maxY,bounds.maxY);
@@ -160,9 +167,23 @@ public final class PmdBattleSprites {
          // intersecting the command panel, and above it for the entire pose.
          baseScale=Math.min(baseScale,Math.min(44f/Math.max(1,maxY),6f/Math.max(1,-minY)));
          baseScale=Math.min(baseScale,33f/Math.max(1,Math.max(-minX,maxX)));
+         // Keep one size for every direction. Fit even the widest pose against
+         // the complete orbit, rather than cropping large species at its edge.
+         for(int step=0;step<=128;step++) {
+            float yaw=BattleScenery.orbit(step*(40f/128f));
+            Vector3 limit=BattleScenery.project(back?40:124,back?48:88,yaw,new Vector3());
+            float ratio=limit.z*(back?1f:.9f);
+            baseScale=Math.min(baseScale,(limit.x-2)/(Math.max(1,-minX)*ratio));
+            baseScale=Math.min(baseScale,(158-limit.x)/(Math.max(1,maxX)*ratio));
+            baseScale=Math.min(baseScale,((back?110:142)-limit.y)/(Math.max(1,maxY-minY)*ratio));
+         }
          scales.put(key, baseScale);
       }
       float scale = baseScale * source.getWidth() / (back ? 48f : pokemon.specie.sprite.getWidth()) * (back ? 1f : .90f);
+      float baseGround=source.getY()-(back&&game.battle.drawAction instanceof SpecialBattleMegaGengar.DrawBattle1?14:0);
+      Vector3 camera=game.johtoBattleRenderer==null?new Vector3(source.getX()+source.getWidth()*.5f,baseGround,1):
+         game.johtoBattleRenderer.projectActor(game,source.getX()+source.getWidth()*.5f,baseGround,new Vector3());
+      scale*=camera.z;
       TextureRegion visible = frame.region;
       if (fraction < 1f) {
          // The original faint action removes rows from the bottom of its image.
@@ -173,7 +194,7 @@ public final class PmdBattleSprites {
       }
       Sprite draw = new Sprite(visible);
       float width = frame.width * scale, height = visible.getRegionHeight() * scale;
-      float groundY=source.getY()-(back&&game.battle.drawAction instanceof SpecialBattleMegaGengar.DrawBattle1?14:0);
+      float groundY=camera.y;
       PmdPokemonSprites.AnimationBounds contact=PmdPokemonSprites.get().bounds(pokemon,facing,"Idle");
       float contactLift=contact==null?0:-Math.min(0,contact.minY)*scale;
       if(fraction>=.99f&&source.getColor().a>0) {
@@ -182,10 +203,10 @@ public final class PmdBattleSprites {
          Color shade=new Color(.08f,.12f,.13f,.22f*source.getColor().a);
          for(int row=0;row<5;row++){
             float dy=(row-2)/2.5f,half=radius*(float)Math.sqrt(Math.max(0,1-dy*dy));
-            ui.rect(game,source.getX()+source.getWidth()*.5f-half,groundY-.7f+row*.4f,half*2,.4f,shade);
+            ui.rect(game,camera.x-half,groundY-.7f+row*.4f,half*2,.4f,shade);
          }
       }
-      draw.setBounds(source.getX() + source.getWidth()*.5f - frame.anchorX*scale,
+      draw.setBounds(camera.x - frame.anchorX*scale,
          groundY + contactLift - frame.anchorY*scale*fraction, width, height);
       // Move effects retain their original rotation around the PMD ground anchor.
       draw.setOrigin(frame.anchorX*scale,frame.anchorY*scale*fraction); draw.setRotation(source.getRotation());

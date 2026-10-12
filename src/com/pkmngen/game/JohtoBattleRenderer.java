@@ -21,6 +21,9 @@ public final class JohtoBattleRenderer {
    private final Color oldColor = new Color();
    private Texture worldSnapshot;
    private Texture rippleSnapshot;
+   private Texture cameraSnapshot;
+   private float cameraBlend;
+   private boolean previousSelection,hasCameraSnapshot;
    private Texture arena;
    private String arenaBiome;
    private final BattleScenery scenery=new BattleScenery();
@@ -62,6 +65,10 @@ public final class JohtoBattleRenderer {
       ModernUi modernUi=ModernUi.get(game);
       if(battleCanvas&&(modernUi==null||!modernUi.reducedMotion()))
          scenerySeconds+=Math.min(.05f,Math.max(0,Gdx.graphics.getDeltaTime()));
+      boolean selection=selectionCamera(game);
+      if(!battleCanvas||!phase.equals("none")||modernUi==null||modernUi.reducedMotion())cameraBlend=0;
+      else if(selection!=previousSelection&&hasCameraSnapshot)cameraBlend=.14f;
+      previousSelection=selection;
       if (worldRendered) captureWorld();
       // A cleanup can remove DrawBattle before the next world pass. Always
       // supply an opaque modern frame in that gap, even with no fade action.
@@ -79,8 +86,31 @@ public final class JohtoBattleRenderer {
       transitionLengths.keySet().removeIf(action -> !game.actionStack.contains(action));
    }
 
-   /** Restore projection only: painting margins here used to erase screen-wide effects. */
+   /** A short dissolve hides the camera cut when a turn begins or the menu returns.
+    * Actions and particles retain their original coordinates and timing. */
    public void finishFrame(Game game) {
+      if(battleCanvas&&phase.equals("none")&&ModernUi.get(game)!=null&&!ModernUi.get(game).reducedMotion()) {
+         int w=Gdx.graphics.getBackBufferWidth(),h=Gdx.graphics.getBackBufferHeight();
+         if(cameraSnapshot==null||cameraSnapshot.getWidth()!=w||cameraSnapshot.getHeight()!=h) {
+            if(cameraSnapshot!=null)cameraSnapshot.dispose();
+            // The framebuffer already contains composed UI. Its destination
+            // alpha must not make that captured UI translucent a second time.
+            cameraSnapshot=new Texture(w,h,Pixmap.Format.RGB888);
+            cameraSnapshot.setFilter(Texture.TextureFilter.Nearest,Texture.TextureFilter.Nearest);
+            hasCameraSnapshot=false;cameraBlend=0;
+         }
+         if(cameraBlend>0&&hasCameraSnapshot) {
+            if(snapshotBatch==null)snapshotBatch=new SpriteBatch();
+            snapshotBatch.setProjectionMatrix(new Matrix4().setToOrtho2D(0,0,w,h));
+            snapshotBatch.setColor(1,1,1,MathUtils.clamp(cameraBlend/.14f,0,1));
+            snapshotBatch.begin();snapshotBatch.draw(cameraSnapshot,0,0,w,h,0,0,w,h,false,true);snapshotBatch.end();
+            snapshotBatch.setColor(Color.WHITE);
+            cameraBlend=Math.max(0,cameraBlend-Math.min(.05f,Math.max(0,Gdx.graphics.getDeltaTime())));
+         } else {
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);cameraSnapshot.bind();
+            Gdx.gl.glCopyTexSubImage2D(GL20.GL_TEXTURE_2D,0,0,0,0,0,w,h);hasCameraSnapshot=true;
+         }
+      } else {hasCameraSnapshot=false;cameraBlend=0;}
       if(projectionSaved) {
          game.uiBatch.setProjectionMatrix(previousUiProjection);
          projectionSaved=false;
@@ -198,7 +228,7 @@ public final class JohtoBattleRenderer {
       game.uiBatch.setColor(Color.WHITE);
       float aspect=Gdx.graphics.getBackBufferWidth()/(float)Math.max(1,Gdx.graphics.getBackBufferHeight());
       float w=Math.max(160,144*aspect),h=Math.max(144,160/aspect);
-      scenery.draw(game.uiBatch,arena,biome,ui.reducedMotion()?0:scenerySeconds,(160-w)*.5f,(144-h)*.5f,w,h);
+      scenery.draw(game.uiBatch,arena,biome,ui.reducedMotion()?0:scenerySeconds,cameraYaw(game),(160-w)*.5f,(144-h)*.5f,w,h);
       game.uiBatch.setColor(oldColor);
       if (lastBattleFrame != frame) { battleFrames++; lastBattleFrame = frame; }
    }
@@ -255,16 +285,16 @@ public final class JohtoBattleRenderer {
    public void drawFriendlyHealth(Game game, DrawFriendlyHealthGen2 health) {
       ModernUi ui = ModernUi.get(game);
       Pokemon pokemon = game.player.currPokemon;
-      ui.panel(game, 82, 47, 75, 35);
-      ui.fitText(game, pokemon.nickname, 87, 79, 6f, 47, ModernUi.INK);
-      ui.text(game, "Lv " + pokemon.level, 135, 78, 3.6f, ModernUi.MUTED);
+      ui.panel(game, 82, 44, 75, 28);
+      ui.fitText(game, pokemon.nickname, 87, 69, 5.7f, 47, ModernUi.INK);
+      ui.text(game, "Lv " + pokemon.level, 135, 68, 3.3f, ModernUi.MUTED);
       String status = status(pokemon);
-      ui.text(game, status.isEmpty() ? gender(pokemon) : status, 88, 71, 3.8f, status.isEmpty() ? ModernUi.MUTED : ModernUi.RED);
-      ui.text(game, "HP", 87, 65.5f, 3.2f, ModernUi.MUTED);
-      ui.bar(game, 99, 62.5f, 51, 3.4f, health.currHealth / 48f, healthColor(health.currHealth));
-      ui.text(game, health.currHealthRemaining + " / " + pokemon.maxStats.get("hp"), 115, 59.5f, 4.2f, ModernUi.INK);
-      ui.text(game, "EXP", 87, 52.5f, 2.8f, ModernUi.MUTED);
-      ui.bar(game, 100, 49.5f, 50, 1.7f, DrawFriendlyHealthGen2.xpBarIndex / 68f, ModernUi.GOLD);
+      ui.text(game, status.isEmpty() ? gender(pokemon) : status, 88, 62, 3.4f, status.isEmpty() ? ModernUi.MUTED : ModernUi.RED);
+      ui.text(game, "HP", 87, 57.5f, 3.2f, ModernUi.MUTED);
+      ui.bar(game, 99, 54.5f, 51, 3f, health.currHealth / 48f, healthColor(health.currHealth));
+      ui.text(game, health.currHealthRemaining + " / " + pokemon.maxStats.get("hp"), 115, 51.5f, 3.8f, ModernUi.INK);
+      ui.text(game, "EXP", 87, 48f, 2.6f, ModernUi.MUTED);
+      ui.bar(game, 100, 45.5f, 50, 1.5f, DrawFriendlyHealthGen2.xpBarIndex / 68f, ModernUi.GOLD);
    }
 
    public void drawEnemyHealth(Game game, DrawEnemyHealthGen2 health) {
@@ -369,6 +399,16 @@ public final class JohtoBattleRenderer {
       float left=(160-canvasWidth)*.5f,bottom=(144-canvasHeight)*.5f;
       float entrance=ease(p/.20f),close=ease((p-.77f)/.23f);
       boolean still=ui.reducedMotion();
+      if(!still&&hasSnapshot) {
+         // A short lens push into the captured modern world leads into the arena.
+         // This is presentation only; the original encounter timers stay unchanged.
+         float zoom=1f+.13f*ease(p/.77f);
+         oldColor.set(game.uiBatch.getColor());game.uiBatch.setColor(Color.WHITE);
+         game.uiBatch.draw(worldSnapshot,left-canvasWidth*(zoom-1)*.5f,
+            bottom-canvasHeight*(zoom-1)*.5f,canvasWidth*zoom,canvasHeight*zoom,
+            0,0,snapshotWidth,snapshotHeight,false,true);
+         game.uiBatch.setColor(oldColor);
+      }
       // One continuous darkening replaces the old repeating flashes. The
       // modern world capture remains underneath for every encounter frame.
       ui.rect(game,left,bottom,canvasWidth,canvasHeight,tint.set(ModernUi.INK).mul(1,1,1,.36f*entrance));
@@ -379,7 +419,9 @@ public final class JohtoBattleRenderer {
          ui.text(game,"WILD ENCOUNTER",22,83,4,ModernUi.LINE);
          Pokemon opponent=game.battle.oppPokemon;
          String name=opponent==null?"A new challenge":opponent.isGhost?"Unknown presence":opponent.nickname;
-         ui.fitText(game,name,22,74,8,120,ModernUi.PAPER);
+         ui.fitText(game,name,22,74,8,89,ModernUi.PAPER);
+         if(opponent!=null&&!opponent.isGhost&&!opponent.isEgg)
+            PmdBattleSprites.event(game,opponent,opponent.specie.name,116,57,27,29);
          ui.rect(game,22,59,116,.6f,ModernUi.MUTED);
          if(!still)ui.rect(game,22,59,116*MathUtils.clamp(p/.77f,0,1),.6f,ModernUi.GOLD);
       }
@@ -456,169 +498,36 @@ public final class JohtoBattleRenderer {
       if (lastTransitionFrame != frame) { transitionFrames++; lastTransitionFrame = frame; }
    }
 
-   /** Compose authored landscape tiles and props into a fixed battle stage. */
+   /** Opaque continuous arena, independent of map tiles and viewport size. */
    private void ensureArena(String biome) {
-      if (biome == null) biome = "grassland";
-      biome=biome.toLowerCase(Locale.ROOT);
-      float aspect=Gdx.graphics.getBackBufferWidth()/(float)Math.max(1,Gdx.graphics.getBackBufferHeight());
-      int width=(int)Math.ceil(Math.max(320,288*aspect)),height=(int)Math.ceil(Math.max(288,320/aspect));
-      if (arena != null && biome.equals(arenaBiome) && width==arenaWidth && height==arenaHeight) return;
-      if (arena != null) arena.dispose();
-      arenaBiome = biome;
-      arenaWidth=width;arenaHeight=height;
-      int offsetX=(width-320)/2,offsetY=(height-288)/2;
-      Pixmap p = new Pixmap(width,height,Pixmap.Format.RGBA8888);
-      boolean sand = biome.contains("desert") || biome.contains("beach");
-      boolean snow = biome.contains("tundra") || biome.contains("snow");
-      boolean cave = biome.contains("cave") || biome.contains("volcan") || biome.contains("dungeon");
-      boolean volcano = biome.contains("volcan");
-      boolean graveyard=biome.contains("graveyard");
-      boolean marine=BattleScenery.kind(biome)<=2;
-      BiomeProfiles.Profile profile=BiomeProfiles.named(volcano?"volcano":graveyard?"graveyard":snow?"snow":marine?"beach":sand?"desert":cave?"cave":biome.contains("forest")?"forest":"plains");
-      Color sky = graveyard?new Color(.20f,.28f,.28f,1):volcano ? new Color(.22f,.09f,.14f,1) : cave ? new Color(.12f,.18f,.26f,1)
-         : snow ? new Color(.69f,.79f,.88f,1) : marine ? new Color(.35f,.63f,.79f,1) : sand ? new Color(.76f,.83f,.80f,1) : new Color(.49f,.69f,.64f,1);
-      Color horizon = graveyard?new Color(.46f,.53f,.49f,1):volcano ? new Color(.48f,.16f,.13f,1) : cave ? new Color(.25f,.34f,.40f,1)
-         : marine ? new Color(.76f,.89f,.86f,1) : new Color(.83f,.88f,.69f,1);
-      for (int y = 0; y < height; y++) {
-         tint.set(sky).lerp(horizon,MathUtils.clamp((y-offsetY)/105f,0,1));
-         p.setColor(tint); p.drawLine(0,y,width-1,y);
-      }
-      Pixmap atlas=new Pixmap(Gdx.files.internal("visual/stardew/world-atlas.png"));
-      BwAssets assets=BwAssets.get();
-      TextureRegion ground=assets.cell(profile.terrain("ground"),0,0);
-      paintGround(p,atlas,ground,horizon);
-      if(marine)paintSea(p,atlas,assets.namedAnimated(profile.string("fluid","water","water"),0));
-      if (cave) {
-         TextureRegion wall=assets.named(profile.cliff("front"));
-         Color wallTint=volcano?Color.WHITE:new Color(.58f,.64f,.72f,1);
-         for (int x=-8-offsetX;x<320+offsetX;x+=32) stamp(p,atlas,wall,x+offsetX,-24-(x&16),40,122+offsetY,wallTint);
-         TextureRegion stone=assets.named(profile.decor("rock"));
-         if (stone==null) stone=assets.named("rock");
-         for (int x=-18-offsetX;x<340+offsetX;x+=43) stamp(p,atlas,stone,x+offsetX,offsetY+53+(x&15),36,48,new Color(.72f,.80f,.84f,1));
-      } else if(!marine) {
-         TextureRegion tree=assets.named(snow||sand||graveyard?profile.decor("tree"):"forest_tree");
-         if (tree==null) tree=assets.named("tree");
-         for (int x=-30-offsetX;x<350+offsetX;x+=37) {
-            int treeHeight=64+(Math.floorMod(x*7,19));
-            stamp(p,atlas,tree,x+offsetX,offsetY+92-treeHeight,Math.max(1,(int)(treeHeight*tree.getRegionWidth()/(float)tree.getRegionHeight())),treeHeight,
-               new Color(.57f,.69f,.64f,1));
-         }
-         for (int x=-38-offsetX;x<360+offsetX;x+=73) {
-            int treeHeight=90+Math.floorMod(x*3,19);
-            stamp(p,atlas,tree,x+offsetX,offsetY+103-treeHeight,Math.max(1,(int)(treeHeight*tree.getRegionWidth()/(float)tree.getRegionHeight())),treeHeight,Color.WHITE);
-         }
-      }
-      if(graveyard) {
-         for(int x=-12-offsetX;x<340+offsetX;x+=44)
-            stamp(p,atlas,assets.named(profile.decor("gravestone")),x+offsetX,offsetY+80+(x&7),17,24,Color.WHITE);
-      }
-      if(volcano)paintLava(p,atlas,assets.namedAnimated(profile.string("fluid","lava","lava_bright"),0));
-      TextureRegion platform=assets.cell(profile.terrain("path"),0,0);
-      if(platform==null) platform=ground;
-      paintPlatform(p,atlas,platform,offsetX+188,offsetY+103,120,24,cave);
-      paintPlatform(p,atlas,platform,offsetX-9,offsetY+179,173,34,cave);
-      if(graveyard) {
-         // Haze belongs to the scenery; it never veils UI text or the Pokemon.
-         Color pixel=new Color(),mist=Color.valueOf(profile.string("ambient","fogColor","a5b5b0"));
-         for(int y=0;y<height;y++)for(int x=0;x<width;x++) {
-            Color.rgba8888ToColor(pixel,p.getPixel(x,y));
-            pixel.lerp(mist,.09f+.05f*MathUtils.sin(y*.12f));p.drawPixel(x,y,Color.rgba8888(pixel));
-         }
-      }
-      atlas.dispose();
-      arena = new Texture(p);
-      arena.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-      p.dispose();
+      String key=BattleScenery.asset(biome);
+      if(arena!=null&&key.equals(arenaBiome))return;
+      if(arena!=null)arena.dispose();
+      arena=new Texture(Gdx.files.internal("visual/battle-scenes/"+key+".png"));
+      arena.setFilter(Texture.TextureFilter.Nearest,Texture.TextureFilter.Nearest);
+      arena.setWrap(Texture.TextureWrap.ClampToEdge,Texture.TextureWrap.ClampToEdge);
+      arenaBiome=key;arenaWidth=arena.getWidth();arenaHeight=arena.getHeight();
    }
 
-   private void paintGround(Pixmap destination, Pixmap atlas, TextureRegion region, Color haze) {
-      if (region==null) return;
-      int ox=region.getRegionX(), oy=region.getRegionY(), width=region.getRegionWidth(), height=region.getRegionHeight();
-      Color pixel = new Color();
-      int offsetY=(destination.getHeight()-288)/2;
-      for (int y=76+offsetY;y<destination.getHeight();y++) {
-         float depth=(y-76-offsetY)/212f, perspective=.28f+depth*1.55f;
-         int ty=Math.floorMod((int)((y-76-offsetY)/perspective),height);
-         for (int x=0;x<destination.getWidth();x++) {
-            int tx=Math.floorMod((int)((x-destination.getWidth()/2)/perspective),width);
-            int rgba=atlas.getPixel(ox+tx,oy+ty);
-            if ((rgba&255)<128) continue;
-            Color.rgba8888ToColor(pixel,rgba);
-            pixel.lerp(haze,Math.max(0,(1-depth)*.18f));
-            destination.drawPixel(x,y,Color.rgba8888(pixel));
-         }
-      }
+   /** Effects retain their exact legacy targets while a turn executes.
+    * The orbit belongs to the command/attack selection phase only. */
+   float cameraYaw(Game game) {
+      return selectionCamera(game)?BattleScenery.orbit(scenerySeconds):0;
    }
-
-   private static void stamp(Pixmap destination,Pixmap atlas,TextureRegion region,int x,int y,int width,int height,Color tint) {
-      if(region==null)return;
-      Color color=new Color();
-      for(int row=0;row<height;row++) for(int col=0;col<width;col++) {
-         int rgba=atlas.getPixel(region.getRegionX()+col*region.getRegionWidth()/width,
-            region.getRegionY()+row*region.getRegionHeight()/height);
-         if((rgba&255)==0)continue;
-         Color.rgba8888ToColor(color,rgba); color.mul(tint);
-         destination.drawPixel(x+col,y+row,Color.rgba8888(color));
-      }
+   private boolean selectionCamera(Game game) {
+      ModernUi ui=ModernUi.get(game);
+      if(!battleCanvas||ui==null||ui.reducedMotion()||!phase.equals("none"))return false;
+      for(Action action:game.actionStack)
+         if(action instanceof DrawBattleMenuNormal&&!((DrawBattleMenuNormal)action).disabled
+            ||action instanceof DrawBattleMenuSafariZone
+            ||action instanceof DrawAttacksMenu&&((DrawAttacksMenu)action).attackLearning==null)
+            return true;
+      return false;
    }
-
-   private static void paintPlatform(Pixmap p,Pixmap atlas,TextureRegion material,int x,int y,int width,int height,boolean cave) {
-      ellipse(p,x,y+4,width,height,new Color(.09f,.14f,.15f,.55f));
-      if(material==null)return;
-      Color color=new Color();
-      for(int row=0;row<height;row++) {
-         float dy=(row+.5f)/height*2-1, half=(float)Math.sqrt(Math.max(0,1-dy*dy))*width*.5f;
-         int left=Math.round(x+width*.5f-half), right=Math.round(x+width*.5f+half);
-         for(int col=left;col<=right;col++) {
-            int rgba=atlas.getPixel(material.getRegionX()+Math.floorMod(col,material.getRegionWidth()),
-               material.getRegionY()+Math.floorMod(row*2,material.getRegionHeight()));
-            Color.rgba8888ToColor(color,rgba);
-            color.mul(cave?.84f:1.04f,cave?.86f:1.02f,cave?.92f:.94f,1);
-            if(row>height-4)color.mul(.75f,.80f,.77f,1);
-            p.drawPixel(col,y+row,Color.rgba8888(color));
-         }
-      }
+   com.badlogic.gdx.math.Vector3 projectActor(Game game,float x,float y,com.badlogic.gdx.math.Vector3 out) {
+      return BattleScenery.project(x,y,cameraYaw(game),out);
    }
-
-   private static void paintLava(Pixmap destination,Pixmap atlas,TextureRegion lava) {
-      if(lava==null)return;
-      int offsetY=(destination.getHeight()-288)/2,offsetX=(destination.getWidth()-320)/2;
-      for(int x=0;x<destination.getWidth();x++){
-         int top=offsetY+143+Math.round(7*MathUtils.sin((x-offsetX)/43f));
-         for(int y=top-2;y<top+14;y++){
-            int color=y<top||y>top+11?0x402127FF:atlas.getPixel(lava.getRegionX()+x%lava.getRegionWidth(),
-               lava.getRegionY()+(y-top)%lava.getRegionHeight());
-            destination.drawPixel(x,y,color);
-         }
-      }
-   }
-
-   /** The shoreline is part of the cached scene; only light and wave phase vary per frame. */
-   private static void paintSea(Pixmap destination,Pixmap atlas,TextureRegion water) {
-      if(water==null)return;
-      int offsetY=(destination.getHeight()-288)/2,offsetX=(destination.getWidth()-320)/2;
-      Color pixel=new Color(),deepSea=new Color(.16f,.43f,.50f,1);
-      for(int x=0;x<destination.getWidth();x++) {
-         int shore=offsetY+143+Math.round(7*MathUtils.sin((x-offsetX)/43f));
-         for(int y=offsetY+76;y<shore;y++) {
-            int rgba=atlas.getPixel(water.getRegionX()+Math.floorMod(x,water.getRegionWidth()),
-               water.getRegionY()+Math.floorMod(y,water.getRegionHeight()));
-            Color.rgba8888ToColor(pixel,rgba);
-            float depth=MathUtils.clamp((y-offsetY-76)/67f,0,1);
-            pixel.lerp(deepSea,.32f*(1-depth));
-            destination.drawPixel(x,y,Color.rgba8888(pixel));
-         }
-      }
-   }
-
-   private static void ellipse(Pixmap p, int x, int y, int width, int height, Color color) {
-      p.setColor(color);
-      for (int row = 0; row < height; row++) {
-         float dy = (row + 0.5f) / height * 2f - 1f;
-         float half = (float)Math.sqrt(Math.max(0f, 1f - dy * dy)) * width * 0.5f;
-         p.drawLine(Math.round(x + width * 0.5f - half), y + row, Math.round(x + width * 0.5f + half), y + row);
-      }
-   }
+   String actorFacing(Game game,boolean friendly){return BattleScenery.facing(friendly,cameraYaw(game));}
 
    public long getBattleFrames() { return battleFrames; }
    public long getTransitionFrames() { return transitionFrames; }
@@ -627,6 +536,7 @@ public final class JohtoBattleRenderer {
    public void dispose() {
       if (worldSnapshot != null) worldSnapshot.dispose();
       if (rippleSnapshot != null) rippleSnapshot.dispose();
+      if (cameraSnapshot != null) cameraSnapshot.dispose();
       if (arena != null) arena.dispose();
       scenery.dispose();
       if (snapshotBatch != null) snapshotBatch.dispose();

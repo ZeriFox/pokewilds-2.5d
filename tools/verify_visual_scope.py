@@ -20,8 +20,13 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "f2c1f39f4c9abfd42bcb92d1c1580c10ce8fd2bb6c4665e5077b002f7081d574"
+FROZEN_MANIFEST_SHA256 = "67a078821afeee2595a1a7274bc8ec775b431333eb100b320cd327729ba1cf3b"
 PREFIX = "src/com/pkmngen/game/"
+CINEMATIC_CUSTOMIZATION_ARCHIVE = {
+    "baseline/before-cinematic-customization/modernization-scope.json": "f2c1f39f4c9abfd42bcb92d1c1580c10ce8fd2bb6c4665e5077b002f7081d574",
+    "baseline/before-cinematic-customization/VERIFICA.txt": "da6ac2c8e922fcc913bb9fc9302c6288c30bc8fb75f8cb11d537cc55964dd7f7",
+    "baseline/before-cinematic-customization/verify_visual_scope.py": "ca1f20158801848b86ccc54554478e5655e1d9d7726d447fd16d8a8658bddbfa"
+}
 TRAINER_REDRAW_ARCHIVE = {
     "baseline/before-trainer-redraw/modernization-scope.json": "835e48420251cbeb252e3ef0f716969f06c4e5509a8a0f8b3cf73432e0df4a66",
     "baseline/before-trainer-redraw/verify_visual_scope.py": "c2b822bf4e69d622c4ecbf70299925580fbd2675b4f4a162194197dcd2310f43",
@@ -114,33 +119,37 @@ MODIFIED_SCOPES = {
     "util/SpriteProxy.java": "Presentation: intercept known battle actors for PMD rendering; legacy fallback retained.",
 }
 ADDED_SCOPES = {
-    "BattleScenery.java": "GPU-only biome background effects and gentle 2.5D background parallax with protected near-ground and combatant platforms. Owns/disposes its shader, restores caller batch state and uses a bounded presentation clock; no battle rules, actor positions, action timers, RNG or save writes.",
-    "WorldNatureMotion.java": "Pure coordinate-derived bounded vegetation/crown wind and nearby shore/sand masks. Fixed trunk/root region, deterministic selected live trees, excludes rigid/dead objects and elevation discontinuities; no textures, gameplay clocks, RNG, map mutation or persisted state.",
+    "GhostVisualAssets.java": "Shared four-frame transparent concealed spirit artwork with finite-clock selection and explicit texture disposal/reload. Does not inspect or reveal the hidden Pokemon species.",
+    "StartupCinematic.java": "Skippable 7.2-second opening using authored coast/forest artwork and selected trainer/companion, bounded parallax, title fade and full viewport bars. Disabled for reduced motion; owns/disposes artwork; no map, RNG, save or action mutations.",
+    "MenuMotion.java": "Bounded presentation-only selection and entrance easing, fixed layout and immediate reduced-motion state; no input or gameplay state.",
+    "CharacterAppearance.java": "Validated local per-name/trainer cosmetic profiles with atomic file persistence and backup, independent generated outfit/backpack/shoes/headwear/hair variants and colors, face-preserving layered composition and run anticipation. No game-save schema, inventory, network or Pokemon changes.",
+    "BattleScenery.java": "Illustrated biome arenas with a shared CPU/GPU floor projection, bounded camera orbit, directional sprite selection and animated background depth/light/water. Restores shader state; no combat formulas, action timing, map or RNG writes.",
+    "WorldNatureMotion.java": "Pure coordinate-derived rooted vegetation movement, shore distance and same-height live tidal adjacency masks. No simulation clocks, map mutation, gameplay RNG or saved state.",
     "AuthoredTerrain.java": "Generation-only reconstruction and deterministic 17/9/5-cell authored modules for ten natural biome families. Region-specific footprints, minimum useful pocket area, immutable water/tidal/maze boundaries, protected event and encounter access, biome/route preservation, dry connectivity and no save-load regeneration.",
     'DesktopInterfaceSettings.java': 'Explicit local UI/control preferences, draft validation, reserved menu keys and duplicate rejection, atomic save with backup; no game-save schema or legacy settings-file rewrite.',
-    "DesktopMenuController.java": "Existing desktop setup, controls and menu navigation retained. Trainer picker lists nineteen distinct identities plus complete installed mods, restores saved identity independent of obsolete global style, applies existing costume colors and original setup routines, with unchanged input-context and saved Player schema.",
+    "DesktopMenuController.java": "Desktop setup/control navigation with nineteen unique trainers and installed mods, skippable opening, wardrobe draft/apply/cancel from trainer picker and existing-game settings, independent parts/colors/preview direction. Retains original game launch/input dispatch and Player schema; cosmetic data saved separately.",
     'MenuTextSession.java': 'Explicit reversible setup text draft with caret/deletion, length/character constraints and IPv4 validation; selection alone never consumes WASD as text.',
-    "ModernStartupUi.java": "Existing desktop title/setup/options presentation with a unified nineteen-character B/W-style selector. Preview shares actual world appearance and clothing accent selection; truthful native B/W/mod color affordances. No gameplay, RNG or save-format changes.",
-    "TrainerCatalog.java": "Identity-specific B/W-style sheets for seventeen redrawn built-ins, clothing-only masked palette variants, and original installed-mod artwork. Owned bounded cache with per-frame disposal guard, consistent directional frame selection and complete required-pose checks including back art. No saved Player schema, original sprite mutation or game rules.",
+    "ModernStartupUi.java": "Modern title/setup/options and nineteen-trainer picker, authored opening delegation and wardrobe preview with matching pointer hit boxes and current bindings. No gameplay RNG or save format changes.",
+    "TrainerCatalog.java": "Nineteen identity-preserving B/W-style trainers with clothing accents, generated modular part composition and run anticipation. Bounded owned texture cache, mod/custom-art priority, direction/frame and complete required-pose validation retained. No Player schema or gameplay changes.",
 
     "WorldMaterials.java": "Presentation-only semantic terrain/prop resolver, natural dry transitions, regional tree selection and cave floor caps. Upper objects override floor-name heuristics; whole rocks remain props and volcanic cracks remain flat. No asset ownership, Tile mutations or saved-data changes.",
     "WorldAmbientOverlay.java": "Sparse deterministic world-space mist, embers, fireflies, dust, snow and water glints with count/opacity budgets, protected actor focus, depth testing and separate shader ownership. Respects ambient toggle and freezes environmental motion with reduced motion; no gameplay RNG, indoor/UI overlays or saved-state writes.",
     "WorldMeshBatch.java": "CPU vertex storage, identity-based texture grouping, triangle-aligned mesh upload/reuse and GPU ownership extracted from JohtoRenderer; no camera, scene state, shader uniforms, texture ownership, gameplay or saved data.",
     "ActorModelRenderer.java": "Existing optional 3D helper, disabled by the modern sprite launcher.",
     "BiomeProfiles.java": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state.",
-    "BwAssets.java": "Shared landscape atlas and custom sampling contracts preserved; unified identity-specific trainer presentation across menus, world and battles. Explicit generic/per-character atlas overrides retain priority; installed mods preserved; genuine B/W idle and running frames corrected. Ignores obsolete global classic-cast selection for bundled characters, preserves owned texture lifecycle and layout metadata; no gameplay or save writes.",
+    "BwAssets.java": "Shared landscape/custom sampling contracts with unified player appearance composition across world, preview and battle, native B/W run/idle and explicit mod/atlas override priority. Resolves local appearance without changing Player or game saves; disposes owned trainer textures.",
     "DesktopControls.java": "Authorized desktop binding parser, exact legacy-preset migration, text-entry detection and truthful dynamic hints. Step 3 treats only an explicitly active setup edit as text focus; highlighting a row is navigation.",
     "StartupVerification.java": "Opt-in packaged-launch probe inside the delivered Game: observe 120 original menu frames, verify nonempty framebuffer, save capture and exit normally; disabled in ordinary play.",
     "ExpansionDex.java": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration.",
-    "JohtoBattleRenderer.java": "Modern full-viewport biome arenas/HUD and preserved encounter transitions. Owns cached animated background scenery and a presentation-only clock; restores batch shader/projection/color, keeps combatant platforms and UI stable, preserves original action durations/dispatch and boss effects, and freezes scenery for reduced motion.",
-    "JohtoRenderer.java": "Exclusive perspective world renderer with shared terrain/actor depth. Stronger world-space water swell, ripples and moving reflections offshore and at real shores; selective rooted crown wind, grounded canopy shadows and local lighting. Preserves atlas bounds, field-action trees, actor geometry, original action clocks and reduced-motion environmental freeze; no gameplay, RNG, map generation or saved-state writes.",
+    "JohtoBattleRenderer.java": "Full-viewport painted biome arenas, bounded presentation camera during command selection and neutral original effect anchors during turns; modern encounter transition coverage and HUD. Owns/disposes scenery resources, honors reduced motion, preserves battle dispatch and timing.",
+    "JohtoRenderer.java": "Exclusive perspective world presentation with continuous shore wash, shaped connected tidal films and localized puddles, wet-surface sky/local-light reflections, subtle convex plateau bevels and blended cliff contact/corner lighting. Explicit animated concealed ghost sprite follows original action lifecycle. Preserves grid collisions, elevation ramps, actor depth, saved maps and gameplay clocks; reduced-motion freeze and GPU resource lifecycle retained.",
     "ModernBatch.java": "Suppress legacy draw submissions while original menu actions advance.",
     "ModernInventoryUi.java": "Modern inventory/item/crafting/guide presentation with shared palette/cards, five pocket tabs, quantity-safe list, scrollbar and scrollable detail pane; controller hitboxes and item/crafting rules unchanged.",
     "ModernPartyUi.java": "Modern setup/party/storage/nickname UI with shared modern cards replacing old party-sheet backgrounds, full animated summary actors and reduced-motion support; existing hitboxes, setup delegation, controls and action semantics unchanged.",
-    "ModernUi.java": "Modern typography, shared logical viewport and anchored panel layout, cool-paper/slate/teal palette with crisp card corners, dialogs, event backgrounds and menu dispatch; respects reduced motion and delegates existing desktop controller and original actions.",
+    "ModernUi.java": "Shared viewport, modern UI/card typography and palettes with bounded color/indicator easing at fixed hit boxes and reduced-motion snap. Delegates original menu actions and disposes opening artwork; no game rules or inventory changes.",
     "ModernWorldGenerator.java": "Authorized deterministic procedural terrain generation, version 3, with biome-authored modules and the existing connected single-depth caldera. Preserves dungeon routes, deep-forest maze walls, graveyards, ruins and special pits during volcanic finishing; shoreline smoothing excludes reserved actors, stored encounters and dungeon water while retaining normal inland smoothing. No save schema change.",
     "MoveEffectPresentation.java": "R15 semantic local/screen effect classification, viewport-sized arena snapshots and GPU row/color effects, PMD shrink presentation, explicit GL state restoration and disposal; original action clocks and scheduling retained.",
-    "PmdBattleSprites.java": "Exact PMD battle/event actors with diagonal battle-facing poses, complete animation-envelope fit and ground anchoring, trimmed trainers, hidden-identity ghost presentation and visual effects. Step 3 only passes Player to the trainer-presentation lookup; Pokemon actors and combat formulas unchanged.",
+    "PmdBattleSprites.java": "Exact PMD actors with whole-animation and whole-direction envelope fitting, shared projected actor/shadow ground anchors, explicit concealed spirit sprite and original move/faint/capture transforms. No species revelation or combat changes.",
     "PmdPokemonSprites.java": "Pinned PMD portrait/animation loading, timing/directions, bounded texture cache and complete animation bounds for uncropped actors.",
     "TrainerModel3D.java": "Existing optional experimental trainer model helper.",
     "VisualGeometry.java": "Pure presentation helpers for diagonal battle-facing poses, uniform sprite fitting, cliff footprint math and building-wall classification; no map or collision writes.",
@@ -160,6 +169,9 @@ def sha256(path: Path) -> str:
 
 
 def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
+    for archived, expected in CINEMATIC_CUSTOMIZATION_ARCHIVE.items():
+        if sha256(root / archived) != expected:
+            raise RuntimeError("Pre-cinematic customization archive changed: " + archived)
     for archived, expected in TRAINER_REDRAW_ARCHIVE.items():
         if sha256(root / archived) != expected:
             raise RuntimeError("Pre-trainer redraw archive changed: " + archived)

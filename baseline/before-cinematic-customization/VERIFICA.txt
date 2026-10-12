@@ -1,0 +1,68 @@
+VERIFICA - cast giocabile in stile Bianco e Nero, 12 ottobre 2026
+
+VERSIONE LOCALE
+Base: 5df682645ed6925608e939efac76781883fe733e.
+Ramo: work/local-terrain-2026-10-12.
+Backup: backup/before-trainer-redraw-2026-10-12.
+Avvio: AVVIA-POKEWILDS.cmd oppure "PokeWilds 2.5D - Prova locale" sul desktop.
+Funziona anche con i personaggi dei salvataggi esistenti. Nessuna nuova isola
+o migrazione del salvataggio. Nessun push, tag o nuova release GitHub.
+
+ARTEFATTO VERIFICATO
+dist/pokewilds-rebuilt.jar
+SHA-256: 47d14f1325bfb05b377b34afcd7bbcbdc2b009fdd983b9d50afdd3e30c101d53
+Dimensione: 309645014 byte; 109021 voci ZIP.
+Java 17; 231 sorgenti; 492 classi compilate.
+Modelli GLB esclusi; zero classi di gioco recuperate dal runtime upstream.
+Sorgenti, risorse e librerie corrispondono al build report.
+Digest sorgenti: 40ab8e25d17821e898df04daa6eb848422d1e23175c71f3a17195f72c9f1887b
+Avvio reale java -jar: 120 frame e uscita regolare in build/trainer-launcher.
+Ricevuta completa: build/trainer-verification/final.json.
+
+MODIFICHE
+- 19 identita uniche nel selettore; Hilbert e Hilda originali B/W, altri 17
+  ridisegnati con image_gen nello stesso stile. I nuovi sono adattamenti
+  fan art assistiti da IA, non sprite ufficiali estratti da B/W.
+- 12 fotogrammi per ogni nuovo personaggio, quattro direzioni. Corsa a
+  cadenza piu rapida; i due originali usano anche la propria grafica di corsa.
+- Preview, mondo, scheda giocatore e apparizione in battaglia coerenti;
+  Surf, pesca, cavalcatura e riposo mantengono le composizioni 2.5D esistenti.
+- Maschere sugli abiti per i colori personalizzati dei 17 personaggi nuovi;
+  pelle e capelli invariati. I due originali mantengono la palette nativa.
+- Vecchia preferenza classicCast non ripristina gli sprite piccoli.
+  Override espliciti e mod conservati. Le mod prive di back.png non vengono
+  proposte come complete, prevenendo il fallimento del caricamento originale.
+- Shader, terreno, meccaniche, azioni e formato dei salvataggi invariati.
+
+VERIFICHE
+10 suite native sul JAR indicato, senza sorgenti o risorse sovrapposte:
+- tools/trainer_style_test.py: TRAINER STYLE PASS: checks=421133, identities=19, walkFrames=228, worldPoses=76, captures=10, unique cast and selector, legacy preference, walk/run clocks, rooted complete sprites, mod art and costume, cache/dispose
+- tools/desktop_menu_flow_test.py: DESKTOP MENU FLOW PASS: 417 assertions; 10 captures; explicit text focus, release barriers, settings persistence, 19 B/W-style identities and costume accents, pointer bag and reorder cancel
+- tools/field_scene_test.py: FIELD PASS: exclusive modern world; POWER/BUILD/DIG/SURF/FLY/RIDE activation; real BUILD placement/collision/resources, DIG excavation/refill/resources, cancellation without consumption; Surf/Ride movement and FLY takeoff/key movement/RMB landing; CUT/HEADBUTT/plant clocks and next actions; original couch enter/exit, bed sleep/wake, kiln enter/cancel, filtered-empty fishing and rod-restricted catch into battle; furniture geometry/projection and previews/light/pose snapshots
+- tools/terrain_readability_test.py: TERRAIN READABILITY PASS: checks=402, screenshots=6, frames=110, flat/inclined stairs, material boundaries, PMD/tree overlap, B/W trainer
+- tools/biome_scene_test.py: BIOME SCENE PASS: dedicated desert art; volcanic/graveyard day/night; closed plateau and continuous ramp; waterfall; walkable high/low tides and localized puddles with visible sand bed; real SpawnGhost/DrawGhost/DespawnGhost lifecycle with zero post-despawn draws
+- tools/bw_assets_integration_test.py: BW ASSETS PASS: 8759 checks; 218 complete built-in regions; 24 animation frames; custom 64px and rectangular GPU sampling; normalized/pixel anchors; actual renderer trainer crops/feet/offset geometry; strict invalid overrides; disposal/recovery
+- tools/pmd_battle_visual_test.py: PMD BATTLE VISUAL PASS captures=18 originalActions=EnemyFaint,FriendlyFaint,ThrowOutPokemonCrystal,EvolutionAnim,EggHatchAnim,PokemonFrame
+- tools/battle_entry_test.py: BATTLE ENTRY PASS sizes=4 motionModes=2 originalIntroFrames=74 originalWipeFrames=70 coveredFrames=1152 captures=64 reducedMotion=stationaryFade
+- tools/modern_ui_smoke_test.py: UI PASS: original input, menus, crafting, NPC encounter, battle turn, flee, capture and save/load
+- tools/landscape_smoke_test.py: LANDSCAPE PASS: day/night, relief/ramp, caldera, interior, real EnterBuilding/exit, PMD/BW GPU rendering
+
+TrainerStyle: 421133 controlli, 19 identita,
+228 fotogrammi, 76 pose nel mondo e 10 PNG.
+Verificati pixel effettivi delle texture GPU e continuita del corpo con
+controllo negativo che simula una fascia nascosta dal terreno; selezione,
+colori, risorse, cache, mod incomplete/complete e invarianti di mappa/RNG.
+Le prove BiomeScene e TerrainReadability leggono ora la texture del personaggio
+effettivo, anche ricolorata: non presumono l'atlante o il cappello rosso del
+precedente avatar Hilbert. Le soglie di visibilita sono conservate.
+Preparazione deterministica: 17 identita, 34 PNG, controllo senza scritture.
+Revisione visiva dei 204 frame nuovi e delle maschere costume.
+Ambito: 157 sorgenti originali invariati, 41 con ambito esplicito, 33 aggiunte;
+40 mutazioni non autorizzate respinte. Archivio baseline/before-trainer-redraw.
+
+LIMITI
+Test automatici sulla GPU disponibile, non una campagna manuale completa,
+una prova multiplayer o un benchmark su altre macchine. Non e l'intera
+pipeline di 31 suite native. Il salvataggio personale Kiri.sav non e stato aperto.
+Dettagli, provenienza e prompt: docs/TRAINERS-BW.md e
+resources/visual/trainers-bw/PROVENANCE.json (sorgenti conservate in sources/).

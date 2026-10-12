@@ -59,7 +59,7 @@ final class TrainerCatalog {
       // The historical default selection means the artist's original outfit palette.
       boolean original=costume==null||Math.abs(costume.r-248f/255f)<.001f
          &&Math.abs(costume.g-56f/255f)<.001f&&Math.abs(costume.b-8f/255f)<.001f;
-      String key="bw:"+id+":"+(original?"original":Integer.toHexString(Color.rgba8888(costume)));
+      String key="bw:"+id+":"+(running?"run:":"walk:")+(original?"original":Integer.toHexString(Color.rgba8888(costume)));
       Sheet sheet=cache.get(key);long frame=Gdx.graphics.getFrameId();
       if(sheet==null) {
          FileHandle file=Gdx.files.internal("visual/trainers-bw/"+id+".png");
@@ -69,11 +69,29 @@ final class TrainerCatalog {
             if(pixels.getWidth()!=96||pixels.getHeight()!=128)
                throw new IllegalArgumentException("B/W trainer sheet must be 96x128: "+id);
             if(!original)recolor(pixels,id,costume);
-            reserve(frame);sheet=new Sheet(pixels);cache.put(key,sheet);owned.add(sheet.texture);
+            reserve(frame);
+            if(running){Pixmap run=CharacterAppearance.running(pixels);try{sheet=new Sheet(run);}finally{run.dispose();}}
+            else sheet=new Sheet(pixels);
+            cache.put(key,sheet);owned.add(sheet.texture);
          } finally {pixels.dispose();}
       }
       sheet.used=frame;
       return sheet.frames[direction(direction)][animationFrame(seconds,moving,running)];
+   }
+   TextureRegion appearanceFrame(String id,String direction,float seconds,boolean moving,boolean running,CharacterAppearance appearance,Color costume) {
+      if(!builtin(id)||appearance==null||!appearance.active())return null;
+      String key="parts:"+id+":"+(running?"run:":"walk:")+appearance.key()+":"+(costume==null?"original":Integer.toHexString(Color.rgba8888(costume)));
+      Sheet sheet=cache.get(key);long frame=Gdx.graphics.getFrameId();
+      if(sheet==null) {
+         Pixmap original=CharacterAppearance.original(id,running),composed=null,run=null;
+         try {
+            if(costume!=null&&!id.equals("hilbert")&&!id.equals("hilda")&&Color.rgba8888(costume)!=0xf83808ff)recolor(original,id,costume);
+            composed=appearance.compose(original);
+            if(running&&!id.equals("hilbert")&&!id.equals("hilda"))run=CharacterAppearance.running(composed);
+            reserve(frame);sheet=new Sheet(run==null?composed:run);cache.put(key,sheet);owned.add(sheet.texture);
+         }finally{original.dispose();if(composed!=null)composed.dispose();if(run!=null)run.dispose();}
+      }
+      sheet.used=frame;return sheet.frames[direction(direction)][animationFrame(seconds,moving,running)];
    }
    private static void recolor(Pixmap pixels,String id,Color costume) {
       FileHandle file=Gdx.files.internal("visual/trainers-bw/"+id+"-mask.png");

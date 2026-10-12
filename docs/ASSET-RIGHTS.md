@@ -21,3 +21,13 @@ are preserved in `visual/trainers-bw/sources`; its `PROVENANCE.json` records
 deterministic normalization and clothing masks. The character rights remain
 with their respective holders; this addition does not assert an open artwork
 licence or change the distribution status recorded above.
+# Arene, guardaroba e fantasma (ottobre 2026)
+
+I nuovi fondali in `resources/visual/battle-scenes`, i componenti in
+`resources/visual/wardrobe` e lo spettro in `resources/visual/ghost` sono immagini
+fan art create con lo strumento integrato ImageGen. Le sorgenti e i prompt sono
+conservati nelle rispettive cartelle. La foresta usa l'immagine fornita dall'utente
+come riferimento di composizione e stile; lo spettro richiama il fantasma
+misterioso di Lavandonia. Questi adattamenti non trasferiscono diritti sui
+personaggi, sui marchi Pokémon o sui riferimenti preesistenti e non sono rip
+ufficiali di Nintendo.

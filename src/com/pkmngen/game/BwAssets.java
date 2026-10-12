@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import java.util.HashMap;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
@@ -283,7 +284,7 @@ public final class BwAssets {
    }
    public TextureRegion trainer(Player player,String direction,float seconds,boolean moving) {
       return trainerFrame(player==null?"gold":player.character,direction,seconds,moving,
-         running(player,moving),player==null?null:player.color);
+         running(player,moving),player==null?null:player.color,CharacterAppearance.player(player));
    }
    public TextureRegion classicTrainer(String character,String direction,float seconds,boolean moving,com.badlogic.gdx.graphics.Color color) { return trainers.frame(character,direction,seconds,moving,color); }
    public TextureRegion trainer(String character, String direction, float seconds, boolean moving) {
@@ -296,6 +297,9 @@ public final class BwAssets {
    TextureRegion trainerPreview(String character,String direction,float seconds,boolean moving,com.badlogic.gdx.graphics.Color color) {
       return trainerFrame(character,direction,seconds,moving,false,color);
    }
+   TextureRegion trainerPreview(String character,String direction,float seconds,boolean moving,com.badlogic.gdx.graphics.Color color,CharacterAppearance appearance) {
+      return trainerFrame(character,direction,seconds,moving,false,color,appearance);
+   }
    private static boolean running(Player player,boolean moving) {
       Game game=Game.staticGame;
       if(!moving||player==null||game==null||player.isSleeping||player.isSitting
@@ -307,11 +311,13 @@ public final class BwAssets {
    }
    private TextureRegion trainerFrame(String character,String direction,float seconds,boolean moving,
          boolean running,com.badlogic.gdx.graphics.Color color) {
+      return trainerFrame(character,direction,seconds,moving,running,color,null);
+   }
+   private TextureRegion trainerFrame(String character,String direction,float seconds,boolean moving,
+         boolean running,com.badlogic.gdx.graphics.Color color,CharacterAppearance appearance) {
       String name=character==null?"gold":character;
       String id=lower(name);
-      boolean female = id.equals("kris") || id.equals("lyra") || id.equals("leaf") || id.equals("may")
-         || id.equals("dawn") || id.equals("hilda") || id.equals("rosa") || id.equals("serena")
-         || id.equals("selene") || id.equals("gloria") || id.equals("elaine") || id.equals("summer")||id.equals("mint");
+      boolean female = femaleTrainer(id);
       String dir = "up".equals(direction) || "left".equals(direction) || "right".equals(direction) ? direction : "down";
       int frame=TrainerCatalog.animationFrame(seconds,moving,running);
       String sex=female?"female":"male",pose=running?"run":"walk";
@@ -325,6 +331,8 @@ public final class BwAssets {
          TextureRegion mod=trainers.frame(name,dir,seconds,moving,running,color);
          if(mod!=null)return mod;
       }
+      TextureRegion customized=trainers.appearanceFrame(id,dir,seconds,moving,running,appearance,color);
+      if(customized!=null)return customized;
       TextureRegion modern=trainers.modernFrame(id,dir,seconds,moving,running,color);
       if(modern!=null)return modern;
       // Original B/W sheets place idle first: left step, idle, right step, idle.
@@ -334,6 +342,14 @@ public final class BwAssets {
    private TextureRegion trainerOverride(String id,String pose,String direction,int frame) {
       String key="trainer_"+id+"_"+pose+"_"+direction+"_"+frame;
       return customRegions.contains(key)?named(key):null;
+   }
+   private static boolean femaleTrainer(String id) {
+      return Arrays.asList("kris","lyra","leaf","may","dawn","hilda","rosa","serena","selene","gloria","elaine","summer","mint").contains(id);
+   }
+   boolean hasTrainerOverride(String character) {
+      String id=lower(character==null?"gold":character),sex=femaleTrainer(id)?"female":"male";
+      for(String key:customRegions)if(key.startsWith("trainer_"+id+"_")||key.startsWith("trainer_"+sex+"_"))return true;
+      return false;
    }
    public TextureRegion terrain(Tile tile) { return terrain(tile, 0f); }
    /** Total terrain mapping: even unknown biome tiles use an explicit modern material. */

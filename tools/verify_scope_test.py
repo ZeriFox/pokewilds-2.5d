@@ -19,7 +19,7 @@ def main() -> int:
             raise RuntimeError("Test copy escaped the intended temporary directory")
         shutil.copytree(verifier.ROOT / "src", root / "src")
         shutil.copytree(verifier.ROOT / verifier.CLASSIC_SOURCES, root / verifier.CLASSIC_SOURCES)
-        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE, *verifier.TERRAIN_ARCHIVE, *verifier.LIVING_WORLD_ARCHIVE, *verifier.CINEMATIC_NATURE_ARCHIVE, *verifier.TRAINER_REDRAW_ARCHIVE]:
+        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE, *verifier.TERRAIN_ARCHIVE, *verifier.LIVING_WORLD_ARCHIVE, *verifier.CINEMATIC_NATURE_ARCHIVE, *verifier.TRAINER_REDRAW_ARCHIVE, *verifier.CINEMATIC_CUSTOMIZATION_ARCHIVE]:
             target = root / source
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / source, target)
@@ -99,6 +99,10 @@ def main() -> int:
         reject("battle scenery changed after freeze", verifier.PREFIX + "BattleScenery.java", append)
         for name in verifier.TRAINER_REDRAW_ARCHIVE:
             reject("pre-trainer redraw archive changed " + name, name, append)
+        for name in verifier.CINEMATIC_CUSTOMIZATION_ARCHIVE:
+            reject("pre-cinematic customization archive changed " + name, name, append)
+        for name in ("CharacterAppearance.java", "StartupCinematic.java", "GhostVisualAssets.java", "MenuMotion.java"):
+            reject("cinematic/customization helper changed " + name, verifier.PREFIX + name, append)
         reject("original setup launch logic changed", verifier.PREFIX + "DrawSetupMenu.java", append)
         verifier.audit(root)
     report = destination / "results.txt"

@@ -11,32 +11,15 @@ final class ModernStartupUi {
       DesktopMenuController c=ui.desktop;c.attach(setup);c.tick();
       if(c.optionsOpen()){options(ui,game,c);return;}
       switch(c.screen) {
-         case TITLE: scenery(ui,game,c);title(ui,game,c);break;
+         case TITLE: if(StartupCinematic.render(ui,game,c))break;scenery(ui,game,c);title(ui,game,c);break;
          case HOME: scenery(ui,game,c);home(ui,game,c);break;
          case TRAINERS: trainers(ui,game,c);break;
+         case WARDROBE: wardrobe(ui,game,c);break;
          default: setup(ui,game,c);
       }
    }
    private void scenery(ModernUi ui,Game game,DesktopMenuController c) {
-      ModernUi.Box view=ui.viewportBounds();float time=c.preferences.reducedMotion?0:c.clock;
-      ui.fill(game,SKY);
-      for(int i=0;i<24;i++){float f=i/23f;Color color=new Color(SKY).lerp(SKY_LIGHT,1-f);ui.rect(game,view.x,32+i*5,view.width,5,color);}
-      // Three quiet parallax bands; these are title artwork, never a fake playable world.
-      ui.rect(game,view.x,view.y,view.width,64-view.y,SHORE);
-      ui.rect(game,view.x,55,view.width,9,Color.valueOf("315b55"));
-      for(int i=0;i<5;i++) {
-         float x=view.x+(i*83+time*1.7f)%(view.width+48)-40;
-         ui.rect(game,x,89+(i%3)*9,32,1.5f,new Color(.86f,.94f,.90f,.09f));
-         ui.rect(game,x+7,91+(i%3)*9,18,1,new Color(.86f,.94f,.90f,.06f));
-      }
-      TextureRegion tree=BwAssets.get().named("tree");
-      for(int i=0;i<7;i++){float x=view.x+i*(view.width/6)-10;region(ui,game,tree,x,34+(i%2)*3,25,43);}
-      ui.rect(game,view.x,26,view.width,6,Color.valueOf("adad78"));
-      ui.rect(game,view.x,25,view.width,1,ModernUi.GOLD);
-      TextureRegion trainer=BwAssets.get().trainer("hilbert","right",time*.35f,true);
-      region(ui,game,trainer,56,29,24,30);
-      PmdPokemonSprites.Frame p=PmdPokemonSprites.get().frame("pikachu","left","Idle",time);
-      if(p!=null)region(ui,game,p.region,90,30,22,23);
+      StartupCinematic.menuBackdrop(ui,game,c);
    }
    private void title(ModernUi ui,Game game,DesktopMenuController c) {
       float lift=c.preferences.reducedMotion?0:(float)Math.max(0,1-c.screenAge/.6f)*5;
@@ -109,7 +92,7 @@ final class ModernStartupUi {
          ui.panel(game,b);if(at==c.trainerIndex)ui.rect(game,b.x,b.y,b.width,1.5f,ModernUi.ACCENT);
          String id=c.trainerId(at);
          boolean animate=at==c.trainerIndex&&!c.preferences.reducedMotion;
-         TextureRegion image=BwAssets.get().trainerPreview(id,"down",c.clock,animate,c.setup.colors.get(c.trainerColor));
+         TextureRegion image=BwAssets.get().trainerPreview(id,"down",c.clock,animate,c.setup.colors.get(c.trainerColor),c.previewAppearance(id));
          region(ui,game,image,b.x+5,b.y+6,17,19);
          ui.fitText(game,Game.capitalize(id),b.x+2,b.y+4.8f,4.5f,b.width-4,ModernUi.INK);
       }
@@ -119,25 +102,49 @@ final class ModernStartupUi {
       ui.fitText(game,Game.capitalize(c.trainerId(c.trainerIndex))+"  /  "+(mod?"Installed custom artwork":"B/W style"),9,37,6,143,ModernUi.ACCENT);
       ui.fitText(game,costume?DesktopControls.label(InputProcessor.keyboardL)+" / "+DesktopControls.label(InputProcessor.keyboardR)+" Costume accents":"Original outfit colors  /  Four-direction animation",9,26,4.8f,128,ModernUi.MUTED);
       if(costume)ui.rect(game,142,20,8,8,c.setup.colors.get(c.trainerColor));
-      if(!c.message.isEmpty())ui.fitText(game,c.message,8,17,4.3f,145,ModernUi.RED);
+      ModernUi.Box customize=DesktopMenuController.customizeBox();ui.row(game,"CUSTOMIZE  /  Shift + Enter",customize.x,customize.y,customize.width,customize.height,false);
+      if(!c.message.isEmpty())ui.fitText(game,c.message,8,36,4.3f,145,ModernUi.RED);
       ui.footer(game,DesktopControls.movement()+" Choose   LMB / Enter Apply   Esc Back");
    }
+   void wardrobe(ModernUi ui,Game game,DesktopMenuController c) {
+      ui.fullScreen(game,"TRAINER WARDROBE","Original preserves the preset. Picking a color equips an alternate part.");
+      CharacterAppearance a=c.appearanceDraft;if(a==null)return;
+      String dir=new String[]{"down","up","left","right"}[c.wardrobeDirection];
+      float time=c.preferences.reducedMotion?0:c.clock;
+      TextureRegion trainer=BwAssets.get().trainerPreview(c.wardrobeId,dir,time,!c.preferences.reducedMotion,game.player.color,a);
+      ui.panel(game,8,40,50,68);region(ui,game,trainer,11,43,44,59);
+      ui.fitText(game,Game.capitalize(c.wardrobeId),9,33,5.8f,49,ModernUi.ACCENT);
+      ui.fitText(game,dir.toUpperCase(Locale.ROOT)+"  /  TAB",9,24,4.5f,48,ModernUi.MUTED);
+      for(int i=0;i<7;i++) {
+         ModernUi.Box box=DesktopMenuController.wardrobeBox(i);boolean selected=c.wardrobeSlot==i;
+         String label=i<5?CharacterAppearance.SLOTS[i]+": "+CharacterAppearance.STYLES[i][a.styles[i]]:i==5?"Reset to original":"Apply appearance";
+         ui.row(game,"",box.x,box.y,box.width,box.height,selected);
+         ui.fitText(game,label,box.x+3,box.y+7,5.7f,i<5?72:81,selected?ModernUi.PAPER:ModernUi.INK);
+         if(i<5) {
+            int color=a.colors[i];ui.rect(game,box.x+79,box.y+2,5,5,color==0?ModernUi.LINE:new Color(CharacterAppearance.COLORS[color]));
+         }
+      }
+      if(c.wardrobeSlot<5)ui.fitText(game,"COLOR: "+CharacterAppearance.COLOR_NAMES[a.colors[c.wardrobeSlot]],66,19,4.5f,85,ModernUi.ACCENT);
+      ui.footer(game,DesktopControls.vertical()+" Slot   "+DesktopControls.horizontal()+" Style   "+DesktopControls.label(InputProcessor.keyboardL)+"/"+DesktopControls.label(InputProcessor.keyboardR)+" Color   Tab Turn   Esc Cancel");
+      if(!c.message.isEmpty()){ui.panel(game,7,111,146,9);ui.fitText(game,c.message,10,117,4.1f,140,ModernUi.RED);}
+   }
    void options(ModernUi ui,Game game,DesktopMenuController c) {
+      if(c.appearanceDraft!=null&&c.wardrobeFromOptions){wardrobe(ui,game,c);return;}
       ui.fullScreen(game,"CONTROLS & DISPLAY","Changes are applied only with Save settings; Esc discards them.");
-      for(int i=0;i<15;i++) {
+      for(int i=0;i<16;i++) {
          ModernUi.Box b=DesktopMenuController.optionBox(i);boolean active=i==c.optionIndex;
          ui.rect(game,b.x,b.y,b.width,b.height,active?ModernUi.ACCENT:ModernUi.PAPER);
-         String label=i<9?DesktopInterfaceSettings.ACTIONS[i]:new String[]{"Reduced menu motion","Opening scene","Ambient accents","Reset control draft","Save settings","Discard / back"}[i-9];
+         String label=i<9?DesktopInterfaceSettings.ACTIONS[i]:new String[]{"Reduced menu motion","Opening scene","Ambient accents","Reset control draft","Save settings","Discard / back","Customize character"}[i-9];
          String val=i<9?DesktopControls.label(c.draft.bindings[i]):i==9?(c.draft.reducedMotion?"ON":"OFF"):i==10?(c.draft.openingScene?"ON":"OFF"):i==11?(c.draft.ambient?"ON":"OFF"):"";
          ui.fitText(game,label,b.x+3,b.y+4.8f,4.8f,99,active?ModernUi.PAPER:ModernUi.INK);
          ui.fitText(game,val,b.x+111,b.y+4.8f,4.8f,30,active?ModernUi.PAPER:ModernUi.ACCENT);
       }
-      if(!c.message.isEmpty())ui.fitText(game,c.message,9,16,4.2f,142,c.capture>=0?ModernUi.ACCENT:ModernUi.RED);
       if(c.capture>=0) {
          ui.panel(game,15,57,130,29);ui.fitText(game,"BIND: "+DesktopInterfaceSettings.ACTIONS[c.capture],21,79,6.2f,118,ModernUi.ACCENT);
          ui.fitText(game,"Press a key or mouse button. Esc cancels.",21,65,5.1f,118,ModernUi.INK);
       }
       ui.footer(game,DesktopControls.vertical()+" Navigate   LMB / Enter Change   Esc Discard");
+      if(!c.message.isEmpty()){ui.panel(game,7,117,146,8);ui.fitText(game,c.message,10,123,4.2f,140,c.capture>=0?ModernUi.ACCENT:ModernUi.RED);}
    }
    static void region(ModernUi ui,Game game,TextureRegion region,float x,float y,float w,float h) {
       if(region==null)return;float scale=Math.min(w/region.getRegionWidth(),h/region.getRegionHeight());

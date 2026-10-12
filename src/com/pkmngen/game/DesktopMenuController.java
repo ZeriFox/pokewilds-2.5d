@@ -9,7 +9,7 @@ import java.util.*;
 
 /** Desktop UI state only. Launching/loading and all inventory operations stay in original actions. */
 final class DesktopMenuController {
-   enum Screen { TITLE, HOME, SETUP, TRAINERS }
+   enum Screen { TITLE, HOME, SETUP, TRAINERS, WARDROBE }
    enum Field { MODE, ADVENTURE, SAVE, SIZE, NAME, TRAINER, FILE, ADDRESS, GO }
    static final class Row {
       final Field field;final int legacyIndex;
@@ -25,6 +25,11 @@ final class DesktopMenuController {
    int homeIndex,trainerIndex,trainerPage,trainerColor,optionIndex,capture=-1,rawPrevious;
    float clock,screenAge;
    String message="";
+   CharacterAppearance appearanceDraft;
+   String wardrobeId="gold",wardrobeName="";
+   int wardrobeSlot,wardrobeDirection;
+   boolean wardrobeFromOptions;
+   final Map<String,CharacterAppearance> selectedAppearances=new HashMap<>();
    boolean enter,back,settingsRequest,tab,editConfirm,editCancel,opened;
    float wheel;
    int detailScroll;
@@ -57,7 +62,7 @@ final class DesktopMenuController {
       com.badlogic.gdx.InputProcessor installed=Gdx.input.getInputProcessor();
       if(installed!=events){delegate=installed;Gdx.input.setInputProcessor(events);}
    }
-   void blur() {text.cancel();typingBarrier.clear();capture=-1;captureWaiting=false;clearEvents();rawPrevious=0;}
+   void blur() {text.cancel();typingBarrier.clear();capture=-1;captureWaiting=false;appearanceDraft=null;if(screen==Screen.WARDROBE)screen=Screen.TRAINERS;clearEvents();rawPrevious=0;}
    private void clearEvents(){enter=back=settingsRequest=tab=editConfirm=editCancel=false;pointerButton=-1;wheel=0;}
    private boolean settingsAllowed(Game game) {
       for(Action a:game.actionStack)if(a instanceof DrawSetupMenu || a instanceof DrawPlayerMenu&&!((DrawPlayerMenu)a).disabled)return true;
@@ -79,7 +84,7 @@ final class DesktopMenuController {
    }
    void attach(DrawSetupMenu value) {
       if(setup==value)return;
-      text.cancel();setup=value;
+      text.cancel();appearanceDraft=null;selectedAppearances.clear();setup=value;
       if(Game.staticGame!=null && setup.playerTypes.contains(Game.staticGame.player.character))setup.playerTypeIndex=setup.playerTypes.indexOf(Game.staticGame.player.character);
       if(!setup.playerTypes.contains("lyra")&&TrainerCatalog.complete("lyra"))setup.playerTypes.add("lyra");
       trainerChoices.clear();
@@ -114,6 +119,9 @@ final class DesktopMenuController {
    static ModernUi.Box homeBox(int i){return new ModernUi.Box(27,69-i*13,106,11.5f);}
    static ModernUi.Box trainerBox(int i){return new ModernUi.Box(7+(i%5)*29.5f,75-(i/5)*30,27,27);}
    static ModernUi.Box optionBox(int i){return new ModernUi.Box(7,110-i*6.2f,146,5.9f);}
+   static ModernUi.Box customizeBox(){return new ModernUi.Box(9,12,142,10);}
+   static ModernUi.Box wardrobeBox(int i){return new ModernUi.Box(65,103-i*12,87,10);}
+   static ModernUi.Box wardrobeSwatch(int i){ModernUi.Box row=wardrobeBox(i);return new ModernUi.Box(row.x+77,row.y,10,10);}
    boolean hit(ModernUi.Box box){return pointerX>=box.x&&pointerX<box.x+box.width&&pointerY>=box.y&&pointerY<box.top();}
    private void locatePointer(Game game) {
       ModernUi.Box viewport=game.modernUi.viewportBounds();
@@ -158,7 +166,10 @@ final class DesktopMenuController {
             if(text.commit()) {if(tab){List<Row> r=rows();DrawSetupMenu.currIndex=r.get((selected(r)+1)%r.size()).legacyIndex;}InputProcessor.blockHeldInputs();}
          }return true;
       }
-      if(screen==Screen.TITLE){if(confirm||cancel||InputProcessor.aJustPressed)change(Screen.HOME);return true;}
+      if(screen==Screen.TITLE){if(confirm||cancel||InputProcessor.aJustPressed) {
+         if(StartupCinematic.active(this)){screenAge=StartupCinematic.DURATION;clearEvents();InputProcessor.blockHeldInputs();}
+         else change(Screen.HOME);
+      }return true;}
       if(screen==Screen.HOME) {
          if(vertical!=0)homeIndex=Math.floorMod(homeIndex+vertical,4);
          if(pointerButton==Buttons.LEFT)for(int i=0;i<4;i++)if(hit(homeBox(i))){homeIndex=i;confirm=true;}
@@ -171,6 +182,9 @@ final class DesktopMenuController {
          }return true;
       }
       if(screen==Screen.TRAINERS) {
+         if(pointerButton==Buttons.LEFT&&hit(customizeBox())||confirm&&(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)||Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT))) {
+            openWardrobe(false);return true;
+         }
          int total=trainerCount();
          if(TrainerCatalog.costumeColors(trainerId(trainerIndex))&&(InputProcessor.lJustPressed||InputProcessor.rJustPressed))
             trainerColor=Math.floorMod(trainerColor+(InputProcessor.rJustPressed?1:-1),setup.colors.size());
@@ -183,6 +197,7 @@ final class DesktopMenuController {
          if(confirm)applyTrainer(game);
          return true;
       }
+      if(screen==Screen.WARDROBE){updateWardrobe();return true;}
       if(cancel){change(Screen.HOME);return true;}
       List<Row> r=rows();int selected=selected(r);
       if(vertical!=0){selected=Math.floorMod(selected+vertical,r.size());DrawSetupMenu.currIndex=r.get(selected).legacyIndex;}
@@ -204,6 +219,11 @@ final class DesktopMenuController {
          else if(row.field==Field.TRAINER)openTrainers();
          else if(row.field==Field.GO) {
             if(setup.newLoadIndex==1&&setup.fileNames.isEmpty()){message="No save selected. Choose a new adventure.";return true;}
+            if(setup.newLoadIndex==0) {
+               CharacterAppearance chosen=selectedAppearances.get(game.player.character);
+               if(chosen!=null)try{CharacterAppearance.save(appearanceName(),game.player.character,chosen);}
+               catch(java.io.IOException error){message="Could not save the selected appearance for this name.";return true;}
+            }
             setup.offset=setup.localHostJoinIndex==2?-1:0;
             setup.offset2=setup.newLoadIndex==1?-3:0;
             setup.offset3=setup.localHostJoinIndex==1&&setup.newLoadIndex==0?-2:0;
@@ -219,6 +239,46 @@ final class DesktopMenuController {
       trainerColor=setup.avatarColorIndex;trainerPage=trainerIndex/10;change(Screen.TRAINERS);}
    int trainerCount(){return trainerChoices.size();}
    String trainerId(int i){return trainerChoices.get(Math.max(0,Math.min(trainerChoices.size()-1,i)));}
+   String appearanceName(){StringBuilder s=new StringBuilder();if(setup!=null)for(char c:setup.name)s.append(c);return s.toString();}
+   CharacterAppearance previewAppearance(String id){CharacterAppearance selected=selectedAppearances.get(id);return selected==null?CharacterAppearance.get(appearanceName(),id):selected.copy();}
+   void openWardrobe(boolean fromOptions) {
+      Game game=Game.staticGame;String id=fromOptions?game.player.character:trainerId(trainerIndex);
+      if(!TrainerCatalog.builtin(id)||TrainerCatalog.hasMod(id)||BwAssets.get().hasTrainerOverride(id)){message="Installed trainer artwork keeps its own clothing and color controls.";return;}
+      boolean setupContext=!fromOptions||optionsOwner instanceof DrawSetupMenu;
+      wardrobeFromOptions=fromOptions;wardrobeId=id;wardrobeName=setupContext?appearanceName():game.player.name;
+      appearanceDraft=setupContext?previewAppearance(id):CharacterAppearance.get(wardrobeName,id);wardrobeSlot=0;wardrobeDirection=0;
+      if(!fromOptions)change(Screen.WARDROBE);else{clearEvents();InputProcessor.blockHeldInputs();}
+      message=CharacterAppearance.warning;
+   }
+   private void closeWardrobe(){appearanceDraft=null;if(!wardrobeFromOptions)change(Screen.TRAINERS);else{clearEvents();InputProcessor.blockHeldInputs();}}
+   private void updateWardrobe() {
+      if(appearanceDraft==null){closeWardrobe();return;}
+      if(back||InputProcessor.bJustPressed){closeWardrobe();return;}
+      if(tab){wardrobeDirection=(wardrobeDirection+1)%4;tab=false;}
+      int vertical=InputProcessor.downJustPressed?1:InputProcessor.upJustPressed?-1:0;
+      if(vertical!=0)wardrobeSlot=Math.floorMod(wardrobeSlot+vertical,7);
+      boolean confirm=enter||InputProcessor.startJustPressed||InputProcessor.aJustPressed&&pointerButton!=Buttons.LEFT;
+      boolean colorClick=false;
+      if(pointerButton==Buttons.LEFT)for(int i=0;i<7;i++)if(hit(wardrobeBox(i))){wardrobeSlot=i;colorClick=i<5&&hit(wardrobeSwatch(i));confirm=!colorClick;}
+      if(wardrobeSlot<5) {
+         int horizontal=InputProcessor.rightJustPressed?1:InputProcessor.leftJustPressed?-1:0;
+         if(confirm)horizontal=1;
+         if(horizontal!=0)appearanceDraft.styles[wardrobeSlot]=Math.floorMod(appearanceDraft.styles[wardrobeSlot]+horizontal,CharacterAppearance.STYLES[wardrobeSlot].length);
+         if(colorClick||InputProcessor.lJustPressed||InputProcessor.rJustPressed) {
+            // Color picks are attached to actual replacement parts, never to the whole trainer.
+            if(appearanceDraft.styles[wardrobeSlot]==0)appearanceDraft.styles[wardrobeSlot]=1;
+            appearanceDraft.colors[wardrobeSlot]=Math.floorMod(appearanceDraft.colors[wardrobeSlot]+(colorClick||InputProcessor.rJustPressed?1:-1),CharacterAppearance.COLORS.length);
+         }
+      }else if(confirm&&wardrobeSlot==5)appearanceDraft.reset();
+      else if(confirm) {
+         try {
+            CharacterAppearance.save(wardrobeName,wardrobeId,appearanceDraft);
+            if(!wardrobeFromOptions||optionsOwner instanceof DrawSetupMenu)selectedAppearances.put(wardrobeId,appearanceDraft.copy());
+            if(wardrobeFromOptions){closeWardrobe();message="Appearance saved for this trainer.";}
+            else{closeWardrobe();applyTrainer(Game.staticGame);}
+         }catch(java.io.IOException error){message="Could not save appearance; the previous profile is unchanged.";}
+      }
+   }
    private void applyTrainer(Game game) {
       String id=trainerId(trainerIndex);if(!TrainerCatalog.complete(id)){message="This trainer is missing a required pose.";return;}
       if(!setup.playerTypes.contains(id))setup.playerTypes.add(id);setup.playerTypeIndex=setup.playerTypes.indexOf(id);
@@ -228,21 +288,22 @@ final class DesktopMenuController {
       preferences.classicCast=TrainerCatalog.hasMod(id);
       try{preferences.save();change(Screen.SETUP);}catch(java.io.IOException e){message="Trainer applied this session; settings could not be saved.";}
    }
-   void openOptions(Action owner){optionsOwner=owner;draft=preferences.copy();optionIndex=0;capture=-1;message="";InputProcessor.blockHeldInputs();clearEvents();}
+   void openOptions(Action owner){appearanceDraft=null;optionsOwner=owner;draft=preferences.copy();optionIndex=0;capture=-1;message="";InputProcessor.blockHeldInputs();clearEvents();}
    void closeOptions(boolean save) {
       if(save&&draft!=null) {
          try{draft.save();preferences.bindings=draft.bindings.clone();preferences.reducedMotion=draft.reducedMotion;
             preferences.openingScene=draft.openingScene;preferences.ambient=draft.ambient;preferences.apply();}
          catch(java.io.IOException e){message="Could not save settings. Your previous settings are intact.";return;}
       }
-      draft=null;optionsOwner=null;capture=-1;clearEvents();InputProcessor.blockHeldInputs();
+      appearanceDraft=null;draft=null;optionsOwner=null;capture=-1;clearEvents();InputProcessor.blockHeldInputs();
    }
    private void updateOptions() {
+      if(appearanceDraft!=null&&wardrobeFromOptions){updateWardrobe();return;}
       if(capture>=0){if(back){capture=-1;message="Binding unchanged.";InputProcessor.blockHeldInputs();}return;}
       int delta=InputProcessor.downJustPressed?1:InputProcessor.upJustPressed?-1:0;
-      if(delta!=0)optionIndex=Math.floorMod(optionIndex+delta,15);
+      if(delta!=0)optionIndex=Math.floorMod(optionIndex+delta,16);
       boolean confirm=enter||InputProcessor.startJustPressed||InputProcessor.aJustPressed&&pointerButton!=Buttons.LEFT;
-      if(pointerButton==Buttons.LEFT)for(int i=0;i<15;i++)if(hit(optionBox(i))){optionIndex=i;confirm=true;}
+      if(pointerButton==Buttons.LEFT)for(int i=0;i<16;i++)if(hit(optionBox(i))){optionIndex=i;confirm=true;}
       if(back||InputProcessor.bJustPressed){closeOptions(false);return;}
       if(!confirm&&!InputProcessor.leftJustPressed&&!InputProcessor.rightJustPressed)return;
       if(optionIndex<9){capture=optionIndex;captureWaiting=true;message="Press a key or mouse button. Esc cancels.";InputProcessor.blockHeldInputs();}
@@ -250,6 +311,7 @@ final class DesktopMenuController {
       else if(optionIndex==10)draft.openingScene=!draft.openingScene;
       else if(optionIndex==11)draft.ambient=!draft.ambient;
       else if(optionIndex==12){draft.bindings=DesktopInterfaceSettings.defaults();message="Default controls restored in this draft. Save to apply.";}
+      else if(optionIndex==15)openWardrobe(true);
       else closeOptions(optionIndex==13);
    }
    private void captured(int code) {

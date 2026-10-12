@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "volcano",
+  "tool": "built-in image_gen",
+  "kind": "AI-created pixel-art battle scenery; not official ripped artwork",
+  "prompt": "Use case: stylized-concept. Production background illustration for a modern 2.5D pixel-art creature battle arena, landscape 16:9, target1024x576. Reference image is STYLE and composition guidance: crisp colorful low-resolution Nintendo DS-era pixel art, one clear consistent logicalpixelgrid, clusteredcolors, simple3tones shading, dark subtleoutlines; not photorealistic, no smoothpainting. Low elevated camera looking across a large natural clearing, wide fieldofview. Strong layereddepth: close substantial scenery at the extreme left andright, midground woods/rocks, hazy distantbackground. One continuous natural ground plane reaching everyloweredge. Center and lower60% must be open for two creatures to be rendered by the game later. No characters, animals, people, Pokémon, UI, text, frames, labels, battleplatforms, disks, floating islands, objects in centralcombat area. Full opaqueimage with absolutelyno transparentmargins. Preservevisualclarity at512x288. Lighting bright enough to see floor detail. Subject: A dramatic volcanic caldera clearing. Dark basalt cliffs frame both sides, distant jagged volcanic mountains and dim red sky, orange glowing lava channels behind the clearing and at far perimeter. The front sixty percent is continuous open solid dark basalt with subtle cracked stone patterns, faint warm reflected light. Keep lava outside the central combat clearing.",
+  "reference": {
+    "path": "C:/Users/Utente/AppData/Local/Temp/codex-clipboard-5734ab33-4b85-4559-b79f-4830f8d04363.png",
+    "role": "User-provided forest composition and pixel-art style reference"
+  },
+  "source_path": "C:\\Users\\Utente\\.codex\\generated_images\\01a130a9-272d-71a3-8ab8-6c84943d38f7\\exec-049e5241-8d85-4511-8802-d4f2be1e863b.png",
+  "preparation": "Original generated file preserved exactly; runtime sheet uses nearest-neighbor resize only."
+}

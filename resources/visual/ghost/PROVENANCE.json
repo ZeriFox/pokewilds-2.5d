@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "asset": "lavender-spirit.png",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: stylized-concept. Asset type: transparent production pixel-art sprite sheet for a Nintendo DS-inspired 2.5D Pokémon fan game. Primary request: an ominous but charming unidentified lavender-tower ghost inspired by the classic Lavender Town Pokémon ghost: rounded violet spectral body, two raised wispy claw arms, jagged vapor tail instead of legs, dark face with sharply readable pale eyes and a small mischievous mouth. Do not resemble a recognizable Pokémon species; this is the mysterious concealed ghost before revelation. Crisp DS-era pixel art with dark violet outline, three-tone purple shading and a pale lilac rim, no smooth painted texture. Layout: exactly FOUR complete whole-body animation frames in a SINGLE HORIZONTAL ROW, evenly spaced equal cells. Front-facing pose in all four frames, breathing/hover cycle: neutral, arms lifted and body slightly stretched, neutral alternate wisps, arms lower and body slightly compressed. Keep same face and proportions, same baseline, very readable silhouette. Actual transparent alpha, generous empty space around every ghost, no cast shadow, no text, labels, border, background, ground, particles outside sprite or extra characters. Output wide 3:1 canvas; logical sprite about 40x44 pixels within each 64x64 cell then nearest-neighbor enlarged. All four frames must remain fully visible.",
+  "source": "C:/Users/Utente/.codex/generated_images/01a10397-8c14-78f1-b39f-0b0996682eb4/exec-0c11f415-050d-4bf1-8905-8a0046756ca2.png",
+  "layout": {
+    "columns": 4,
+    "rows": 1,
+    "transparent": true
+  },
+  "authorship": "AI-assisted fan art inspired by the Lavender Town unidentified ghost; not an official ripped sprite. Source PNG preserved byte-for-byte; runtime only divides and scales the four frames.",
+  "sha256": "70494411e8333dd312c4b63196721a30ee0f798aa986e10063f82f77284d6d5d",
+  "dimensions": [
+    2172,
+    724
+  ]
+}

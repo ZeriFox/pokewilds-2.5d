@@ -25,6 +25,7 @@ public final class ModernUi {
    private final ModernStartupUi startup = new ModernStartupUi();
    private final ModernPartyUi party = new ModernPartyUi();
    private final ModernInventoryUi inventory = new ModernInventoryUi();
+   private final MenuMotion motion = new MenuMotion();
    private final Map<String,Long> counts = new LinkedHashMap<>();
    private final Map<String,Character> letters = new HashMap<>();
    private long drawCount;
@@ -165,6 +166,8 @@ public final class ModernUi {
       surface(game,x+.5f,y-1,w,h,1.5f,PANEL_SHADOW);
       surface(game,x,y,w,h,1.5f,LINE);
       surface(game,x+.6f,y+.6f,w-1.2f,h-1.2f,1,PAPER);
+      float reveal=motion.reveal(desktop.clock,reducedMotion());
+      if(reveal<1&&w>8)rect(game,x+2,y+h-.6f,(w-4)*reveal,.5f,new Color(.49f,.75f,.70f,1-reveal));
    }
    /** Small clipped corners retain crisp pixel edges at every desktop scale. */
    public void surface(Game game,float x,float y,float w,float h,float corner,Color color) {
@@ -208,9 +211,15 @@ public final class ModernUi {
       row(game,value,x,y,w,h,selected,0);
    }
    public void row(Game game,String value,float x,float y,float w,float h,boolean selected,float reserveRight) {
-      surface(game,x,y,w,h,1,selected?ACCENT:SURFACE);
-      if(selected) rect(game,x+1,y+2,1.4f,Math.max(0,h-4),GOLD);
-      fitText(game,value,x+5,y+h-(h-7)/2,7,w-10-reserveRight,selected?PAPER:INK);
+      float selection=motion.selection(x,y,selected,desktop.clock,reducedMotion());
+      Color background=new Color(SURFACE).lerp(ACCENT,selection);
+      surface(game,x,y,w,h,1,background);
+      if(selection>.01f) {
+         float height=Math.max(0,h-4)*MenuMotion.ease(selection);
+         rect(game,x+1,y+(h-height)*.5f,1.4f,height,new Color(GOLD.r,GOLD.g,GOLD.b,selection));
+         rect(game,x+3,y+h-.7f,Math.max(0,w-6)*selection,.4f,new Color(1,1,1,.12f*selection));
+      }
+      fitText(game,value,x+5,y+h-(h-7)/2,7,w-10-reserveRight,new Color(INK).lerp(PAPER,selection));
    }
    public void header(Game game,String title,String subtitle) {
       rect(game,viewportX,121,viewportWidth,viewportY+viewportHeight-121,INK);
@@ -218,7 +227,9 @@ public final class ModernUi {
       fitText(game,title,8,140,9,144,PAPER); fitText(game,subtitle,8,128.5f,4.7f,144,LINE);
    }
    public void fullScreen(Game game,String title,String subtitle) {
+      motion.screen(title,desktop.clock);
       fill(game,BACK); header(game,title,subtitle);
+      rect(game,8,120.5f,144*motion.reveal(desktop.clock,reducedMotion()),.5f,GOLD);
    }
    public void footer(Game game,String value) {
       String hints=DesktopControls.hints(value).replace("↑↓", DesktopControls.vertical()).replace("←→", DesktopControls.horizontal())
@@ -300,5 +311,5 @@ public final class ModernUi {
       for(Field f:object.getClass().getDeclaredFields()) if(f.isSynthetic() && f.getName().startsWith("this$")) try {f.setAccessible(true);return f.get(object);} catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
       return null;
    }
-   public void dispose() { desktop.dispose();font.dispose(); pixel.dispose(); }
+   public void dispose() { desktop.dispose();StartupCinematic.disposeShared();font.dispose(); pixel.dispose(); }
 }

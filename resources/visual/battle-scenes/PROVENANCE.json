@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "preparation": "Nearest-neighbor resize to 768x432; full opaque continuous arenas without platforms. Original generated images and prompts retained.",
+  "reference": "User-provided pixel-art forest clearing",
+  "png_encoding": {
+    "name": "RGBA8-filter0-stored-deflate",
+    "version": 1,
+    "blockBytes": 65535,
+    "implementation": "tools/deterministic_png.py"
+  },
+  "scenes": {
+    "beach": {
+      "source": "sources/beach.png",
+      "source_sha256": "5ff025fcb9b0f8768eed6c83c4d5f6f0f4210f0416e5f58db4d48c35c3dfa51a",
+      "metadata_sha256": "2e78e3716ea4d529b84ff4d3421d5655341eebc9c4e42d050d125d3cc47c4d82",
+      "runtime": "beach.png",
+      "runtime_sha256": "0a96ab55457a0820c400fd065b6356d754394bfdcf4b5a5f2980dddc6a06508b",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Production background illustration for a modern 2.5D pixel-art creature battle arena, landscape 16:9, target1024x576. Reference image is STYLE and composition guidance: crisp colorful low-resolution Nintendo DS-era pixel art, one clear consistent logicalpixelgrid, clusteredcolors, simple3tones shading, dark subtleoutlines; not photorealistic, no smoothpainting. Low elevated camera looking across a large natural clearing, wide fieldofview. Strong layereddepth: close substantial scenery at the extreme left andright, midground woods/rocks, hazy distantbackground. One continuous natural ground plane reaching everyloweredge. Center and lower60% must be open for two creatures to be rendered by the game later. No characters, animals, people, Pok\u00e9mon, UI, text, frames, labels, battleplatforms, disks, floating islands, objects in centralcombat area. Full opaqueimage with absolutelyno transparentmargins. Preservevisualclarity at512x288. Lighting bright enough to see floor detail. Subject: A sheltered tropical beach clearing. Tall palms and low coastal rocks frame the sides, bright turquoise ocean with gentle white wave crests occupies the far upper third, distant blue islands on horizon. The front sixty percent is a continuous large open pale sand clearing with subtle dune color and a thin wet-sand shoreline well behind it. No platforms or disconnected islands."
+    },
+    "cave": {
+      "source": "sources/cave.png",
+      "source_sha256": "917f4043f189ed7823322d220af453bede1e6dad7b892380bf901ab543d66265",
+      "metadata_sha256": "cf6cb46310a7925c103300d5398e5fd2d4247a1b149eeda68319b9d73806933c",
+      "runtime": "cave.png",
+      "runtime_sha256": "404d8c83d09a1e0fa5e2f59307b3b2e51ef6cbd7a92f8d08a2ba866858b4e3e1",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Production background illustration for a modern 2.5D pixel-art creature battle arena, landscape 16:9, target1024x576. Reference image is STYLE and composition guidance: crisp colorful low-resolution Nintendo DS-era pixel art, one clear consistent logicalpixelgrid, clusteredcolors, simple3tones shading, dark subtleoutlines; not photorealistic, no smoothpainting. Low elevated camera looking across a large natural clearing, wide fieldofview. Strong layereddepth: close substantial scenery at the extreme left andright, midground woods/rocks, hazy distantbackground. One continuous natural ground plane reaching everyloweredge. Center and lower60% must be open for two creatures to be rendered by the game later. No characters, animals, people, Pok\u00e9mon, UI, text, frames, labels, battleplatforms, disks, floating islands, objects in centralcombat area. Full opaqueimage with absolutelyno transparentmargins. Preservevisualclarity at512x288. Lighting bright enough to see floor detail. Subject: A deep underground cavern clearing. Huge cold slate stalagmites and rock columns frame both sides, high dark blue cave walls, receding tunnels in the upper center and small cyan crystal clusters at perimeter. The front sixty percent is continuous open slate ground with muted blue-gray mineral veins, clear and walkable."
+    },
+    "desert": {
+      "source": "sources/desert.png",
+      "source_sha256": "7cd3d109b9ca0575e904b656b8bb1b4aa3c8490d997fbd739aa86625ac47946b",
+      "metadata_sha256": "d4e1449d9b1131b22bc84a121ba145cb527f3f4d17d8efd3df89c085235f7b40",
+      "runtime": "desert.png",
+      "runtime_sha256": "e33252594d7299f4c24d0dc6789920cbff73ca5cf1f34af6453eebe6ddae5335",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Production background illustration for a modern 2.5D pixel-art creature battle arena, landscape 16:9, target1024x576. Reference image is STYLE and composition guidance: crisp colorful low-resolution Nintendo DS-era pixel art, one clear consistent logicalpixelgrid, clusteredcolors, simple3tones shading, dark subtleoutlines; not photorealistic, no smoothpainting. Low elevated camera looking across a large natural clearing, wide fieldofview. Strong layereddepth: close substantial scenery at the extreme left andright, midground woods/rocks, hazy distantbackground. One continuous natural ground plane reaching everyloweredge. Center and lower60% must be open for two creatures to be rendered by the game later. No characters, animals, people, Pok\u00e9mon, UI, text, frames, labels, battleplatforms, disks, floating islands, objects in centralcombat area. Full opaqueimage with absolutelyno transparentmargins. Preservevisualclarity at512x288. Lighting bright enough to see floor detail. Subject: A broad desert basin clearing. Ochre sandstone cliffs and weathered red buttes frame the sides, a distant layered mesa horizon under a soft blue sky, sparse dry shrubs and a few small cacti only at the edges. The front sixty percent is continuous open fine sand and warm pale stone, with delicate ripples and scattered tiny pebbles."
+    },
+    "forest": {
+      "source": "sources/forest.png",
+      "source_sha256": "1d57ca46bd7e45735b92cadf1a2ebf93109f8a6bb2ca6ec801c89b9d9d233285",
+      "metadata_sha256": "39e26008e593964576972ad6e3745eada6a4c47635dc3823fbb183b210822341",
+      "runtime": "forest.png",
+      "runtime_sha256": "19ba244b1ee59ae0ca2136333c0d10a130df5423a2871323bcead12e968269d0",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Production background illustration for a modern 2.5D pixel-art creature battle arena, landscape 16:9, target1024x576. Reference image is STYLE and composition guidance: crisp colorful low-resolution Nintendo DS-era pixel art, one clear consistent logicalpixelgrid, clusteredcolors, simple3tones shading, dark subtleoutlines; not photorealistic, no smoothpainting. Low elevated camera looking across a large natural clearing, wide fieldofview. Strong layereddepth: close substantial scenery at the extreme left andright, midground woods/rocks, hazy distantbackground. One continuous natural ground plane reaching everyloweredge. Center and lower60% must be open for two creatures to be rendered by the game later. No characters, animals, people, Pok\u00e9mon, UI, text, frames, labels, battleplatforms, disks, floating islands, objects in centralcombat area. Full opaqueimage with absolutelyno transparentmargins. Preservevisualclarity at512x288. Lighting bright enough to see floor detail. Subject: An enclosed woodland clearing like the supplied reference: warm broad tree trunks frame both sides, rounded layered green canopy above, receding cool blue-green woodland in the center distance, lush grass, a few pink flowers and low ferns only around the perimeter. The front sixty percent is continuous open, gently textured grassy ground."
+    },
+    "graveyard": {
+      "source": "sources/graveyard.png",
+      "source_sha256": "831ee3d33ef109e6fa3bc87eea318c45fe8e04cb91d4ffccc0ff4e22b8d8a420",
+      "metadata_sha256": "2e97a3f468f0227f7e0d996b95a31267c15b3ca7d767dd33f1e45964718afed2",
+      "runtime": "graveyard.png",
+      "runtime_sha256": "fd0ac529a44ecccccaa0188904541ae6d9c78e2123455973526ec39a1bd9db94",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Production background illustration for a modern 2.5D pixel-art creature battle arena, landscape 16:9, target1024x576. Reference image is STYLE and composition guidance: crisp colorful low-resolution Nintendo DS-era pixel art, one clear consistent logicalpixelgrid, clusteredcolors, simple3tones shading, dark subtleoutlines; not photorealistic, no smoothpainting. Low elevated camera looking across a large natural clearing, wide fieldofview. Strong layereddepth: close substantial scenery at the extreme left andright, midground woods/rocks, hazy distantbackground. One continuous natural ground plane reaching everyloweredge. Center and lower60% must be open for two creatures to be rendered by the game later. No characters, animals, people, Pok\u00e9mon, UI, text, frames, labels, battleplatforms, disks, floating islands, objects in centralcombat area. Full opaqueimage with absolutelyno transparentmargins. Preservevisualclarity at512x288. Lighting bright enough to see floor detail. Subject: A moonlit woodland graveyard clearing. Gnarled dark trees and modest old weathered gravestones frame both sides, distant layers of blue-green trees and translucent low mist under a moonlit sky. The front sixty percent is continuous open muted gray-green grass and pale stone, with all gravestones restricted to perimeter."
+    },
+    "snow": {
+      "source": "sources/snow.png",
+      "source_sha256": "98c01464bf457b871067847f18e112ebf24a4a65031ca93e8112b955ac7443ec",
+      "metadata_sha256": "551e44254e2e8ed842274f2416456f2f39cc5470447bf11125a4d641ced33ffd",
+      "runtime": "snow.png",
+      "runtime_sha256": "5dd1ee4408da059ffe9154fb185e0006f16de971d8875909db12ee546b98682f",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Production background illustration for a modern 2.5D pixel-art creature battle arena, landscape 16:9, target1024x576. Reference image is STYLE and composition guidance: crisp colorful low-resolution Nintendo DS-era pixel art, one clear consistent logicalpixelgrid, clusteredcolors, simple3tones shading, dark subtleoutlines; not photorealistic, no smoothpainting. Low elevated camera looking across a large natural clearing, wide fieldofview. Strong layereddepth: close substantial scenery at the extreme left andright, midground woods/rocks, hazy distantbackground. One continuous natural ground plane reaching everyloweredge. Center and lower60% must be open for two creatures to be rendered by the game later. No characters, animals, people, Pok\u00e9mon, UI, text, frames, labels, battleplatforms, disks, floating islands, objects in centralcombat area. Full opaqueimage with absolutelyno transparentmargins. Preservevisualclarity at512x288. Lighting bright enough to see floor detail. Subject: A spacious snowy woodland glade. Tall dark fir trees with thick snow-laden boughs frame the sides, distant layers of misty blue alpine pines and a far mountain. The front sixty percent is open continuous smooth snow ground, with a few low icy blue shadows and sparse frost bushes only at the perimeter."
+    },
+    "volcano": {
+      "source": "sources/volcano.png",
+      "source_sha256": "3a24824f8e4f3d560e93427d5764dfa98c4a50f806db3b3fb61e2aecfb3573b0",
+      "metadata_sha256": "a71042c7dfdab7e57de90a5a239e4382a4d1a6aef06824ae50b1ebd578def861",
+      "runtime": "volcano.png",
+      "runtime_sha256": "b48350442bebc2f81cb04a18d25865b4b7b7c51e2fbe22a94538c7b261242219",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Production background illustration for a modern 2.5D pixel-art creature battle arena, landscape 16:9, target1024x576. Reference image is STYLE and composition guidance: crisp colorful low-resolution Nintendo DS-era pixel art, one clear consistent logicalpixelgrid, clusteredcolors, simple3tones shading, dark subtleoutlines; not photorealistic, no smoothpainting. Low elevated camera looking across a large natural clearing, wide fieldofview. Strong layereddepth: close substantial scenery at the extreme left andright, midground woods/rocks, hazy distantbackground. One continuous natural ground plane reaching everyloweredge. Center and lower60% must be open for two creatures to be rendered by the game later. No characters, animals, people, Pok\u00e9mon, UI, text, frames, labels, battleplatforms, disks, floating islands, objects in centralcombat area. Full opaqueimage with absolutelyno transparentmargins. Preservevisualclarity at512x288. Lighting bright enough to see floor detail. Subject: A dramatic volcanic caldera clearing. Dark basalt cliffs frame both sides, distant jagged volcanic mountains and dim red sky, orange glowing lava channels behind the clearing and at far perimeter. The front sixty percent is continuous open solid dark basalt with subtle cracked stone patterns, faint warm reflected light. Keep lava outside the central combat clearing."
+    }
+  }
+}

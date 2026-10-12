@@ -150,6 +150,7 @@ public final class BiomeSceneTest {
                if(phase==6)checkHeight();
                if(phase==7)require(waterfallFrames()>waterfallBefore,"Generated waterfall was swallowed by the earlier cliff dispatch");
                if(phase>=8)checkShallowLayers();
+               if(phase==10)checkPuddlePixels();
                String[] names={"desert-day","desert-night","volcano-day","volcano-night","graveyard-day","graveyard-night","plateau-ramp","waterfall","tidal-high","tidal-low","puddles"};
                screenshot(String.format("%02d-%s.png",phase<8?phase:phase+4,names[phase]));nextPhase();
             }
@@ -164,7 +165,7 @@ public final class BiomeSceneTest {
             if(drawing)drawFrames++;
             if(despawning)despawnFrames++;
             if(spawnFrames==145)screenshot("08-ghost-spawning.png");
-            if(drawFrames==20 && drawing){screenshot("09-ghost-chase.png");time("day");}
+            if(drawFrames==20 && drawing){checkGhostPixels();screenshot("09-ghost-chase.png");time("day");}
             if(despawnFrames==20)screenshot("10-ghost-despawning.png");
             if(!spawning&&!drawing&&!despawning) {
                if(ghostAfter==0){ghostAfter=renderer().getGhostFrames();screenshot("11-ghost-gone.png");}
@@ -205,13 +206,59 @@ public final class BiomeSceneTest {
                   }
                   if(!shallow||minX<shallowProbe.position.x||maxX>shallowProbe.position.x+16||minY<shallowProbe.position.y||maxY>shallowProbe.position.y+16)continue;
                   overlays++;
-                  float expected=phase==10?10:16;
+                  float expected=16; // The fragment mask, rather than an inset rectangular quad, defines the wet silhouette.
                   require(Math.abs(maxX-minX-expected)<.01f&&Math.abs(maxY-minY-expected)<.01f,"Puddle/tide overlay footprint incorrect");
                }
             }
          } catch(ReflectiveOperationException error){throw new IllegalStateException(error);}
          require(overlays==(phase==9?0:1),"Live tide/puddle produced incorrect number of shallow overlays: "+overlays+" phase="+phase);
          System.out.println("BIOME SCENE shallow phase="+phase+" tile="+shallowProbe.name+" isTidal="+shallowProbe.isTidal+" isWater="+shallowProbe.isWater+" overlays="+overlays);
+      }
+      byte[] frozenWorld() throws ReflectiveOperationException {
+         JohtoRenderer r=renderer();Field clock=JohtoRenderer.class.getDeclaredField("seconds");clock.setAccessible(true);
+         clock.setFloat(r,3.25f-Math.min(.1f,Math.max(0,Gdx.graphics.getDeltaTime())));
+         require(r.render(this),"Frozen world probe was not rendered");
+         return ScreenUtils.getFrameBufferPixels(0,0,Gdx.graphics.getBackBufferWidth(),Gdx.graphics.getBackBufferHeight(),false);
+      }
+      int differenceAt(byte[] a,byte[] b,float x,float y,float height,int radius) throws ReflectiveOperationException {
+         PerspectiveCamera camera=(PerspectiveCamera)read(renderer(),"camera");Vector3 at=camera.project(new Vector3(x,height,-y));
+         int width=Gdx.graphics.getBackBufferWidth(),screenHeight=Gdx.graphics.getBackBufferHeight(),changed=0;
+         for(int yy=(int)at.y-radius;yy<=(int)at.y+radius;yy++)for(int xx=(int)at.x-radius;xx<=(int)at.x+radius;xx++) {
+            require(xx>=0&&yy>=0&&xx<width&&yy<screenHeight,"Pixel probe outside viewport");int p=(yy*width+xx)*4;
+            if(Math.abs((a[p]&255)-(b[p]&255))+Math.abs((a[p+1]&255)-(b[p+1]&255))+Math.abs((a[p+2]&255)-(b[p+2]&255))>6)changed++;
+         }
+         return changed;
+      }
+      void checkPuddlePixels() {
+         String original=shallowProbe.name;
+         try {
+            byte[] wet=frozenWorld();shallowProbe.name="sand4";shallowProbe.init();byte[] dry=frozenWorld();
+            float x=shallowProbe.position.x,y=shallowProbe.position.y;
+            int center=differenceAt(wet,dry,x+8,y+8,.045f,2),corners=0;
+            for(float px:new float[]{1,15})for(float py:new float[]{1,15})corners+=differenceAt(wet,dry,x+px,y+py,.045f,1);
+            require(center>=12,"Puddle shader erased its actual visible centre: "+center);
+            require(corners==0,"Puddle shader still paints square corners: "+corners);
+            System.out.println("BIOME SCENE puddle GPU centre="+center+"/25 visible; square corners="+corners+"/36 changed");
+         }catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
+         finally {shallowProbe.name=original;shallowProbe.init();}
+         try{frozenWorld();}catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
+      }
+      void checkGhostPixels() {
+         Action ghost=null;int index=-1;
+         for(int i=0;i<actionStack.size();i++)if(actionStack.get(i) instanceof DrawGhost){ghost=actionStack.get(i);index=i;break;}
+         require(ghost!=null,"Missing real DrawGhost action for night pixel probe");
+         try {
+            byte[] with=frozenWorld();actionStack.remove(index);byte[] without=frozenWorld();
+            int changed=0,bright=0;
+            for(int i=0;i<with.length;i+=4) {
+               int delta=Math.abs((with[i]&255)-(without[i]&255))+Math.abs((with[i+1]&255)-(without[i+1]&255))+Math.abs((with[i+2]&255)-(without[i+2]&255));
+               if(delta>12){changed++;if((with[i]&255)+(with[i+1]&255)+(with[i+2]&255)>160)bright++;}
+            }
+            require(changed>150&&bright>40,"Night ghost has no readable emitted sprite: changed="+changed+" lit="+bright);
+            System.out.println("BIOME SCENE real night ghost GPU visible="+changed+" readable="+bright+" pixels; removed-action negative probe");
+         }catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
+         finally {if(!actionStack.contains(ghost))actionStack.add(index,ghost);}
+         try{frozenWorld();}catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
       }
       long waterfallFrames() {
          try{return ((Number)JohtoRenderer.class.getMethod("getWaterfallFrames").invoke(renderer())).longValue();}

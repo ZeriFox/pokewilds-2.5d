@@ -1,68 +1,70 @@
-VERIFICA - cast giocabile in stile Bianco e Nero, 12 ottobre 2026
+VERIFICA - arene 2.5D, costa, luci e guardaroba - 12 ottobre 2026
 
 VERSIONE LOCALE
-Base: 5df682645ed6925608e939efac76781883fe733e.
-Ramo: work/local-terrain-2026-10-12.
-Backup: backup/before-trainer-redraw-2026-10-12.
+Base: ac200935861a13018f6c7a68aced39ccdd1276d0
+Ramo: work/local-terrain-2026-10-12
+Backup: backup/before-cinematic-customization-2026-10-12.
 Avvio: AVVIA-POKEWILDS.cmd oppure "PokeWilds 2.5D - Prova locale" sul desktop.
-Funziona anche con i personaggi dei salvataggi esistenti. Nessuna nuova isola
-o migrazione del salvataggio. Nessun push, tag o nuova release GitHub.
+Nessuna nuova isola o migrazione dei salvataggi. Nessun push/tag/release.
 
 ARTEFATTO VERIFICATO
 dist/pokewilds-rebuilt.jar
-SHA-256: 47d14f1325bfb05b377b34afcd7bbcbdc2b009fdd983b9d50afdd3e30c101d53
-Dimensione: 309645014 byte; 109021 voci ZIP.
-Java 17; 231 sorgenti; 492 classi compilate.
-Modelli GLB esclusi; zero classi di gioco recuperate dal runtime upstream.
-Sorgenti, risorse e librerie corrispondono al build report.
-Digest sorgenti: 40ab8e25d17821e898df04daa6eb848422d1e23175c71f3a17195f72c9f1887b
-Avvio reale java -jar: 120 frame e uscita regolare in build/trainer-launcher.
-Ricevuta completa: build/trainer-verification/final.json.
+SHA-256: e45d33c27efa4e4106221f355a05275a910fc99a4dc077cb99bbdfe51206b6e6
+Dimensione: 329018147 byte; 109055 voci ZIP.
+Java 17; 235 sorgenti; 497 classi compilate.
+Modelli GLB esclusi, zero classi di gioco recuperate dal runtime upstream.
+Sorgenti e risorse corrispondono al build report.
+Digest sorgenti: 9bc070218cff58663dbe0b99c579af836117f5b91d74a6811acb906137aa4225
+Avvio reale java -jar: 120 frame e uscita regolare in directory isolata.
+Ricevuta completa: build/cinematic-customization-verification/final.json.
 
 MODIFICHE
-- 19 identita uniche nel selettore; Hilbert e Hilda originali B/W, altri 17
-  ridisegnati con image_gen nello stesso stile. I nuovi sono adattamenti
-  fan art assistiti da IA, non sprite ufficiali estratti da B/W.
-- 12 fotogrammi per ogni nuovo personaggio, quattro direzioni. Corsa a
-  cadenza piu rapida; i due originali usano anche la propria grafica di corsa.
-- Preview, mondo, scheda giocatore e apparizione in battaglia coerenti;
-  Surf, pesca, cavalcatura e riposo mantengono le composizioni 2.5D esistenti.
-- Maschere sugli abiti per i colori personalizzati dei 17 personaggi nuovi;
-  pelle e capelli invariati. I due originali mantengono la palette nativa.
-- Vecchia preferenza classicCast non ripristina gli sprite piccoli.
-  Override espliciti e mod conservati. Le mod prive di back.png non vengono
-  proposte come complete, prevenendo il fallimento del caricamento originale.
-- Shader, terreno, meccaniche, azioni e formato dei salvataggi invariati.
+- Sette fondali pieni dipinti, piano prospettico e camera orbitale contenuta
+  nella scelta comandi/mosse. Pokémon e ombre proiettati nello stesso spazio.
+  Durante le azioni mantiene gli ancoraggi originali degli effetti.
+- Entrata in battaglia rivista con copertura dello schermo, senza cambiare
+  durata delle azioni. UI ferma, compatibile con movimento ridotto.
+- Acqua bassa/pozze con margini morbidi, sabbia visibile, schiuma e riflessi;
+  raccordi convessi sulle alture e ombre di contatto. Collisioni invariate.
+- Fantasma dedicato a quattro frame, leggibile di notte e senza rivelare
+  la specie nascosta. Ciclo originale apparizione/inseguimento/scomparsa.
+- Apertura saltabile di 7,2 secondi e transizioni dei menu.
+- 19 allenatori conservati, animazione corsa migliorata e guardaroba con
+  vestito, zaino, scarpe, cappello, capelli e colori separati.
+  Aprire Customize nel selettore oppure menu partita > F1 > Customize character.
+  Profili locali appearance-profiles.json separati dal salvataggio.
 
 VERIFICHE
-10 suite native sul JAR indicato, senza sorgenti o risorse sovrapposte:
+18 suite native sul JAR indicato, senza sorgenti o risorse sovrapposte:
 - tools/trainer_style_test.py: TRAINER STYLE PASS: checks=421133, identities=19, walkFrames=228, worldPoses=76, captures=10, unique cast and selector, legacy preference, walk/run clocks, rooted complete sprites, mod art and costume, cache/dispose
-- tools/desktop_menu_flow_test.py: DESKTOP MENU FLOW PASS: 417 assertions; 10 captures; explicit text focus, release barriers, settings persistence, 19 B/W-style identities and costume accents, pointer bag and reorder cancel
+- tools/desktop_menu_flow_test.py: DESKTOP MENU FLOW PASS: 418 assertions; 10 captures; explicit text focus, release barriers, settings persistence, 19 B/W-style identities and costume accents, pointer bag and reorder cancel
+- tools/wardrobe_style_test.py: WARDROBE STYLE PASS: checks=14740, identities=19, directions=4, captures=10, separateparts/colors, realcontrollerdraft/apply/cancel, existing-gameentry, profileatomicbackup/reload, runningposes
+- tools/bw_assets_integration_test.py: BW ASSETS PASS: 8759 checks; 218 complete built-in regions; 24 animation frames; custom 64px and rectangular GPU sampling; normalized/pixel anchors; actual renderer trainer crops/feet/offset geometry; strict invalid overrides; disposal/recovery
+- tools/nature_animation_test.py: NATURE ANIMATION PASS: checks=66057, scenes=15, captures=45, animated open ocean/coast/vegetation/crowns, rooted trunks, directional and local light/shadows, shore seams, deterministic frames, reduced motion, unchanged tiles/RNG
 - tools/field_scene_test.py: FIELD PASS: exclusive modern world; POWER/BUILD/DIG/SURF/FLY/RIDE activation; real BUILD placement/collision/resources, DIG excavation/refill/resources, cancellation without consumption; Surf/Ride movement and FLY takeoff/key movement/RMB landing; CUT/HEADBUTT/plant clocks and next actions; original couch enter/exit, bed sleep/wake, kiln enter/cancel, filtered-empty fishing and rod-restricted catch into battle; furniture geometry/projection and previews/light/pose snapshots
 - tools/terrain_readability_test.py: TERRAIN READABILITY PASS: checks=402, screenshots=6, frames=110, flat/inclined stairs, material boundaries, PMD/tree overlap, B/W trainer
 - tools/biome_scene_test.py: BIOME SCENE PASS: dedicated desert art; volcanic/graveyard day/night; closed plateau and continuous ramp; waterfall; walkable high/low tides and localized puddles with visible sand bed; real SpawnGhost/DrawGhost/DespawnGhost lifecycle with zero post-despawn draws
-- tools/bw_assets_integration_test.py: BW ASSETS PASS: 8759 checks; 218 complete built-in regions; 24 animation frames; custom 64px and rectangular GPU sampling; normalized/pixel anchors; actual renderer trainer crops/feet/offset geometry; strict invalid overrides; disposal/recovery
-- tools/pmd_battle_visual_test.py: PMD BATTLE VISUAL PASS captures=18 originalActions=EnemyFaint,FriendlyFaint,ThrowOutPokemonCrystal,EvolutionAnim,EggHatchAnim,PokemonFrame
-- tools/battle_entry_test.py: BATTLE ENTRY PASS sizes=4 motionModes=2 originalIntroFrames=74 originalWipeFrames=70 coveredFrames=1152 captures=64 reducedMotion=stationaryFade
-- tools/modern_ui_smoke_test.py: UI PASS: original input, menus, crafting, NPC encounter, battle turn, flee, capture and save/load
 - tools/landscape_smoke_test.py: LANDSCAPE PASS: day/night, relief/ramp, caldera, interior, real EnterBuilding/exit, PMD/BW GPU rendering
+- tools/battle_scenery_test.py: BATTLE SCENERY PASS: checks=28457, scenes=32, captures=41, four aspects, shared floor/actor orbit, directional sprites, fixed UI, reduced motion, cache/disposal, batch state, gameplay/RNG unchanged
+- tools/pmd_battle_visual_test.py: PMD BATTLE VISUAL PASS captures=19 originalActions=EnemyFaint,FriendlyFaint,ThrowOutPokemonCrystal,EvolutionAnim,EggHatchAnim,PokemonFrame
+- tools/battle_entry_test.py: BATTLE ENTRY PASS sizes=4 motionModes=2 originalIntroFrames=74 originalWipeFrames=70 coveredFrames=1152 captures=64 reducedMotion=stationaryFade
+- tools/battle_viewport_test.py: BATTLE VIEWPORT PASS sizes=5 biomes=6 zooms=5 exitFrames=170 captures=82 panoramaMarginPixels=12154480 missingWorldGap=opaque
+- tools/move_effect_presentation_test.py: MOVE EFFECT PRESENTATION PASS: real Surf/Tackle/Rain Dance/Thunder; full viewport rows; local bounds; HUD; GL restoration; original frame progression; real Dig PMD shrink; local Water Gun/Teleport/Double Team row operations | MOVE EFFECT PRESENTATION PASS: real Surf/Tackle/Rain Dance/Thunder; full viewport rows; local bounds; HUD; GL restoration; original frame progression; real Dig PMD shrink; local Water Gun/Teleport/Double Team row operations | MOVE EFFECT PRESENTATION PASS: real Surf/Tackle/Rain Dance/Thunder; full viewport rows; local bounds; HUD; GL restoration; original frame progression; real Dig PMD shrink; local Water Gun/Teleport/Double Team row operations
+- tools/cinematic_opening_test.py: CINEMATIC OPENING PASS: checks=36, captures=8, full viewport, skippable opening, motion preferences, four visible spirit frames, dispose/reload
+- tools/ui_layout_test.py: UI LAYOUT PASS: 117 screens; 100/125/150%, widescreen, portrait, ultrawide and desktop-full-size; uniform scale and clear tutorial gutters
+- tools/modern_ui_smoke_test.py: UI PASS: original input, menus, crafting, NPC encounter, battle turn, flee, capture and save/load
+- tools/active_move_resize_test.py: ACTIVE MOVE RESIZE PASS: Surf/Tackle, four in-flight window resizes, same actions/targets, contiguous clocks, true PNG target, HUD/GL/projection, original completion and disposed FBO
 
-TrainerStyle: 421133 controlli, 19 identita,
-228 fotogrammi, 76 pose nel mondo e 10 PNG.
-Verificati pixel effettivi delle texture GPU e continuita del corpo con
-controllo negativo che simula una fascia nascosta dal terreno; selezione,
-colori, risorse, cache, mod incomplete/complete e invarianti di mappa/RNG.
-Le prove BiomeScene e TerrainReadability leggono ora la texture del personaggio
-effettivo, anche ricolorata: non presumono l'atlante o il cappello rosso del
-precedente avatar Hilbert. Le soglie di visibilita sono conservate.
-Preparazione deterministica: 17 identita, 34 PNG, controllo senza scritture.
-Revisione visiva dei 204 frame nuovi e delle maschere costume.
-Ambito: 157 sorgenti originali invariati, 41 con ambito esplicito, 33 aggiunte;
-40 mutazioni non autorizzate respinte. Archivio baseline/before-trainer-redraw.
+Preparazione deterministica di sprite, componenti e fondali verificata.
+Scope: 157 sorgenti originali invariati, 41 con ambito esplicito, 37 aggiunte.
+47 mutazioni non autorizzate respinte. Revisione precedente archiviata in
+baseline/before-cinematic-customization/.
 
 LIMITI
-Test automatici sulla GPU disponibile, non una campagna manuale completa,
-una prova multiplayer o un benchmark su altre macchine. Non e l'intera
-pipeline di 31 suite native. Il salvataggio personale Kiri.sav non e stato aperto.
-Dettagli, provenienza e prompt: docs/TRAINERS-BW.md e
-resources/visual/trainers-bw/PROVENANCE.json (sorgenti conservate in sources/).
+La camera non e libera a 360 gradi; le luci usano shader raster, non RTX hardware.
+La personalizzazione non viene sincronizzata tra client multiplayer.
+Prove automatiche native sulla GPU disponibile, non una campagna manuale
+completa o un benchmark su altre macchine. Non e l'intera pipeline di 33 suite.
+Salvataggi personali non aperti o modificati.
+Dettagli, istruzioni, provenienza e prompt: docs/CINEMATIC-CUSTOMIZATION.md e
+resources/visual/{battle-scenes,ghost,wardrobe}/.

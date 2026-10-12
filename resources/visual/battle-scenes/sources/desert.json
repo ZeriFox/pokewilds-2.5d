@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "desert",
+  "tool": "built-in image_gen",
+  "kind": "AI-created pixel-art battle scenery; not official ripped artwork",
+  "prompt": "Use case: stylized-concept. Production background illustration for a modern 2.5D pixel-art creature battle arena, landscape 16:9, target1024x576. Reference image is STYLE and composition guidance: crisp colorful low-resolution Nintendo DS-era pixel art, one clear consistent logicalpixelgrid, clusteredcolors, simple3tones shading, dark subtleoutlines; not photorealistic, no smoothpainting. Low elevated camera looking across a large natural clearing, wide fieldofview. Strong layereddepth: close substantial scenery at the extreme left andright, midground woods/rocks, hazy distantbackground. One continuous natural ground plane reaching everyloweredge. Center and lower60% must be open for two creatures to be rendered by the game later. No characters, animals, people, Pokémon, UI, text, frames, labels, battleplatforms, disks, floating islands, objects in centralcombat area. Full opaqueimage with absolutelyno transparentmargins. Preservevisualclarity at512x288. Lighting bright enough to see floor detail. Subject: A broad desert basin clearing. Ochre sandstone cliffs and weathered red buttes frame the sides, a distant layered mesa horizon under a soft blue sky, sparse dry shrubs and a few small cacti only at the edges. The front sixty percent is continuous open fine sand and warm pale stone, with delicate ripples and scattered tiny pebbles.",
+  "reference": {
+    "path": "C:/Users/Utente/AppData/Local/Temp/codex-clipboard-5734ab33-4b85-4559-b79f-4830f8d04363.png",
+    "role": "User-provided forest composition and pixel-art style reference"
+  },
+  "source_path": "C:\\Users\\Utente\\.codex\\generated_images\\01a130a9-272d-71a3-8ab8-6c84943d38f7\\exec-7ef7e00d-0f3c-4f9c-a1b3-40864fcd06ec.png",
+  "preparation": "Original generated file preserved exactly; runtime sheet uses nearest-neighbor resize only."
+}

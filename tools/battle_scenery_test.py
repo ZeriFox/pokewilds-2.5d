@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Native battle panorama, fixed anchor and shader-state regression."""
+"""Native battle orbit, projected actor and shader-state regression."""
 from __future__ import annotations
 import argparse
 import json
@@ -12,7 +12,7 @@ from smoke_test import CREATE_FLAGS, JAR, ROOT, find_jdk, sha256
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--sources', action='store_true', help='Diagnostic: compile only the two battle scenery sources over the existing JAR')
+    parser.add_argument('--sources', action='store_true', help='Diagnostic: compile battle scenery and actor sources with loose resources over the existing JAR')
     args = parser.parse_args()
     destination = ROOT / ('build/battle-scenery-diagnostic' if args.sources else 'build/battle-scenery')
     classes = destination / 'classes'
@@ -26,8 +26,8 @@ def main() -> int:
     java, javac = find_jdk()
     sources = [ROOT / 'tools/BattleSceneryTest.java']
     if args.sources:
-        sources += [ROOT / 'src/com/pkmngen/game' / name for name in ('JohtoBattleRenderer.java', 'BattleScenery.java')]
-    cp = os.pathsep.join(map(str, [classes, JAR]))
+        sources += [ROOT / 'src/com/pkmngen/game' / name for name in ('JohtoBattleRenderer.java', 'BattleScenery.java', 'PmdBattleSprites.java', 'GhostVisualAssets.java')]
+    cp = os.pathsep.join(map(str, [classes, *([ROOT / 'resources'] if args.sources else []), JAR]))
     commands = [
         [javac, '--release', '17', '-encoding', 'UTF-8', '-proc:none', '-cp', cp, '-d', str(classes), *map(str, sources)],
         [java, '-Xmx1g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off',
@@ -50,7 +50,7 @@ def main() -> int:
                 print(logpath.read_text(encoding='utf-8'))
                 return result.returncode
     output = logpath.read_text(encoding='utf-8')
-    if ('BATTLE SCENERY PASS:' not in output or len(list(destination.glob('*.png'))) != 24
+    if ('BATTLE SCENERY PASS:' not in output or len(list(destination.glob('*.png'))) != 41
             or re.search(r'(?m)^\s*(?:[\w$]+\.)*[\w$]*(?:Exception|Error)(?:[:\s]|$)|^\s*at\s+[\w.$]+\(', output)):
         receipt.update(status='failed', reason='Incomplete native evidence')
         receiptpath.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
