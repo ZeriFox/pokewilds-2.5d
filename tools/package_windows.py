@@ -109,7 +109,7 @@ def make_package(version: str, destination: Path, receipts: list[Path]) -> Path:
             add(path, "documentazione/" + path.relative_to(ROOT / "resources").as_posix())
     add(ROOT / "art-source/reference/manifest.json", "documentazione/reference-manifest.json")
     add(ROOT / "docs/ASSET-RIGHTS.md", "documentazione/ASSET-RIGHTS.md")
-    for name in ("REWORK-STATUS.md", "ASSET-COVERAGE.md", "REWORK-TESTS.md", "PACKAGING.md", "VERTICAL-SLICE.md"):
+    for name in ("REWORK-STATUS.md", "ASSET-COVERAGE.md", "REWORK-TESTS.md", "PACKAGING.md", "VERTICAL-SLICE.md", "JAVA-REFACTOR-STEP3.md"):
         path = ROOT / "docs" / name
         if path.is_file():
             add(path, "documentazione/" + name)
@@ -127,7 +127,15 @@ COMANDI
 WASD: movimento. Mouse sinistro: conferma/azione.
 Mouse destro: annulla; tienilo premuto per la corsa dove prevista.
 Invio: menu Start. F11: schermo intero. I comandi personalizzati
-gia salvati vengono rispettati; consulta il menu Comandi.
+gia salvati vengono rispettati. F1 nel menu iniziale o di pausa apre
+Controlli e schermo: modifica, verifica conflitti, Salva per applicare.
+Nei campi nome/salvataggio: seleziona con WASD, conferma per scrivere,
+Invio salva la modifica, Esc la annulla. Non serve passare alle frecce.
+Inventario: primo clic seleziona, secondo apre; rotella scorre; C/V
+scorrono le descrizioni lunghe. Il tasto destro annulla il riordino.
+Personaggi: due presentazioni dettagliate B/W e 19 set classici completi.
+I set classici non sono nuovi sprite HD. Anteprima e colore sono separati
+prima di confermare. Impostazioni interfaccia in interface-settings.json.
 
 SALVATAGGI E AGGIORNAMENTO
 La cartella run-johto viene creata accanto a GIOCA.cmd al primo avvio.

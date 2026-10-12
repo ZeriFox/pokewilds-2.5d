@@ -800,7 +800,7 @@ public final class JohtoRenderer {
                y+=bedLayout.offsetY-bedHeight*bedLayout.anchorY(0f)*MathUtils.sinDeg(50f);
                bedLift+=bedLayout.elevation-bedHeight*bedLayout.anchorY(0f)*MathUtils.cosDeg(50f);
             }
-            person=assets.trainer(player.character,"down",seconds,false);
+            person=assets.trainer(player,"down",seconds,false);
             trainerImage(person,14,x,y+pillow*MathUtils.sinDeg(50f),
                bedLift+pillow*MathUtils.cosDeg(50f),0,.55f);
          } else {

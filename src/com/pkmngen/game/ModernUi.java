@@ -19,6 +19,8 @@ public final class ModernUi {
    private final Texture pixel;
    private final BitmapFont font;
    private final GlyphLayout layout = new GlyphLayout();
+   final DesktopMenuController desktop = new DesktopMenuController();
+   private final ModernStartupUi startup = new ModernStartupUi();
    private final ModernPartyUi party = new ModernPartyUi();
    private final ModernInventoryUi inventory = new ModernInventoryUi();
    private final Map<String,Long> counts = new LinkedHashMap<>();
@@ -91,7 +93,7 @@ public final class ModernUi {
       boolean replace = covers(action);
       ModernBatch batch = (ModernBatch)game.uiBatch;
       batch.suppressed = replace;
-      try { action.step(game); } finally { batch.suppressed = false; }
+      try { if(!desktop.beforeAction(game,action)) action.step(game); desktop.afterAction(game,action); } finally { batch.suppressed = false; }
       if(replace) render(game,action);
    }
    /** Rendering a parent never executes it again; nested menus already do that themselves. */
@@ -99,7 +101,8 @@ public final class ModernUi {
       if(action == null) return;
       float saved = game.uiBatch.getPackedColor();
       game.uiBatch.setColor(Color.WHITE);
-      if(party.covers(action)) party.render(this,game,action);
+      if(action instanceof DrawSetupMenu) startup.render(this,game,(DrawSetupMenu)action);
+      else if(party.covers(action)) party.render(this,game,action);
       else if(inventory.covers(action)) inventory.render(this,game,action);
       else if(game.johtoBattleRenderer != null && game.johtoBattleRenderer.renderMenu(game,action)) { }
       else if(action instanceof DisplayText) dialogue(game,(DisplayText)action);
@@ -136,8 +139,10 @@ public final class ModernUi {
          if(owner instanceof DisplayText) dialogue(game,(DisplayText)owner);
          else if(owner instanceof DisplayTextIntro) introText(game,(DisplayTextIntro)owner);
       }
+      if(desktop.optionsOpen() && action == desktop.optionsOwner && !(action instanceof DrawSetupMenu)) startup.options(this,game,desktop);
       mark(action); game.uiBatch.setPackedColor(saved);
    }
+   void renderStartup(Game game, DrawSetupMenu setup) {startup.render(this,game,setup);}
    public void renderAction(Game game, Action action) { render(game, action); }
    private void toast(Game game,String message,float y) {
       panel(game,4,y+122,152,20); rect(game,5,y+123,2,18,GOLD);
@@ -235,7 +240,11 @@ public final class ModernUi {
       float h=17+visible*14, y=45;
       if(y+h>137) y=137-h;
       panel(game,68,y,87,h); fitText(game,title,74,y+h-5,5,75,MUTED);
-      for(int i=0;i<visible;i++) row(game,words.get(start+i),72,y+h-17-(i+1)*14,79,13,start+i==selected);
+      for(int i=0;i<visible;i++) {Box b=popupRow(words.size(),selected,i);row(game,words.get(start+i),b.x,b.y,b.width,b.height,start+i==selected);}
+   }
+   static Box popupRow(int count,int selected,int visibleIndex) {
+      int visible=Math.min(6,count);float h=17+visible*14,y=Math.min(45,137-h);
+      return new Box(72,y+h-17-(visibleIndex+1)*14,79,13);
    }
    private void dialogue(Game game,DisplayText text) {
       panel(game,2,2,156,38); rect(game,3,37,154,2,ACCENT);
@@ -278,5 +287,5 @@ public final class ModernUi {
       for(Field f:object.getClass().getDeclaredFields()) if(f.isSynthetic() && f.getName().startsWith("this$")) try {f.setAccessible(true);return f.get(object);} catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
       return null;
    }
-   public void dispose() { font.dispose(); pixel.dispose(); }
+   public void dispose() { desktop.dispose();font.dispose(); pixel.dispose(); }
 }

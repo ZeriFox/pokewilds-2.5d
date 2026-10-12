@@ -91,6 +91,7 @@ public final class DesktopControls {
             if (!nickname.disabled && !nickname.done) return true;
          }
          if (action instanceof DrawSetupMenu) {
+            if(game.modernUi!=null)return game.modernUi.desktop.isTyping(game);
             DrawSetupMenu setup = (DrawSetupMenu)action;
             int joinOffset = setup.localHostJoinIndex == 2 ? -1 : 0;
             int loadOffset = setup.newLoadIndex == 1 && setup.localHostJoinIndex != 2 ? -3 : 0;

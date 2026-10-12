@@ -1,3 +1,11 @@
+# Checkpoint interfaccia Java / passaggio 3
+
+Base: main `500a9c9c`. Sorgenti implementati: titolo/home/setup, modifica testo esplicita, controlli configurabili con bozza, catalogo classico opzionale e inventario a due colonne.
+
+Il file `docs/JAVA-REFACTOR-STEP3.md` descrive il perimetro e i limiti. La suite comprende 25 runner nativi. Prossimo comando: `python tools/verify_rework.py --stage all` su checkout pulito; successivamente packaging verificato. Le ricevute e la PR indicano l’esito reale, non questa nota.
+
+---
+
 # Current Java checkpoint — material roles and subtle ambient overlays
 
 Updated: 2026-10-11. Base main: `392411be7bcb13f19a63948ad4544c36d9cec164`.
