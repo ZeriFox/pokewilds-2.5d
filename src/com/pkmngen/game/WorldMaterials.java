@@ -5,6 +5,21 @@ package com.pkmngen.game;
  * JohtoRenderer builds geometry from these explicit roles. */
 public final class WorldMaterials {
    private WorldMaterials() {}
+   /** Only natural dry surfaces may feather into each other. Floors, puzzles,
+    * water boundaries and stairs must keep their exact gameplay footprint. */
+   public static boolean blendable(Tile tile) {
+      if(tile==null || tile.isWater || tile.isLava || tile.isWaterfall || tile.isTidal
+         || tile.isLedge || ModernWorldGenerator.isRamp(tile))return false;
+      String name=lower(tile.name),upper=lower(tile.nameUpper);
+      if(upper.contains("stairs")||upper.contains("ramp"))return false;
+      return name.startsWith("green") || name.startsWith("grass") || name.startsWith("tree")
+         || name.startsWith("flower") || name.startsWith("sand") || name.startsWith("path")
+         || name.startsWith("mountain") || name.startsWith("snow") || name.startsWith("volcano");
+   }
+   public static boolean softGrass(String material) {
+      return material.equals("grass") || material.equals("grass_light")
+         || material.equals("forest_ground") || material.equals("deep_forest_ground");
+   }
    public static String terrainName(Tile tile) {
       if (tile == null) return "grass_light";
       String name = lower(tile.name);

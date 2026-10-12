@@ -99,6 +99,7 @@ public final class WorldSmokeTest {
         Player.Emote controlledEmote;
         Vector2 emotePosition;
         long emoteStartRenderedFrames;
+        ModernWorldGenerator.Report generatedTopology;
 
         SmokeGame() { super(new String[0], 2); }
 
@@ -124,6 +125,19 @@ public final class WorldSmokeTest {
                 Gdx.app.postRunnable(() -> {
                     start();
                     generator.step(this);
+                    if (ModernWorldGenerator.enabled()) {
+                        ModernWorldGenerator.Report topology = generator.modernReport;
+                        generatedTopology = topology;
+                        if (topology == null || topology.authored == null || topology.authored.modules < 5
+                            || topology.authored.preparedCells < 1000)
+                            throw new IllegalStateException("Real island did not receive authored terrain: " + topology);
+                        System.out.println("WORLD: real authored coverage prepared=" + topology.authored.preparedCells
+                            + ", moduleCells=" + topology.authored.cellsRebuilt + ", modules=" + topology.authored.modules);
+                        if (topology.calderaBasinRadius > 0) {
+                            ModernWorldGenerationTest.verifyCaldera(map.tiles, topology);
+                            System.out.println("WORLD: caldera single-depth geometry verified, radius=" + topology.calderaBasinRadius);
+                        }
+                    }
                     int width = (int)(map.topRight.x - map.bottomLeft.x) / 8;
                     int height = (int)(map.topRight.y - map.bottomLeft.y) / 8;
                     map.minimap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
@@ -264,6 +278,15 @@ public final class WorldSmokeTest {
             Tile chosen = null;
             int bestScore = -1;
             Vector2 probe = new Vector2();
+            if (generatedTopology != null && generatedTopology.calderaBasinRadius > 0) {
+                for (int dx : new int[]{0, -16, 16}) {
+                    Tile landing = map.tiles.get(new Vector2(generatedTopology.calderaBasinX + dx,
+                        generatedTopology.calderaBasinY - (generatedTopology.calderaBasinRadius + 1) * 16));
+                    if (ModernWorldGenerator.isWalkable(landing) && !map.pokemon.containsKey(landing.position)) {
+                        chosen = landing; bestScore = Integer.MAX_VALUE; break;
+                    }
+                }
+            }
             for (Tile tile : map.tiles.values()) {
                 String name = tile.name == null ? "" : tile.name;
                 if (!("volcano".equals(tile.biome) || name.startsWith("volcano"))

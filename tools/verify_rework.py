@@ -43,6 +43,9 @@ NATIVE = [
     ["tools/world_mesh_batch_test.py"],
     ["tools/world_presentation_layers_test.py"],
     ["tools/desktop_menu_flow_test.py"],
+    ["tools/authored_terrain_test.py"],
+    ["tools/terrain_readability_test.py"],
+    ["tools/battle_entry_test.py"],
 ]
 
 

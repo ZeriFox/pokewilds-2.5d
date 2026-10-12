@@ -12,7 +12,7 @@ import java.util.Set;
 
 /** Topology pass for newly generated islands. Uses the existing saved Tile schema. */
 public final class ModernWorldGenerator {
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     private static final int[] DX = {0, 1, 0, -1};
     private static final int[] DY = {1, 0, -1, 0};
     private ModernWorldGenerator() {}
@@ -42,7 +42,7 @@ public final class ModernWorldGenerator {
     /** Called once, before wild Pokemon placement and shoreline texture construction. */
     public static Report apply(Map<Vector2, Tile> tiles, Map<Vector2, Pokemon> earlyPokemon) {
         long seed = fingerprint(tiles);
-        Report report = apply(tiles, seed);
+        Report report = apply(tiles, seed, earlyPokemon.keySet());
         // Earlier scripted placements must not leave a Pokemon on a new lava cell.
         earlyPokemon.entrySet().removeIf(entry -> {
             Tile tile = tiles.get(entry.getKey());
@@ -53,12 +53,18 @@ public final class ModernWorldGenerator {
 
     /** Explicit seed is useful for repeatable topology tests; no global random state is read. */
     public static Report apply(Map<Vector2, Tile> tiles, long seed) {
+        return apply(tiles, seed, java.util.Collections.emptySet());
+    }
+
+    private static Report apply(Map<Vector2, Tile> tiles, long seed, Set<Vector2> reservedPositions) {
         Report report = new Report(seed);
         Grid grid = new Grid(tiles);
         report.tilesBefore = tiles.size();
         report.componentsBefore = components(grid).sizes.size();
+        report.authored = AuthoredTerrain.apply(tiles, seed, reservedPositions);
+        report.rampsOpened += report.authored.ramps;
         smoothInlandShore(grid, report);
-        caldera(grid, seed, report);
+        caldera(grid, seed, reservedPositions, report);
         connectMountainTerraces(grid, seed, report);
         report.componentsAfter = components(grid).sizes.size();
         report.tilesAfter = tiles.size();
@@ -97,7 +103,7 @@ public final class ModernWorldGenerator {
         }
     }
 
-    private static void caldera(Grid grid, long seed, Report report) {
+    private static void caldera(Grid grid, long seed, Set<Vector2> reservedPositions, Report report) {
         // Anchor to the original volcano: never overwrite a dungeon with a random new island.
         long totalX = 0, totalY = 0;
         int count = 0;
@@ -109,56 +115,144 @@ public final class ModernWorldGenerator {
         report.centerX = cx * 16;
         report.centerY = cy * 16;
         Route route = new Route("volcano1", 22);
-        double radius = Math.max(24, Math.min(42, Math.sqrt(count / Math.PI) * 1.65));
+        // Leave room to place a complete basin beside the protected mansion,
+        // rather than forcing a partial crater through its entrance approach.
+        double radius = Math.max(32, Math.min(42, Math.sqrt(count / Math.PI) * 1.65));
         double phase = (mix(seed) & 65535L) / 65535.0 * Math.PI * 2;
         List<Tile> candidates = new ArrayList<>();
+        Set<Long> footprint = new HashSet<>();
         Set<Long> trails = new HashSet<>();
         for (Tile tile : grid.sorted) {
             if (!naturalTerrain(tile) || protectedTile(tile) || tile.isWater || tile.isWaterfall || tile.isTidal) continue;
+            if (reservedPositions.contains(tile.position) || tile.routeBelongsTo != null && !tile.routeBelongsTo.storedPokemon.isEmpty()) continue;
             int x = grid.x(tile) - cx, y = grid.y(tile) - cy;
             double distance = Math.hypot(x, y);
             double angle = Math.atan2(y, x);
             double boundary = radius * (1 + .10 * Math.sin(angle * 3 + phase) + .06 * Math.cos(angle * 5 - phase));
             if (distance > boundary) continue;
-            boolean trail = Math.abs(x - 2.5 * Math.sin(y * .12 + phase)) <= 1.5
-                || Math.abs(y - 2.5 * Math.cos(x * .11 - phase)) <= 1.5
+            boolean trail = Math.abs(x) <= 1 || Math.abs(y) <= 1
                 || Math.abs(distance - radius * .70) < 1.6;
             if (trail) trails.add(grid.key(tile));
-            String upper = tile.nameUpper;
-            boolean ledge = upper.contains("ledges3");
-            if (ledge) upper = upper.replace("ledges3snow", "ledges3volcano").replace("ledges3_", "ledges3volcano_");
-            else upper = "";
-            if (trail) upper = "";
-            String ground = trail ? (ledge ? "ledge_grass_ramp" : "volcano2")
-                : tile.isLava ? "lava1" : "volcano1";
-            replace(tile, ground, upper, "volcano", route);
-            if (trail && ledge) report.rampsOpened++;
             candidates.add(tile);
+            footprint.add(grid.key(tile));
         }
-        // Channels and lava pockets follow a coherent low frequency field. The local
-        // connectivity guard prevents every insertion from cutting a dry walking path.
+        // Plan a complete basin before changing cells. Its only height change is
+        // one inward-facing closed contour; two three-wide ramps descend into it.
+        // Reusing old ledges along winding trails created chains of inferred ramps
+        // and compounded heights. Old contours are deliberately not carried over.
+        int[] basin = calderaBasin(grid, candidates, footprint, reservedPositions, cx, cy);
+        for (Tile tile : candidates) {
+            if (tile.isLedge || isRamp(tile)) report.calderaContoursRemoved++;
+            // If an island cannot contain a full basin, keep its existing lava
+            // footprint flat rather than inventing partial walls or ramps.
+            String ground = basin == null && tile.isLava ? "lava1" : trails.contains(grid.key(tile)) ? "volcano2" : "volcano1";
+            replace(tile, ground, "", "volcano", route);
+        }
+        if (basin != null) buildCalderaBasin(grid, basin, trails, route, report);
+        // Solid basalt outcrops also preserve all adjacent dry paths. They remain
+        // smashable using the game's real rock tile and its original item/spawn rules.
         candidates.sort(Comparator.comparingLong(tile -> mix(seed ^ grid.key(tile))));
         for (Tile tile : candidates) {
             if (!isWalkable(tile) || trails.contains(grid.key(tile))) continue;
-            double x = grid.x(tile) - cx, y = grid.y(tile) - cy;
-            double distance = Math.hypot(x, y);
-            double channel = Math.sin(x * .18 + .9 * Math.sin(y * .11 + phase))
-                + .65 * Math.cos(y * .21 - phase);
-            boolean lava = distance < radius * .28 || channel > .98 && distance < radius * .86;
-            if (lava && preservesLocalPaths(grid, tile)) {
-                replace(tile, "lava1", "", "volcano", route);
-                report.lavaCellsAdded++;
-            }
-        }
-        // Solid basalt outcrops also preserve all adjacent dry paths. They remain
-        // smashable using the game's real rock tile and its original item/spawn rules.
-        for (Tile tile : candidates) {
-            if (!isWalkable(tile) || trails.contains(grid.key(tile))) continue;
+            if (basin != null && Math.abs(grid.x(tile) - basin[0]) <= basin[2] + 2
+                && Math.abs(grid.y(tile) - basin[1]) <= basin[2] + 2) continue;
             if (Math.floorMod(mix(seed + grid.key(tile)), 89) == 0 && preservesLocalPaths(grid, tile)) {
                 replace(tile, "volcano1", "rock_volcano1", "volcano", route);
                 report.basaltOutcrops++;
             }
         }
+    }
+
+    private static int[] calderaBasin(Grid grid, List<Tile> candidates, Set<Long> footprint, Set<Vector2> reservedPositions, int cx, int cy) {
+        List<Tile> centers = new ArrayList<>(candidates);
+        centers.sort(Comparator.comparingInt((Tile tile) -> Math.abs(grid.x(tile) - cx) + Math.abs(grid.y(tile) - cy))
+            .thenComparingInt(grid::y).thenComparingInt(grid::x));
+        for (int radius = 9; radius >= 6; radius--) for (Tile center : centers) {
+            int x = grid.x(center), y = grid.y(center);
+            boolean complete = true;
+            for (int dy = -radius - 2; dy <= radius + 2 && complete; dy++)
+                for (int dx = -radius - 2; dx <= radius + 2; dx++) {
+                    if (footprint.contains(pack(x + dx, y + dy))) continue;
+                    Tile retained = grid.at(x + dx, y + dy);
+                    // A natural volcanic encounter rock may remain on a flat dry
+                    // cell. It cannot occupy a wall, stair, landing or lava pool.
+                    int edge = Math.max(Math.abs(dx), Math.abs(dy));
+                    if (!calderaEncounterRock(retained) || reservedPositions.contains(retained.position)
+                        || edge == radius || calderaLava(dx, dy, radius)
+                        || Math.abs(dx) <= 1 || Math.abs(dy) >= radius - 1 && Math.abs(dx) <= 2) {
+                        complete = false; break;
+                    }
+                }
+            if (complete && connectedCaldera(grid, x, y, radius)) return new int[]{x, y, radius};
+        }
+        return null;
+    }
+
+    private static void buildCalderaBasin(Grid grid, int[] basin, Set<Long> trails, Route route, Report report) {
+        int cx = basin[0], cy = basin[1], radius = basin[2];
+        report.calderaBasinX = cx * 16; report.calderaBasinY = cy * 16; report.calderaBasinRadius = radius;
+        for (int y = -radius - 2; y <= radius + 2; y++) for (int x = -radius - 2; x <= radius + 2; x++) {
+            Tile tile = grid.at(cx + x, cy + y);
+            if (calderaEncounterRock(tile)) continue;
+            int edge = Math.max(Math.abs(x), Math.abs(y));
+            boolean ramp = Math.abs(y) == radius && Math.abs(x) <= 1;
+            boolean path = Math.abs(x) <= 1 || Math.abs(y) >= radius - 1 && Math.abs(x) <= 2;
+            String ground = path ? "volcano2" : "volcano1", upper = "";
+            if (edge == radius && !ramp) {
+                // Saved directions face the LOWER neighbor, hence the opposite
+                // signs from a raised plateau. Corners use a concave diagonal.
+                String direction = "";
+                if (y == -radius) direction += "S";
+                if (y == radius) direction += "N";
+                if (x == -radius) direction += "W";
+                if (x == radius) direction += "E";
+                upper = "ledges3volcano_" + direction + (direction.length() == 2 ? "_inner" : "");
+            }
+            if (ramp) { ground = "ledge_grass_ramp"; report.rampsOpened++; }
+            // Two continuous lava pools with a central dry causeway and an
+            // unbroken inner walking ring. The template itself preserves every
+            // dry connection; per-cell random rejection cannot fragment it.
+            boolean lava = calderaLava(x, y, radius);
+            if (lava) { ground = "lava1"; report.lavaCellsAdded++; }
+            replace(tile, ground, upper, "volcano", route);
+            if (path || edge >= radius - 1) trails.add(grid.key(tile));
+        }
+    }
+
+    private static boolean calderaLava(int x, int y, int radius) {
+        return Math.abs(x) >= 3 && Math.abs(x) <= radius - 2 && Math.abs(y) <= radius - 2;
+    }
+
+    private static boolean calderaEncounterRock(Tile tile) {
+        return tile != null && tile.getClass() == Tile.class && tile.name.equals("volcano1")
+            && tile.nameUpper.matches("rock(?:1(?:_color)?|_volcano1)") && tile.hasItem == null
+            && tile.items == null && tile.doorTiles == null && tile.squishedTiles == null
+            && tile.routeBelongsTo != null && tile.routeBelongsTo.name.isEmpty()
+            && !tile.routeBelongsTo.storedPokemon.isEmpty();
+    }
+
+    private static boolean connectedCaldera(Grid grid, int cx, int cy, int radius) {
+        int reach = radius + 2, width = reach * 2 + 1, count = 0, start = -1;
+        boolean[] dry = new boolean[width * width], visited = new boolean[width * width];
+        for (int y = -reach; y <= reach; y++) for (int x = -reach; x <= reach; x++) {
+            int index = (y + reach) * width + x + reach;
+            boolean ramp = Math.abs(y) == radius && Math.abs(x) <= 1;
+            dry[index] = (Math.max(Math.abs(x), Math.abs(y)) != radius || ramp)
+                && !calderaLava(x, y, radius) && !calderaEncounterRock(grid.at(cx + x, cy + y));
+            if (dry[index]) { count++; start = index; }
+        }
+        if (start < 0) return false;
+        ArrayDeque<Integer> queue = new ArrayDeque<>(); queue.add(start); visited[start] = true;
+        int reached = 0;
+        while (!queue.isEmpty()) {
+            int index = queue.removeFirst(), x = index % width, y = index / width; reached++;
+            for (int d = 0; d < 4; d++) {
+                int nx = x + DX[d], ny = y + DY[d], next = ny * width + nx;
+                if (nx < 0 || ny < 0 || nx >= width || ny >= width || !dry[next] || visited[next]) continue;
+                visited[next] = true; queue.addLast(next);
+            }
+        }
+        return reached == count;
     }
 
     private static boolean naturalTerrain(Tile tile) {
@@ -167,7 +261,7 @@ public final class ModernWorldGenerator {
         return name.startsWith("mountain") || name.startsWith("volcano") || name.startsWith("lava")
             || name.startsWith("snow") || name.startsWith("green") || name.startsWith("grass")
             || name.startsWith("sand") || name.startsWith("tree") || name.startsWith("flower")
-            || name.equals("soot1") || isRamp(tile);
+            || name.matches("(?:path[1-3]|ground[1-3])") || name.equals("soot1") || isRamp(tile);
     }
 
     private static boolean protectedTile(Tile tile) {
@@ -233,6 +327,10 @@ public final class ModernWorldGenerator {
     private static void replace(Tile tile, String name, String upper, String biome, Route route) {
         tile.shoreOcean = null;
         tile.shoreTidal = null;
+        tile.drawAsTree = false;
+        tile.drawSavannaTree = false;
+        tile.yOffset = 0;
+        tile.isBottomMtnLayer = false;
         tile.init(name, upper, tile.position, true, route);
         tile.biome = biome;
     }
@@ -300,13 +398,16 @@ public final class ModernWorldGenerator {
         public final long seed;
         public int tilesBefore, tilesAfter, shoreCellsSmoothed, lavaCellsAdded, basaltOutcrops, rampsOpened;
         public int componentsBefore, componentsAfter, volcanicTiles, lavaTiles, centerX, centerY;
+        public int calderaBasinX, calderaBasinY, calderaBasinRadius, calderaContoursRemoved;
+        public AuthoredTerrain.Report authored;
         Report(long seed) { this.seed = seed; }
         @Override public String toString() {
             return "WORLDGEN v" + VERSION + " seed=" + seed + " tiles=" + tilesBefore + "->" + tilesAfter
                 + " coast=" + shoreCellsSmoothed + " ramps=" + rampsOpened + " dryComponents="
                 + componentsBefore + "->" + componentsAfter + " volcanic=" + volcanicTiles
                 + " lava=" + lavaTiles + " newLava=" + lavaCellsAdded + " outcrops=" + basaltOutcrops
-                + " center=" + centerX + "," + centerY;
+                + " center=" + centerX + "," + centerY + " basin=" + calderaBasinX + "," + calderaBasinY
+                + ",r" + calderaBasinRadius + " oldCalderaContours=" + calderaContoursRemoved + " " + authored;
         }
     }
 }

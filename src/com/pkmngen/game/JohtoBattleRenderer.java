@@ -361,33 +361,65 @@ public final class JohtoBattleRenderer {
    public void drawIntro(Game game, Action action, int remaining) {
       ModernUi ui = ModernUi.get(game);
       float p = progress(action, remaining);
-      float pulse = 0.10f + 0.13f * (0.5f + 0.5f * MathUtils.sin(p * MathUtils.PI * 6f));
-      ui.rect(game, -320, -288, 800, 720, tint.set(0.08f, 0.22f, 0.26f, pulse));
-      float band = MathUtils.clamp(p * 5f, 0f, 1f);
-      ui.rect(game, 0, 60, 160 * band, 25, tint.set(0.08f, 0.24f, 0.28f, 0.94f));
-      ui.rect(game, 0, 59, 160 * band, 1, ModernUi.GOLD);
-      if (band > 0.9f) {
-         ui.text(game, "WILD ENCOUNTER", 18, 80, 4f, ModernUi.PAPER);
-         if (game.battle.oppPokemon != null) ui.fitText(game, game.battle.oppPokemon.nickname, 18, 72, 6f, 126, ModernUi.PAPER);
+      float left=(160-canvasWidth)*.5f,bottom=(144-canvasHeight)*.5f;
+      float entrance=ease(p/.20f),close=ease((p-.77f)/.23f);
+      boolean still=ui.reducedMotion();
+      // One continuous darkening replaces the old repeating flashes. The
+      // modern world capture remains underneath for every encounter frame.
+      ui.rect(game,left,bottom,canvasWidth,canvasHeight,tint.set(ModernUi.INK).mul(1,1,1,.36f*entrance));
+      float bandWidth=still?canvasWidth:canvasWidth*entrance;
+      ui.rect(game,left,53,bandWidth,38,tint.set(ModernUi.INK).mul(1,1,1,still?entrance:.94f));
+      if(entrance>.99f) {
+         ui.rect(game,14,61,1.5f,22,ModernUi.GOLD);
+         ui.text(game,"WILD ENCOUNTER",22,83,4,ModernUi.LINE);
+         Pokemon opponent=game.battle.oppPokemon;
+         String name=opponent==null?"A new challenge":opponent.isGhost?"Unknown presence":opponent.nickname;
+         ui.fitText(game,name,22,74,8,120,ModernUi.PAPER);
+         ui.rect(game,22,59,116,.6f,ModernUi.MUTED);
+         if(!still)ui.rect(game,22,59,116*MathUtils.clamp(p/.77f,0,1),.6f,ModernUi.GOLD);
       }
+      if(still)ui.rect(game,left,bottom,canvasWidth,canvasHeight,tint.set(ModernUi.INK).mul(1,1,1,close));
+      else shutters(game,ui,close,false);
       countTransition();
    }
 
    public void drawWipe(Game game, Action action, int remaining) {
       ModernUi ui = ModernUi.get(game);
       int total = total(action, remaining);
-      float p = MathUtils.clamp((total - remaining + 1f) / Math.min(28f, total), 0f, 1f);
-      ui.rect(game, -320, -288, 800, 288 + 72 * p, ModernUi.INK);
-      ui.rect(game, -320, 144 - 72 * p, 800, 432, ModernUi.INK);
-      ui.rect(game, 0, 72 * p, 160, 1, ModernUi.GOLD);
-      ui.rect(game, 0, 143 - 72 * p, 160, 1, ModernUi.GOLD);
+      float elapsed=total-remaining;
+      float reveal=ease((elapsed-5f)/Math.max(1,Math.min(32,total-6)));
+      // The arena is already complete behind the opening shutters. No old
+      // world tiles or 160x144 margin masks can leak through the reveal.
+      drawBackground(game,isSpecialIntro(action)?"cave":game.map==null?"grassland":game.map.currBiome);
+      if(ui.reducedMotion()) {
+         ui.rect(game,(160-canvasWidth)*.5f,(144-canvasHeight)*.5f,canvasWidth,canvasHeight,
+            tint.set(ModernUi.INK).mul(1,1,1,1-reveal));
+      } else shutters(game,ui,1-reveal,true);
       countTransition();
+   }
+
+   /** Exact viewport halves meet without a seam, including portrait/ultrawide. */
+   private void shutters(Game game,ModernUi ui,float coverage,boolean edge) {
+      float left=(160-canvasWidth)*.5f,bottom=(144-canvasHeight)*.5f;
+      float height=canvasHeight*.5f*MathUtils.clamp(coverage,0,1);
+      if(height<=0)return;
+      ui.rect(game,left,bottom,canvasWidth,height,ModernUi.INK);
+      ui.rect(game,left,bottom+canvasHeight-height,canvasWidth,height,ModernUi.INK);
+      if(edge&&coverage>0&&coverage<1) {
+         ui.rect(game,left,bottom+height-.4f,canvasWidth,.4f,ModernUi.GOLD);
+         ui.rect(game,left,bottom+canvasHeight-height,canvasWidth,.4f,ModernUi.GOLD);
+      }
+   }
+
+   private static float ease(float value) {
+      float t=MathUtils.clamp(value,0,1);return t*t*(3-2*t);
    }
 
    public void drawFadeOut(Game game, Action action, int remaining) {
       ModernUi ui = ModernUi.get(game);
-      float alpha = MathUtils.clamp(remaining / (float)total(action, remaining), 0f, 1f);
-      ui.rect(game, -320, -288, 800, 720, tint.set(ModernUi.PAPER).mul(1f, 1f, 1f, alpha));
+      float alpha = ease(remaining / (float)total(action, remaining));
+      ui.rect(game,(160-canvasWidth)*.5f,(144-canvasHeight)*.5f,canvasWidth,canvasHeight,
+         tint.set(ModernUi.INK).mul(1f, 1f, 1f, alpha));
       countTransition();
    }
 
@@ -407,7 +439,9 @@ public final class JohtoBattleRenderer {
       countTransition();
    }
 
-   private float progress(Action action, int remaining) { return 1f - remaining / (float)total(action, remaining); }
+   private float progress(Action action, int remaining) {
+      return MathUtils.clamp((total(action,remaining)-remaining)/(float)Math.max(1,total(action,remaining)-1),0,1);
+   }
    private int total(Action action, int remaining) {
       Integer total = transitionLengths.get(action);
       if (total == null) { total = Math.max(1, remaining); transitionLengths.put(action, total); }

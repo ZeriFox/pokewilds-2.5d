@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Real OpenGL parity/lifecycle tests against the pinned pre-refactor renderer.
+"""Real OpenGL batch parity/lifecycle tests against the pinned pre-refactor batch.
 
 Only test classes and a renamed reference renderer precede the built game JAR.
 No production class or loose production asset is compiled as an override.
-New ambient accents are disabled here; world_presentation_layers_test checks them on/off.
+Whole-scene historical pixel parity is opt-in: the authored-terrain update
+intentionally changes stairs, palette and billboard depth. New scene acceptance
+is covered by terrain_readability_test; batch CPU/GPU byte parity stays mandatory.
 """
+import argparse
 from pathlib import Path
 import hashlib
 import os
@@ -15,6 +18,10 @@ from smoke_test import CREATE_FLAGS, ROOT, JAR, find_jdk, sha256
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--historical-parity', action='store_true',
+                        help='Also require the old step-1 scene pixels; only applicable to that historical refactor')
+    args = parser.parse_args()
     if not JAR.is_file():
         raise RuntimeError('Build the game first with python build.py')
     out = ROOT / 'build/world-mesh-batch'
@@ -40,11 +47,13 @@ def main():
          str(reference), str(ROOT / 'tools/WorldMeshBatchTest.java'), str(ROOT / 'tools/WorldRendererParityTest.java')],
         [java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off', '-Dpokewilds.ambientOverlays=off', '-cp', cp,
          'com.pkmngen.game.WorldMeshBatchTest'],
-        [java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off', '-Dpokewilds.ambientOverlays=off', '-cp', cp,
-         'com.pkmngen.game.WorldRendererParityTest'],
     ]
+    if args.historical_parity:
+        commands.append([java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off',
+                         '-Dpokewilds.ambientOverlays=off', '-cp', cp, 'com.pkmngen.game.WorldRendererParityTest'])
     with log_path.open('w', encoding='utf-8') as log:
-        log.write('JAR SHA256 ' + sha256(JAR) + '\nPinned baseline blob ' + blob + '\nNew ambient accents OFF for historical refactor-only parity; validated on/off separately.\n')
+        log.write('JAR SHA256 ' + sha256(JAR) + '\nPinned baseline blob ' + blob
+                  + '\nBatch CPU/GPU parity required; historical whole-scene parity=' + str(args.historical_parity) + '\n')
         for command in commands:
             log.flush()
             result = subprocess.run(command, cwd=out, stdout=log, stderr=subprocess.STDOUT,
@@ -55,7 +64,7 @@ def main():
                 print(log_path.read_text(encoding='utf-8', errors='replace'))
                 return result.returncode
     content = log_path.read_text(encoding='utf-8')
-    for marker in ('WORLD MESH BATCH PASS', 'WORLD RENDERER PARITY PASS'):
+    for marker in (('WORLD MESH BATCH PASS', 'WORLD RENDERER PARITY PASS') if args.historical_parity else ('WORLD MESH BATCH PASS',)):
         if marker not in content:
             raise RuntimeError('Missing native success marker: ' + marker)
     print(content)

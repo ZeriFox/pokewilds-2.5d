@@ -11,7 +11,6 @@ import java.util.Map;
 
 /** Read-only presentation of setup, party and summary actions. Input remains in their original step methods. */
 public final class ModernPartyUi {
-   private static final Color SOFT = new Color(0.87f, 0.94f, 0.88f, 1f);
    private static final String PARTY_NESTED = DrawPokemonMenu.class.getName() + "$";
    private long animationFrame = Long.MIN_VALUE;
    private float animationSeconds;
@@ -93,34 +92,19 @@ public final class ModernPartyUi {
       ui.footer(game, DesktopControls.vertical() + " Select   " + confirmBack() + "   F1 Settings");
    }
 
-   private static final java.util.IdentityHashMap<TextureRegion, com.badlogic.gdx.graphics.g2d.NinePatch> frlgPatches = new java.util.IdentityHashMap<>();
-
    static void frlgScreen(ModernUi ui, Game game, String title, String subtitle) {
       ui.fullScreen(game,title,subtitle);
-      TextureRegion background=BwAssets.get().named("ui_frlg_background");
-      if(background!=null) {
-         Color previous=new Color(game.uiBatch.getColor());
-         game.uiBatch.setColor(Color.WHITE);
-         game.uiBatch.draw(background,4,16,152,102);
-         game.uiBatch.setColor(previous);
-      }
    }
 
    static void frlgPanel(ModernUi ui, Game game, float x,float y,float w,float h,boolean selected,boolean leader) {
-      TextureRegion art=BwAssets.get().named(leader?"ui_frlg_leader":"ui_frlg_row");
-      if(art==null) {ui.panel(game,x,y,w,h);return;}
-      com.badlogic.gdx.graphics.g2d.NinePatch patch=frlgPatches.get(art);
-      if(patch==null) {
-         if(frlgPatches.size()>4)frlgPatches.clear();
-         patch=new com.badlogic.gdx.graphics.g2d.NinePatch(art,3,3,3,3);
-         frlgPatches.put(art,patch);
+      // Keep the existing controller's hit boxes and party arrangement; the
+      // surface is shared with desktop menus instead of a second legacy skin.
+      ui.panel(game,x,y,w,h);
+      if(selected) {
+         ui.surface(game,x+.6f,y+.6f,w-1.2f,h-1.2f,1,ModernUi.SOFT);
+         ui.rect(game,x+1,y+2,1.4f,Math.max(0,h-4),ModernUi.ACCENT);
       }
-      Color previous=new Color(game.uiBatch.getColor());
-      game.uiBatch.setColor(Color.WHITE);
-      if(selected)ui.rect(game,x-.7f,y-.7f,w+1.4f,h+1.4f,ModernUi.GOLD);
-      patch.draw(game.uiBatch,x,y,w,h);
-      ui.rect(game,x+2,y+2,w-4,h-4,selected?new Color(.84f,.95f,.91f,1):new Color(.74f,.88f,.87f,1));
-      game.uiBatch.setColor(previous);
+      if(leader)ui.rect(game,x+5,y+h-2.5f,w-10,.65f,selected?ModernUi.ACCENT:ModernUi.LINE);
    }
 
    static void frlgRow(ModernUi ui,Game game,String label,float x,float y,float w,float h,boolean selected,float reserve) {
@@ -165,7 +149,7 @@ public final class ModernPartyUi {
          ui.bar(game,leader?x+4:x+48,leader?y+13:y+4,leader?42:41,3.4f,max>0?(float)hp/max:0,healthColor(hp,max));
          if(leader)ui.fitText(game,hp+" / "+max,x+4,y+8,4.4f,42,ModernUi.INK);
       }
-      if(pokemon.size()>6)ui.fitText(game,(Math.max(0,scroll)+1)+" - "+Math.min(scroll+6,pokemon.size())+" / "+pokemon.size(),7,24,4.2f,48,ModernUi.PAPER);
+      if(pokemon.size()>6)ui.fitText(game,(Math.max(0,scroll)+1)+" - "+Math.min(scroll+6,pokemon.size())+" / "+pokemon.size(),7,24,4.2f,48,ModernUi.MUTED);
       ui.footer(game,(menu.isStorageChest?DesktopControls.horizontal()+" Party / storage   ":DesktopControls.vertical()+" Select   ")+confirmBack());
    }
 
@@ -174,7 +158,7 @@ public final class ModernPartyUi {
       if (p == null) return;
       if (animationFrame != Gdx.graphics.getFrameId()) {
          animationFrame = Gdx.graphics.getFrameId();
-         animationSeconds += Math.min(.1f, Gdx.graphics.getDeltaTime());
+         if(!ui.reducedMotion())animationSeconds += Math.min(.1f, Gdx.graphics.getDeltaTime());
       }
       String[] pages = {"Overview", "Moves", "Stats"};
       ui.fullScreen(game, displayName(p), pages[Math.max(0, Math.min(2, menu.currIndex))] + "  /  " + (menu.currIndex + 1) + " of 3");
@@ -182,7 +166,7 @@ public final class ModernPartyUi {
       ModernUi.Box summary=ModernUi.Layout.CONTENT;
       ModernUi.Box actorColumn=new ModernUi.Box(summary.x,summary.y,60,summary.height);
       ui.panel(game, actorColumn);
-      ui.rect(game, 8, 18, 56, 74, SOFT);
+      ui.surface(game, 8, 18, 56, 74,1, ModernUi.SOFT);
       if (!PmdBattleSprites.portrait(game, p, 10, 94, 21, 21)) sprite(game, p.sprite, 10, 94, 21, 21, true);
       ui.fitText(game, "Lv " + p.level, 35, 108, 6.5f, 27, ModernUi.ACCENT);
       if (p.isShiny) ui.text(game, "SHINY", 35, 99, 4.2f, ModernUi.GOLD);

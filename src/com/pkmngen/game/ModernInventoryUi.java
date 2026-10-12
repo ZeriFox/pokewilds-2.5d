@@ -18,7 +18,8 @@ final class ModernInventoryUi {
          String[] categories={"ITEMS","BALLS","MATERIALS","KEY ITEMS","MEDICINE"};
          ModernPartyUi.frlgScreen(ui,game,"BAG",categories[Math.floorMod(m.boxIndex,5)]);
          for(int i=0;i<5;i++) {
-            ui.rect(game,7+i*30,108,27,8,i==m.boxIndex?ModernUi.ACCENT:ModernUi.LINE);
+            ui.surface(game,7+i*30,108,27,8,1,i==m.boxIndex?ModernUi.ACCENT:ModernUi.PAPER);
+            if(i==m.boxIndex)ui.rect(game,12+i*30,107,17,.8f,ModernUi.GOLD);
             ui.fitText(game,new String[]{"Items","Balls","Materials","Key","Medicine"}[i],9+i*30,114,5,23,i==m.boxIndex?ModernUi.PAPER:ModernUi.INK);
          }
          ui.panel(game,6,23,89,80);
@@ -39,8 +40,8 @@ final class ModernInventoryUi {
          }
          String selected=at(m.itemsList,m.currIndex+m.cursorPos);
          ui.panel(game,98,23,56,80);
-         if(m.bagIcons[Math.floorMod(m.boxIndex,5)]!=null)
-            game.uiBatch.draw(m.bagIcons[Math.floorMod(m.boxIndex,5)],112,84,25,15);
+         ui.surface(game,101,81,50,19,1,ModernUi.SURFACE);
+         pocketIcon(ui,game,Math.floorMod(m.boxIndex,5),117,84);
          ui.wrapped(game,selected,103,79,5.6f,46,2,ModernUi.INK);
          if(game.player!=null&&game.player.hasItem(selected))ui.fitText(game,"Owned: "+game.player.getItemAmount(selected),103,60,5,46,ModernUi.ACCENT);
          String description=DrawItemMenuGen2.itemDescriptions.get(selected.toLowerCase(Locale.ROOT));
@@ -98,6 +99,33 @@ final class ModernInventoryUi {
             ui.text(game,"x "+(amount==null?1:amount),87,72,13,ModernUi.INK);
             ui.fitText(game,DesktopControls.movement()+" adjust / "+ModernUi.confirmKey()+" select",78,52,4.4f,70,ModernUi.MUTED);
          }
+      }
+   }
+   /** Native UI geometry shares the palette; no opaque legacy icon plate. */
+   private static void pocketIcon(ModernUi ui,Game game,int pocket,float x,float y) {
+      if(pocket==1) {
+         ui.surface(game,x,y,15,15,3,ModernUi.INK);
+         ui.surface(game,x+1,y+8,13,6,2,ModernUi.ACCENT);
+         ui.surface(game,x+1,y+1,13,6,2,ModernUi.PAPER);
+         ui.surface(game,x+5,y+5,5,5,1,ModernUi.INK);
+         ui.rect(game,x+6.5f,y+6.5f,2,2,ModernUi.PAPER);
+      } else if(pocket==2) {
+         ui.surface(game,x,y,15,14,1,ModernUi.ACCENT);
+         ui.rect(game,x+6,y,3,14,ModernUi.PAPER);ui.rect(game,x,y+6,15,2,ModernUi.PAPER);
+      } else if(pocket==3) {
+         ui.surface(game,x,y+7,8,8,2,ModernUi.GOLD);
+         ui.rect(game,x+3,y+10,2,2,ModernUi.PAPER);
+         ui.rect(game,x+6,y+7,9,2,ModernUi.GOLD);
+         ui.rect(game,x+10,y+4,2,4,ModernUi.GOLD);ui.rect(game,x+13,y+5,2,3,ModernUi.GOLD);
+      } else if(pocket==4) {
+         ui.surface(game,x,y,15,13,1,ModernUi.PAPER);
+         ui.rect(game,x+4,y+13,7,2,ModernUi.INK);
+         ui.rect(game,x+6,y+3,3,7,ModernUi.RED);ui.rect(game,x+4,y+5,7,3,ModernUi.RED);
+      } else {
+         ui.surface(game,x+1,y,13,13,2,ModernUi.ACCENT);
+         ui.rect(game,x+4,y+13,7,2,ModernUi.INK);
+         ui.surface(game,x+3,y+2,9,5,1,ModernUi.SOFT);
+         ui.rect(game,x+5,y+9,5,1,ModernUi.GOLD);
       }
    }
    static List<String> detailLines(ModernUi ui,String text,float width,float size) {

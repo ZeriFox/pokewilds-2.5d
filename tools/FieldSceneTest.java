@@ -249,7 +249,7 @@ public final class FieldSceneTest {
          }else if(lifecycle==2){
             leftMouse=age==0||age%12==0&&(find(DisplayText.class)!=null||find(DrawYesNoMenu.class)!=null);
             if(player.isSleeping&&++furnitureSettledFrames>=2){require(player.sleepingDir!=null,"Bed sleep lost its original bed target");
-               furnitureAnchor(true);screenshot("21-bed-sleep.png");phase(3);rightMouse=true;}
+               furnitureAnchor(true);bedDepthAtZooms();screenshot("21-bed-sleep.png");phase(3);rightMouse=true;}
          }else if(lifecycle==3){
             rightMouse=age==0;
             if(age==12){require(!player.isSleeping&&player.sleepingDir==null&&playerCanMove,"Bed wake did not restore movement");
@@ -303,6 +303,17 @@ public final class FieldSceneTest {
          throw new IllegalStateException("Original construction list omitted "+name);
       }
       /** Assert the submitted mesh and its projection, not just flags or a colourful frame. */
+      void bedDepthAtZooms() {
+         float original=cam.zoom;
+         try {
+            for(float zoom:new float[]{.65f,1.6f}) {
+               cam.zoom=zoom;require(renderer().render(this),"Modern bed fixture unavailable after zoom");
+               furnitureAnchor(true);
+            }
+         } finally {
+            cam.zoom=original;require(renderer().render(this),"Modern bed fixture unavailable after restoring zoom");
+         }
+      }
       void furnitureAnchor(boolean bed){
          BwAssets assets=BwAssets.get();
          float[] person=geometryQuad(assets.trainer(player,0,false),true);
@@ -325,7 +336,17 @@ public final class FieldSceneTest {
                "Sleeping head is outside the rendered pillow plane: "+pillowFraction);
             require(Math.abs(headBottom.x-(bedBottom.x+bedTop.x)*.5f)<3,
                "Sleeping head projects outside bed centre");
-            System.out.println("FIELD bed projected pillow fraction="+pillowFraction);
+            // These are the depth attributes actually submitted to the GPU.
+            // Correct x/y placement alone also passes with the entire head
+            // hidden behind a foreground pillow after billboard depth changes.
+            require(furniture[6]>3.5f&&person[6]>3.5f,"Furniture/head must share the vertical depth-plane convention");
+            float bedBottomDepth=(furniture[7]+furniture[15])*.5f;
+            float bedTopDepth=(furniture[23]+furniture[39])*.5f;
+            float pillowDepth=bedBottomDepth+(bedTopDepth-bedBottomDepth)*pillowFraction;
+            float headDepth=(person[7]+person[15])*.5f;
+            require(headDepth<=pillowDepth+.000002f,
+               "Sleeping head is occluded by its own pillow: head="+headDepth+" pillow="+pillowDepth);
+            System.out.println("FIELD bed projected pillow fraction="+pillowFraction+" headDepth="+headDepth+" pillowDepth="+pillowDepth);
          }
       }
       float[] geometryQuad(TextureRegion region,boolean actor){
@@ -335,7 +356,7 @@ public final class FieldSceneTest {
          FloatArray vertices=(FloatArray)field(mesh,"vertices");
          for(int offset=0;offset+47<vertices.size;offset+=48){
             float[] data=vertices.items;boolean isActor=data[offset+6]>3.5f;
-            if(isActor!=actor)continue;
+            if(actor&&!isActor)continue;
             if(!actor&&(Math.abs(data[offset+4]-region.getU())>.00001f
                ||Math.abs(data[offset+5]-region.getV2())>.00001f
                ||Math.abs(data[offset+12]-region.getU2())>.00001f))continue;

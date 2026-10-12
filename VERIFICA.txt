@@ -1,80 +1,78 @@
-VERIFICA — integrazione delle modifiche locali con GitHub johto.3, 2026-10-07
+VERIFICA — terreno modulare e presentazione desktop, 12 ottobre 2026
 
-VERSIONE UNIFICATA
-Il merge unisce il checkpoint locale 1aefbe4d (biomi/UI/comandi/alture v5)
-con origin/main 49860e9e (14 commit successivi alla base johto.2).
-I sorgenti e gli asset sono destinati a main. La release binaria johto.3
-resta precedente; il merge non sostituisce quel download ne crea un nuovo tag.
-Code > Download ZIP contiene sorgenti, non Java/JAR gia pronti.
-Il collegamento desktop e AVVIA-POKEWILDS.cmd usano la build locale verificata.
+VERSIONE LOCALE
+Recuperato origin/main ac526d14 con fast-forward, senza conflitti.
+Ramo di lavoro: work/local-terrain-2026-10-12.
+Backup Git precedente: backup/before-structural-terrain-2026-10-12.
+Le nuove modifiche e la build sono locali; nessun push, tag o nuova release.
+AVVIA-POKEWILDS.cmd e il collegamento desktop usano il JAR seguente.
+Per provare la nuova struttura occorre una nuova avventura/isola.
+Il terreno e le costruzioni dei salvataggi esistenti non vengono rigenerati.
 
-ARTIFACT VERIFICATO
+ARTEFATTO VERIFICATO
 dist/pokewilds-rebuilt.jar
-SHA-256: 928958d81c26d5c296fd88207daee2bdcb0e33e89c2c26bbae09523fd66bc39c
-Dimensione: 297836047 byte; 108907 voci ZIP.
-Java 17: 218 sorgenti, 457 classi compilate,
-36792 risorse locali. Zero classi di gioco copiate
-dal runtime upstream; GLB esclusi. CRC ZIP verificati.
-Tutti i sorgenti, le classi e le risorse corrispondono a report/file/JAR:
-build/scope-negative/build-alignment.txt. Indice degli 8 log e relativi hash:
-build/local-verification.json. Le 8 suite usano questo JAR senza --sources
-o override di classi di produzione. Le prove precedenti non lo certificano.
+SHA-256: f0b384a5b54f7046902fe49e46146f5835e33dc0fedbaa02bca320aab4cc4835
+Dimensione: 298069165 byte; 108949 voci ZIP.
+Java 17, 229 sorgenti, 490 classi compilate.
+Zero classi di gioco copiate dal runtime upstream; modelli GLB esclusi.
+CRC, classi, sorgenti, risorse e librerie corrispondono al build report.
+Digest sorgenti: 6c76eb2f1226604850f6e7102cfa3f2155ce4c8e131d9ead5a58db481b8673b2
+Indice con hash dei log: build/structural-verification/final.json.
+Avvio reale con java -jar: 120 frame, menu moderno, uscita regolare;
+cartella isolata build/structural-launcher, Java incluso nel progetto.
 
-RISOLUZIONE DEL MERGE
-- BwAssets conserva atlas landscape 202 regioni, 6 animazioni/48 frame,
-  materiali dei 14 profili e trainer Unova separati. Aggiunge VisualSampling,
-  PNG personalizzati, dimensioni mondo, anchor/offset e cache delle texture.
-  I metadata builtin in pixel sono convertiti; quelli custom sono normalizzati.
-  I 68 ritagli builtin irregolari mantengono il mosaico storico a 16px;
-  i custom devono dividere esattamente la griglia dichiarata.
-- JohtoRenderer conserva quote, superfici/rampe continue e depth plane degli
-  attori. Le facce usano l'intera immagine verticale, gli arredi non diventano
-  pareti per il nome del pavimento; trainer e ritagli seguono proporzioni
-  indipendenti dalla risoluzione. Anchor e ombre seguono i layout personalizzati.
-  Il vecchio renderer di muretti della johto.3 e superato da WorldElevation.
-- PmdBattleSprites usa pose up-right/down-left, anche per bounds e send-out;
-  conserva scala dell'intera animazione, piedi, boss e identita del fantasma.
-- VisualSampling e VisualGeometry sono aggiunti come helper di presentazione.
-  WorldElevation e gli altri 213 sorgenti del checkpoint locale sono invariati.
+MODIFICHE
+- Ricostruzione del terreno naturale interno e sei moduli manuali 17x17/9x9
+  assemblati proceduralmente: radure, boschetti e terrazze con due accessi.
+  Terreno, ostacoli, collisioni e rampe appartengono alle stesse celle.
+- Caldera con contorno chiuso, dislivello unico, due scalinate e bacini di lava
+  separati da una passerella. Eventi e incontri protetti conservati.
+- Gradini visibili anche sui connettori piatti, bordi dei materiali raccordati,
+  prato meno contrastato e profondita coerente fra oggetti e sprite.
+- Pokemon stabili nelle dimensioni quando cambiano direzione; allenatori B/W
+  esistenti piu leggibili. Nessun nuovo set di personaggi originali dichiarato.
+- Pannelli squadra/inventario/menu con palette ardesia e verde petrolio;
+  ingresso battaglia continuo, copertura dell'intera finestra e movimento ridotto.
+- Testa del personaggio nel letto allineata alla profondita reale del cuscino,
+  verificata anche a zoom differenti.
 
-VERIFICHE CONCLUSE
-Sampling standalone: 12.309 controlli. Geometry standalone: 312 controlli.
-verify_landscape_assets.py: 202 regioni, 6 sequenze, 14 profili PASS.
-bw_assets_integration_test.py: 8.155 controlli GPU e geometria del renderer,
-  mosaici64/rettangolari, trainer32/64 e crop25/26/14, piedi/offset, errori e cleanup.
-pmd_battle_visual_test.py: 183 draw reali NE/SW confrontati con texture/UV,
-  bounds e piedi; 18 PNG incluse faint, shiny, fantasma e rivelazione.
-boss_battle_visual_test.py: presentazione delle lotte originali Mewtwo,
-  Mega Gengar e Regigigas, transizioni, attori e cleanup.
-relief_visual_test.py: 414 frame/13 PNG, 324 frame di movimento originale;
-  caldera salvata con 32/32 bordi e 16/16 rampe coerenti, pianoro aperto0->14,
-  nessuna parete sopra entrambi i terreni; tutti i 5 file del save invariati.
-biome_scene_test.py: 663 frame/17 PNG, rampa/cascata, giorno/notte,
-  sprite integri, maree/pozzanghere e comparsa/inseguimento/scomparsa fantasma.
-landscape_smoke_test.py: 415 frame/10 PNG, rilievi, interni, ingresso/uscita,
-  arredi e oggetti funzionali con i nuovi materiali.
-field_scene_test.py: 405 frame, POWER/BUILD/DIG/SURF/FLY originali, Surf,
-  preview, pose e luce; zero draw del vecchio mondo inviati.
-modern_ui_smoke_test.py: menu, crafting, battaglie, fuga/cattura, livelli,
-  nickname, save/load e ritorno al mondo moderno. Dettagli nel log indicizzato.
+VERIFICHE FINALI
+16 suite native sul JAR indicato, senza sorgenti o risorse sovrapposte:
+- field_scene_test.py
+- battle_entry_test.py
+- ui_layout_test.py
+- battle_viewport_test.py
+- world_elevation_test.py
+- bw_assets_integration_test.py
+- world_mesh_batch_test.py
+- pmd_battle_visual_test.py
+- boss_battle_visual_test.py
+- authored_terrain_test.py
+- modern_world_test.py
+- terrain_readability_test.py
+- world_presentation_layers_test.py
+- landscape_smoke_test.py
+- desktop_menu_flow_test.py
+- modern_ui_smoke_test.py
 
-AMBITO E STORIA
-verify_visual_scope.py PASS: schema6 congelato, 218 sorgenti = 161 originali
-identici + 37 modificati con ambito esplicito + 20 aggiunte.
-Manifest SHA-256: 73cb6a1c9cd99e9a223df8c2c707ced128283c82e7ac2ac97858f739d90e2f0b
-Digest sorgenti: 31ff3b7abc5deb561471cae29c6bed1a0035e8cdde0c87761e093e1cfaacc32a
-verify_scope_test.py: 16 mutazioni non autorizzate respinte in copie isolate.
-Archivi v2/v3/v4/v5 immutabili conservati sotto baseline/.
-Attack/Battle/Player/PkmnMap/Network/Save e altre classi protette invariate.
-La verifica di ambito non dimostra equivalenza totale del gameplay.
+AuthoredTerrain: 605120 controlli, 12 seed e serializzazione delle celle.
+Terreno: 342 controlli, visibilita GPU di scale e personaggi, occlusione PMD/alberi.
+Battaglia: 1152 frame di ingresso, 4 formati e 2 modalita movimento;
+viewport su 5 formati e 6 biomi, transizioni di uscita e boss originali.
+Mondo reale: generazione, movimento, salvataggio/caricamento e 0 fallback classici.
+Il log modern-world contiene seed, copertura e quote della specifica isola.
+Audit: 157 sorgenti originali invariati, 41 con ambito esplicito, 31 aggiunte;
+29 mutazioni non autorizzate respinte. Archivio pre-modifiche conservato in
+baseline/before-structural-terrain. Controllo CPU/GPU WorldMeshBatch superato.
 
-AUTOMAZIONE E LIMITI
-Visual regression controlla anche landscape/biomi/custom e audit. Il workflow
-Windows playable richiede avvio manuale e tag nuovo; non riscrive la johto.3.
-YAML e Python incorporato verificati sintatticamente; lo stato reale dei run
-remoti e visibile in GitHub Actions, distinto dalle verifiche Windows locali.
-Test eseguiti in cartelle build/ isolate. Kiri.sav non aperto o riscritto.
-Non e una prova esaustiva di tutte le mappe, mosse, periferiche o multiplayer,
-ne una certificazione Nintendo3DS. Nessun override custom e attivo nel gioco
-distribuito nei sorgenti: i PNG sintetici sono solo fixture dei test.
-Backup locale precedente: build/local-history/pokewilds-before-github-merge.jar.
+LIMITI E PROVA
+Catalogo iniziale di moduli per interni naturali e caldera: coste, dungeon,
+labirinti ed eventi speciali mantengono la propria struttura. La copertura
+dipende dalla forma dell'isola e dai contenuti protetti; non tutti i biomi
+sono stati sostituiti con moduli. Dove non entra un bacino completo, la caldera
+usa un terreno piano sicuro, indicato dal report r0.
+Sono prove automatiche su fixture native, non una campagna manuale completa
+o una prova multiplayer. Il salvataggio personale Kiri.sav non e stato aperto.
+Queste 16 suite non sono l'intera pipeline di 28 suite richiesta per una release.
+Il vecchio confronto pixel-identico dell'intera scena e disponibile con
+--historical-parity; i nuovi criteri sono documentati in docs/STRUCTURAL-TERRAIN.md.

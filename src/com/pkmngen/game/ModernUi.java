@@ -13,9 +13,11 @@ import java.util.*;
 
 /** Presentation only. Original actions retain ownership of input, timing and rules. */
 public final class ModernUi {
-   public static final Color INK = Color.valueOf("203e4c"), MUTED = Color.valueOf("667c80"),
-      PAPER = Color.valueOf("fffbed"), ACCENT = Color.valueOf("287e78"), GOLD = Color.valueOf("d7a955"),
-      RED = Color.valueOf("c85252"), LINE = Color.valueOf("cfddd4"), BACK = Color.valueOf("e7eee2");
+   public static final Color INK = Color.valueOf("223648"), MUTED = Color.valueOf("596b7b"),
+      PAPER = Color.valueOf("f8fafb"), ACCENT = Color.valueOf("197569"), GOLD = Color.valueOf("d6a650"),
+      RED = Color.valueOf("b84959"), LINE = Color.valueOf("d5dfe5"), BACK = Color.valueOf("e8eef2"),
+      SOFT = Color.valueOf("e0efeb"), SURFACE = Color.valueOf("eef3f6");
+   private static final Color PANEL_SHADOW = new Color(.09f,.16f,.22f,.13f);
    private final Texture pixel;
    private final BitmapFont font;
    private final GlyphLayout layout = new GlyphLayout();
@@ -62,6 +64,7 @@ public final class ModernUi {
       game.uiBatch.getProjectionMatrix().setToOrtho2D(viewportX,viewportY,viewportWidth,viewportHeight);
    }
    public Box viewportBounds() { return new Box(viewportX,viewportY,viewportWidth,viewportHeight); }
+   public boolean reducedMotion() { return desktop.preferences.reducedMotion; }
 
    public ModernUi() {
       Pixmap p = new Pixmap(1,1,Pixmap.Format.RGBA8888);
@@ -159,8 +162,16 @@ public final class ModernUi {
       game.uiBatch.draw(pixel,x,y,w,h); game.uiBatch.setPackedColor(saved);
    }
    public void panel(Game game,float x,float y,float w,float h) {
-      rect(game,x+1,y-1,w,h,new Color(INK.r,INK.g,INK.b,0.18f));
-      rect(game,x,y,w,h,LINE); rect(game,x+0.65f,y+0.65f,w-1.3f,h-1.3f,PAPER);
+      surface(game,x+.5f,y-1,w,h,1.5f,PANEL_SHADOW);
+      surface(game,x,y,w,h,1.5f,LINE);
+      surface(game,x+.6f,y+.6f,w-1.2f,h-1.2f,1,PAPER);
+   }
+   /** Small clipped corners retain crisp pixel edges at every desktop scale. */
+   public void surface(Game game,float x,float y,float w,float h,float corner,Color color) {
+      if(w<=0||h<=0)return;
+      float c=Math.max(0,Math.min(corner,Math.min(w,h)*.5f));
+      rect(game,x+c,y,w-2*c,h,color);
+      rect(game,x,y+c,c,h-2*c,color);rect(game,x+w-c,y+c,c,h-2*c,color);
    }
    public void panel(Game game,Box bounds) { panel(game,bounds.x,bounds.y,bounds.width,bounds.height); }
    public void fill(Game game,Color color) { rect(game,viewportX,viewportY,viewportWidth,viewportHeight,color); }
@@ -190,18 +201,20 @@ public final class ModernUi {
       if(row<lines) fitText(game,line.toString(),x,top-row*(size+2),size,maxWidth,color);
    }
    public void bar(Game game,float x,float y,float w,float h,float ratio,Color color) {
-      rect(game,x,y,w,h,LINE); rect(game,x+0.5f,y+0.5f,Math.max(0,(w-1)*Math.min(1,Math.max(0,ratio))),h-1,color);
+      surface(game,x,y,w,h,.5f,LINE);
+      surface(game,x+.5f,y+.5f,Math.max(0,(w-1)*Math.min(1,Math.max(0,ratio))),h-1,.35f,color);
    }
    public void row(Game game,String value,float x,float y,float w,float h,boolean selected) {
       row(game,value,x,y,w,h,selected,0);
    }
    public void row(Game game,String value,float x,float y,float w,float h,boolean selected,float reserveRight) {
-      if(selected) { rect(game,x,y,w,h,ACCENT); rect(game,x,y,2,h,GOLD); }
-      else rect(game,x,y,w,h,new Color(1f,1f,1f,.35f));
+      surface(game,x,y,w,h,1,selected?ACCENT:SURFACE);
+      if(selected) rect(game,x+1,y+2,1.4f,Math.max(0,h-4),GOLD);
       fitText(game,value,x+5,y+h-(h-7)/2,7,w-10-reserveRight,selected?PAPER:INK);
    }
    public void header(Game game,String title,String subtitle) {
-      rect(game,viewportX,121,viewportWidth,viewportY+viewportHeight-121,INK); rect(game,0,121,160,1.2f,GOLD);
+      rect(game,viewportX,121,viewportWidth,viewportY+viewportHeight-121,INK);
+      rect(game,8,121,24,1.2f,GOLD);rect(game,32,121,120,.6f,ACCENT);
       fitText(game,title,8,140,9,144,PAPER); fitText(game,subtitle,8,128.5f,4.7f,144,LINE);
    }
    public void fullScreen(Game game,String title,String subtitle) {
@@ -249,7 +262,7 @@ public final class ModernUi {
    private void dialogue(Game game,DisplayText text) {
       panel(game,2,2,156,38); rect(game,3,37,154,2,ACCENT);
       drawRevealed(game,text.spritesBeingDrawn,6,38,text.braillify||DisplayText.unownText);
-      if(text.spritesNotDrawn.isEmpty() && (text.timer/18)%2==0) fitText(game,confirmKey(),145,10,5,10,ACCENT);
+      if(text.spritesNotDrawn.isEmpty() && (reducedMotion() || (text.timer/18)%2==0)) fitText(game,confirmKey(),145,10,5,10,ACCENT);
    }
    private void introText(Game game,DisplayTextIntro text) {
       panel(game,2,2,156,38); drawRevealed(game,text.spritesBeingDrawn,0,144,false);

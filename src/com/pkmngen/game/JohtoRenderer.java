@@ -36,6 +36,8 @@ import java.util.WeakHashMap;
 public final class JohtoRenderer {
    private static final float TILE = VisualSampling.WORLD_TILE_SIZE;
    private static final float WHITE = Color.WHITE_FLOAT_BITS;
+   private static final String[] ACTOR_DIRECTIONS={"down","up","left","right"};
+   private static final String[] LOCOMOTION_ANIMATIONS={"Idle","Walk"};
    private final PerspectiveCamera camera = new PerspectiveCamera(35f, 160f, 144f);
    private final Vector2 lookup = new Vector2();
    private final WorldMeshBatch geometry = new WorldMeshBatch();
@@ -62,6 +64,8 @@ public final class JohtoRenderer {
    private float surfaceLift;
    private float actorPlaneZ;
    private final Vector3 projectedAnchor = new Vector3();
+   private boolean captureBedDepth, bedDepthValid, matchBedDepth;
+   private float bedBottomScreenY, bedTopScreenY, bedBottomDepth, bedTopDepth;
    private final BoundingBox wallOcclusionBounds = new BoundingBox();
    private final Ray wallOcclusionRay = new Ray();
    private final Vector3 wallOcclusionMin = new Vector3(), wallOcclusionMax = new Vector3(), wallOcclusionTarget = new Vector3();
@@ -164,6 +168,9 @@ public final class JohtoRenderer {
          + "varying vec4 v_color;\nvarying vec2 v_texCoords;\nvarying float v_style;\n"
          + "void main(){vec4 c=texture2D(u_texture,v_texCoords);"
          + "c*=v_color;"
+         + "if(v_style>.5&&v_style<1.5){float l=dot(c.rgb,vec3(.299,.587,.114));"
+         + "c.rgb=mix(mix(c.rgb,vec3(l),.30),vec3(.37,.49,.28),.42);}"
+         + "if(v_style>4.5){float l=dot(c.rgb,vec3(.299,.587,.114));c.rgb=mix(c.rgb,vec3(l),.20);}"
          + "float glow=0.0;for(int i=0;i<8;i++){vec4 l=u_lights[i];"
          + "float f=clamp(1.0-distance(v_world,l.xy)/max(l.z,1.0),0.0,1.0);glow=max(glow,f*f*l.w);}"
          + "vec3 light=max(u_tint,mix(u_tint,vec3(1.0,.91,.77),glow));"
@@ -202,6 +209,7 @@ public final class JohtoRenderer {
    }
 
    private void collectWorld(Game game) {
+      bedDepthValid=false;
       shakingTrees.clear();
       growingPlants.clear();
       for (Action action : game.actionStack) {
@@ -337,7 +345,10 @@ public final class JohtoRenderer {
             if(next!=null&&!next.isLava){ground=assets.cell(profile.string("fluid","cooledLava","lava_cooled"),x,y,seconds);break;}
          }
       }
-      if(!tile.isWaterfall&&!names.contains("lavafall")) terrainSurface(tile,ground);
+      if(!tile.isWaterfall&&!names.contains("lavafall")) {
+         terrainSurface(tile,ground);
+         terrainTransitions(game,tile);
+      }
       if(!tile.isWater && !tile.isLava && (tile.isTidal || lower.contains("puddle"))) {
          // High tide is a walkable film over sand, not an opaque deep-water tile.
          // Read the live tide flag: CycleDayNight changes names before init().
@@ -350,7 +361,7 @@ public final class JohtoRenderer {
       if (tile.isWater && !tile.isLava) coast(game, tile);
       if(tile.isWaterfall || names.contains("lavafall")) { waterfall(tile,profile);return; }
       terrainEdges(game,tile,profile);
-      if (ModernWorldGenerator.isRamp(tile) && elevation.isSloped(tile)) ramp(tile,profile);
+      if (ModernWorldGenerator.isRamp(tile)) ramp(tile,profile);
       if (ModernWorldGenerator.isRamp(tile)) return;
       // The growing action owns its one animated sprout, not a second static prop.
       if (growingPlants.contains(tile.position)) return;
@@ -447,19 +458,74 @@ public final class JohtoRenderer {
       float x=tile.position.x,y=tile.position.y,previousLift=surfaceLift;surfaceLift=0;
       float a=elevation.height(x+.01f,y+.01f),b=elevation.height(x+15.99f,y+.01f);
       float c=elevation.height(x+15.99f,y+15.99f),d=elevation.height(x+.01f,y+15.99f);
-      // Subtle treads follow the actual incline; a flat tile never gets a staircase.
+      // Keep the authored step material visible even when an old save contains a
+      // flat connector. It stays a flat marker, never an invented cliff face.
+      TextureRegion steps=assets.named(profile.cliff("ramp"));
+      if(steps!=null)surfacePatch(tile,steps,x+1,y+.5f,x+15,y+15.5f,.10f,WHITE,WHITE,WHITE,WHITE,geometry,0);
+      // Flat connectors keep planar tread markings too: the inherited steps
+      // material alone is a stone slab. No height is invented by these lines.
+      // Broad highlights and adjacent dark risers retain direction at game zoom.
       boolean horizontal=Math.abs((b+c)-(a+d))>Math.abs((c+d)-(a+b));
       for(int step=1;step<5;step++) {
          float f=step/5f,px=horizontal?x+16*f:x,py=horizontal?y:y+16*f;
-         float ex=px+(horizontal?.45f:16),ey=py+(horizontal?16:.45f);
+         float ex=px+(horizontal?.85f:16),ey=py+(horizontal?16:.85f);
          float h0=elevation.height(MathUtils.clamp(px,x+.01f,x+15.99f),MathUtils.clamp(py,y+.01f,y+15.99f));
          float h1=elevation.height(MathUtils.clamp(ex,x+.01f,x+15.99f),MathUtils.clamp(py,y+.01f,y+15.99f));
          float h2=elevation.height(MathUtils.clamp(ex,x+.01f,x+15.99f),MathUtils.clamp(ey,y+.01f,y+15.99f));
          float h3=elevation.height(MathUtils.clamp(px,x+.01f,x+15.99f),MathUtils.clamp(ey,y+.01f,y+15.99f));
-         quad(translucent.buffer(whiteTexture),px,h0+.06f,-py,ex,h1+.06f,-py,ex,h2+.06f,-ey,px,h3+.06f,-ey,
-            white,Color.toFloatBits(.72f,.69f,.62f,.34f));
+         quad(translucent.buffer(whiteTexture),px,h0+.14f,-py,ex,h1+.14f,-py,ex,h2+.14f,-ey,px,h3+.14f,-ey,
+            white,Color.toFloatBits(.91f,.87f,.72f,.76f));
+         float dark=Color.toFloatBits(.12f,.15f,.13f,.62f);
+         surfacePatch(tile,white,horizontal?ex:px,horizontal?py:ey,
+            horizontal?ex+.55f:ex,horizontal?ey:ey+.55f,.13f,dark,dark,dark,dark,translucent,0);
       }
       surfaceLift=previousLift;
+   }
+
+   /** Shared-corner patches follow the same triangle split as the terrain. */
+   private void surfacePatch(Tile tile,TextureRegion art,float x0,float y0,float x1,float y1,float lift,
+      float c0,float c1,float c2,float c3,WorldMeshBatch batch,float style) {
+      float x=tile.position.x,y=tile.position.y;
+      float a=terrainHeight(tile,MathUtils.clamp(x0,x+.01f,x+15.99f),MathUtils.clamp(y0,y+.01f,y+15.99f))+lift;
+      float b=terrainHeight(tile,MathUtils.clamp(x1,x+.01f,x+15.99f),MathUtils.clamp(y0,y+.01f,y+15.99f))+lift;
+      float c=terrainHeight(tile,MathUtils.clamp(x1,x+.01f,x+15.99f),MathUtils.clamp(y1,y+.01f,y+15.99f))+lift;
+      float d=terrainHeight(tile,MathUtils.clamp(x0,x+.01f,x+15.99f),MathUtils.clamp(y1,y+.01f,y+15.99f))+lift;
+      float u0=MathUtils.lerp(art.getU(),art.getU2(),(x0-x)/16),u1=MathUtils.lerp(art.getU(),art.getU2(),(x1-x)/16);
+      float v0=MathUtils.lerp(art.getV2(),art.getV(),(y0-y)/16),v1=MathUtils.lerp(art.getV2(),art.getV(),(y1-y)/16);
+      Buffer mesh=batch.buffer(art.getTexture());
+      vertex(mesh,x0,a,-y0,c0,u0,v0,style);vertex(mesh,x1,b,-y0,c1,u1,v0,style);vertex(mesh,x1,c,-y1,c2,u1,v1,style);
+      vertex(mesh,x1,c,-y1,c2,u1,v1,style);vertex(mesh,x0,d,-y1,c3,u0,v1,style);vertex(mesh,x0,a,-y0,c0,u0,v0,style);
+   }
+
+   /** Feather only adjoining dry materials on the same continuous surface.
+    * Actual water, cliff, stair and structure boundaries remain explicit. */
+   private void terrainTransitions(Game game,Tile tile) {
+      if(!WorldMaterials.blendable(tile))return;
+      float x=tile.position.x,y=tile.position.y,previous=surfaceLift;surfaceLift=0;
+      // A feather strip has its own diagonal. On a twisted old cell it could
+      // cross the original mesh plane, so leave that unusual edge explicit.
+      if(Math.abs(terrainHeight(tile,x+.01f,y+.01f)+terrainHeight(tile,x+15.99f,y+15.99f)
+         -terrainHeight(tile,x+15.99f,y+.01f)-terrainHeight(tile,x+.01f,y+15.99f))>.025f) {
+         surfaceLift=previous;return;
+      }
+      String material=WorldMaterials.terrainName(tile);
+      float edge=Color.toFloatBits(1,1,1,.5f),clear=Color.toFloatBits(1,1,1,0);
+      float width=MathUtils.clamp(BiomeProfiles.visualForTile(tile).number("transition","blendWidth",4)*.5f,1,4);
+      for(int side=0;side<4;side++) {
+         int dx=side==2?-1:side==3?1:0,dy=side==0?-1:side==1?1:0;
+         Tile next=game.map.tiles.get(lookup.set(x+dx*16,y+dy*16));
+         if(!WorldMaterials.blendable(next))continue;
+         String neighbor=WorldMaterials.terrainName(next);if(material.equals(neighbor))continue;
+         float mx=x+8+dx*8,my=y+8+dy*8;
+         if(Math.abs(terrainHeight(tile,mx-dx*.01f,my-dy*.01f)-terrainHeight(next,mx+dx*.01f,my+dy*.01f))>.15f)continue;
+         TextureRegion art=assets.cell(neighbor,x,y,seconds);if(art==null)continue;
+         float x0=x,y0=y,x1=x+16,y1=y+16;
+         float c0=clear,c1=clear,c2=clear,c3=clear;
+         if(side==0){y1=y+width;c0=c1=edge;}else if(side==1){y0=y+16-width;c2=c3=edge;}
+         else if(side==2){x1=x+width;c0=c3=edge;}else{x0=x+16-width;c1=c2=edge;}
+         surfacePatch(tile,art,x0,y0,x1,y1,.035f,c0,c1,c2,c3,translucent,WorldMaterials.softGrass(neighbor)?1:0);
+      }
+      surfaceLift=previous;
    }
 
    private void waterfall(Tile tile,BiomeProfiles.Profile profile) {
@@ -531,7 +597,8 @@ public final class JohtoRenderer {
       float gx=((b+c)-(a+d))/32f,gy=((c+d)-(a+b))/32f;
       float sun=(.82f+.30f*gx+.32f*gy)/(float)Math.sqrt(1+gx*gx+gy*gy);
       float light=tile.isLava?1:MathUtils.clamp(.60f+.40f*sun/.82f,.60f,1f);
-      quad(geometry.buffer(art.getTexture()),x,a,-y,x+16,b,-y,x+16,c,-y-16,x,d,-y-16,art,color(light,light,light),tile.isLava?3f:0f);
+      quad(geometry.buffer(art.getTexture()),x,a,-y,x+16,b,-y,x+16,c,-y-16,x,d,-y-16,art,color(light,light,light),
+         tile.isLava?3f:WorldMaterials.softGrass(WorldMaterials.terrainName(tile))?1f:0f);
       surfaceLift=previous;
    }
 
@@ -597,7 +664,10 @@ public final class JohtoRenderer {
          float scale=VisualGeometry.fitScale(art.getRegionWidth(),art.getRegionHeight(),24,29);
          float width=assets.worldWidth(art,art.getRegionWidth()*scale),height=assets.worldHeight(art,art.getRegionHeight()*scale);
          assetShadow(art,x+8,y+7,width*.28f,2.4f);
-         upright(art,x+8-width*.5f,y+7,.16f,width,height,WHITE);
+         captureBedDepth="bed".equals(identity)&&game.player.isSleeping
+            &&tile.position.equals(game.player.sleepingDir);
+         try {upright(art,x+8-width*.5f,y+7,.16f,width,height,WHITE);}
+         finally {captureBedDepth=false;}
          return true;
       }
       if(kind==WorldMaterials.Kind.BRIDGE) {
@@ -699,8 +769,14 @@ public final class JohtoRenderer {
       PmdPokemonSprites sprites = PmdPokemonSprites.get();
       PmdPokemonSprites.Frame frame = pokemon.isEgg ? null : sprites.frame(pokemon, pokemon.dirFacing, moving ? "Walk" : "Idle", seconds);
       if (frame != null) {
-         PmdPokemonSprites.Frame idle = sprites.frame(pokemon, "down", "Idle", 0f);
-         float scale = Math.min(.85f, 30f / Math.max(1f, idle == null ? Math.max(frame.width, frame.height) : Math.max(idle.width, idle.height)));
+         // One envelope for both locomotion animations and all directions: no
+         // resizing on a turn, and pixels below the PMD anchor stay above ground.
+         float extent=1,bottom=0;
+         for(String direction:ACTOR_DIRECTIONS)for(String animation:LOCOMOTION_ANIMATIONS) {
+            PmdPokemonSprites.AnimationBounds bounds=sprites.bounds(pokemon,direction,animation);
+            if(bounds!=null){extent=Math.max(extent,Math.max(bounds.width,bounds.height));bottom=Math.min(bottom,bounds.minY);}
+         }
+         float scale = Math.min(.85f, 28f / extent);
          float anchorY = frame.anchorY;
          TextureRegion region = frame.region;
          if (pokemon.inWater && pokemon.drawUpper != null) {
@@ -708,7 +784,8 @@ public final class JohtoRenderer {
             spritePart.setRegion(region); spritePart.setRegionHeight(region.getRegionHeight() - hidden);
             region = spritePart; anchorY -= hidden;
          } else shadow(pokemon.position.x + 8, pokemon.position.y + 7, Math.min(7, frame.width * scale * .25f), 2.5f);
-         anchored(region, pokemon.position.x + 8, pokemon.position.y + 7, .15f,
+         anchored(region, pokemon.position.x + 8, pokemon.position.y + 7,
+            .15f-(pokemon.inWater?0:bottom*scale*MathUtils.cosDeg(50)),
             frame.anchorX, anchorY, scale);
          return;
       }
@@ -739,7 +816,7 @@ public final class JohtoRenderer {
       surfaceLift=elevation.height(player.position.x+8,player.position.y+8);
       TextureRegion region = assets.trainer(player, seconds, moving(player, player.position.x, player.position.y));
       assetShadow(region, player.position.x + 8, player.position.y + 7, 4.5f, 2.5f);
-      trainerImage(region,32,player.position.x+8,player.position.y+7,.15f+lift,3,.85f);
+      trainerImage(region,32,player.position.x+8,player.position.y+7,.15f+lift,3,.95f);
    }
 
    /** Field moves use the same PMD/BW actors as walking, never composite GB sprites. */
@@ -801,8 +878,13 @@ public final class JohtoRenderer {
                bedLift+=bedLayout.elevation-bedHeight*bedLayout.anchorY(0f)*MathUtils.cosDeg(50f);
             }
             person=assets.trainer(player,"down",seconds,false);
-            trainerImage(person,14,x,y+pillow*MathUtils.sinDeg(50f),
-               bedLift+pillow*MathUtils.cosDeg(50f),0,.55f);
+            // The bed's GPU depth interpolates between its actual endpoints.
+            // Re-projecting a separate head plane differs under perspective,
+            // even with identical ground anchors, and can hide the whole face.
+            matchBedDepth=bedDepthValid;
+            try {trainerImage(person,14,x,y+pillow*MathUtils.sinDeg(50f),
+               bedLift+pillow*MathUtils.cosDeg(50f),0,.55f);}
+            finally {matchBedDepth=false;}
          } else {
             // Ground sleeping keeps its own bag; furniture sleep uses the actual bed.
             floor(white,x-7,y-7,14,22,.16f,color(.16f,.32f,.39f),geometry);
@@ -820,7 +902,7 @@ public final class JohtoRenderer {
          trainerImage(person,26,x,y,.3f,0,.85f);
       } else {
          assetShadow(person,x,y,4.5f,2.5f);
-         trainerImage(person,32,x,y,lift+Math.max(0,DrawPlayerUpper.pokemonOffsetY)*.4f,3,.85f);
+         trainerImage(person,32,x,y,lift+Math.max(0,DrawPlayerUpper.pokemonOffsetY)*.4f,3,.95f);
       }
       if (player.isFishing) {
          Vector2 target=player.facingPos();
@@ -954,7 +1036,8 @@ public final class JohtoRenderer {
       float height = assets.worldHeight(sprite,key.contains("dead") || key.contains("charred")?36:name.contains("large") ? 62 : key.equals("tree_pine") || key.equals("tree_snow") ? 46 : 42);
       float width = assets.worldWidth(sprite,height * sprite.getRegionWidth() / sprite.getRegionHeight());
       assetShadow(sprite,x,y,Math.min(width*.35f,10f),4);
-      upright(sprite,x-width/2,y,.2f,width,height,WHITE);
+      actorPlaneZ=-y;
+      upright(sprite,x-width/2,y,.2f,width,height,WHITE,5f);
    }
 
    private String treeKey(Tile tile, String name) { return WorldMaterials.treeKey(tile); }
@@ -968,7 +1051,8 @@ public final class JohtoRenderer {
          float progress = MathUtils.clamp(plant.timer / 24f, 0, 1);
          float height = 4 + progress * 10, width = height * art.getRegionWidth() / art.getRegionHeight();
          surfaceLift = elevation.height(plant.pos.x + 8, plant.pos.y + 8);
-         uprightRaw(art, plant.pos.x + 8 - width/2, plant.pos.y + 7, .2f, width, height, WHITE, 0);
+         actorPlaneZ=-plant.pos.y-7;
+         uprightRaw(art, plant.pos.x + 8 - width/2, plant.pos.y + 7, .2f, width, height, WHITE, 4);
          fieldEffectFrames++;
          return;
       }
@@ -990,8 +1074,9 @@ public final class JohtoRenderer {
       float spread = tick < 20 ? 0 : 2 + (tick >= 39 ? 2 : 0) + (tick >= 43 ? 2 : 0) + (tick >= 47 ? 2 : 0);
       float leftWidth = width * half / art.getRegionWidth();
       float x = tile.position.x + 8 - width/2, y = tile.position.y + 8;
-      uprightRaw(cutLeft,x-spread,y,.2f,leftWidth,height,WHITE,0);
-      uprightRaw(cutRight,x+leftWidth+spread,y,.2f,width-leftWidth,height,WHITE,0);
+      actorPlaneZ=-y;
+      uprightRaw(cutLeft,x-spread,y,.2f,leftWidth,height,WHITE,5);
+      uprightRaw(cutRight,x+leftWidth+spread,y,.2f,width-leftWidth,height,WHITE,5);
       fieldEffectFrames++;
    }
 
@@ -1013,7 +1098,11 @@ public final class JohtoRenderer {
    }
 
    private void upright(TextureRegion region, float x, float y, float base, float width, float height, float tint) {
-      upright(region, x, y, base, width, height, tint, 0f);
+      // Every billboard, including furniture and vegetation, sorts through the
+      // same vertical ground plane as the actors. Mixing tilted prop depth with
+      // upright actor depth cuts heads/bodies through foreground crowns.
+      actorPlaneZ=-y;
+      upright(region, x, y, base, width, height, tint, 4f);
    }
 
    private void upright(TextureRegion region, float x, float y, float base, float width, float height, float tint, float style) {
@@ -1034,6 +1123,14 @@ public final class JohtoRenderer {
    private void uprightRaw(TextureRegion region, float x, float y, float base, float width, float height, float tint, float style) {
       // Camera-facing sprites keep their pixel proportions in the tilted world.
       float rise = height * MathUtils.cosDeg(50f), back = height * MathUtils.sinDeg(50f);
+      if(captureBedDepth) {
+         // Capture after SpriteLayout has applied dimensions, anchors and offsets.
+         bedBottomScreenY=projectedAnchor.set(x,base+surfaceLift,-y).prj(camera.combined).y;
+         bedTopScreenY=projectedAnchor.set(x,base+rise+surfaceLift,-y-back).prj(camera.combined).y;
+         bedBottomDepth=projectedAnchor.set(x,base+surfaceLift+.12f,actorPlaneZ).prj(camera.combined).z;
+         bedTopDepth=projectedAnchor.set(x,base+rise+surfaceLift+.12f,actorPlaneZ).prj(camera.combined).z;
+         bedDepthValid=Math.abs(bedTopScreenY-bedBottomScreenY)>.000001f;
+      }
       quad(geometry.buffer(region.getTexture()),
          x, base, -y, x + width, base, -y, x + width, base + rise, -y-back, x, base + rise, -y-back, region, tint, style);
    }
@@ -1077,8 +1174,12 @@ public final class JohtoRenderer {
 
    private void vertex(Buffer mesh, float x, float y, float z, float color, float u, float v, float style) {
       // Scene-dependent transforms stay here; storage/upload belong to the batch.
-      mesh.vertex(x, y+surfaceLift, z, color, u, v, style,
-         style>3.5f?projectedAnchor.set(x,y+surfaceLift+.12f,actorPlaneZ).prj(camera.combined).z:0f);
+      float depth=style>3.5f?projectedAnchor.set(x,y+surfaceLift+.12f,actorPlaneZ).prj(camera.combined).z:0f;
+      if(style>3.5f&&matchBedDepth) {
+         float screenY=projectedAnchor.set(x,y+surfaceLift,z).prj(camera.combined).y;
+         depth=MathUtils.lerp(bedBottomDepth,bedTopDepth,(screenY-bedBottomScreenY)/(bedTopScreenY-bedBottomScreenY))-.000001f;
+      }
+      mesh.vertex(x, y+surfaceLift, z, color, u, v, style,depth);
    }
 
    private void collectLights(Game game) {

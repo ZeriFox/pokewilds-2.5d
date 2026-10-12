@@ -26,7 +26,7 @@ def main() -> int:
     java, javac = find_jdk()
     sources = [ROOT / "tools" / "ModernWorldGenerationTest.java", ROOT / "tools" / "WorldSmokeTest.java"]
     if args.sources:
-        sources += [ROOT / "src/com/pkmngen/game" / name for name in ("ModernWorldGenerator.java", "GenIsland1.java", "BiomeProfiles.java", "WildSpawnRules.java", "Pokemon.java", "WorldElevation.java")]
+        sources += [ROOT / "src/com/pkmngen/game" / name for name in ("ModernWorldGenerator.java", "AuthoredTerrain.java", "GenIsland1.java", "BiomeProfiles.java", "WildSpawnRules.java", "ExpansionDex.java", "Pokemon.java", "WorldElevation.java")]
     log_path = destination / "modern-world.log"
     commands = [[javac, "--release", "17", "-encoding", "UTF-8", "-proc:none", "-classpath", str(JAR),
                  "-d", str(classes), *map(str, sources)]]
@@ -47,7 +47,7 @@ def main() -> int:
     output = log_path.read_text(encoding="utf-8")
     if "TOPOLOGY PASS:" not in output or not args.fixtures_only and "WORLD PASS:" not in output:
         raise RuntimeError(f"Missing PASS result: {log_path}")
-    reports = re.findall(r"WORLDGEN v1 .*?dryComponents=(\d+)->(\d+).*?volcanic=(\d+).*?lava=(\d+)", output)
+    reports = re.findall(r"WORLDGEN v2 .*?dryComponents=(\d+)->(\d+).*?volcanic=(\d+).*?lava=(\d+)", output)
     if not reports or any(int(after) > int(before) or int(volcanic) < 100 or int(lava) < 20
                           for before, after, volcanic, lava in reports):
         raise RuntimeError(f"World topology regression: {reports}")

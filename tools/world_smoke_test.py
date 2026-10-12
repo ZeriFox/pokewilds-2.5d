@@ -43,7 +43,7 @@ def main() -> int:
         log.write(f"JAR: {JAR}\nSHA-256: {sha256(JAR)}\nVisual: {mode}\n")
         commands = [
             ("Compile harness", [javac, "--release", "17", "-encoding", "UTF-8", "-proc:none",
-                "-classpath", str(JAR), "-d", str(classes), str(ROOT / "tools" / "WorldSmokeTest.java")]),
+                "-classpath", str(JAR), "-d", str(classes), str(ROOT / "tools" / "ModernWorldGenerationTest.java"), str(ROOT / "tools" / "WorldSmokeTest.java")]),
             ("Generate/render/move/save/load", [java, "-Xmx2g", "-Dfile.encoding=UTF-8",
                 f"-Dpokewilds.visual={mode}", "-classpath", os.pathsep.join((str(classes), str(JAR))),
                 "com.pkmngen.game.WorldSmokeTest"]),
