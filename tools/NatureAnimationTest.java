@@ -5,9 +5,11 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.kryonet.Server;
 import com.pkmngen.leaks.LeakTracer;
@@ -42,7 +44,7 @@ public final class NatureAnimationTest {
          if(failure!=null)throw new IllegalStateException("Native nature verification failed",failure);
          require(probe.complete&&probe.disposed,"Native lifecycle incomplete");
          System.out.println("NATURE ANIMATION PASS: checks="+checks+", scenes="+probe.scenes+", captures="+probe.captures
-            +", real animated vegetation/water/coast/falls/lava, rooted wind, shore seams, deterministic frames, reduced motion, unchanged tiles/RNG");
+            +", animated open ocean/coast/vegetation/crowns, rooted trunks, directional and local light/shadows, shore seams, deterministic frames, reduced motion, unchanged tiles/RNG");
          System.exit(0);
       }catch(Throwable error){error.printStackTrace();System.exit(1);}
    }
@@ -55,7 +57,7 @@ public final class NatureAnimationTest {
          if(failure!=null)return;
          try {
             super.render();frames++;
-            if(frames==15){initialize();materialCoverage();windContract();shoreRestrictions();natureScenes();complete=true;Gdx.app.exit();}
+            if(frames==15){initialize();materialCoverage();windContract();shoreRestrictions();natureScenes();openOcean();crownScenes();lightingScene();complete=true;Gdx.app.exit();}
          }catch(Throwable error){failure=error;Gdx.app.exit();}
       }
       void initialize() {
@@ -76,7 +78,7 @@ public final class NatureAnimationTest {
       }
       void world(String ground,String biome,boolean indoor) {
          Map<Vector2,Tile> tiles=new HashMap<>();if(!indoor)map.overworldTiles=tiles;
-         map.tiles=tiles;map.refreshCache=true;map.onscreenPokemon.clear();map.onscreenBurrowed.clear();
+         map.tiles=tiles;map.refreshCache=true;map.onscreenTiles.clear();map.onscreenPokemon.clear();map.onscreenBurrowed.clear();
          map.onscreenFossils.clear();map.pokemon.clear();
          for(int y=-256;y<=256;y+=16)for(int x=-256;x<=256;x+=16)put(ground,"",x,y,biome);
          player.position.set(0,0);player.spawnLoc.set(0,0);player.dirFacing="down";
@@ -112,6 +114,17 @@ public final class NatureAnimationTest {
             &&!WorldNatureMotion.flexible("rock")&&!WorldNatureMotion.flexible("stump")
             &&!WorldNatureMotion.flexible("bush_dry"),"Rigid nature props bend");
          require(WorldNatureMotion.flexible("grass_dry_tuft"),"Dry grass cannot move in the wind");
+         for(String identity:new String[]{"tree","tree_oak","tree_pine","tree_snow","forest_tree_willow"})
+            require(WorldNatureMotion.treeFlexible(identity),"Living crown excluded from wind: "+identity);
+         for(String identity:new String[]{"tree_dead","volcanic_charred_tree","desert_cactus","stump","rock","unknown_custom_tree"})
+            require(!WorldNatureMotion.treeFlexible(identity),"Unreviewed or rigid tree bends: "+identity);
+         for(float time:new float[]{0,3.2f,4.5f,1200})for(float fraction:new float[]{0,.2f,.4f,.45f,.5f,.8f,1}) {
+            float dx=WorldNatureMotion.crownWind(32,-48,time,fraction,2,false);
+            require(Float.isFinite(dx)&&Math.abs(dx)<=2.001f,"Unbounded crown wind");
+            if(fraction<=.45f)require(dx==0,"Crown signal moves the rooted trunk");
+            require(WorldNatureMotion.crownWind(32,-48,time,fraction,2,true)==0,"Reduced crown signal still moves");
+            require(Math.abs(dx-WorldNatureMotion.crownWind(32,-48,time+.001f,fraction,2,false))<.02f,"Crown wind clock jumps");
+         }
       }
       void plants(String ground,String biome,String tree) {
          world(ground,biome,false);
@@ -170,6 +183,108 @@ public final class NatureAnimationTest {
          put("house5_floor1","pot1",-48,32,"interior");compare("10-interior-still",false,true);
          world("cave1_floor1","cave",true);put("cave1_floor1","rock1",48,32,"cave");
          compare("11-cave-still",false,true);
+      }
+      void openOcean()throws Exception {
+         world("water1","beach",false);
+         compare("12-open-ocean",true,true);
+         byte[] a=draw(null,3.2f,false),near=draw(null,3.22f,false);
+         int active=0,total=0;
+         // Broad independent screen areas away from the trainer. These times
+         // share one atlas frame, so regional change must come from the shader.
+         for(int row=0;row<3;row++)for(int col=0;col<3;col++) {
+            if(row==1&&col==1)continue;
+            int changed=changedRegion(a,near,80+col*280,60+row*190,240,150);
+            require(changed>100,"Open water is static outside the shore/player area: "+row+","+col+"="+changed);
+            active++;total+=changed;
+         }
+         double variance=luminanceDeviation(a,80,60,240,150);
+         require(active==8&&total>1600&&variance>4,"Open sea lacks distributed wave relief: changed="+total+", deviation="+variance);
+         int water=0;
+         for(float[] v:meshVertices("geometry",-1)) {
+            require(v[7]==WorldNatureMotion.MAX_SHORE_DISTANCE,"Open-ocean fixture accidentally samples a shore");water++;
+         }
+         require(water>100,"Open-ocean probe did not render actual fluid geometry");
+         System.out.println("NATURE ocean: same-atlas-frame changedPixels="+total+", activeRegions="+active+", luminanceDeviation="+variance+", all shoreDistances=16");
+      }
+      void crownScenes()throws Exception {
+         world("green1","forest",false);put("green1","tree1",-32,32,"forest");
+         put("green1","tree2",48,32,"forest");compare("13-living-crowns",true,true);
+         draw(null,3.2f,false);List<float[]> a=meshVertices("geometry",5);
+         draw(null,4.5f,false);List<float[]> b=meshVertices("geometry",5);
+         require(a.size()==b.size()&&a.size()>24,"Living crowns lack subdivided geometry");
+         float low=Float.POSITIVE_INFINITY,high=Float.NEGATIVE_INFINITY;
+         for(float[] v:a){low=Math.min(low,v[1]);high=Math.max(high,v[1]);}
+         int fixed=0,moved=0;
+         for(int i=0;i<a.size();i++) {
+            float[] before=a.get(i),after=b.get(i);float fraction=(before[1]-low)/(high-low);
+            for(int component=1;component<8;component++)require(Float.floatToIntBits(before[component])==Float.floatToIntBits(after[component]),"Wind changed crown depth/UV/height/tint");
+            float displacement=Math.abs(before[0]-after[0]);
+            require(displacement<4.01f,"Crown wind is unbounded");
+            if(fraction<=.4f){require(displacement==0,"Wind detached a tree trunk from its collision tile");fixed++;}
+            else if(displacement>.001f)moved++;
+         }
+         require(fixed>6&&moved>12,"Actual tree geometry did not keep roots fixed while moving crowns");
+         draw(null,3.2f,true);List<float[]> stillA=meshVertices("geometry",5);
+         draw(null,4.5f,true);List<float[]> stillB=meshVertices("geometry",5);
+         require(equalVertices(stillA,stillB),"Reduced motion still moves crown vertices");
+         System.out.println("NATURE crowns: fixed lower vertices="+fixed+", moving crown vertices="+moved+", UV/depth/height unchanged");
+         world("desert6","desert",false);put("desert6","tree1",-32,32,"desert");
+         require(!WorldNatureMotion.treeFlexible(WorldMaterials.treeKey(map.tiles.get(new Vector2(-32,32)))),"Rigid desert tree selected for wind");
+         compare("14-rigid-tree",false,true);
+      }
+      void lightingScene()throws Exception {
+         world("green1","forest",false);put("green1","tree1",-48,32,"forest");
+         Tile torch=put("green1","",32,32,"forest");map.onscreenTiles.add(torch);
+         byte[] day=draw("15-lighting-day",3.2f,true);List<float[]> dayShadows=meshVertices("shadows",Float.NaN);
+         map.timeOfDay="night";mapBatch.setColor(PkmnMap.nightColor);
+         byte[] night=draw("15-lighting-night",3.2f,true);List<float[]> nightShadows=meshVertices("shadows",Float.NaN);
+         require(meanLuminance(day)>meanLuminance(night)*1.15,"Directional lighting erased the original night cycle");
+         require(!equalVertices(dayShadows,nightShadows),"Tree/actor shadows do not respond to day/night lighting");
+         torch.isTorch=true;byte[] lit=draw("15-lighting-torch",3.2f,true);
+         PerspectiveCamera camera=(PerspectiveCamera)field(JohtoRenderer.class,"camera").get(renderer());
+         Vector3 near=camera.project(new Vector3(40,.2f,-24),0,0,WIDTH,HEIGHT);
+         Vector3 far=camera.project(new Vector3(-80,.2f,-24),0,0,WIDTH,HEIGHT);
+         int nearChanged=changedRegion(night,lit,(int)near.x-8,(int)near.y-8,16,16);
+         int farChanged=changedRegion(night,lit,(int)far.x-8,(int)far.y-8,16,16);
+         require(nearChanged>150,"Local torch produces no visible ground lighting");
+         require(farChanged==0,"Local torch illuminates unrelated distant terrain");
+         require(Arrays.equals(lit,draw(null,11f,true)),"Reduced motion still flickers local lighting");
+         torch.isTorch=false;require(Arrays.equals(night,draw(null,3.2f,true)),"Torch removal left stale light/shadow state");
+         scenes++;System.out.println("NATURE lighting: dayLuma="+meanLuminance(day)+", nightLuma="+meanLuminance(night)
+            +", nearTorchPixels="+nearChanged+", farTorchPixels="+farChanged+", shadows respond; reduced motion stable");
+      }
+      List<float[]> meshVertices(String name,float style)throws Exception {
+         WorldMeshBatch batch=(WorldMeshBatch)field(JohtoRenderer.class,name).get(renderer());
+         Map<?,?> groups=(Map<?,?>)field(WorldMeshBatch.class,"groups").get(batch);List<float[]> result=new ArrayList<>();
+         for(Object buffer:groups.values()) {
+            com.badlogic.gdx.utils.FloatArray v=(com.badlogic.gdx.utils.FloatArray)field(buffer.getClass(),"vertices").get(buffer);
+            for(int i=0;i<v.size;i+=8)if(Float.isNaN(style)||v.get(i+6)==style) {
+               float[] vertex=new float[8];for(int c=0;c<8;c++)vertex[c]=v.get(i+c);result.add(vertex);
+            }
+         }
+         return result;
+      }
+      boolean equalVertices(List<float[]> a,List<float[]> b) {
+         if(a.size()!=b.size())return false;
+         for(int i=0;i<a.size();i++)if(!Arrays.equals(a.get(i),b.get(i)))return false;return true;
+      }
+      int changedRegion(byte[] a,byte[] b,int left,int bottom,int width,int height) {
+         require(left>=0&&bottom>=0&&left+width<=WIDTH&&bottom+height<=HEIGHT,"Pixel probe outside view");
+         int count=0;for(int y=bottom;y<bottom+height;y++)for(int x=left;x<left+width;x++) {
+            int i=(y*WIDTH+x)*4;if(a[i]!=b[i]||a[i+1]!=b[i+1]||a[i+2]!=b[i+2])count++;
+         }return count;
+      }
+      double meanLuminance(byte[] pixels) {
+         double sum=0;for(int i=0;i<pixels.length;i+=4)sum+=luma(pixels,i);return sum/(WIDTH*HEIGHT);
+      }
+      double luminanceDeviation(byte[] pixels,int left,int bottom,int width,int height) {
+         double sum=0,squared=0;int count=0;
+         for(int y=bottom;y<bottom+height;y++)for(int x=left;x<left+width;x++) {
+            double value=luma(pixels,(y*WIDTH+x)*4);sum+=value;squared+=value*value;count++;
+         }return Math.sqrt(Math.max(0,squared/count-(sum/count)*(sum/count)));
+      }
+      double luma(byte[] pixels,int index) {
+         return .2126*(pixels[index]&255)+.7152*(pixels[index+1]&255)+.0722*(pixels[index+2]&255);
       }
       void coastSeams(String name)throws Exception {
          WorldElevation elevation=new WorldElevation();elevation.update(map.tiles);

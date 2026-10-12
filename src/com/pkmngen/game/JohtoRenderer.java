@@ -38,6 +38,7 @@ public final class JohtoRenderer {
    private static final float WHITE = Color.WHITE_FLOAT_BITS;
    private static final String[] ACTOR_DIRECTIONS={"down","up","left","right"};
    private static final String[] LOCOMOTION_ANIMATIONS={"Idle","Walk"};
+   private static final float[] CROWN_ROWS={0,.225f,.45f,.5875f,.725f,.8625f,1};
    private final PerspectiveCamera camera = new PerspectiveCamera(35f, 160f, 144f);
    private final Vector2 lookup = new Vector2();
    private final WorldMeshBatch geometry = new WorldMeshBatch();
@@ -50,7 +51,7 @@ public final class JohtoRenderer {
    private final Map<Object, Motion> motion = new WeakHashMap<>();
    private BwAssets assets;
    private float seconds;
-   private float natureSeconds, vegetationBend;
+   private float natureSeconds, vegetationBend, crownBend, daylight;
    private boolean reducedMotion;
    private final WorldNatureMotion shore=new WorldNatureMotion();
    private final WorldNatureMotion heightShore=new WorldNatureMotion();
@@ -189,10 +190,25 @@ public final class JohtoRenderer {
          + "float signedShore=v_style> -1.5?-v_shore:v_shore;"
          + "float foam=(1.0-smoothstep(.14,.68,abs(signedShore-reach)))"
          + "*(.58+.42*smoothstep(-.6,.7,small));"
-         + "if(v_style> -1.5){float crest=smoothstep(.94,.997,swell)*smoothstep(-.2,.8,small);"
-         + "c.rgb=mix(c.rgb,vec3(.21,.53,.57),.10);"
-         + "c.rgb*=mix(vec3(1.02,1.02,.99),vec3(.92,.97,1.0),smoothstep(0.0,16.0,v_shore))*(.99+.012*swell);"
-         + "c.rgb=mix(c.rgb,vec3(.48,.77,.81),crest*.12);"
+         + "if(v_style> -1.5){float offshore=smoothstep(2.0,16.0,v_shore);"
+         // Long swells carry crossed ripples instead of repeating a flat atlas
+         // cell. Both colour and analytical normals are continuous world fields.
+         + "float longA=dot(p,vec2(.038,.024))-u_time*.61;"
+         + "float longB=dot(p,vec2(-.022,.046))+u_time*.43;"
+         + "float rippleA=dot(p,vec2(.21,.13))+bend-u_time*1.63;"
+         + "float rippleB=dot(p,vec2(-.12,.27))+.45*sin(longA)+u_time*1.14;"
+         + "float ocean=sin(longA)*.62+sin(longB)*.38;"
+         + "vec2 slope=vec2(.55,.35)*cos(longA)+vec2(-.20,.42)*cos(longB)"
+         + "+vec2(.22,.14)*cos(rippleA)+vec2(-.10,.23)*cos(rippleB);"
+         + "vec3 normal=normalize(vec3(-slope.x*.54,1.0,-slope.y*.54));"
+         + "float diffuse=dot(normal,normalize(vec3(-.42,.85,.32)));"
+         + "float sparkle=pow(max(0.0,dot(normal,normalize(vec3(-.12,.98,.14)))),30.0);"
+         + "float crest=smoothstep(.84,.998,sin(rippleA))*smoothstep(.05,.85,sin(rippleB));"
+         + "vec3 depthColor=mix(vec3(.21,.58,.60),vec3(.10,.35,.48),offshore);"
+         + "c.rgb=mix(c.rgb,depthColor,.36+offshore*.15);"
+         + "c.rgb*=.79+diffuse*.21+ocean*(.045+offshore*.095);"
+         + "c.rgb=mix(c.rgb,vec3(.62,.83,.87),sparkle*(.10+offshore*.24));"
+         + "c.rgb=mix(c.rgb,vec3(.53,.80,.84),crest*(.10+offshore*.09));"
          + "float breaker=smoothstep(.87,.99,sin(v_shore*.68+u_time*1.05+bend*.32))*(1.0-smoothstep(2.0,11.0,v_shore));"
          + "c.rgb=mix(c.rgb,vec3(.82,.94,.92),max(foam*.68,breaker*.18));}"
          + "else{float wet=1.0-smoothstep(.4,5.0,v_shore);"
@@ -200,8 +216,13 @@ public final class JohtoRenderer {
          + "c.rgb=mix(c.rgb,vec3(.30,.57,.59),wash);c.rgb=mix(c.rgb,vec3(.87,.95,.92),foam*.52);}}"
          + "float glow=0.0;for(int i=0;i<8;i++){vec4 l=u_lights[i];"
          + "float f=clamp(1.0-distance(v_world,l.xy)/max(l.z,1.0),0.0,1.0);glow=max(glow,f*f*l.w);}"
-         + "vec3 light=max(u_tint,mix(u_tint,vec3(1.0,.91,.77),glow));"
-         + "if(c.a<0.1)discard;c.rgb*=v_style>2.5&&v_style<3.5?mix(light,vec3(1.0),0.65):light;"
+         + "vec3 light=max(u_tint,mix(u_tint,vec3(1.14,1.03,.82),clamp(glow,0.0,1.0)));"
+         // Crown shadows remain translucent and local illumination opens them
+         // up. Actor/UI colours never receive the ground's shadow multiplier.
+         + "bool crownShadow=v_style>1.5&&v_style<2.5;"
+         + "if(crownShadow){c.rgb=vec3(.04,.075,.12);c.a*=1.0-clamp(glow*.72,0.0,.72);}"
+         + "if(c.a<(crownShadow?.003:.1))discard;"
+         + "c.rgb*=v_style>2.5&&v_style<3.5?mix(light,vec3(1.0),0.65):light;"
          + "c.rgb=mix(c.rgb,vec3(dot(c.rgb,vec3(.299,.587,.114))),u_desaturation);"
          + "float mist=u_fogDensity*(.65+.35*sin(v_world.x*.036+u_time*.21)*sin(v_world.y*.047-u_time*.16));"
          + "gl_FragColor=vec4(mix(c.rgb,u_fogColor,clamp(mist,0.0,.45)),c.a);}\n";
@@ -237,6 +258,8 @@ public final class JohtoRenderer {
 
    private void collectWorld(Game game) {
       bedDepthValid=false;
+      Color sceneLight=game.mapBatch.getColor();
+      daylight=MathUtils.clamp((sceneLight.r+sceneLight.g)*.5f,0,1);
       natureTiles=game.map.tiles;heightShoreTile=null;
       shakingTrees.clear();
       growingPlants.clear();
@@ -1065,7 +1088,14 @@ public final class JohtoRenderer {
       float width = assets.worldWidth(sprite,height * sprite.getRegionWidth() / sprite.getRegionHeight());
       assetShadow(sprite,x,y,Math.min(width*.35f,10f),4);
       actorPlaneZ=-y;
-      upright(sprite,x-width/2,y,.2f,width,height,WHITE,5f);
+      boolean leafy=WorldNatureMotion.treeFlexible(key);
+      // Gameplay shaking owns the complete tree during Headbutt. Growth and
+      // cutting have separate presentation paths and never inherit wind state.
+      crownBend=leafy&&shake==null?MathUtils.clamp(height*.038f,1f,2f):0;
+      try {
+         if(leafy)canopyShadow(tile,sprite,x,y,width,height);
+         upright(sprite,x-width/2,y,.2f,width,height,WHITE,5f);
+      } finally {crownBend=0;}
    }
 
    private String treeKey(Tile tile, String name) { return WorldMaterials.treeKey(tile); }
@@ -1113,6 +1143,44 @@ public final class JohtoRenderer {
       shadow(x+(layout==null?0:layout.offsetX),y+(layout==null?0:layout.offsetY),width,depth);
    }
 
+   /** Soft projected crown shade, clipped to real dry ground at the tree's level.
+    * Each eight-unit patch follows terrain elevation: no floating screen overlay
+    * and no dark band climbing a cliff, building, actor or water surface. */
+   private void canopyShadow(Tile tree,TextureRegion region,float x,float y,float width,float height) {
+      if(natureTiles==null)return;
+      BwAssets.SpriteLayout layout=assets.layout(region);
+      x+=layout==null?0:layout.offsetX;y+=layout==null?0:layout.offsetY;
+      float movement=WorldNatureMotion.crownWind(x,y,natureSeconds,1,crownBend,reducedMotion);
+      float cx=x+height*.27f+movement*.65f,cy=y-height*.20f;
+      float rx=MathUtils.clamp(width*.43f,8,22),ry=MathUtils.clamp(height*.21f,5,14);
+      float strength=.07f+.30f*daylight,level=elevation.tileHeight(tree),previous=surfaceLift;
+      Buffer mesh=shadows.buffer(whiteTexture);surfaceLift=0;
+      int left=MathUtils.floor((cx-rx)/8),right=MathUtils.ceil((cx+rx)/8);
+      int bottom=MathUtils.floor((cy-ry)/8),top=MathUtils.ceil((cy+ry)/8);
+      for(int row=bottom;row<top;row++)for(int col=left;col<right;col++) {
+         float px=col*8,py=row*8;
+         Tile ground=natureTiles.get(lookup.set(MathUtils.floor((px+4)/16)*16,MathUtils.floor((py+4)/16)*16));
+         if(ground==null||ground.isWater||ground.isLava||ground.isWaterfall||ground.isLedge
+            ||ModernWorldGenerator.isRamp(ground)||Math.abs(elevation.tileHeight(ground)-level)>.35f)continue;
+         float a=crownShade(px,py,cx,cy,rx,ry,strength),b=crownShade(px+8,py,cx,cy,rx,ry,strength);
+         float c=crownShade(px+8,py+8,cx,cy,rx,ry,strength),d=crownShade(px,py+8,cx,cy,rx,ry,strength);
+         if(a+b+c+d<.006f)continue;
+         a=Color.toFloatBits(1,1,1,a);b=Color.toFloatBits(1,1,1,b);
+         c=Color.toFloatBits(1,1,1,c);d=Color.toFloatBits(1,1,1,d);
+         float ha=elevation.height(px+.01f,py+.01f)+.10f,hb=elevation.height(px+7.99f,py+.01f)+.10f;
+         float hc=elevation.height(px+7.99f,py+7.99f)+.10f,hd=elevation.height(px+.01f,py+7.99f)+.10f;
+         vertex(mesh,px,ha,-py,a,.5f,.5f,2);vertex(mesh,px+8,hb,-py,b,.5f,.5f,2);
+         vertex(mesh,px+8,hc,-py-8,c,.5f,.5f,2);vertex(mesh,px+8,hc,-py-8,c,.5f,.5f,2);
+         vertex(mesh,px,hd,-py-8,d,.5f,.5f,2);vertex(mesh,px,ha,-py,a,.5f,.5f,2);
+      }
+      surfaceLift=previous;
+   }
+
+   private static float crownShade(float x,float y,float cx,float cy,float rx,float ry,float strength) {
+      float dx=(x-cx)/rx,dy=(y-cy)/ry,edge=MathUtils.clamp(1-dx*dx-dy*dy,0,1);
+      return strength*edge*edge*(3-2*edge);
+   }
+
    private void shadow(float x, float y, float width, float depth) {
       Buffer mesh = shadows.buffer(whiteTexture);
       float tint = Color.toFloatBits(0.13f, 0.22f, 0.19f, 0.26f);
@@ -1151,14 +1219,19 @@ public final class JohtoRenderer {
    private void uprightRaw(TextureRegion region, float x, float y, float base, float width, float height, float tint, float style) {
       // Camera-facing sprites keep their pixel proportions in the tilted world.
       float rise = height * MathUtils.cosDeg(50f), back = height * MathUtils.sinDeg(50f);
-      if(vegetationBend>0&&!reducedMotion) {
+      if((vegetationBend>0||crownBend>0)&&!reducedMotion) {
          Buffer mesh=geometry.buffer(region.getTexture());
-         // Subdivide vertically: all bottom vertices remain fixed, then bending
-         // increases quadratically toward the tip. Texture and depth stay upright.
-         for(int strip=0;strip<3;strip++) {
-            float f0=strip/3f,f1=(strip+1)/3f;
-            float dx0=WorldNatureMotion.wind(x+width*.5f,y,natureSeconds,f0,vegetationBend,false);
-            float dx1=WorldNatureMotion.wind(x+width*.5f,y,natureSeconds,f1,vegetationBend,false);
+         // Grass has rooted tips; trees have an entirely fixed lower trunk.
+         // Subdivision deforms only X, preserving sprite UVs and the feet depth
+         // plane shared with Pokémon and the trainer behind/in front of foliage.
+         int strips=crownBend>0?6:3;
+         for(int strip=0;strip<strips;strip++) {
+            float f0=crownBend>0?CROWN_ROWS[strip]:strip/(float)strips;
+            float f1=crownBend>0?CROWN_ROWS[strip+1]:(strip+1)/(float)strips;
+            float dx0=crownBend>0?WorldNatureMotion.crownWind(x+width*.5f,y,natureSeconds,f0,crownBend,false)
+               :WorldNatureMotion.wind(x+width*.5f,y,natureSeconds,f0,vegetationBend,false);
+            float dx1=crownBend>0?WorldNatureMotion.crownWind(x+width*.5f,y,natureSeconds,f1,crownBend,false)
+               :WorldNatureMotion.wind(x+width*.5f,y,natureSeconds,f1,vegetationBend,false);
             float v0=MathUtils.lerp(region.getV2(),region.getV(),f0),v1=MathUtils.lerp(region.getV2(),region.getV(),f1);
             vertex(mesh,x+dx0,base+rise*f0,-y-back*f0,tint,region.getU(),v0,style);
             vertex(mesh,x+width+dx0,base+rise*f0,-y-back*f0,tint,region.getU2(),v0,style);

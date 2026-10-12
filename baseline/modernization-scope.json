@@ -5,7 +5,7 @@
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "eb57090d5d529353db5c6e75b7bc46f03bd7090a8204876e732d6f7419b45459",
+  "reviewed_patch_sha256": "6f84f11c380f98ffecf067944eaabef72e3a27996a036ccac788a51ac1bd74f1",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/CheckEndOfBattle.java",
@@ -245,12 +245,12 @@
       "scope": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration."
     },
     "src/com/pkmngen/game/JohtoBattleRenderer.java": {
-      "reviewed_sha256": "71aab5a233d74ddefec9641a14c26f0ba03c9d58b7c397f265428b8acf2a3b77",
-      "scope": "Modern biome battle arenas/HUD and full-viewport composition; continuous preserved-world encounter ribbon and shutter reveal, reduced-motion fades, calm return transition and existing boss presentation, with original action durations and dispatch unchanged."
+      "reviewed_sha256": "a1a20a0a9a5984c16ab29feffd576dd1ec55e019e13f9cfd33d9c650c3b61cbc",
+      "scope": "Modern full-viewport biome arenas/HUD and preserved encounter transitions. Owns cached animated background scenery and a presentation-only clock; restores batch shader/projection/color, keeps combatant platforms and UI stable, preserves original action durations/dispatch and boss effects, and freezes scenery for reduced motion."
     },
     "src/com/pkmngen/game/JohtoRenderer.java": {
-      "reviewed_sha256": "59a019f9713183dfaf4a168c0622bcf6e98ada9bbcd681096c024f58810c073f",
-      "scope": "Exclusive perspective scene with natural material transitions, shared terrain heights and actor/prop foot depth. Adds rooted low-vegetation wind, curved world-space water waves, shoreline foam/wet sand and sand-to-water height continuity; separate reduced-motion environmental clock. Retains PMD envelopes, field-action feedback, bed depth, custom asset contracts and original action clocks; no gameplay/RNG/saved-state writes."
+      "reviewed_sha256": "58089638cb46decd8c94fd97198483d49e38b4e70d74504221e35d2cec089292",
+      "scope": "Exclusive perspective world renderer with shared terrain/actor depth. Stronger world-space water swell, ripples and moving reflections offshore and at real shores; selective rooted crown wind, grounded canopy shadows and local lighting. Preserves atlas bounds, field-action trees, actor geometry, original action clocks and reduced-motion environmental freeze; no gameplay, RNG, map generation or saved-state writes."
     },
     "src/com/pkmngen/game/ModernBatch.java": {
       "reviewed_sha256": "f02a0d0fd3f6e2e2a38a975c2a1a0ada4197770a5371c1d73d08e06474d44cd4",
@@ -349,8 +349,12 @@
       "scope": "Generation-only reconstruction and deterministic 17/9/5-cell authored modules for ten natural biome families. Region-specific footprints, minimum useful pocket area, immutable water/tidal/maze boundaries, protected event and encounter access, biome/route preservation, dry connectivity and no save-load regeneration."
     },
     "src/com/pkmngen/game/WorldNatureMotion.java": {
-      "reviewed_sha256": "6b16e90c214da83fb81cde194b95130f8be1152089ff9cbda403d12523a803ad",
-      "scope": "Pure presentation helper for bounded wind and real nearby shore/sand distance masks, excluding ledges, ramps and mismatched elevation. Coordinate-derived read-only signals; no textures, gameplay clocks, RNG or persisted state."
+      "reviewed_sha256": "cb966c782c18e9d3463b5e984af8468be6b4b6c2138ae7cce94374ebf6ed861f",
+      "scope": "Pure coordinate-derived bounded vegetation/crown wind and nearby shore/sand masks. Fixed trunk/root region, deterministic selected live trees, excludes rigid/dead objects and elevation discontinuities; no textures, gameplay clocks, RNG, map mutation or persisted state."
+    },
+    "src/com/pkmngen/game/BattleScenery.java": {
+      "reviewed_sha256": "01d39182ca416f377cdd2e6282dd815dcab848b09c3ea0d0d663ef8c7f1f5d5f",
+      "scope": "GPU-only biome background effects and gentle 2.5D background parallax with protected near-ground and combatant platforms. Owns/disposes its shader, restores caller batch state and uses a bounded presentation clock; no battle rules, actor positions, action timers, RNG or save writes."
     }
   },
   "review_notes": [
@@ -384,7 +388,8 @@
     "Step 3 on main 500a9c9c: explicitly reviewed title/setup/options and trainer presentation; transactional text focus fixes WASD editing traps, draft validated controls persist separately, inventory pointer/description navigation retains original item operations. DrawSetupMenu, Player, saves, combat rules and every original PNG remain byte-identical. Prior manifest/verifier archived in baseline/java-interface-step3. Actual acceptance receipts are required before merging or packaging.",
     "Step 3 pointer safety review: popup rows share the presenter hitboxes; a click on a different choice selects without confirming the old YES/USE selection, a subsequent click delegates the original action. Outside clicks do not act. Keyboard controls remain unchanged.",
     "2026-10-12: recovered ac526d14 unchanged, then reviewed authored generation modules, terrain/billboard readability and modern UI/encounter presentation; pre-change review archived; battle/save/controller sources outside this scope unchanged. Native results are separate.",
-    "2026-10-12 living world: reviewed biome-specific structural modules and boundary retention, world-space nature rendering/shore heights, regional materials and reduced-motion accents. Previous local 5dd0db06 manifest/verifier/verification archived; original combat, Player, save and map sources unchanged. Native evidence remains separate."
+    "2026-10-12 living world: reviewed biome-specific structural modules and boundary retention, world-space nature rendering/shore heights, regional materials and reduced-motion accents. Previous local 5dd0db06 manifest/verifier/verification archived; original combat, Player, save and map sources unchanged. Native evidence remains separate.",
+    "2026-10-12 cinematic nature: reviewed stronger offshore water and grounded canopy motion/lighting plus biome battle background animation and 2.5D parallax. Four presentation helpers only; original combat, Player, save and terrain generation unchanged from accepted f3b55100. Prior manifest/verifier/verification archived in before-cinematic-nature; native evidence separate."
   ],
   "historical_v2": "baseline/modernization-v2/archive.json",
   "historical_v3": "baseline/modernization-v3/",

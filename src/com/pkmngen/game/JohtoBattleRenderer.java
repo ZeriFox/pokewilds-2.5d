@@ -23,6 +23,8 @@ public final class JohtoBattleRenderer {
    private Texture rippleSnapshot;
    private Texture arena;
    private String arenaBiome;
+   private final BattleScenery scenery=new BattleScenery();
+   private float scenerySeconds;
    private SpriteBatch snapshotBatch;
    private int snapshotWidth, snapshotHeight;
    private long frame, lastBattleFrame = -1, lastTransitionFrame = -1;
@@ -57,6 +59,9 @@ public final class JohtoBattleRenderer {
       battleCanvas = phase.equals("intro") || phase.equals("wipe") || phase.equals("out")
          || game.player != null && game.player.dontDrawMapDuringBattle;
       for (Action action : game.actionStack) if (action instanceof DrawBattle) battleCanvas = true;
+      ModernUi modernUi=ModernUi.get(game);
+      if(battleCanvas&&(modernUi==null||!modernUi.reducedMotion()))
+         scenerySeconds+=Math.min(.05f,Math.max(0,Gdx.graphics.getDeltaTime()));
       if (worldRendered) captureWorld();
       // A cleanup can remove DrawBattle before the next world pass. Always
       // supply an opaque modern frame in that gap, even with no fade action.
@@ -193,7 +198,7 @@ public final class JohtoBattleRenderer {
       game.uiBatch.setColor(Color.WHITE);
       float aspect=Gdx.graphics.getBackBufferWidth()/(float)Math.max(1,Gdx.graphics.getBackBufferHeight());
       float w=Math.max(160,144*aspect),h=Math.max(144,160/aspect);
-      game.uiBatch.draw(arena,(160-w)*.5f,(144-h)*.5f,w,h);
+      scenery.draw(game.uiBatch,arena,biome,ui.reducedMotion()?0:scenerySeconds,(160-w)*.5f,(144-h)*.5f,w,h);
       game.uiBatch.setColor(oldColor);
       if (lastBattleFrame != frame) { battleFrames++; lastBattleFrame = frame; }
    }
@@ -454,6 +459,7 @@ public final class JohtoBattleRenderer {
    /** Compose authored landscape tiles and props into a fixed battle stage. */
    private void ensureArena(String biome) {
       if (biome == null) biome = "grassland";
+      biome=biome.toLowerCase(Locale.ROOT);
       float aspect=Gdx.graphics.getBackBufferWidth()/(float)Math.max(1,Gdx.graphics.getBackBufferHeight());
       int width=(int)Math.ceil(Math.max(320,288*aspect)),height=(int)Math.ceil(Math.max(288,320/aspect));
       if (arena != null && biome.equals(arenaBiome) && width==arenaWidth && height==arenaHeight) return;
@@ -467,11 +473,12 @@ public final class JohtoBattleRenderer {
       boolean cave = biome.contains("cave") || biome.contains("volcan") || biome.contains("dungeon");
       boolean volcano = biome.contains("volcan");
       boolean graveyard=biome.contains("graveyard");
-      BiomeProfiles.Profile profile=BiomeProfiles.named(volcano?"volcano":graveyard?"graveyard":snow?"snow":sand?"desert":cave?"cave":biome.contains("forest")?"forest":"plains");
+      boolean marine=BattleScenery.kind(biome)<=2;
+      BiomeProfiles.Profile profile=BiomeProfiles.named(volcano?"volcano":graveyard?"graveyard":snow?"snow":marine?"beach":sand?"desert":cave?"cave":biome.contains("forest")?"forest":"plains");
       Color sky = graveyard?new Color(.20f,.28f,.28f,1):volcano ? new Color(.22f,.09f,.14f,1) : cave ? new Color(.12f,.18f,.26f,1)
-         : snow ? new Color(.69f,.79f,.88f,1) : sand ? new Color(.76f,.83f,.80f,1) : new Color(.49f,.69f,.64f,1);
+         : snow ? new Color(.69f,.79f,.88f,1) : marine ? new Color(.35f,.63f,.79f,1) : sand ? new Color(.76f,.83f,.80f,1) : new Color(.49f,.69f,.64f,1);
       Color horizon = graveyard?new Color(.46f,.53f,.49f,1):volcano ? new Color(.48f,.16f,.13f,1) : cave ? new Color(.25f,.34f,.40f,1)
-         : new Color(.83f,.88f,.69f,1);
+         : marine ? new Color(.76f,.89f,.86f,1) : new Color(.83f,.88f,.69f,1);
       for (int y = 0; y < height; y++) {
          tint.set(sky).lerp(horizon,MathUtils.clamp((y-offsetY)/105f,0,1));
          p.setColor(tint); p.drawLine(0,y,width-1,y);
@@ -480,6 +487,7 @@ public final class JohtoBattleRenderer {
       BwAssets assets=BwAssets.get();
       TextureRegion ground=assets.cell(profile.terrain("ground"),0,0);
       paintGround(p,atlas,ground,horizon);
+      if(marine)paintSea(p,atlas,assets.namedAnimated(profile.string("fluid","water","water"),0));
       if (cave) {
          TextureRegion wall=assets.named(profile.cliff("front"));
          Color wallTint=volcano?Color.WHITE:new Color(.58f,.64f,.72f,1);
@@ -487,7 +495,7 @@ public final class JohtoBattleRenderer {
          TextureRegion stone=assets.named(profile.decor("rock"));
          if (stone==null) stone=assets.named("rock");
          for (int x=-18-offsetX;x<340+offsetX;x+=43) stamp(p,atlas,stone,x+offsetX,offsetY+53+(x&15),36,48,new Color(.72f,.80f,.84f,1));
-      } else {
+      } else if(!marine) {
          TextureRegion tree=assets.named(snow||sand||graveyard?profile.decor("tree"):"forest_tree");
          if (tree==null) tree=assets.named("tree");
          for (int x=-30-offsetX;x<350+offsetX;x+=37) {
@@ -585,6 +593,24 @@ public final class JohtoBattleRenderer {
       }
    }
 
+   /** The shoreline is part of the cached scene; only light and wave phase vary per frame. */
+   private static void paintSea(Pixmap destination,Pixmap atlas,TextureRegion water) {
+      if(water==null)return;
+      int offsetY=(destination.getHeight()-288)/2,offsetX=(destination.getWidth()-320)/2;
+      Color pixel=new Color(),deepSea=new Color(.16f,.43f,.50f,1);
+      for(int x=0;x<destination.getWidth();x++) {
+         int shore=offsetY+143+Math.round(7*MathUtils.sin((x-offsetX)/43f));
+         for(int y=offsetY+76;y<shore;y++) {
+            int rgba=atlas.getPixel(water.getRegionX()+Math.floorMod(x,water.getRegionWidth()),
+               water.getRegionY()+Math.floorMod(y,water.getRegionHeight()));
+            Color.rgba8888ToColor(pixel,rgba);
+            float depth=MathUtils.clamp((y-offsetY-76)/67f,0,1);
+            pixel.lerp(deepSea,.32f*(1-depth));
+            destination.drawPixel(x,y,Color.rgba8888(pixel));
+         }
+      }
+   }
+
    private static void ellipse(Pixmap p, int x, int y, int width, int height, Color color) {
       p.setColor(color);
       for (int row = 0; row < height; row++) {
@@ -602,6 +628,7 @@ public final class JohtoBattleRenderer {
       if (worldSnapshot != null) worldSnapshot.dispose();
       if (rippleSnapshot != null) rippleSnapshot.dispose();
       if (arena != null) arena.dispose();
+      scenery.dispose();
       if (snapshotBatch != null) snapshotBatch.dispose();
       transitionLengths.clear();
    }

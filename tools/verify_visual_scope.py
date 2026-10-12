@@ -20,8 +20,14 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "6a4d1767b748c53ae6e7ec1c10470f8cf09091af2cc356175fbbbe4fa5ff1a67"
+FROZEN_MANIFEST_SHA256 = "835e48420251cbeb252e3ef0f716969f06c4e5509a8a0f8b3cf73432e0df4a66"
 PREFIX = "src/com/pkmngen/game/"
+# Immutable local build accepted before stronger nature/battle presentation.
+CINEMATIC_NATURE_ARCHIVE = {
+    "baseline/before-cinematic-nature/modernization-scope.json": "6a4d1767b748c53ae6e7ec1c10470f8cf09091af2cc356175fbbbe4fa5ff1a67",
+    "baseline/before-cinematic-nature/verify_visual_scope.py": "892de550361952c2f57846ad7f1a54589ebbbc305beb324d82a77627e18409f9",
+    "baseline/before-cinematic-nature/VERIFICA.txt": "d03d78cdb7d03d31cbf30b13931313ec6466ecd30b82e81acfa13f5a911aef3a",
+}
 # Immutable local build accepted before the broader biome/nature pass.
 LIVING_WORLD_ARCHIVE = {
     "baseline/before-living-world/modernization-scope.json": "b46f145b24d5ad774f5aebfdd4a8fa23b2166968b097bdfffabb00a7b703ed13",
@@ -103,7 +109,8 @@ MODIFIED_SCOPES = {
     "util/SpriteProxy.java": "Presentation: intercept known battle actors for PMD rendering; legacy fallback retained.",
 }
 ADDED_SCOPES = {
-    "WorldNatureMotion.java": "Pure presentation helper for bounded wind and real nearby shore/sand distance masks, excluding ledges, ramps and mismatched elevation. Coordinate-derived read-only signals; no textures, gameplay clocks, RNG or persisted state.",
+    "BattleScenery.java": "GPU-only biome background effects and gentle 2.5D background parallax with protected near-ground and combatant platforms. Owns/disposes its shader, restores caller batch state and uses a bounded presentation clock; no battle rules, actor positions, action timers, RNG or save writes.",
+    "WorldNatureMotion.java": "Pure coordinate-derived bounded vegetation/crown wind and nearby shore/sand masks. Fixed trunk/root region, deterministic selected live trees, excludes rigid/dead objects and elevation discontinuities; no textures, gameplay clocks, RNG, map mutation or persisted state.",
     "AuthoredTerrain.java": "Generation-only reconstruction and deterministic 17/9/5-cell authored modules for ten natural biome families. Region-specific footprints, minimum useful pocket area, immutable water/tidal/maze boundaries, protected event and encounter access, biome/route preservation, dry connectivity and no save-load regeneration.",
     'DesktopInterfaceSettings.java': 'Explicit local UI/control preferences, draft validation, reserved menu keys and duplicate rejection, atomic save with backup; no game-save schema or legacy settings-file rewrite.',
     'DesktopMenuController.java': 'Desktop title/home/setup state, explicit transactional text focus, input-context release barriers, complete trainer/mod selection and F1 options; native Go delegates untouched original setup operations once; pointer inventory selection uses existing action data without item creation or use/toss rule changes.',
@@ -120,8 +127,8 @@ ADDED_SCOPES = {
     "DesktopControls.java": "Authorized desktop binding parser, exact legacy-preset migration, text-entry detection and truthful dynamic hints. Step 3 treats only an explicitly active setup edit as text focus; highlighting a row is navigation.",
     "StartupVerification.java": "Opt-in packaged-launch probe inside the delivered Game: observe 120 original menu frames, verify nonempty framebuffer, save capture and exit normally; disabled in ordinary play.",
     "ExpansionDex.java": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration.",
-    "JohtoBattleRenderer.java": "Modern biome battle arenas/HUD and full-viewport composition; continuous preserved-world encounter ribbon and shutter reveal, reduced-motion fades, calm return transition and existing boss presentation, with original action durations and dispatch unchanged.",
-    "JohtoRenderer.java": "Exclusive perspective scene with natural material transitions, shared terrain heights and actor/prop foot depth. Adds rooted low-vegetation wind, curved world-space water waves, shoreline foam/wet sand and sand-to-water height continuity; separate reduced-motion environmental clock. Retains PMD envelopes, field-action feedback, bed depth, custom asset contracts and original action clocks; no gameplay/RNG/saved-state writes.",
+    "JohtoBattleRenderer.java": "Modern full-viewport biome arenas/HUD and preserved encounter transitions. Owns cached animated background scenery and a presentation-only clock; restores batch shader/projection/color, keeps combatant platforms and UI stable, preserves original action durations/dispatch and boss effects, and freezes scenery for reduced motion.",
+    "JohtoRenderer.java": "Exclusive perspective world renderer with shared terrain/actor depth. Stronger world-space water swell, ripples and moving reflections offshore and at real shores; selective rooted crown wind, grounded canopy shadows and local lighting. Preserves atlas bounds, field-action trees, actor geometry, original action clocks and reduced-motion environmental freeze; no gameplay, RNG, map generation or saved-state writes.",
     "ModernBatch.java": "Suppress legacy draw submissions while original menu actions advance.",
     "ModernInventoryUi.java": "Modern inventory/item/crafting/guide presentation with shared palette/cards, five pocket tabs, quantity-safe list, scrollbar and scrollable detail pane; controller hitboxes and item/crafting rules unchanged.",
     "ModernPartyUi.java": "Modern setup/party/storage/nickname UI with shared modern cards replacing old party-sheet backgrounds, full animated summary actors and reduced-motion support; existing hitboxes, setup delegation, controls and action semantics unchanged.",
@@ -148,6 +155,9 @@ def sha256(path: Path) -> str:
 
 
 def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
+    for archived, expected in CINEMATIC_NATURE_ARCHIVE.items():
+        if sha256(root / archived) != expected:
+            raise RuntimeError("Pre-cinematic nature archive changed: " + archived)
     for archived, expected in LIVING_WORLD_ARCHIVE.items():
         if sha256(root / archived) != expected:
             raise RuntimeError("Immutable pre-living-world review archive changed: " + archived)

@@ -1,93 +1,72 @@
-VERIFICA — mondo procedurale e natura animata, 12 ottobre 2026
+VERIFICA - mare, luci, chiome e battaglie animate, 12 ottobre 2026
 
 VERSIONE LOCALE
-Base: 5dd0db0661e40db3c41795cfb666a2b44c3144bf.
+Base: f3b55100391b8dbcdd93fbed7606bcfe6d92298b.
 Ramo: work/local-terrain-2026-10-12.
-Backup: backup/before-living-world-2026-10-12.
+Backup: backup/before-cinematic-nature-2026-10-12.
 Nessun push, tag o nuova release. Avvio con AVVIA-POKEWILDS.cmd
 oppure con il collegamento desktop "PokeWilds 2.5D - Prova locale".
-Le animazioni valgono anche sulle isole salvate; per la nuova disposizione
-strutturale serve una nuova avventura/isola. I salvataggi non sono rigenerati.
+Gli effetti funzionano anche sui mondi salvati: non serve una nuova isola.
+La generazione del terreno e le regole di gioco non cambiano in questa revisione.
 
 ARTEFATTO VERIFICATO
 dist/pokewilds-rebuilt.jar
-SHA-256: 0caeb79e78463842d903db0ecd04f82bac62beac65a2379cba72969b472118f7
-Dimensione: 298077319 byte; 108950 voci ZIP.
-Java 17, 230 sorgenti, 491 classi compilate.
+SHA-256: 07b37a476cb0a9623842c4e7fc79cc192e76c2b139ff4bfc8f17025f526349bb
+Dimensione: 298082731 byte; 108951 voci ZIP.
+Java 17, 231 sorgenti, 492 classi compilate.
 Modelli GLB esclusi; zero classi di gioco copiate dal runtime upstream.
 Sorgenti, risorse e librerie corrispondono al build report.
-Digest sorgenti: 8938bb23ea401e86250ab4896e8ed150a065b6e8375bebed7df536953b35c2b6
-Ricevuta con hash dei log: build/living-world-verification/final.json.
+Digest sorgenti: 0f791e1dd9275ff10afb67172d6485457b42402b6b9a8c9431120dfcc3aa3e96
+Ricevuta con hash dei log: build/cinematic-verification/final.json.
 Avvio reale java -jar: 120 frame, uscita regolare, Java incluso,
-cartella isolata build/living-world-launcher.
+cartella isolata build/cinematic-launcher.
 
 MODIFICHE
-- 33 pezzi progettati da 17, 9 e 5 celle per dieci famiglie naturali:
-  pianura/bosco, foresta profonda, palude, montagna, neve, deserto,
-  spiaggia, oasi, savana e cimitero. Terreno, ostacoli e accessi reali.
-- Il nuovo assemblaggio preserva acqua/maree, eventi, labirinti, tombe,
-  costruzioni e incontri. Caldera con due scalinate e passaggio asciutto.
-  Il raccordo rive preesistente puo riempire singole water2 interne quasi
-  circondate da terra; non si dichiara acqua identica nella generazione completa.
-  Corretti i bordi dei pocket intorno a incontri/attori riservati; anche il
-  raccordo delle rive esclude acqua riservata, incontri memorizzati e dungeon.
-- Vento su erba, fiori e vegetazione bassa flessibile, radici ferme;
-  alberi, cactus, personaggi e arredi non vengono deformati.
-- Onde in coordinate mondo, schiuma e risacca alle coste effettive,
-  sabbia umida e raccordo del fondale alla spiaggia. Nessun collider animato.
-- Materiali regionali per vegetazione e grotte; grafica esistente conservata.
-- Movimento ridotto congela gli effetti ambientali, non azioni e personaggi.
+- Onde ampie, increspature incrociate e riflessi continui anche in mare aperto;
+  gradiente di profondita piu marcato, schiuma e risacca sulle coste reali.
+- Vento sulle chiome degli alberi vivi selezionati, con tronchi e radici fissi.
+  Alberi secchi e oggetti rigidi conservano la forma. Taglio, crescita e
+  Bottintesta mantengono la propria animazione di azione.
+- Ombre morbide delle chiome adattate alla quota del suolo asciutto,
+  contrasto diurno e luce locale piu calda. Ombre approssimate, non shadow map.
+- Fondali animati per otto ambienti di battaglia: acqua, luce, nuvole,
+  vegetazione, lava, nebbia. Parallasse lenta della camera sullo sfondo 2.5D;
+  pedane, combattenti e interfaccia mantengono i rispettivi ancoraggi.
+- Movimento ridotto congela gli effetti ambientali e la parallasse.
+  Le animazioni delle azioni e le regole di gioco continuano normalmente.
+- Risorse raster esistenti riutilizzate; nessun pacchetto sprite sostituito.
 
 VERIFICHE FINALI
 14 suite native sul JAR indicato, senza sorgenti o risorse sovrapposte:
-- modern_world_test.py
-- authored_terrain_test.py
-- world_elevation_test.py
-- biome_habitat_test.py
-- nature_animation_test.py
-- terrain_readability_test.py
-- world_presentation_layers_test.py
-- field_scene_test.py
-- battle_entry_test.py
-- world_mesh_batch_test.py
-- bw_assets_integration_test.py
-- biome_scene_test.py
-- landscape_smoke_test.py
-- modern_ui_smoke_test.py
+- tools/nature_animation_test.py: NATURE ANIMATION PASS: checks=40957, scenes=15, captures=45, animated open ocean/coast/vegetation/crowns, rooted trunks, directional and local light/shadows, shore seams, deterministic frames, reduced motion, unchanged tiles/RNG
+- tools/battle_scenery_test.py: BATTLE SCENERY PASS: checks=2905, scenes=32, captures=24, four aspects, real shader motion, fixed actor/stage/UI anchors, reduced motion, cache/disposal, batch state, gameplay/RNG unchanged
+- tools/terrain_readability_test.py: TERRAIN READABILITY PASS: checks=402, screenshots=6, frames=110, flat/inclined stairs, material boundaries, PMD/tree overlap, B/W trainer
+- tools/world_presentation_layers_test.py: WORLD PRESENTATION LAYERS PASS: 714143 checks; semantic roles, whole rectangular sprites, flat volcanic cracks, seven on/off scenes, UI/focus budgets, deterministic RNG-free accents, indoor reset
+- tools/field_scene_test.py: FIELD PASS: exclusive modern world; POWER/BUILD/DIG/SURF/FLY/RIDE activation; real BUILD placement/collision/resources, DIG excavation/refill/resources, cancellation without consumption; Surf/Ride movement and FLY takeoff/key movement/RMB landing; CUT/HEADBUTT/plant clocks and next actions; original couch enter/exit, bed sleep/wake, kiln enter/cancel, filtered-empty fishing and rod-restricted catch into battle; furniture geometry/projection and previews/light/pose snapshots
+- tools/world_mesh_batch_test.py: WORLD MESH BATCH PASS: 2097471 assertions; real GL, chunk boundaries, reuse, eviction, borrowed textures
+- tools/biome_scene_test.py: BIOME SCENE PASS: dedicated desert art; volcanic/graveyard day/night; closed plateau and continuous ramp; waterfall; walkable high/low tides and localized puddles with visible sand bed; real SpawnGhost/DrawGhost/DespawnGhost lifecycle with zero post-despawn draws
+- tools/landscape_smoke_test.py: LANDSCAPE PASS: day/night, relief/ramp, caldera, interior, real EnterBuilding/exit, PMD/BW GPU rendering
+- tools/battle_entry_test.py: BATTLE ENTRY PASS sizes=4 motionModes=2 originalIntroFrames=74 originalWipeFrames=70 coveredFrames=1152 captures=64 reducedMotion=stationaryFade
+- tools/battle_viewport_test.py: BATTLE VIEWPORT PASS sizes=5 biomes=6 zooms=5 exitFrames=170 captures=82 panoramaMarginPixels=12154480 missingWorldGap=opaque
+- tools/pmd_battle_visual_test.py: PMD BATTLE VISUAL PASS captures=18 originalActions=EnemyFaint,FriendlyFaint,ThrowOutPokemonCrystal,EvolutionAnim,EggHatchAnim,PokemonFrame
+- tools/boss_battle_visual_test.py: BOSS VISUAL PASS captures=18 mewtwoIntroFrames=641 gengarIntroFrames=391 regigigasSpecialFrames=201 originalRocksAndRipple=PASS cleanup=PASS
+- tools/modern_world_test.py: WORLD PASS: original S generation, native rendering, one movement, save/load, clean close
+- tools/modern_ui_smoke_test.py: UI PASS: original input, menus, crafting, NPC encounter, battle turn, flee, capture and save/load
 
-Nature: 36088 controlli, 11 scene, 33 PNG; continuita costa, radici fisse,
-pixel stabili con movimento ridotto, flag e RNG invariati.
-AuthoredTerrain: 798767 controlli, 12 seed bosco e nove altre famiglie
-su quattro seed ciascuna, contenuti protetti, bordi e serializzazione.
-Regressioni per pozze con attori/incontri speciali, loro alone e successivo
-raccordo delle rive; conservato il comportamento dell'acqua ordinaria.
-Presentation layers: 714143 controlli; terreno: 342 controlli GPU.
-WorldMeshBatch: 2097471 asserzioni e parita CPU/GPU.
-FieldScene: 2140 frame, 108 effetti, zero disegni legacy inviati.
-BattleEntry: 1152 frame, 64 catture, quattro formati e due modalita movimento.
-BW assets: 8759 controlli, 218 regioni, 24 frame animati.
-Il falso positivo iniziale di BiomeScene scambiava i gradini chiari per
-parti del trainer: verifica corretta, senza modificare il renderer.
-
-MONDO REALE
-Seed -8651504418136730931; 169576 celle prima, 169576 dopo.
-398 moduli, 8 terrazze, 26908 celle preparate, 12013 celle nei moduli,
-6648 cambiamenti effettivi. Preparazione e moduli si sovrappongono:
-non sommare i due conteggi come copertura.
-Moduli per famiglia: {'beach': 16, 'desert': 79, 'graveyard': 1, 'mountain': 83, 'oasis': 3, 'savanna': 79, 'snow': 40, 'temperate': 78, 'wetland': 19}.
-Una famiglia assente in questo elenco non ha una stanza accettata su questa
-specifica isola; le dieci famiglie sono anche verificate su fixture a seed fisso.
-Generazione originale, movimento, salvataggio/caricamento superati,
-zero fallback classici. 9 anteprime effettive in build/modern-world.
+Nature: 40957 controlli, 15 scene, 45 PNG.
+Mare aperto distribuito, movimento fra frame dello stesso atlas, radici fisse,
+chiome flessibili, luci locali, riduzione del movimento, terreno e RNG invariati.
+BattleScenery: otto biomi per quattro proporzioni della finestra, 32 scene e
+24 PNG; shader/batch ripristinati, arena riutilizzata, pedane e comandi fissi,
+invarianti combattenti/mappa/RNG e ciclo di vita delle risorse.
+Mondo reale: generazione originale, movimento, salvataggio/caricamento;
+9 anteprime effettive in build/modern-world. Dettagli e seed nella ricevuta.
 
 AUDIT E LIMITI
-157 sorgenti originali invariati, 41 con ambito esplicito, 32 aggiunte;
-33 mutazioni non autorizzate respinte. Archivio pre-modifiche in
-baseline/before-living-world. Dettagli in docs/LIVING-WORLD.md.
-La ricostruzione riguarda celle naturali compatibili: non ogni cella o
-struttura del gioco viene sostituita. Ingressi, enigmi e percorsi protetti
-conservano la propria struttura. L'inserimento dipende dal seed e dallo spazio.
+157 sorgenti originali invariati, 41 con ambito esplicito, 33 aggiunte;
+37 mutazioni non autorizzate respinte. Archivio precedente in
+baseline/before-cinematic-nature. Dettagli in docs/CINEMATIC-NATURE.md.
 Prove automatiche sulla GPU disponibile, non una campagna manuale completa,
 una prova multiplayer o un benchmark su altre macchine.
 Il salvataggio personale Kiri.sav non e stato aperto.
-Queste 14 suite non sono l'intera pipeline di 29 suite per una release.
+Queste 14 suite non sono l'intera pipeline di 30 suite native per una release.

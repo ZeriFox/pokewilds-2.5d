@@ -21,6 +21,20 @@ final class WorldNatureMotion {
       return amplitude*f*f*(broad*.78f+ripple*.22f);
    }
 
+   /** Only catalogued leafy crowns bend; the lower trunk is a rigid anchor. */
+   static boolean treeFlexible(String key) {
+      return "tree".equals(key)||"tree_oak".equals(key)||"tree_pine".equals(key)
+         ||"tree_snow".equals(key)||"forest_tree_willow".equals(key);
+   }
+   static float crownWind(float x,float y,float time,float fraction,float amplitude,boolean reducedMotion) {
+      if(reducedMotion||fraction<=.45f||amplitude==0)return 0;
+      float f=MathUtils.clamp((fraction-.45f)/.55f,0,1);
+      // Follow the same gust as the undergrowth, with a slower branch response.
+      float gust=wind(x,y,time,1,1,false);
+      float branch=MathUtils.sin(x*.025f+y*.019f-time*.83f);
+      return amplitude*f*f*(3-2*f)*(gust*.72f+branch*.28f);
+   }
+
    static boolean water(Tile tile) {
       return tile!=null&&tile.isWater&&!tile.isLava&&!tile.isWaterfall;
    }

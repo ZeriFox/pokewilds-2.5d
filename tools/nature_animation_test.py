@@ -13,13 +13,16 @@ from smoke_test import CREATE_FLAGS, JAR, ROOT, find_jdk, sha256
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--sources', action='store_true', help='Diagnostic only: compile current sources and load source resources')
+    parser.add_argument('--output', default='nature-animation', help='Test folder immediately inside build/ (diagnostics can use a separate folder)')
     args = parser.parse_args()
-    destination = ROOT / 'build/nature-animation'
+    if not re.fullmatch(r'[a-z0-9][a-z0-9-]*', args.output):
+        raise ValueError('Output must be a plain folder name inside build/')
+    destination = ROOT / 'build' / args.output
     classes = destination / ('source-classes' if args.sources else 'jar-classes')
-    if destination.is_symlink() or classes.is_symlink():
+    expected_output = ROOT.resolve() / 'build' / args.output
+    if destination.is_symlink() or classes.is_symlink() or destination.resolve() != expected_output:
         raise RuntimeError('Test output must not be a link')
     classes.mkdir(parents=True, exist_ok=True)
-    expected_output = (ROOT / 'build/nature-animation').resolve()
     for image in destination.glob('*.png'):
         if image.is_symlink() or image.resolve().parent != expected_output:
             raise RuntimeError('Unexpected image path in test output')
@@ -59,12 +62,19 @@ def main() -> int:
                 print(f'FAIL: {logpath}')
                 return result.returncode
     output = logpath.read_text(encoding='utf-8')
-    if ('NATURE ANIMATION PASS:' not in output or len(list(destination.glob('*.png'))) != 33
+    evidence = re.search(r'NATURE ANIMATION PASS: checks=(\d+), scenes=(\d+), captures=(\d+)', output)
+    # Fifteen controlled scenes: preserve the eleven existing fixtures, then add
+    # open ocean, living crowns, a rigid tree and day/night/local-light isolation.
+    expected_names = [f'{number:02d}-' for number in range(1, 16)]
+    images = list(destination.glob('*.png'))
+    if (not evidence or int(evidence[2]) != 15 or int(evidence[3]) != 45
+            or len(images) != 45 or any(sum(p.name.startswith(prefix) for p in images) != 3 for prefix in expected_names)
             or re.search(r'(?m)^\s*(?:[\w$]+\.)*[\w$]*(?:Exception|Error)(?:[:\s]|$)|^\s*at\s+[\w.$]+\(', output)):
         receipt.update(status='failed', reason='Incomplete native evidence')
         receipt_path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
         raise RuntimeError(f'Incomplete native test: {logpath}')
-    receipt.update(status='passed', log_sha256=sha256(logpath),
+    receipt.update(status='passed', checks=int(evidence[1]), scenes=int(evidence[2]), captures=int(evidence[3]),
+                   log_sha256=sha256(logpath),
                    images={p.name: sha256(p) for p in sorted(destination.glob('*.png'))})
     receipt_path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
     print(f'PASS: {logpath}')

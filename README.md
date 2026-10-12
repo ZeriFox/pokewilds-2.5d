@@ -4,7 +4,7 @@ Una ricostruzione PC di PokeWilds 0.8.11 in Java/LibGDX, con mondo prospettico, 
 
 La versione aggiunge **552 specie giocabili** alle 410 della base, per **962 specie totali**, una caldera vulcanica e rampe percorribili tra alcune terrazze montane. La mappa resta procedurale: il nuovo passaggio di generazione modifica davvero terreno e collisioni. La presentazione predefinita usa sprite 2D e la build normale esclude i modelli GLB. È una versione Windows PC x64, non un port Nintendo 3DS.
 
-La lavorazione locale corrente prosegue dal commit `5dd0db06`: [mondo e natura animata](docs/LIVING-WORLD.md), [ricevuta della build e verifiche](VERIFICA.txt). Avvia **AVVIA-POKEWILDS.cmd** nella cartella completa. Le animazioni valgono anche nei salvataggi esistenti; per la nuova struttura procedurale serve una nuova avventura/isola. Questa lavorazione non crea una release GitHub. Il precedente pacchetto **v0.8.11-stardew.1** e le anteprime seguenti sono storici; [REWORK-STATUS.md](docs/REWORK-STATUS.md) ne conserva lo stato e gli hash.
+La lavorazione locale corrente prosegue dal commit `f3b55100`: [mare, chiome e scenari di battaglia](docs/CINEMATIC-NATURE.md), [ricevuta della build e verifiche](VERIFICA.txt). Avvia **AVVIA-POKEWILDS.cmd** nella cartella completa. Questi nuovi effetti funzionano anche sui mondi salvati. La precedente [ricostruzione del terreno](docs/LIVING-WORLD.md) richiede invece una nuova avventura/isola per vedere la diversa disposizione strutturale. Questa lavorazione non crea una release GitHub. Il precedente pacchetto **v0.8.11-stardew.1** e le anteprime seguenti sono storici; [REWORK-STATUS.md](docs/REWORK-STATUS.md) ne conserva lo stato e gli hash.
 
 ![Mondo procedurale in 2.5D](anteprima-25d.png)
 
