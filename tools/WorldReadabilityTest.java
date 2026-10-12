@@ -110,7 +110,15 @@ public final class WorldReadabilityTest {
             put(ground,upper,x,y,"mountain");
          }
          map.refreshCache=true;player.position.set(0,-96);cam.position.set(8,-88,0);
-         capture("04-ramp-readable",true);check(renderer().getMarkedRamps()>0,"No ramp cues emitted");
+         // The existing elevation cache observes in-place edits during collection,
+         // then rebuilds at the next render. Exercise that lifecycle, not a forced
+         // synthetic height or a replaced cache. Keep the first-frame evidence too.
+         int builds=renderer().getElevation().getRebuilds();
+         capture("04a-ramp-first-observation",true);
+         capture("04-ramp-readable",true);
+         System.out.println("RAMP cache rebuilds="+builds+" -> "+renderer().getElevation().getRebuilds()+" marks="+renderer().getMarkedRamps());
+         check(renderer().getElevation().getRebuilds()>builds,"In-place terrain edit was not observed/rebuilt");
+         check(renderer().getMarkedRamps()>0,"No ramp cues emitted");
          check(renderer().getElevation().isSloped(map.tiles.get(new Vector2(0,-80))),"Fixture must really slope");
          // Presentation calls never shorten the original battle action or schedule a second battle.
          BattleIntro intro=new BattleIntro(null);int count=intro.frames.size();actionStack.add(intro);
