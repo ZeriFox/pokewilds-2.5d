@@ -1,10 +1,10 @@
 # PokeWilds 2.5D — biomi, interfaccia e rilievi
 
-Una ricostruzione PC di PokeWilds 0.8.11 in Java/LibGDX, con mondo prospettico, sprite animati [PMDCollab](https://sprites.pmdcollab.org/) e allenatori di Pokémon Black / White. Il rework recuperato usa un atlante ambientale Stardew di 218 regioni e sei animazioni, pannelli ispirati a FireRed/LeafGreen, arredi completi e mosse con effetti estesi al viewport. I Pokémon PMD e il sistema di rilievi vengono conservati. Fonti, trasformazioni e limiti di distribuzione sono registrati in [ASSET-RIGHTS.md](docs/ASSET-RIGHTS.md).
+Una ricostruzione PC di PokeWilds 0.8.11 in Java/LibGDX, con mondo prospettico, sprite animati [PMDCollab](https://sprites.pmdcollab.org/) e allenatori di Pokémon Black / White. Il rework usa un atlante ambientale di 218 regioni e sei sequenze animate, pannelli moderni, arredi completi e mosse con effetti estesi al viewport. Il mondo aggiunge moduli di terreno per bioma, vento nella vegetazione, onde e risacca sulla sabbia. I Pokémon PMD e il sistema di rilievi vengono conservati. Fonti, trasformazioni e limiti di distribuzione sono registrati in [ASSET-RIGHTS.md](docs/ASSET-RIGHTS.md).
 
 La versione aggiunge **552 specie giocabili** alle 410 della base, per **962 specie totali**, una caldera vulcanica e rampe percorribili tra alcune terrazze montane. La mappa resta procedurale: il nuovo passaggio di generazione modifica davvero terreno e collisioni. La presentazione predefinita usa sprite 2D e la build normale esclude i modelli GLB. È una versione Windows PC x64, non un port Nintendo 3DS.
 
-Build locale verificata: **v0.8.11-stardew.1**, tag sul commit `9066b067`; `main` include anche la regressione del resize durante le mosse, senza cambiare il JAR consegnato. Stato, hash dello ZIP, prossimo comando e prove: [REWORK-STATUS.md](docs/REWORK-STATUS.md), [REWORK-TESTS.md](docs/REWORK-TESTS.md), [copertura materiali](docs/ASSET-COVERAGE.md). Le anteprime seguenti sono storiche; gli screenshot del nuovo JAR sono negli artifact di verifica e nella consegna della build.
+La lavorazione locale corrente prosegue dal commit `5dd0db06`: [mondo e natura animata](docs/LIVING-WORLD.md), [ricevuta della build e verifiche](VERIFICA.txt). Avvia **AVVIA-POKEWILDS.cmd** nella cartella completa. Le animazioni valgono anche nei salvataggi esistenti; per la nuova struttura procedurale serve una nuova avventura/isola. Questa lavorazione non crea una release GitHub. Il precedente pacchetto **v0.8.11-stardew.1** e le anteprime seguenti sono storici; [REWORK-STATUS.md](docs/REWORK-STATUS.md) ne conserva lo stato e gli hash.
 
 ![Mondo procedurale in 2.5D](anteprima-25d.png)
 
@@ -22,7 +22,7 @@ Build locale verificata: **v0.8.11-stardew.1**, tag sul commit `9066b067`; `main
 
 ![Comandi e tutorial con colonne allineate](anteprima-comandi.png)
 
-Il ramo **`main`** riunisce le correzioni di johto.3 con **14 profili di bioma**, rilievi ricostruiti dai dirupi reali, nebbia del cimitero, materiali vulcanici e desertici dedicati, regole di habitat per i nuovi incontri e un layout uniforme per i menu. Conserva WASD/mouse, il Pokémon intero animato nelle informazioni e la continuità della vista durante abilità e battaglie. Integra le pose diagonali PMD e il campionamento configurabile degli asset senza sostituire le alture v5. [REWORK-TESTS.md](docs/REWORK-TESTS.md) identifica le verifiche correnti; [VERIFICA.txt](VERIFICA.txt) e [AGGIORNAMENTO-BIOMI.txt](AGGIORNAMENTO-BIOMI.txt) conservano la documentazione delle iterazioni precedenti.
+Il ramo **`main`** riunisce le correzioni di johto.3 con **14 profili di bioma**, rilievi ricostruiti dai dirupi reali, nebbia del cimitero, materiali vulcanici e desertici dedicati, regole di habitat per i nuovi incontri e un layout uniforme per i menu. Conserva WASD/mouse, il Pokémon intero animato nelle informazioni e la continuità della vista durante abilità e battaglie. Integra le pose diagonali PMD e il campionamento configurabile degli asset senza sostituire le alture v5. [REWORK-TESTS.md](docs/REWORK-TESTS.md) documenta la pipeline; [VERIFICA.txt](VERIFICA.txt) identifica la build locale corrente, mentre [AGGIORNAMENTO-BIOMI.txt](AGGIORNAMENTO-BIOMI.txt) conserva una precedente iterazione.
 
 ## Giocare su Windows
 

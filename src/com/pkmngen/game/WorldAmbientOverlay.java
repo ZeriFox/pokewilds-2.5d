@@ -62,6 +62,9 @@ final class WorldAmbientOverlay {
       if (!settings.enabled || settings.strength == 0 || game.map.tiles != game.map.overworldTiles) {
          mesh.upload(); return;
       }
+      // The display preference freezes environmental animation only. Actors,
+      // action clocks and the world's day/night cycle continue normally.
+      if (game.modernUi != null && game.modernUi.desktop.preferences.reducedMotion) seconds = 0f;
       focusX = game.player.position.x + 8; focusY = game.player.position.y + 7;
       int cx = MathUtils.floor(game.cam.position.x / 32), cy = MathUtils.floor(game.cam.position.y / 32);
       float halfW = game.cam.viewportWidth * game.cam.zoom * .5f + 32;

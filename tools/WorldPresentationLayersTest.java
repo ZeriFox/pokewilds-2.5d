@@ -111,6 +111,17 @@ public final class WorldPresentationLayersTest {
          for(String key:new String[]{"window","door_locked","roof","fence_wood","pressure_plate"})
             require(WorldMaterials.kind(t,key)!=WorldMaterials.Kind.ROCK,"Structural/decal role misclassified: "+key);
          t.nameUpper="tree1_nosprite";require(WorldMaterials.kind(t,null)==WorldMaterials.Kind.HIDDEN,"Hidden collision marker rendered");
+         Tile regional=new Tile("green1","tree1",new Vector2(0,0),true);
+         for(String[] sample:new String[][]{{"deep_forest","tree_oak"},{"wooded_lake","forest_tree_willow"},
+            {"savanna","tree_dry"},{"mountain","tree_pine"},{"snow","tree_snow"}}) {
+            regional.biome=sample[0];
+            require(WorldMaterials.treeKey(regional).equals(sample[1]),"Regional tree ignored: "+sample[0]);
+            require(BwAssets.get().named(sample[1])!=null,"Regional tree missing: "+sample[1]);
+         }
+         Tile cave=new Tile("cave1_left1",new Vector2(0,0),true);
+         require(WorldMaterials.caveWall(cave)&&WorldMaterials.wallCap(cave).equals("cave_floor"),"Cave cap leaks outdoor mountain material");
+         for(String biome:new String[]{"snow","savanna"})
+            require(BiomeProfiles.named(biome).decor("grass").equals("grass_dry_tuft"),"Bright green tufts in "+biome);
          for(BiomeProfiles.Profile p:BiomeProfiles.all())for(boolean night:new boolean[]{false,true}) {
             require(WorldAmbientOverlay.effect(p.id,night,false,false,true)==WorldAmbientOverlay.Effect.NONE,"Solid prop emits weather");
             require(WorldAmbientOverlay.effect("interior",night,true,true,false)==WorldAmbientOverlay.Effect.NONE,"Indoor particle leak");
@@ -185,8 +196,26 @@ public final class WorldPresentationLayersTest {
          for(int y=(int)p.y-12;y<(int)p.y+12;y++)for(int x=(int)p.x-12;x<(int)p.x+12;x++)for(int c=0;c<4;c++)
             require(before[(y*WIDTH+x)*4+c]==after[(y*WIDTH+x)*4+c],"Accent obscured the central actor focus");
          byte[] repeat=draw(null,true,3f);require(Arrays.equals(after,repeat),"Same state and clock changed ambient image");
+         if(expected) {
+            modernUi.desktop.preferences.reducedMotion=true;
+            try {
+               draw(null,true,2f);String still=ambientGeometry();
+               draw(null,true,11f);
+               require(still.equals(ambientGeometry()),"Reduced motion still animates ambient geometry: "+name);
+            } finally {modernUi.desktop.preferences.reducedMotion=false;}
+         }
          System.out.println("LAYERS "+name+" changedPixels="+count+"/"+(WIDTH*HEIGHT)+" maxChannelDelta="+maxDelta
             +" particles="+overlay().particleCount()+" mist="+overlay().mistCount()+" UI=identical focus=identical RNG=unchanged");
+      }
+      String ambientGeometry() throws Exception {
+         Object mesh=field(overlay(),"mesh").get(overlay());
+         Map<?,?> groups=(Map<?,?>)field(mesh,"groups").get(mesh);
+         StringBuilder result=new StringBuilder();
+         for(Object buffer:groups.values()) {
+            com.badlogic.gdx.utils.FloatArray v=(com.badlogic.gdx.utils.FloatArray)field(buffer,"vertices").get(buffer);
+            result.append(Arrays.toString(v.toArray()));
+         }
+         return result.toString();
       }
    }
 }

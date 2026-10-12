@@ -3,7 +3,10 @@ package com.pkmngen.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.*;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.kryonet.Server;
 import com.pkmngen.leaks.LeakTracer;
@@ -243,24 +246,90 @@ public final class BiomeSceneTest {
          System.out.println("BIOME SCENE image="+name+" fog="+renderer().getFogDensity()+" colors="+colors.size());
       }
       void checkActorContinuity(BufferedImage image,String name) {
-         // In this fixed daylight fixture the stone is blue-grey; BW trainer highlights and
-         // black outlines are disjoint from that palette. A depth slice leaves a long empty
-         // horizontal band through his silhouette. The sprite's eye row naturally spans four.
-         int first=-1,last=-1;boolean[] occupied=new boolean[190];
-         for(int y=140;y<330;y++) {
-            int count=0;
-            for(int x=295;x<345;x++) {
-               int rgb=image.getRGB(x,y),r=rgb>>16&255,g=rgb>>8&255,b=rgb&255;
-               if(r<40&&g<50&&b<60||Math.max(r,Math.max(g,b))>140)count++;
+         // Probe texels of the actual submitted trainer frame. The old fixed
+         // palette crop also counted bright stair treads below his feet, while
+         // dropping the dark face row; both the old and new JAR failed on an
+         // identical complete silhouette. Terrain colors cannot define his bounds.
+         try {
+            JohtoRenderer r=renderer();
+            PerspectiveCamera camera=(PerspectiveCamera)read(r,"camera");
+            TextureRegion trainer=BwAssets.get().trainer(player,"down",0,false);
+            WorldMeshBatch mesh=(WorldMeshBatch)read(r,"geometry");
+            Object buffer=((Map<?,?>)read(mesh,"groups")).get(trainer.getTexture());
+            require(buffer!=null,"Trainer texture absent from ramp geometry "+name);
+            FloatArray vertices=(FloatArray)read(buffer,"vertices");
+            require(vertices.size==48,"Expected one trainer quad in ramp fixture "+name);
+            Pixmap atlas=new Pixmap(Gdx.files.internal("visual/unova/world-atlas.png"));
+            try {
+               int[] result=trainerSamples(image,vertices,camera,atlas);
+               require(result[0]>=150&&result[2]>=20,"Insufficient real trainer texels "+name);
+               require(result[1]>=result[0]*.95f&&result[3]==0,
+                  "Terrain obscured trainer texels: "+result[1]+"/"+result[0]+", missing rows="+result[3]+" in "+name);
+               // Negative control: a band through the projected body must fail.
+               BufferedImage covered=new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_RGB);
+               covered.setData(image.getData());
+               int a=projectedRow(vertices,camera,image,.36f),b=projectedRow(vertices,camera,image,.60f);
+               for(int py=Math.min(a,b);py<=Math.max(a,b);py++)for(int px=0;px<image.getWidth();px++)
+                  covered.setRGB(px,py,0xff00ff);
+               int[] sliced=trainerSamples(covered,vertices,camera,atlas);
+               require(sliced[3]>0&&sliced[1]<sliced[0]*.95f,"Trainer probe did not detect a simulated depth slice");
+               System.out.println("BIOME SCENE actor continuity="+name+" matchedTexels="+result[1]+"/"+result[0]
+                  +" opaqueRows="+result[2]+" missingRows="+result[3]+" negativeSliceRows="+sliced[3]);
+            }finally{atlas.dispose();}
+         }catch(ReflectiveOperationException error){throw new IllegalStateException(error);}
+      }
+      Object read(Object object,String name)throws ReflectiveOperationException {
+         Field f=object.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(object);
+      }
+      int projectedRow(FloatArray vertices,PerspectiveCamera camera,BufferedImage image,float fraction) {
+         Vector3 point=new Vector3(vertices.get(0),
+            vertices.get(1)+(vertices.get(33)-vertices.get(1))*fraction,
+            vertices.get(2)+(vertices.get(34)-vertices.get(2))*fraction);
+         camera.project(point,0,0,image.getWidth(),image.getHeight());
+         return image.getHeight()-1-(int)point.y;
+      }
+      int[] trainerSamples(BufferedImage image,FloatArray vertices,PerspectiveCamera camera,Pixmap atlas) {
+         float u0=vertices.get(4),u1=vertices.get(12),v0=vertices.get(37),v1=vertices.get(5);
+         int left=(int)Math.floor(u0*atlas.getWidth()),right=(int)Math.ceil(u1*atlas.getWidth());
+         int top=(int)Math.floor(v0*atlas.getHeight()),bottom=(int)Math.ceil(v1*atlas.getHeight());
+         int expected=0,visible=0,rows=0,missingRows=0;
+         boolean[] opaqueRows=new boolean[bottom-top],visibleRows=new boolean[bottom-top];
+         int firstVisible=-1,lastVisible=-1;
+         Vector3 point=new Vector3();
+         for(int y=top;y<bottom;y++) {
+            int rowExpected=0,rowVisible=0;
+            for(int x=left;x<right;x++) {
+               int pixel=atlas.getPixel(x,y);if((pixel&255)<240)continue;
+               float fx=((x+.5f)/atlas.getWidth()-u0)/(u1-u0);
+               float fy=1-((y+.5f)/atlas.getHeight()-v0)/(v1-v0);
+               if(fx<0||fx>1||fy<0||fy>1)continue;
+               point.set(vertices.get(0)+(vertices.get(8)-vertices.get(0))*fx+(vertices.get(32)-vertices.get(0))*fy,
+                  vertices.get(1)+(vertices.get(9)-vertices.get(1))*fx+(vertices.get(33)-vertices.get(1))*fy,
+                  vertices.get(2)+(vertices.get(10)-vertices.get(2))*fx+(vertices.get(34)-vertices.get(2))*fy);
+               camera.project(point,0,0,image.getWidth(),image.getHeight());
+               int px=(int)point.x,py=image.getHeight()-1-(int)point.y;
+               boolean matched=false;
+               for(int dy=-1;dy<=1;dy++)for(int dx=-1;dx<=1;dx++) {
+                  int sx=px+dx,sy=py+dy;if(sx<0||sy<0||sx>=image.getWidth()||sy>=image.getHeight())continue;
+                  int actual=image.getRGB(sx,sy);
+                  // Mountain daylight has no tint/fog; allow only quantization.
+                  if(Math.abs((actual>>16&255)-(pixel>>>24&255))<=3
+                     &&Math.abs((actual>>8&255)-(pixel>>>16&255))<=3
+                     &&Math.abs((actual&255)-(pixel>>>8&255))<=3)matched=true;
+               }
+               expected++;rowExpected++;if(matched){visible++;rowVisible++;}
             }
-            occupied[y-140]=count>=3;
-            if(count>=3){if(first<0)first=y-140;last=y-140;}
+            if(rowExpected>0) {
+               rows++;opaqueRows[y-top]=true;visibleRows[y-top]=rowVisible>=rowExpected*.5f;
+               if(visibleRows[y-top]){if(firstVisible<0)firstVisible=y-top;lastVisible=y-top;}
+            }
          }
-         require(first>=0&&last-first>60,"Trainer vanished from ramp fixture "+name);
-         int gap=0,maxGap=0;
-         for(int y=first;y<=last;y++){gap=occupied[y]?0:gap+1;maxGap=Math.max(maxGap,gap);}
-         require(maxGap<8,"Terrain sliced the trainer silhouette: "+maxGap+" empty rows in "+name);
-         System.out.println("BIOME SCENE actor continuity="+name+" maxEmptyRows="+maxGap);
+         // The authored 3px feet anchor may bury the terminal sole pixels in
+         // the ground (identical in both baseline/current builds). Detect cuts
+         // inside the visible body, while the 95% total coverage still rejects
+         // a missing head or substantial loss at either end of the frame.
+         for(int row=firstVisible;row>=0&&row<=lastVisible;row++)if(opaqueRows[row]&&!visibleRows[row])missingRows++;
+         return new int[]{expected,visible,rows,missingRows};
       }
    }
 }

@@ -50,6 +50,12 @@ public final class JohtoRenderer {
    private final Map<Object, Motion> motion = new WeakHashMap<>();
    private BwAssets assets;
    private float seconds;
+   private float natureSeconds, vegetationBend;
+   private boolean reducedMotion;
+   private final WorldNatureMotion shore=new WorldNatureMotion();
+   private final WorldNatureMotion heightShore=new WorldNatureMotion();
+   private Map<Vector2,Tile> natureTiles;
+   private Tile heightShoreTile;
    private final TextureRegion spritePart = new TextureRegion();
    private final FloatBuffer originalClearColor = BufferUtils.newFloatBuffer(4);
    private ShaderProgram shader;
@@ -100,6 +106,8 @@ public final class JohtoRenderer {
          elevation.update(game.map.tiles);
          configureCamera(game);
          seconds += Math.min(0.1f, Math.max(0f, Gdx.graphics.getDeltaTime()));
+         reducedMotion=game.modernUi!=null&&game.modernUi.reducedMotion();
+         natureSeconds=reducedMotion?0:seconds;
          collectWorld(game);
          ambientOverlays.prepare(game, elevation, seconds, whiteTexture);
          // Prepare the complete scene before drawing it in one world pass.
@@ -158,19 +166,38 @@ public final class JohtoRenderer {
    private void initialize() {
       String vertex = "attribute vec3 a_position;\n"
          + "attribute vec4 a_color;\nattribute vec2 a_texCoord0;\nattribute float a_style;\nattribute float a_anchorDepth;\n"
-         + "uniform mat4 u_projTrans;\nvarying vec4 v_color;\nvarying vec2 v_texCoords;\nvarying float v_style;\nvarying vec2 v_world;\n"
+         + "uniform mat4 u_projTrans;\nvarying vec4 v_color;\nvarying vec2 v_texCoords;\nvarying float v_style;\nvarying vec2 v_world;\nvarying float v_shore;\n"
          + "void main(){v_color=a_color;v_color.a*=255.0/254.0;v_texCoords=a_texCoord0;v_style=a_style;"
-         + "v_world=a_position.xz;gl_Position=u_projTrans*vec4(a_position,1.0);"
+         + "v_world=a_position.xz;v_shore=a_anchorDepth;gl_Position=u_projTrans*vec4(a_position,1.0);"
          + "if(a_style>3.5)gl_Position.z=a_anchorDepth*gl_Position.w;}\n";
       String fragment = "#ifdef GL_ES\nprecision mediump float;\n#endif\n"
          + "uniform sampler2D u_texture;\nuniform vec3 u_tint;\nuniform vec4 u_lights[8];\nvarying vec2 v_world;\n"
          + "uniform vec3 u_fogColor;uniform float u_fogDensity;uniform float u_desaturation;uniform float u_time;\n"
-         + "varying vec4 v_color;\nvarying vec2 v_texCoords;\nvarying float v_style;\n"
+         + "varying vec4 v_color;\nvarying vec2 v_texCoords;\nvarying float v_style;\nvarying float v_shore;\n"
          + "void main(){vec4 c=texture2D(u_texture,v_texCoords);"
          + "c*=v_color;"
          + "if(v_style>.5&&v_style<1.5){float l=dot(c.rgb,vec3(.299,.587,.114));"
          + "c.rgb=mix(mix(c.rgb,vec3(l),.30),vec3(.37,.49,.28),.42);}"
          + "if(v_style>4.5){float l=dot(c.rgb,vec3(.299,.587,.114));c.rgb=mix(c.rgb,vec3(l),.20);}"
+         // Negative styles are actual fluid/beach surfaces. A single world-space
+         // field continues across atlas cells; no UV scrolling crosses sprite bounds.
+         + "if(v_style<-.5){vec2 p=vec2(v_world.x,-v_world.y);"
+         + "float bend=.92*sin(dot(p,vec2(.032,.021)))+.38*sin(p.y*.043-p.x*.013-u_time*.11);"
+         + "float swell=sin(dot(p,vec2(.13,.085))+bend-u_time*1.35);"
+         + "float small=sin(dot(p,vec2(-.067,.19))+.35*sin(p.x*.043)+u_time*.75);"
+         + "float reach=.65+2.45*sin(u_time*.92+sin(dot(p,vec2(.016,.013)))*.32);"
+         + "float signedShore=v_style> -1.5?-v_shore:v_shore;"
+         + "float foam=(1.0-smoothstep(.14,.68,abs(signedShore-reach)))"
+         + "*(.58+.42*smoothstep(-.6,.7,small));"
+         + "if(v_style> -1.5){float crest=smoothstep(.94,.997,swell)*smoothstep(-.2,.8,small);"
+         + "c.rgb=mix(c.rgb,vec3(.21,.53,.57),.10);"
+         + "c.rgb*=mix(vec3(1.02,1.02,.99),vec3(.92,.97,1.0),smoothstep(0.0,16.0,v_shore))*(.99+.012*swell);"
+         + "c.rgb=mix(c.rgb,vec3(.48,.77,.81),crest*.12);"
+         + "float breaker=smoothstep(.87,.99,sin(v_shore*.68+u_time*1.05+bend*.32))*(1.0-smoothstep(2.0,11.0,v_shore));"
+         + "c.rgb=mix(c.rgb,vec3(.82,.94,.92),max(foam*.68,breaker*.18));}"
+         + "else{float wet=1.0-smoothstep(.4,5.0,v_shore);"
+         + "c.rgb*=mix(1.0,.77,wet);float wash=(1.0-smoothstep(reach-.35,reach+.35,v_shore))*.20;"
+         + "c.rgb=mix(c.rgb,vec3(.30,.57,.59),wash);c.rgb=mix(c.rgb,vec3(.87,.95,.92),foam*.52);}}"
          + "float glow=0.0;for(int i=0;i<8;i++){vec4 l=u_lights[i];"
          + "float f=clamp(1.0-distance(v_world,l.xy)/max(l.z,1.0),0.0,1.0);glow=max(glow,f*f*l.w);}"
          + "vec3 light=max(u_tint,mix(u_tint,vec3(1.0,.91,.77),glow));"
@@ -210,6 +237,7 @@ public final class JohtoRenderer {
 
    private void collectWorld(Game game) {
       bedDepthValid=false;
+      natureTiles=game.map.tiles;heightShoreTile=null;
       shakingTrees.clear();
       growingPlants.clear();
       for (Action action : game.actionStack) {
@@ -335,30 +363,28 @@ public final class JohtoRenderer {
       String identity = WorldMaterials.objectName(tile);
       WorldMaterials.Kind kind = WorldMaterials.kind(tile, identity);
       BiomeProfiles.Profile profile=BiomeProfiles.visualForTile(tile);
-      TextureRegion ground = assets.terrain(tile, seconds);
-      if(assets.namedAnimated(BwAssets.terrainName(tile),seconds)==null)
+      TextureRegion ground = assets.terrain(tile, natureSeconds);
+      if(assets.namedAnimated(BwAssets.terrainName(tile),natureSeconds)==null)
          assets.reportMissing(BwAssets.terrainName(tile),tile,game.map.timeOfDay);
       if (ground == null) ground = assets.cell("grass_light", x, y);
       if(tile.isLava) {
          for(int[] direction:new int[][]{{0,-16},{0,16},{-16,0},{16,0}}) {
             Tile next=game.map.tiles.get(lookup.set(x+direction[0],y+direction[1]));
-            if(next!=null&&!next.isLava){ground=assets.cell(profile.string("fluid","cooledLava","lava_cooled"),x,y,seconds);break;}
+            if(next!=null&&!next.isLava){ground=assets.cell(profile.string("fluid","cooledLava","lava_cooled"),x,y,natureSeconds);break;}
          }
       }
       if(!tile.isWaterfall&&!names.contains("lavafall")) {
-         terrainSurface(tile,ground);
+         terrainSurface(game,tile,ground);
          terrainTransitions(game,tile);
       }
       if(!tile.isWater && !tile.isLava && (tile.isTidal || lower.contains("puddle"))) {
          // High tide is a walkable film over sand, not an opaque deep-water tile.
          // Read the live tide flag: CycleDayNight changes names before init().
-         TextureRegion shallow=assets.cell(profile.string("fluid","shallow","water_shallow"),x,y,seconds);
+         TextureRegion shallow=assets.cell(profile.string("fluid","shallow","water_shallow"),x,y,natureSeconds);
          float inset=tile.isTidal?0:3;
          floor(shallow,x+inset,y+inset,16-inset*2,16-inset*2,.045f,
             Color.toFloatBits(.92f,1,1,tile.isTidal?.34f:.45f),translucent);
       }
-      // Coast geometry follows actual wet/dry adjacency; never adds collision.
-      if (tile.isWater && !tile.isLava) coast(game, tile);
       if(tile.isWaterfall || names.contains("lavafall")) { waterfall(tile,profile);return; }
       terrainEdges(game,tile,profile);
       if (ModernWorldGenerator.isRamp(tile)) ramp(tile,profile);
@@ -373,7 +399,7 @@ public final class JohtoRenderer {
       if (staticPokemon(tile, x+8, y+7)) return;
       if (names.contains("pokeball") || names.contains("ultraball")) { ball(x+8,y+7,names.contains("ultraball")); return; }
       if (building(game, tile, x, y, names)) return;
-      TextureRegion object = identity == null ? null : assets.namedAnimated(identity, seconds);
+      TextureRegion object = identity == null ? null : assets.namedAnimated(identity, natureSeconds);
       if(object==null && BwAssets.objectName(tile)!=null)
          assets.reportMissing(BwAssets.objectName(tile),tile,game.map.timeOfDay);
       if (object != null) {
@@ -387,7 +413,12 @@ public final class JohtoRenderer {
          float width = assets.worldWidth(object, object.getRegionWidth() * scale);
          float height = assets.worldHeight(object, object.getRegionHeight() * scale);
          if (!plant) assetShadow(object, x + 8, y + 7, width * .3f, 2.4f);
-         upright(object, x + 8 - width/2, y + 7, .15f, width, height, WHITE);
+         // Only living low vegetation bends. Actors, trunks and rigid desert
+         // plants retain their exact positions and normal depth planes.
+         vegetationBend=kind==WorldMaterials.Kind.VEGETATION&&WorldNatureMotion.flexible(identity)
+            ?MathUtils.clamp(height*.055f,.35f,1.0f):0;
+         try {upright(object, x + 8 - width/2, y + 7, .15f, width, height, WHITE);}
+         finally {vegetationBend=0;}
       } else if (tile.isSolid && !tile.isLava && !tile.isWater && !names.contains("_hidden") && !names.contains("nosprite")) {
          // Unknown solid cells still show their real blocked footprint using the
          // current biome material; old map textures never leak into this pass.
@@ -432,25 +463,6 @@ public final class JohtoRenderer {
          triangle(mesh,x,base+radius*rise,-y-radius*back,
             x+MathUtils.cos(a)*radius,base+h1*rise,-y-h1*back,
             x+MathUtils.cos(b)*radius,base+h2*rise,-y-h2*back,i<10?top:bottom);
-      }
-   }
-
-   private void coast(Game game, Tile tile) {
-      int[][] dirs = {{0,-16},{0,16},{-16,0},{16,0}};
-      float x = tile.position.x, y = tile.position.y;
-      for (int i=0;i<4;i++) {
-         Tile next = game.map.tiles.get(lookup.set(x+dirs[i][0],y+dirs[i][1]));
-         if (next == null || next.isWater || next.isWaterfall || next.isLava) continue;
-         float sx=x,sy=y,w=16,d=2;
-         if(i==1) sy+=14;
-         else if(i==2) { w=2;d=16; }
-         else if(i==3) { sx+=14;w=2;d=16; }
-         BiomeProfiles.Profile land=BiomeProfiles.visualForTile(next);
-         float width=land.number("transition","shoreWidth",2);
-         if(i==0){d=width;}else if(i==1){sy=y+16-width;d=width;}
-         else if(i==2){w=width;}else{sx=x+16-width;w=width;}
-         float depth=BiomeProfiles.visualForTile(tile).number("height","shoreDepth",2);
-         floor(assets.named("water_ripple"),sx,sy,w,d,-depth+.035f,Color.toFloatBits(.72f,.95f,.93f,.80f),translucent);
       }
    }
 
@@ -518,7 +530,7 @@ public final class JohtoRenderer {
          String neighbor=WorldMaterials.terrainName(next);if(material.equals(neighbor))continue;
          float mx=x+8+dx*8,my=y+8+dy*8;
          if(Math.abs(terrainHeight(tile,mx-dx*.01f,my-dy*.01f)-terrainHeight(next,mx+dx*.01f,my+dy*.01f))>.15f)continue;
-         TextureRegion art=assets.cell(neighbor,x,y,seconds);if(art==null)continue;
+         TextureRegion art=assets.cell(neighbor,x,y,natureSeconds);if(art==null)continue;
          float x0=x,y0=y,x1=x+16,y1=y+16;
          float c0=clear,c1=clear,c2=clear,c3=clear;
          if(side==0){y1=y+width;c0=c1=edge;}else if(side==1){y0=y+16-width;c2=c3=edge;}
@@ -532,7 +544,7 @@ public final class JohtoRenderer {
       waterfallFrames++;
       float x=tile.position.x,y=tile.position.y;
       String fluid=profile.string("fluid",tile.isLava?"lava":"water",tile.isLava?"lava_bright":"water");
-      TextureRegion art=assets.cell(fluid,x,y,seconds);
+      TextureRegion art=assets.cell(fluid,x,y,natureSeconds);
       float dx="left".equals(tile.ledgeDir)?-1:"right".equals(tile.ledgeDir)?1:0;
       float dy=dx!=0?0:"up".equals(tile.ledgeDir)?1:-1,tx=-dy,ty=dx;
       float lx=x+8+dx*8,ly=y+8+dy*8,hx=x+8-dx*8,hy=y+8-dy*8;
@@ -543,12 +555,12 @@ public final class JohtoRenderer {
       quad(geometry.buffer(art.getTexture()),lx-tx*8,bottom,-ly+ty*8,lx+tx*8,bottom,-ly-ty*8,
          hx+tx*8,top,-hy-ty*8,hx-tx*8,top,-hy+ty*8,art,WHITE,tile.isLava?3:0);
       for(int i=0;i<4;i++) {
-         float travel=(seconds*.7f+i*.25f)%1f;
+         float travel=(natureSeconds*.7f+i*.25f)%1f;
          float xx=MathUtils.lerp(hx,lx,travel),yy=MathUtils.lerp(hy,ly,travel),hh=MathUtils.lerp(top,bottom,travel);
          floor(white,xx-(dx==0?6:.3f),yy-(dx==0?.3f:6),dx==0?12:.6f,dx==0?.6f:12,
             hh+.12f,Color.toFloatBits(.84f,.96f,1,.35f),translucent);
       }
-      ring(lx+dx,ly+dy,5+.7f*MathUtils.sin(seconds*5),.6f,bottom+.14f,Color.toFloatBits(.76f,.92f,.95f,.4f));
+      ring(lx+dx,ly+dy,5+.7f*MathUtils.sin(natureSeconds*5),.6f,bottom+.14f,Color.toFloatBits(.76f,.92f,.95f,.4f));
    }
 
    /** Read real scripted night encounters; never create an actor as an asset fallback. */
@@ -587,7 +599,7 @@ public final class JohtoRenderer {
    }
 
    /** A terrain cell is its upper surface, not a flat floor with a wall prop. */
-   private void terrainSurface(Tile tile,TextureRegion ground) {
+   private void terrainSurface(Game game,Tile tile,TextureRegion ground) {
       float x=tile.position.x,y=tile.position.y,previous=surfaceLift;surfaceLift=0;
       TextureRegion art=ground;
       float a=terrainHeight(tile,x+.01f,y+.01f),b=terrainHeight(tile,x+15.99f,y+.01f);
@@ -597,13 +609,29 @@ public final class JohtoRenderer {
       float gx=((b+c)-(a+d))/32f,gy=((c+d)-(a+b))/32f;
       float sun=(.82f+.30f*gx+.32f*gy)/(float)Math.sqrt(1+gx*gx+gy*gy);
       float light=tile.isLava?1:MathUtils.clamp(.60f+.40f*sun/.82f,.60f,1f);
-      quad(geometry.buffer(art.getTexture()),x,a,-y,x+16,b,-y,x+16,c,-y-16,x,d,-y-16,art,color(light,light,light),
-         tile.isLava?3f:WorldMaterials.softGrass(WorldMaterials.terrainName(tile))?1f:0f);
+      shore.prepare(game.map.tiles,tile,elevation);
+      float style=tile.isLava?3f:WorldNatureMotion.water(tile)?-1f
+         :WorldNatureMotion.sand(tile)&&shore.hasShore()?-2f:WorldMaterials.softGrass(WorldMaterials.terrainName(tile))?1f:0f;
+      if(style<-.5f&&shore.hasShore()) {
+         // Only coastal cells need extra samples. The same world coordinate has
+         // the same shore distance on either side of a tile/biome boundary.
+         for(int iy=0;iy<2;iy++)for(int ix=0;ix<2;ix++)
+            surfacePatch(tile,art,x+ix*8,y+iy*8,x+(ix+1)*8,y+(iy+1)*8,0,
+               color(light,light,light),color(light,light,light),color(light,light,light),color(light,light,light),geometry,style);
+      } else quad(geometry.buffer(art.getTexture()),x,a,-y,x+16,b,-y,x+16,c,-y-16,x,d,-y-16,art,color(light,light,light),style);
       surfaceLift=previous;
    }
 
    private float terrainHeight(Tile tile,float x,float y) {
-      return elevation.height(x,y)-(tile.isWater&&!tile.isWaterfall?BiomeProfiles.forTile(tile).number("height","shoreDepth",2):0);
+      float depth=tile.isWater&&!tile.isWaterfall?BiomeProfiles.forTile(tile).number("height","shoreDepth",2):0;
+      if(depth>0&&natureTiles!=null&&WorldNatureMotion.water(tile)) {
+         if(heightShoreTile!=tile) {heightShore.prepare(natureTiles,tile,elevation);heightShoreTile=tile;}
+         // Sandy coasts grade into the sea. The same height function also builds
+         // exposed edges, so no old vertical bank remains below the animated wash.
+         float beach=MathUtils.clamp(heightShore.beachDistance(x,y)/8f,0,1);
+         depth*=beach*beach*(3-2*beach);
+      }
+      return elevation.height(x,y)-depth;
    }
 
    /** Stitch the real upper and lower surfaces at every exposed step. Never
@@ -1123,6 +1151,24 @@ public final class JohtoRenderer {
    private void uprightRaw(TextureRegion region, float x, float y, float base, float width, float height, float tint, float style) {
       // Camera-facing sprites keep their pixel proportions in the tilted world.
       float rise = height * MathUtils.cosDeg(50f), back = height * MathUtils.sinDeg(50f);
+      if(vegetationBend>0&&!reducedMotion) {
+         Buffer mesh=geometry.buffer(region.getTexture());
+         // Subdivide vertically: all bottom vertices remain fixed, then bending
+         // increases quadratically toward the tip. Texture and depth stay upright.
+         for(int strip=0;strip<3;strip++) {
+            float f0=strip/3f,f1=(strip+1)/3f;
+            float dx0=WorldNatureMotion.wind(x+width*.5f,y,natureSeconds,f0,vegetationBend,false);
+            float dx1=WorldNatureMotion.wind(x+width*.5f,y,natureSeconds,f1,vegetationBend,false);
+            float v0=MathUtils.lerp(region.getV2(),region.getV(),f0),v1=MathUtils.lerp(region.getV2(),region.getV(),f1);
+            vertex(mesh,x+dx0,base+rise*f0,-y-back*f0,tint,region.getU(),v0,style);
+            vertex(mesh,x+width+dx0,base+rise*f0,-y-back*f0,tint,region.getU2(),v0,style);
+            vertex(mesh,x+width+dx1,base+rise*f1,-y-back*f1,tint,region.getU2(),v1,style);
+            vertex(mesh,x+width+dx1,base+rise*f1,-y-back*f1,tint,region.getU2(),v1,style);
+            vertex(mesh,x+dx1,base+rise*f1,-y-back*f1,tint,region.getU(),v1,style);
+            vertex(mesh,x+dx0,base+rise*f0,-y-back*f0,tint,region.getU(),v0,style);
+         }
+         return;
+      }
       if(captureBedDepth) {
          // Capture after SpriteLayout has applied dimensions, anchors and offsets.
          bedBottomScreenY=projectedAnchor.set(x,base+surfaceLift,-y).prj(camera.combined).y;
@@ -1175,6 +1221,7 @@ public final class JohtoRenderer {
    private void vertex(Buffer mesh, float x, float y, float z, float color, float u, float v, float style) {
       // Scene-dependent transforms stay here; storage/upload belong to the batch.
       float depth=style>3.5f?projectedAnchor.set(x,y+surfaceLift+.12f,actorPlaneZ).prj(camera.combined).z:0f;
+      if(style<-.5f)depth=shore.distance(x,-z);
       if(style>3.5f&&matchBedDepth) {
          float screenY=projectedAnchor.set(x,y+surfaceLift,z).prj(camera.combined).y;
          depth=MathUtils.lerp(bedBottomDepth,bedTopDepth,(screenY-bedBottomScreenY)/(bedTopScreenY-bedBottomScreenY))-.000001f;
@@ -1198,14 +1245,14 @@ public final class JohtoRenderer {
       for(Tile tile:game.map.onscreenTiles) {
          if(index>=8)break;
          boolean fire="campfire1".equals(tile.nameUpper) || "volcarona".equals(tile.nameUpper);
-         if(fire || tile.isTorch)index=light(index,tile.position.x+8,tile.position.y+8,fire?65:42,.88f+.05f*MathUtils.sin(seconds*7));
+         if(fire || tile.isTorch)index=light(index,tile.position.x+8,tile.position.y+8,fire?65:42,.88f+.05f*MathUtils.sin(natureSeconds*7));
       }
       // Cluster lava illumination on a stable world lattice; do not spend every slot on one pool.
       for(Tile tile:game.map.onscreenTiles) {
          if(index>=8)break;
          if(tile.isLava && Math.floorMod((int)tile.position.x/16,3)==0 && Math.floorMod((int)tile.position.y/16,3)==0)
             index=light(index,tile.position.x+8,tile.position.y+8,35,
-               BiomeProfiles.visualForTile(tile).number("ambient","glow",.42f)+.05f*MathUtils.sin(seconds*2));
+               BiomeProfiles.visualForTile(tile).number("ambient","glow",.42f)+.05f*MathUtils.sin(natureSeconds*2));
       }
    }
 
@@ -1228,7 +1275,7 @@ public final class JohtoRenderer {
 
    private void shaderAtmosphere() {
       shader.setUniformf("u_fogColor",fogColor.r,fogColor.g,fogColor.b);
-      shader.setUniformf("u_fogDensity",fogDensity);shader.setUniformf("u_desaturation",desaturation);shader.setUniformf("u_time",seconds);
+      shader.setUniformf("u_fogDensity",fogDensity);shader.setUniformf("u_desaturation",desaturation);shader.setUniformf("u_time",natureSeconds);
    }
 
    private int light(int index,float x,float y,float radius,float strength) {

@@ -162,9 +162,13 @@ public final class WorldMaterials {
    public static String treeKey(Tile tile) {
       String name = lower(tile.name) + " " + lower(tile.nameUpper);
       BiomeProfiles.Profile profile = BiomeProfiles.visualForTile(tile);
-      return profile.id.equals("volcano") || profile.id.equals("graveyard") || profile.id.equals("desert") ? profile.decor("tree")
-         : name.contains("tree4") || name.contains("snow") ? "tree_snow"
-         : name.contains("savanna") ? "tree_dry" : name.contains("tree2") ? "tree_pine" : "tree";
+      if (profile.id.equals("volcano") || profile.id.equals("graveyard") || profile.id.equals("desert")) return profile.decor("tree");
+      if (name.contains("tree4") || name.contains("snow") || profile.id.equals("snow")) return "tree_snow";
+      // Regional trees belong to the material catalogue too. Previously the
+      // ordinary-tree fallback ignored wetland/oasis/deep-forest presentation.
+      String regional = profile.decor("tree");
+      if (!regional.equals("tree")) return regional;
+      return name.contains("savanna") ? "tree_dry" : name.contains("tree2") ? "tree_pine" : regional;
    }
 
    public static boolean caveWall(Tile tile) {
@@ -176,7 +180,7 @@ public final class WorldMaterials {
       return caveWall(tile) ? "cliff_dark" : (lower(tile.name) + " " + lower(tile.nameUpper)).contains("ruin") ? "ruin_wall" : "wall";
    }
    public static String wallCap(Tile tile) {
-      return caveWall(tile) ? "mountain" : (lower(tile.name) + " " + lower(tile.nameUpper)).contains("ruin") ? "ruin_floor" : "wall_cap";
+      return caveWall(tile) ? "cave_floor" : (lower(tile.name) + " " + lower(tile.nameUpper)).contains("ruin") ? "ruin_floor" : "wall_cap";
    }
    private static String lower(String value) { return value == null ? "" : value.toLowerCase(java.util.Locale.ROOT); }
 }

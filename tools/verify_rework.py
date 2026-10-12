@@ -46,6 +46,7 @@ NATIVE = [
     ["tools/authored_terrain_test.py"],
     ["tools/terrain_readability_test.py"],
     ["tools/battle_entry_test.py"],
+    ["tools/nature_animation_test.py"],
 ]
 
 

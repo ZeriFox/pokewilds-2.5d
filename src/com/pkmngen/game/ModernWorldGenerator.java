@@ -12,7 +12,7 @@ import java.util.Set;
 
 /** Topology pass for newly generated islands. Uses the existing saved Tile schema. */
 public final class ModernWorldGenerator {
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
     private static final int[] DX = {0, 1, 0, -1};
     private static final int[] DY = {1, 0, -1, 0};
     private ModernWorldGenerator() {}
@@ -63,7 +63,7 @@ public final class ModernWorldGenerator {
         report.componentsBefore = components(grid).sizes.size();
         report.authored = AuthoredTerrain.apply(tiles, seed, reservedPositions);
         report.rampsOpened += report.authored.ramps;
-        smoothInlandShore(grid, report);
+        smoothInlandShore(grid, reservedPositions, report);
         caldera(grid, seed, reservedPositions, report);
         connectMountainTerraces(grid, seed, report);
         report.componentsAfter = components(grid).sizes.size();
@@ -75,11 +75,13 @@ public final class ModernWorldGenerator {
         return report;
     }
 
-    private static void smoothInlandShore(Grid grid, Report report) {
+    private static void smoothInlandShore(Grid grid, Set<Vector2> reservedPositions, Report report) {
         List<Tile> fill = new ArrayList<>();
         for (Tile tile : grid.sorted) {
             // Keep tidal beaches, ocean routes, waterfalls and all map edge cells intact.
             if (!"water2".equals(tile.name) || !tile.nameUpper.isEmpty() || protectedTile(tile)) continue;
+            if (reservedPositions.contains(tile.position) || tile.routeBelongsTo != null
+                && (tile.routeBelongsTo.isDungeon || !tile.routeBelongsTo.storedPokemon.isEmpty())) continue;
             String route = tile.routeBelongsTo == null ? "" : tile.routeBelongsTo.name;
             if (route.contains("beach") || route.equals("ocean1") || route.equals("sea1")) continue;
             int land = 0;
@@ -257,6 +259,12 @@ public final class ModernWorldGenerator {
 
     private static boolean naturalTerrain(Tile tile) {
         if (tile == null || tile instanceof TrainerTipsTile) return false;
+        if (tile.routeBelongsTo != null && tile.routeBelongsTo.isDungeon) return false;
+        // The volcanic finishing pass must not undo AuthoredTerrain's protection
+        // of maze walls, graveyard interactions, ruins or special sand pits.
+        String profile = BiomeProfiles.forTile(tile).id;
+        String route = tile.routeBelongsTo == null ? "" : tile.routeBelongsTo.name;
+        if (profile.equals("deep_forest") || profile.equals("graveyard") || route.startsWith("ruins") || route.equals("sand_pit1")) return false;
         String name = tile.name;
         return name.startsWith("mountain") || name.startsWith("volcano") || name.startsWith("lava")
             || name.startsWith("snow") || name.startsWith("green") || name.startsWith("grass")

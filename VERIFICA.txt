@@ -1,78 +1,93 @@
-VERIFICA — terreno modulare e presentazione desktop, 12 ottobre 2026
+VERIFICA — mondo procedurale e natura animata, 12 ottobre 2026
 
 VERSIONE LOCALE
-Recuperato origin/main ac526d14 con fast-forward, senza conflitti.
-Ramo di lavoro: work/local-terrain-2026-10-12.
-Backup Git precedente: backup/before-structural-terrain-2026-10-12.
-Le nuove modifiche e la build sono locali; nessun push, tag o nuova release.
-AVVIA-POKEWILDS.cmd e il collegamento desktop usano il JAR seguente.
-Per provare la nuova struttura occorre una nuova avventura/isola.
-Il terreno e le costruzioni dei salvataggi esistenti non vengono rigenerati.
+Base: 5dd0db0661e40db3c41795cfb666a2b44c3144bf.
+Ramo: work/local-terrain-2026-10-12.
+Backup: backup/before-living-world-2026-10-12.
+Nessun push, tag o nuova release. Avvio con AVVIA-POKEWILDS.cmd
+oppure con il collegamento desktop "PokeWilds 2.5D - Prova locale".
+Le animazioni valgono anche sulle isole salvate; per la nuova disposizione
+strutturale serve una nuova avventura/isola. I salvataggi non sono rigenerati.
 
 ARTEFATTO VERIFICATO
 dist/pokewilds-rebuilt.jar
-SHA-256: f0b384a5b54f7046902fe49e46146f5835e33dc0fedbaa02bca320aab4cc4835
-Dimensione: 298069165 byte; 108949 voci ZIP.
-Java 17, 229 sorgenti, 490 classi compilate.
-Zero classi di gioco copiate dal runtime upstream; modelli GLB esclusi.
-CRC, classi, sorgenti, risorse e librerie corrispondono al build report.
-Digest sorgenti: 6c76eb2f1226604850f6e7102cfa3f2155ce4c8e131d9ead5a58db481b8673b2
-Indice con hash dei log: build/structural-verification/final.json.
-Avvio reale con java -jar: 120 frame, menu moderno, uscita regolare;
-cartella isolata build/structural-launcher, Java incluso nel progetto.
+SHA-256: 0caeb79e78463842d903db0ecd04f82bac62beac65a2379cba72969b472118f7
+Dimensione: 298077319 byte; 108950 voci ZIP.
+Java 17, 230 sorgenti, 491 classi compilate.
+Modelli GLB esclusi; zero classi di gioco copiate dal runtime upstream.
+Sorgenti, risorse e librerie corrispondono al build report.
+Digest sorgenti: 8938bb23ea401e86250ab4896e8ed150a065b6e8375bebed7df536953b35c2b6
+Ricevuta con hash dei log: build/living-world-verification/final.json.
+Avvio reale java -jar: 120 frame, uscita regolare, Java incluso,
+cartella isolata build/living-world-launcher.
 
 MODIFICHE
-- Ricostruzione del terreno naturale interno e sei moduli manuali 17x17/9x9
-  assemblati proceduralmente: radure, boschetti e terrazze con due accessi.
-  Terreno, ostacoli, collisioni e rampe appartengono alle stesse celle.
-- Caldera con contorno chiuso, dislivello unico, due scalinate e bacini di lava
-  separati da una passerella. Eventi e incontri protetti conservati.
-- Gradini visibili anche sui connettori piatti, bordi dei materiali raccordati,
-  prato meno contrastato e profondita coerente fra oggetti e sprite.
-- Pokemon stabili nelle dimensioni quando cambiano direzione; allenatori B/W
-  esistenti piu leggibili. Nessun nuovo set di personaggi originali dichiarato.
-- Pannelli squadra/inventario/menu con palette ardesia e verde petrolio;
-  ingresso battaglia continuo, copertura dell'intera finestra e movimento ridotto.
-- Testa del personaggio nel letto allineata alla profondita reale del cuscino,
-  verificata anche a zoom differenti.
+- 33 pezzi progettati da 17, 9 e 5 celle per dieci famiglie naturali:
+  pianura/bosco, foresta profonda, palude, montagna, neve, deserto,
+  spiaggia, oasi, savana e cimitero. Terreno, ostacoli e accessi reali.
+- Il nuovo assemblaggio preserva acqua/maree, eventi, labirinti, tombe,
+  costruzioni e incontri. Caldera con due scalinate e passaggio asciutto.
+  Il raccordo rive preesistente puo riempire singole water2 interne quasi
+  circondate da terra; non si dichiara acqua identica nella generazione completa.
+  Corretti i bordi dei pocket intorno a incontri/attori riservati; anche il
+  raccordo delle rive esclude acqua riservata, incontri memorizzati e dungeon.
+- Vento su erba, fiori e vegetazione bassa flessibile, radici ferme;
+  alberi, cactus, personaggi e arredi non vengono deformati.
+- Onde in coordinate mondo, schiuma e risacca alle coste effettive,
+  sabbia umida e raccordo del fondale alla spiaggia. Nessun collider animato.
+- Materiali regionali per vegetazione e grotte; grafica esistente conservata.
+- Movimento ridotto congela gli effetti ambientali, non azioni e personaggi.
 
 VERIFICHE FINALI
-16 suite native sul JAR indicato, senza sorgenti o risorse sovrapposte:
-- field_scene_test.py
-- battle_entry_test.py
-- ui_layout_test.py
-- battle_viewport_test.py
-- world_elevation_test.py
-- bw_assets_integration_test.py
-- world_mesh_batch_test.py
-- pmd_battle_visual_test.py
-- boss_battle_visual_test.py
-- authored_terrain_test.py
+14 suite native sul JAR indicato, senza sorgenti o risorse sovrapposte:
 - modern_world_test.py
+- authored_terrain_test.py
+- world_elevation_test.py
+- biome_habitat_test.py
+- nature_animation_test.py
 - terrain_readability_test.py
 - world_presentation_layers_test.py
+- field_scene_test.py
+- battle_entry_test.py
+- world_mesh_batch_test.py
+- bw_assets_integration_test.py
+- biome_scene_test.py
 - landscape_smoke_test.py
-- desktop_menu_flow_test.py
 - modern_ui_smoke_test.py
 
-AuthoredTerrain: 605120 controlli, 12 seed e serializzazione delle celle.
-Terreno: 342 controlli, visibilita GPU di scale e personaggi, occlusione PMD/alberi.
-Battaglia: 1152 frame di ingresso, 4 formati e 2 modalita movimento;
-viewport su 5 formati e 6 biomi, transizioni di uscita e boss originali.
-Mondo reale: generazione, movimento, salvataggio/caricamento e 0 fallback classici.
-Il log modern-world contiene seed, copertura e quote della specifica isola.
-Audit: 157 sorgenti originali invariati, 41 con ambito esplicito, 31 aggiunte;
-29 mutazioni non autorizzate respinte. Archivio pre-modifiche conservato in
-baseline/before-structural-terrain. Controllo CPU/GPU WorldMeshBatch superato.
+Nature: 36088 controlli, 11 scene, 33 PNG; continuita costa, radici fisse,
+pixel stabili con movimento ridotto, flag e RNG invariati.
+AuthoredTerrain: 798767 controlli, 12 seed bosco e nove altre famiglie
+su quattro seed ciascuna, contenuti protetti, bordi e serializzazione.
+Regressioni per pozze con attori/incontri speciali, loro alone e successivo
+raccordo delle rive; conservato il comportamento dell'acqua ordinaria.
+Presentation layers: 714143 controlli; terreno: 342 controlli GPU.
+WorldMeshBatch: 2097471 asserzioni e parita CPU/GPU.
+FieldScene: 2140 frame, 108 effetti, zero disegni legacy inviati.
+BattleEntry: 1152 frame, 64 catture, quattro formati e due modalita movimento.
+BW assets: 8759 controlli, 218 regioni, 24 frame animati.
+Il falso positivo iniziale di BiomeScene scambiava i gradini chiari per
+parti del trainer: verifica corretta, senza modificare il renderer.
 
-LIMITI E PROVA
-Catalogo iniziale di moduli per interni naturali e caldera: coste, dungeon,
-labirinti ed eventi speciali mantengono la propria struttura. La copertura
-dipende dalla forma dell'isola e dai contenuti protetti; non tutti i biomi
-sono stati sostituiti con moduli. Dove non entra un bacino completo, la caldera
-usa un terreno piano sicuro, indicato dal report r0.
-Sono prove automatiche su fixture native, non una campagna manuale completa
-o una prova multiplayer. Il salvataggio personale Kiri.sav non e stato aperto.
-Queste 16 suite non sono l'intera pipeline di 28 suite richiesta per una release.
-Il vecchio confronto pixel-identico dell'intera scena e disponibile con
---historical-parity; i nuovi criteri sono documentati in docs/STRUCTURAL-TERRAIN.md.
+MONDO REALE
+Seed -8651504418136730931; 169576 celle prima, 169576 dopo.
+398 moduli, 8 terrazze, 26908 celle preparate, 12013 celle nei moduli,
+6648 cambiamenti effettivi. Preparazione e moduli si sovrappongono:
+non sommare i due conteggi come copertura.
+Moduli per famiglia: {'beach': 16, 'desert': 79, 'graveyard': 1, 'mountain': 83, 'oasis': 3, 'savanna': 79, 'snow': 40, 'temperate': 78, 'wetland': 19}.
+Una famiglia assente in questo elenco non ha una stanza accettata su questa
+specifica isola; le dieci famiglie sono anche verificate su fixture a seed fisso.
+Generazione originale, movimento, salvataggio/caricamento superati,
+zero fallback classici. 9 anteprime effettive in build/modern-world.
+
+AUDIT E LIMITI
+157 sorgenti originali invariati, 41 con ambito esplicito, 32 aggiunte;
+33 mutazioni non autorizzate respinte. Archivio pre-modifiche in
+baseline/before-living-world. Dettagli in docs/LIVING-WORLD.md.
+La ricostruzione riguarda celle naturali compatibili: non ogni cella o
+struttura del gioco viene sostituita. Ingressi, enigmi e percorsi protetti
+conservano la propria struttura. L'inserimento dipende dal seed e dallo spazio.
+Prove automatiche sulla GPU disponibile, non una campagna manuale completa,
+una prova multiplayer o un benchmark su altre macchine.
+Il salvataggio personale Kiri.sav non e stato aperto.
+Queste 14 suite non sono l'intera pipeline di 29 suite per una release.

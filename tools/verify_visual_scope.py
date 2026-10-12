@@ -20,8 +20,14 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "b46f145b24d5ad774f5aebfdd4a8fa23b2166968b097bdfffabb00a7b703ed13"
+FROZEN_MANIFEST_SHA256 = "6a4d1767b748c53ae6e7ec1c10470f8cf09091af2cc356175fbbbe4fa5ff1a67"
 PREFIX = "src/com/pkmngen/game/"
+# Immutable local build accepted before the broader biome/nature pass.
+LIVING_WORLD_ARCHIVE = {
+    "baseline/before-living-world/modernization-scope.json": "b46f145b24d5ad774f5aebfdd4a8fa23b2166968b097bdfffabb00a7b703ed13",
+    "baseline/before-living-world/verify_visual_scope.py": "2eff484468c477a000e4fc90d881f1c95d493bf2b4fb7f655e6f50ce44177735",
+    "baseline/before-living-world/VERIFICA.txt": "6b0b42e2652eaf31d275a3340a7da4a7f9064b4605964bdd1c630de20f6cb183",
+}
 V2_ARCHIVE = {
     "baseline/modernization-v2/modernization-scope.json": "f978edd535ac4440d6ce01924bc98135105a718e3a57faf9838827cd3ebf2343",
     "baseline/modernization-v2/verify_visual_scope.py": "20aa2d3c1257379ecc5168b66693bc0f076c3c0bfdc09cab762a7e3c38ce727b",
@@ -97,15 +103,16 @@ MODIFIED_SCOPES = {
     "util/SpriteProxy.java": "Presentation: intercept known battle actors for PMD rendering; legacy fallback retained.",
 }
 ADDED_SCOPES = {
-    "AuthoredTerrain.java": "Generation-only reconstruction of reachable natural inland substrate, replacing old random ledges/vegetation before seeded authored 17x17 and 9x9 modules. Actual Tile ground/obstacle/ledge/ramp identities, protected event and reserved actor halos, retained headbutt trees/route/biome/save schema, and connectivity validation before module mutation; never applied on save loading.",
+    "WorldNatureMotion.java": "Pure presentation helper for bounded wind and real nearby shore/sand distance masks, excluding ledges, ramps and mismatched elevation. Coordinate-derived read-only signals; no textures, gameplay clocks, RNG or persisted state.",
+    "AuthoredTerrain.java": "Generation-only reconstruction and deterministic 17/9/5-cell authored modules for ten natural biome families. Region-specific footprints, minimum useful pocket area, immutable water/tidal/maze boundaries, protected event and encounter access, biome/route preservation, dry connectivity and no save-load regeneration.",
     'DesktopInterfaceSettings.java': 'Explicit local UI/control preferences, draft validation, reserved menu keys and duplicate rejection, atomic save with backup; no game-save schema or legacy settings-file rewrite.',
     'DesktopMenuController.java': 'Desktop title/home/setup state, explicit transactional text focus, input-context release barriers, complete trainer/mod selection and F1 options; native Go delegates untouched original setup operations once; pointer inventory selection uses existing action data without item creation or use/toss rule changes.',
     'MenuTextSession.java': 'Explicit reversible setup text draft with caret/deletion, length/character constraints and IPv4 validation; selection alone never consumes WASD as text.',
     'ModernStartupUi.java': 'Skippable animated title scenery from bundled art, home/adventure setup, complete trainer selector and controls/display cards with shared hitboxes and reduced menu motion; no RNG, generated world or battle rules.',
     'TrainerCatalog.java': 'Opt-in existing classic trainer/mod artwork with identity-preserving directional frames, costume color and owned bounded cache; detailed B/W remains available, no new source PNGs or saved Player schema.',
 
-    "WorldMaterials.java": "Presentation-only semantic terrain/prop resolver, explicit geometry kinds and eligibility for natural dry material transitions; upper objects override floor-name heuristics, whole rocks remain props and volcanic cracks remain flat. No asset ownership, Tile mutations or saved-data changes.",
-    "WorldAmbientOverlay.java": "Sparse deterministic world-space mist, embers, fireflies, dust, snow and water glints with strict count/opacity budgets, protected actor focus, depth testing, separate shader ownership and no gameplay RNG or indoor/UI overlays. Step 3 also respects the user ambient-accents toggle without changing effect generation.",
+    "WorldMaterials.java": "Presentation-only semantic terrain/prop resolver, natural dry transitions, regional tree selection and cave floor caps. Upper objects override floor-name heuristics; whole rocks remain props and volcanic cracks remain flat. No asset ownership, Tile mutations or saved-data changes.",
+    "WorldAmbientOverlay.java": "Sparse deterministic world-space mist, embers, fireflies, dust, snow and water glints with count/opacity budgets, protected actor focus, depth testing and separate shader ownership. Respects ambient toggle and freezes environmental motion with reduced motion; no gameplay RNG, indoor/UI overlays or saved-state writes.",
     "WorldMeshBatch.java": "CPU vertex storage, identity-based texture grouping, triangle-aligned mesh upload/reuse and GPU ownership extracted from JohtoRenderer; no camera, scene state, shader uniforms, texture ownership, gameplay or saved data.",
     "ActorModelRenderer.java": "Existing optional 3D helper, disabled by the modern sprite launcher.",
     "BiomeProfiles.java": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state.",
@@ -114,12 +121,12 @@ ADDED_SCOPES = {
     "StartupVerification.java": "Opt-in packaged-launch probe inside the delivered Game: observe 120 original menu frames, verify nonempty framebuffer, save capture and exit normally; disabled in ordinary play.",
     "ExpansionDex.java": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration.",
     "JohtoBattleRenderer.java": "Modern biome battle arenas/HUD and full-viewport composition; continuous preserved-world encounter ribbon and shutter reveal, reduced-motion fades, calm return transition and existing boss presentation, with original action durations and dispatch unchanged.",
-    "JohtoRenderer.java": "Exclusive perspective scene with shared terrain heights, natural material edge feathering and subdued grass/foliage shading; visible flat/sloped stair markings, continuous cliff faces, common foot-plane billboard depth for actors/props, sleeping head depth matched to actual bed projection, stable full Idle/Walk envelopes and larger detailed trainers; original field-action feedback and custom asset contracts retained. No persisted terrain, collision, RNG or action-timing writes.",
+    "JohtoRenderer.java": "Exclusive perspective scene with natural material transitions, shared terrain heights and actor/prop foot depth. Adds rooted low-vegetation wind, curved world-space water waves, shoreline foam/wet sand and sand-to-water height continuity; separate reduced-motion environmental clock. Retains PMD envelopes, field-action feedback, bed depth, custom asset contracts and original action clocks; no gameplay/RNG/saved-state writes.",
     "ModernBatch.java": "Suppress legacy draw submissions while original menu actions advance.",
     "ModernInventoryUi.java": "Modern inventory/item/crafting/guide presentation with shared palette/cards, five pocket tabs, quantity-safe list, scrollbar and scrollable detail pane; controller hitboxes and item/crafting rules unchanged.",
     "ModernPartyUi.java": "Modern setup/party/storage/nickname UI with shared modern cards replacing old party-sheet backgrounds, full animated summary actors and reduced-motion support; existing hitboxes, setup delegation, controls and action semantics unchanged.",
     "ModernUi.java": "Modern typography, shared logical viewport and anchored panel layout, cool-paper/slate/teal palette with crisp card corners, dialogs, event backgrounds and menu dispatch; respects reduced motion and delegates existing desktop controller and original actions.",
-    "ModernWorldGenerator.java": "Authorized deterministic procedural landforms, biome distribution and volcanic terrain; version 2 reconstructs natural substrate and assembles authored modules while protecting early encounter positions. Caldera replaces inherited contours with a complete single-depth basin, two three-wide stair openings and connected dry causeway; protected or incomplete footprints retain safe flat terrain. Existing save schema and explicit connectivity checks retained.",
+    "ModernWorldGenerator.java": "Authorized deterministic procedural terrain generation, version 3, with biome-authored modules and the existing connected single-depth caldera. Preserves dungeon routes, deep-forest maze walls, graveyards, ruins and special pits during volcanic finishing; shoreline smoothing excludes reserved actors, stored encounters and dungeon water while retaining normal inland smoothing. No save schema change.",
     "MoveEffectPresentation.java": "R15 semantic local/screen effect classification, viewport-sized arena snapshots and GPU row/color effects, PMD shrink presentation, explicit GL state restoration and disposal; original action clocks and scheduling retained.",
     "PmdBattleSprites.java": "Exact PMD battle/event actors with diagonal battle-facing poses, complete animation-envelope fit and ground anchoring, trimmed trainers, hidden-identity ghost presentation and visual effects. Step 3 only passes Player to the trainer-presentation lookup; Pokemon actors and combat formulas unchanged.",
     "PmdPokemonSprites.java": "Pinned PMD portrait/animation loading, timing/directions, bounded texture cache and complete animation bounds for uncropped actors.",
@@ -141,6 +148,9 @@ def sha256(path: Path) -> str:
 
 
 def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
+    for archived, expected in LIVING_WORLD_ARCHIVE.items():
+        if sha256(root / archived) != expected:
+            raise RuntimeError("Immutable pre-living-world review archive changed: " + archived)
     for archived, expected in TERRAIN_ARCHIVE.items():
         if sha256(root / archived) != expected:
             raise RuntimeError("Immutable pre-terrain review archive changed: " + archived)

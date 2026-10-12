@@ -5,7 +5,7 @@
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "a99aa5a2efe2eb9b18f9b72f3511e76f719722135888e9df0b362af54f27451f",
+  "reviewed_patch_sha256": "eb57090d5d529353db5c6e75b7bc46f03bd7090a8204876e732d6f7419b45459",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/CheckEndOfBattle.java",
@@ -249,8 +249,8 @@
       "scope": "Modern biome battle arenas/HUD and full-viewport composition; continuous preserved-world encounter ribbon and shutter reveal, reduced-motion fades, calm return transition and existing boss presentation, with original action durations and dispatch unchanged."
     },
     "src/com/pkmngen/game/JohtoRenderer.java": {
-      "reviewed_sha256": "d3c401a996fa34fd951fc63fd463f5489a83ec38d752a1fe4cd484093aebc3f9",
-      "scope": "Exclusive perspective scene with shared terrain heights, natural material edge feathering and subdued grass/foliage shading; visible flat/sloped stair markings, continuous cliff faces, common foot-plane billboard depth for actors/props, sleeping head depth matched to actual bed projection, stable full Idle/Walk envelopes and larger detailed trainers; original field-action feedback and custom asset contracts retained. No persisted terrain, collision, RNG or action-timing writes."
+      "reviewed_sha256": "59a019f9713183dfaf4a168c0622bcf6e98ada9bbcd681096c024f58810c073f",
+      "scope": "Exclusive perspective scene with natural material transitions, shared terrain heights and actor/prop foot depth. Adds rooted low-vegetation wind, curved world-space water waves, shoreline foam/wet sand and sand-to-water height continuity; separate reduced-motion environmental clock. Retains PMD envelopes, field-action feedback, bed depth, custom asset contracts and original action clocks; no gameplay/RNG/saved-state writes."
     },
     "src/com/pkmngen/game/ModernBatch.java": {
       "reviewed_sha256": "f02a0d0fd3f6e2e2a38a975c2a1a0ada4197770a5371c1d73d08e06474d44cd4",
@@ -269,8 +269,8 @@
       "scope": "Modern typography, shared logical viewport and anchored panel layout, cool-paper/slate/teal palette with crisp card corners, dialogs, event backgrounds and menu dispatch; respects reduced motion and delegates existing desktop controller and original actions."
     },
     "src/com/pkmngen/game/ModernWorldGenerator.java": {
-      "reviewed_sha256": "13afa295f4e8176d9b1973961bc78a1827d71c74981a11a64d8876e174cacf73",
-      "scope": "Authorized deterministic procedural landforms, biome distribution and volcanic terrain; version 2 reconstructs natural substrate and assembles authored modules while protecting early encounter positions. Caldera replaces inherited contours with a complete single-depth basin, two three-wide stair openings and connected dry causeway; protected or incomplete footprints retain safe flat terrain. Existing save schema and explicit connectivity checks retained."
+      "reviewed_sha256": "a7e6e51da47259ddec48e6fbe2ed6253e46d3cb17428216a35ad4d44d183d0e2",
+      "scope": "Authorized deterministic procedural terrain generation, version 3, with biome-authored modules and the existing connected single-depth caldera. Preserves dungeon routes, deep-forest maze walls, graveyards, ruins and special pits during volcanic finishing; shoreline smoothing excludes reserved actors, stored encounters and dungeon water while retaining normal inland smoothing. No save schema change."
     },
     "src/com/pkmngen/game/PmdBattleSprites.java": {
       "reviewed_sha256": "42bfd778d608589db57411dd23f3c305a249ee6abd0a9a82445190c3ac79f63d",
@@ -317,12 +317,12 @@
       "reviewed_sha256": "f213f5dcae5ae1a9f6d69c53efb424c5927c80e2880b5110503e3c6882594bb5"
     },
     "src/com/pkmngen/game/WorldMaterials.java": {
-      "reviewed_sha256": "5ccf49087f4f6ea152e75003f7ac530e39785b6a13ff95cc5f033b28fd55b671",
-      "scope": "Presentation-only semantic terrain/prop resolver, explicit geometry kinds and eligibility for natural dry material transitions; upper objects override floor-name heuristics, whole rocks remain props and volcanic cracks remain flat. No asset ownership, Tile mutations or saved-data changes."
+      "reviewed_sha256": "8bb069dcc0c0a96d05dd226f0691a266d90c9fcb944461d32c47e210ce012bd0",
+      "scope": "Presentation-only semantic terrain/prop resolver, natural dry transitions, regional tree selection and cave floor caps. Upper objects override floor-name heuristics; whole rocks remain props and volcanic cracks remain flat. No asset ownership, Tile mutations or saved-data changes."
     },
     "src/com/pkmngen/game/WorldAmbientOverlay.java": {
-      "scope": "Sparse deterministic world-space mist, embers, fireflies, dust, snow and water glints with strict count/opacity budgets, protected actor focus, depth testing, separate shader ownership and no gameplay RNG or indoor/UI overlays. Step 3 also respects the user ambient-accents toggle without changing effect generation.",
-      "reviewed_sha256": "4037ef0e41ba1e3ee61c97226ebf5a6eb4c625dcf96a2d9d6fa5c4d3c93a535d"
+      "reviewed_sha256": "00cd5a65ee59b720e71540aff2884d657b6160f12d0876622eee185be63d2827",
+      "scope": "Sparse deterministic world-space mist, embers, fireflies, dust, snow and water glints with count/opacity budgets, protected actor focus, depth testing and separate shader ownership. Respects ambient toggle and freezes environmental motion with reduced motion; no gameplay RNG, indoor/UI overlays or saved-state writes."
     },
     "src/com/pkmngen/game/DesktopInterfaceSettings.java": {
       "scope": "Explicit local UI/control preferences, draft validation, reserved menu keys and duplicate rejection, atomic save with backup; no game-save schema or legacy settings-file rewrite.",
@@ -345,8 +345,12 @@
       "reviewed_sha256": "7d9d7b97c0e712261eb4b6029cc914de4b1a0211359425c108d162a6f6079191"
     },
     "src/com/pkmngen/game/AuthoredTerrain.java": {
-      "reviewed_sha256": "2cfe0367a1e956542fb45d7fd69a2e10c09f9f95492041ea1846212ec4da081b",
-      "scope": "Generation-only reconstruction of reachable natural inland substrate, replacing old random ledges/vegetation before seeded authored 17x17 and 9x9 modules. Actual Tile ground/obstacle/ledge/ramp identities, protected event and reserved actor halos, retained headbutt trees/route/biome/save schema, and connectivity validation before module mutation; never applied on save loading."
+      "reviewed_sha256": "c6b34f2cdba1abfb785b87d24e56578af2837ecda595698ba0f0e000dc714bc6",
+      "scope": "Generation-only reconstruction and deterministic 17/9/5-cell authored modules for ten natural biome families. Region-specific footprints, minimum useful pocket area, immutable water/tidal/maze boundaries, protected event and encounter access, biome/route preservation, dry connectivity and no save-load regeneration."
+    },
+    "src/com/pkmngen/game/WorldNatureMotion.java": {
+      "reviewed_sha256": "6b16e90c214da83fb81cde194b95130f8be1152089ff9cbda403d12523a803ad",
+      "scope": "Pure presentation helper for bounded wind and real nearby shore/sand distance masks, excluding ledges, ramps and mismatched elevation. Coordinate-derived read-only signals; no textures, gameplay clocks, RNG or persisted state."
     }
   },
   "review_notes": [
@@ -379,7 +383,8 @@
     "Step 2 on base 392411be: explicitly reviewed WorldMaterials extraction, typed prop/structure/decal dispatch and source-bound subtle WorldAmbientOverlay. No other production or PNG changes. Historical overlay-OFF mesh parity is retained; new accents are covered by independent ON/OFF native pixel/readability/RNG tests. Prior manifest/verifier archived immutably in baseline/java-material-step2.",
     "Step 3 on main 500a9c9c: explicitly reviewed title/setup/options and trainer presentation; transactional text focus fixes WASD editing traps, draft validated controls persist separately, inventory pointer/description navigation retains original item operations. DrawSetupMenu, Player, saves, combat rules and every original PNG remain byte-identical. Prior manifest/verifier archived in baseline/java-interface-step3. Actual acceptance receipts are required before merging or packaging.",
     "Step 3 pointer safety review: popup rows share the presenter hitboxes; a click on a different choice selects without confirming the old YES/USE selection, a subsequent click delegates the original action. Outside clicks do not act. Keyboard controls remain unchanged.",
-    "2026-10-12: recovered ac526d14 unchanged, then reviewed authored generation modules, terrain/billboard readability and modern UI/encounter presentation; pre-change review archived; battle/save/controller sources outside this scope unchanged. Native results are separate."
+    "2026-10-12: recovered ac526d14 unchanged, then reviewed authored generation modules, terrain/billboard readability and modern UI/encounter presentation; pre-change review archived; battle/save/controller sources outside this scope unchanged. Native results are separate.",
+    "2026-10-12 living world: reviewed biome-specific structural modules and boundary retention, world-space nature rendering/shore heights, regional materials and reduced-motion accents. Previous local 5dd0db06 manifest/verifier/verification archived; original combat, Player, save and map sources unchanged. Native evidence remains separate."
   ],
   "historical_v2": "baseline/modernization-v2/archive.json",
   "historical_v3": "baseline/modernization-v3/",

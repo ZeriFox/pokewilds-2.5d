@@ -19,7 +19,7 @@ def main() -> int:
             raise RuntimeError("Test copy escaped the intended temporary directory")
         shutil.copytree(verifier.ROOT / "src", root / "src")
         shutil.copytree(verifier.ROOT / verifier.CLASSIC_SOURCES, root / verifier.CLASSIC_SOURCES)
-        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE, *verifier.TERRAIN_ARCHIVE]:
+        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE, *verifier.TERRAIN_ARCHIVE, *verifier.LIVING_WORLD_ARCHIVE]:
             target = root / source
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / source, target)
@@ -91,6 +91,9 @@ def main() -> int:
         for name in verifier.TERRAIN_ARCHIVE:
             reject("pre-terrain review archive changed " + name, name, append)
         reject("authored terrain changed after freeze", verifier.PREFIX + "AuthoredTerrain.java", append)
+        reject("nature motion changed after freeze", verifier.PREFIX + "WorldNatureMotion.java", append)
+        for name in verifier.LIVING_WORLD_ARCHIVE:
+            reject("pre-living-world review archive changed " + name, name, append)
         reject("original setup launch logic changed", verifier.PREFIX + "DrawSetupMenu.java", append)
         verifier.audit(root)
     report = destination / "results.txt"

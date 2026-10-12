@@ -23,6 +23,13 @@ def main() -> int:
     if destination.is_symlink() or classes.is_symlink():
         raise RuntimeError("Test output must not be a symlink")
     classes.mkdir(parents=True, exist_ok=True)
+    if not args.fixtures_only:
+        # A seed may have no accepted room in one biome. Never leave its preview
+        # from a previous run next to the evidence for the current island.
+        for preview in destination.glob("world-biome-*.png"):
+            if preview.is_symlink() or preview.resolve().parent != destination.resolve():
+                raise RuntimeError("Biome preview must stay in the test directory")
+            preview.unlink()
     java, javac = find_jdk()
     sources = [ROOT / "tools" / "ModernWorldGenerationTest.java", ROOT / "tools" / "WorldSmokeTest.java"]
     if args.sources:
@@ -31,6 +38,7 @@ def main() -> int:
     commands = [[javac, "--release", "17", "-encoding", "UTF-8", "-proc:none", "-classpath", str(JAR),
                  "-d", str(classes), *map(str, sources)]]
     base = [java, "-Xmx2g", "-Dfile.encoding=UTF-8", "-Dpokewilds.visual=johto", "-Dpokewilds.models=off",
+            "-Dpokewilds.test.biomePreviews=true",
             "-classpath", os.pathsep.join([str(classes)] + ([str(ROOT / "resources")] if args.sources else []) + [str(JAR)])]
     commands.append(base + ["com.pkmngen.game.ModernWorldGenerationTest"])
     if not args.fixtures_only:
@@ -47,7 +55,7 @@ def main() -> int:
     output = log_path.read_text(encoding="utf-8")
     if "TOPOLOGY PASS:" not in output or not args.fixtures_only and "WORLD PASS:" not in output:
         raise RuntimeError(f"Missing PASS result: {log_path}")
-    reports = re.findall(r"WORLDGEN v2 .*?dryComponents=(\d+)->(\d+).*?volcanic=(\d+).*?lava=(\d+)", output)
+    reports = re.findall(r"WORLDGEN v3 .*?dryComponents=(\d+)->(\d+).*?volcanic=(\d+).*?lava=(\d+)", output)
     if not reports or any(int(after) > int(before) or int(volcanic) < 100 or int(lava) < 20
                           for before, after, volcanic, lava in reports):
         raise RuntimeError(f"World topology regression: {reports}")

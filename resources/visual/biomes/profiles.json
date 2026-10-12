@@ -149,7 +149,7 @@
       },
       "decor": {
         "rock": "rock",
-        "tree": "tree",
+        "tree": "tree_oak",
         "bush": "bush",
         "grass": "grass_tuft",
         "gravestone": "gravestone"
@@ -385,8 +385,8 @@
       "decor": {
         "rock": "rock_ice",
         "tree": "tree_snow",
-        "bush": "bush",
-        "grass": "grass_tuft",
+        "bush": "bush_dry",
+        "grass": "grass_dry_tuft",
         "gravestone": "gravestone"
       },
       "ambient": {
@@ -442,9 +442,9 @@
       },
       "decor": {
         "rock": "rock",
-        "tree": "tree",
+        "tree": "tree_pine",
         "bush": "bush",
-        "grass": "grass_tuft",
+        "grass": "grass_dry_tuft",
         "gravestone": "gravestone"
       },
       "ambient": {
@@ -560,7 +560,7 @@
       },
       "decor": {
         "rock": "rock",
-        "tree": "tree",
+        "tree": "forest_tree_willow",
         "bush": "bush",
         "grass": "grass_tuft",
         "gravestone": "gravestone"
@@ -678,8 +678,8 @@
       "decor": {
         "rock": "desert_rock",
         "tree": "tree_dry",
-        "bush": "bush",
-        "grass": "grass_tuft",
+        "bush": "bush_dry",
+        "grass": "grass_dry_tuft",
         "gravestone": "gravestone"
       },
       "ambient": {

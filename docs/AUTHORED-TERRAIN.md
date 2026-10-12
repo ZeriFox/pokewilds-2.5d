@@ -12,13 +12,25 @@ to inspect the newly authored terrain structure.
 
 ## Modules and assembly
 
-`src/com/pkmngen/game/AuthoredTerrain.java` contains three editable 17×17 ASCII
-modules: `meadow-crossing`, `woodland-bend` and `double-stair-terrace`, plus three
-9×9 versions for narrower inland areas. Rows are
-written north to south. A deterministic map fingerprint selects the lattice
+`src/com/pkmngen/game/AuthoredTerrain.java` contains 33 editable ASCII modules
+in sizes 17×17, 9×9 and 5×5. Rows are written north to south. A deterministic map fingerprint selects the lattice
 phase, module and horizontal/vertical reflection. No encounter RNG is consumed.
-Every module has matching three-cell path ports and an open outer border. Small
-modules never overlap accepted large modules.
+All modules have an open outer border; bends, courts and washes have their own
+path layout rather than all using the same four-way intersection. Smaller modules
+never overlap accepted larger modules.
+
+| Natural family | Pieces |
+| --- | --- |
+| Temperate | Meadow crossing, woodland bend, broad terrace; small rooms and pocket groves |
+| Desert | Bending dry wash, cactus crescent, narrow mesa with two stairs, pocket wash |
+| Beach | Long dune walk, rock cove, pocket dune; strictly on existing dry land |
+| Wetland | Reed ring and willow bank, smaller bank sections; water stays intact |
+| Mountain | Rock pass and broad ridge shelf with clear stairs, pocket passes |
+| Snow | Pine shelter and narrow cirque terrace, pocket shelter |
+| Oasis | Palm court and grass garden, small courts; existing pools retained |
+| Savanna | Widely spaced acacia glade and grass ribbon, small grass sections |
+| Deep forest | Small root rooms and turns on existing open ground; maze walls retained |
+| Graveyard | Memorial courts and quiet paths in open ground; tombs/interactions retained |
 
 | Symbol | Ground and behavior |
 | --- | --- |
@@ -26,7 +38,7 @@ modules never overlap accepted large modules.
 | `p` | Walkable path |
 | `t` | Tree with ordinary tree collision and field-move interaction |
 | `f` | Small tall-grass habitat patch |
-| `o` | Smashable rock, available for additional modules |
+| `o` | Smashable rock |
 | `h` | Raised biome ground |
 | `H` | Raised path |
 | `R` | Walkable ramp through the terrace contour |
@@ -46,14 +58,37 @@ old contour layout as a constraint on the new map rather than merely changing
 its cliff artwork. Its cells and removed contours are reported separately from
 the cells subsequently placed by full modules, so those counts are not additive.
 
-The first module set targets dry temperate land, mountain, snowy and wetland
-interiors. Coastlines, water, puddles, lava, biome boundaries, dungeon structures,
-the deep-forest maze and special desert/graveyard areas keep their existing
-generation. The opening pass preserves a one-cell halo around unsafe terrain.
-A full natural footprint plus one-cell surrounding halo is required for a module.
+The opening pass now targets all ten natural families. Coastal reconstruction
+stays on dry land: coastlines, water, puddles, tidal zones and their one-cell halo
+remain intact. Sliding ice, desert pits/Trapinch triggers, cracked floors, ruins,
+dungeon structures and multi-cell blockers are excluded. Deep forest and graveyard
+preparation may change only already walkable ground: it cannot cut through a maze
+wall or remove a tomb. Large modules require a full natural footprint and a
+one-cell surrounding halo.
 Any ledges remaining along the outer two cells prevent placement, so a preserved
-contour is never cut by a room. This is deliberately not a claim that every cell
-of every biome is rebuilt by the first six modules.
+contour is never cut by a room. The volcanic finishing pass follows the same maze,
+graveyard, dungeon and sand-pit exclusions instead of overwriting them afterwards.
+
+Flat 5×5 pieces can follow a real water bank or maze corridor: water/tidal cells,
+maze walls, multi-cell tree blockers and other-biome cells inside the footprint
+stay immutable. No partial elevated platform or stair is allowed in these pieces.
+If such a retained cell contains a protected event or reserved actor, the entire
+pocket is rejected, including when that cell is in its surrounding halo. The later
+shore smoothing pass also skips reserved water, dungeon routes and stored encounters;
+it still smooths ordinary eligible inland water.
+At least ten cells must be available for reconstruction and eight must actually
+change; a token edit cannot count as a module. The same connectivity validation
+rejects fragments containing disconnected dry islands. Existing blocked tree
+footprints are never partially removed. Ground-only habitat identity also remains
+intact when a legacy tile has no route or biome label.
+
+This reconstructs eligible natural land; it does not replace every individual cell.
+Narrow maze corridors, tiny islands, coast edges and dense protected content can
+prevent a complete module. The report explicitly distinguishes natural candidate
+cells, prepared ground and accepted module cells per family, so missing coverage is
+visible rather than hidden by a global percentage. Prepared and module counts overlap.
+`changed` counts effective ground/object changes within the accepted modules;
+`rebuilt` counts their reconstructed dry cells, excluding every retained cell.
 
 ## Protected content and connectivity
 
@@ -80,16 +115,25 @@ context; it does not read personal save files.
 
 The fixtures cover 12 seeds, reversed map insertion order, a dense 129×129 forest,
 mountains containing legacy ledges, protected items/actor positions, preserved
-route/biome identity, rejected special biomes/water, unchanged footprint,
+route/biome identity, rejected volcanic terrain/water, unchanged footprint,
 non-increasing dry components and all six actual sloped ramp cells per terrace.
+Nine additional biome fixtures each run four seeds with native tile construction,
+tidal/water borders, dungeon cells, stored encounters, reserved actors, maze walls,
+graves and desert triggers. They check accepted rooms, coverage, material/habitat
+identity, unchanged protected cells, real slopes and save-format compatibility.
+Additional regressions cover diagonal water, a three-cell-wide maze corridor,
+separate tiny islands and terrain whose habitat is encoded only by its ground.
 Every rebuilt fixture tile is round-tripped through the existing save schema.
 The forest coverage requirement is over 50%; actual production coverage depends
-on island shape and protected terrain and is printed in `WORLDGEN v2 ... AUTHORED`.
+on island shape and protected terrain and is printed in `WORLDGEN v3 ... AUTHORED`.
 
 `python tools/modern_world_test.py` additionally exercises the original real
 island generator, field movement and save/load in `build/modern-world`. Its
 report includes accepted modules, terraces, rebuilt cells, true ramps, trees,
 protected cells, and rejected boundary/connectivity plans.
+It also captures `world-biome-<family>.png` from actual accepted modules after
+the save/load checks, using only fixture camera movement without further saves.
+Missing rooms are reported explicitly and do not produce a fabricated preview.
 
 ## Caldera structure
 

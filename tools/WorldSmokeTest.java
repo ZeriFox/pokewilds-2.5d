@@ -100,6 +100,9 @@ public final class WorldSmokeTest {
         Vector2 emotePosition;
         long emoteStartRenderedFrames;
         ModernWorldGenerator.Report generatedTopology;
+        int biomePreviewIndex;
+        String biomePreviewName;
+        final String[] biomePreviews = {"temperate", "desert", "beach", "wetland", "oasis", "savanna", "mountain", "snow", "deep_forest", "graveyard"};
 
         SmokeGame() { super(new String[0], 2); }
 
@@ -267,9 +270,54 @@ public final class WorldSmokeTest {
                     return;
                 }
                 screenshot("world-caldera.png");
+                if (Boolean.getBoolean("pokewilds.test.biomePreviews") && previewNextBiome()) {
+                    phase = 6; phaseFrames = 0; return;
+                }
                 completed = true;
                 Gdx.app.exit();
+            } else if (phase == 6 && phaseFrames >= 25) {
+                if (!johtoFrameActive) {
+                    if (phaseFrames >= 90) throw new IllegalStateException("No active frame for biome preview " + biomePreviewName);
+                    return;
+                }
+                screenshot("world-biome-" + biomePreviewName + ".png");
+                if (previewNextBiome()) { phaseFrames = 0; return; }
+                completed = true; Gdx.app.exit();
             }
+        }
+
+        private boolean previewNextBiome() {
+            if (generatedTopology == null || generatedTopology.authored == null) return false;
+            while (biomePreviewIndex < biomePreviews.length) {
+                String family = biomePreviews[biomePreviewIndex++];
+                Tile chosen = null; String module = ""; int best = -1;
+                for (AuthoredTerrain.Placement placement : generatedTopology.authored.placements) {
+                    boolean temperatePiece = placement.module.contains("woodland") || placement.module.contains("meadow")
+                        || placement.module.contains("double-stair");
+                    if (family.equals("temperate") ? !temperatePiece : !placement.module.startsWith(family.replace('_', '-') + "-")) continue;
+                    int score = placement.size * (placement.module.contains("terrace") ? 2 : 1);
+                    if (score <= best) continue;
+                    for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++) {
+                        Tile tile = map.tiles.get(new Vector2((placement.x + placement.size / 2 + dx) * 16,
+                            (placement.y + placement.size / 2 + dy) * 16));
+                        if (!ModernWorldGenerator.isWalkable(tile) || map.pokemon.containsKey(tile.position)) continue;
+                        String actual = BiomeProfiles.forTile(tile).id;
+                        if (actual.equals("forest") || actual.equals("plains")) actual = "temperate";
+                        if (!actual.equals(family)) continue;
+                        chosen = tile; module = placement.module; best = score;
+                    }
+                }
+                if (chosen == null) {
+                    System.out.println("WORLD: biome preview unavailable (no accepted room): " + family); continue;
+                }
+                biomePreviewName = family;
+                pressedKey = -1; player.position.set(chosen.position);
+                cam.position.set(chosen.position.x + 8, chosen.position.y + 8, 0); map.refreshCache = true;
+                System.out.println("WORLD: biome preview " + family + " module=" + module + " position=" + chosen.position
+                    + "; fixture camera only, no additional save");
+                return true;
+            }
+            return false;
         }
 
         /** Presentation fixture only, after all original save/load assertions.

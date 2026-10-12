@@ -1,0 +1,78 @@
+VERIFICA — terreno modulare e presentazione desktop, 12 ottobre 2026
+
+VERSIONE LOCALE
+Recuperato origin/main ac526d14 con fast-forward, senza conflitti.
+Ramo di lavoro: work/local-terrain-2026-10-12.
+Backup Git precedente: backup/before-structural-terrain-2026-10-12.
+Le nuove modifiche e la build sono locali; nessun push, tag o nuova release.
+AVVIA-POKEWILDS.cmd e il collegamento desktop usano il JAR seguente.
+Per provare la nuova struttura occorre una nuova avventura/isola.
+Il terreno e le costruzioni dei salvataggi esistenti non vengono rigenerati.
+
+ARTEFATTO VERIFICATO
+dist/pokewilds-rebuilt.jar
+SHA-256: f0b384a5b54f7046902fe49e46146f5835e33dc0fedbaa02bca320aab4cc4835
+Dimensione: 298069165 byte; 108949 voci ZIP.
+Java 17, 229 sorgenti, 490 classi compilate.
+Zero classi di gioco copiate dal runtime upstream; modelli GLB esclusi.
+CRC, classi, sorgenti, risorse e librerie corrispondono al build report.
+Digest sorgenti: 6c76eb2f1226604850f6e7102cfa3f2155ce4c8e131d9ead5a58db481b8673b2
+Indice con hash dei log: build/structural-verification/final.json.
+Avvio reale con java -jar: 120 frame, menu moderno, uscita regolare;
+cartella isolata build/structural-launcher, Java incluso nel progetto.
+
+MODIFICHE
+- Ricostruzione del terreno naturale interno e sei moduli manuali 17x17/9x9
+  assemblati proceduralmente: radure, boschetti e terrazze con due accessi.
+  Terreno, ostacoli, collisioni e rampe appartengono alle stesse celle.
+- Caldera con contorno chiuso, dislivello unico, due scalinate e bacini di lava
+  separati da una passerella. Eventi e incontri protetti conservati.
+- Gradini visibili anche sui connettori piatti, bordi dei materiali raccordati,
+  prato meno contrastato e profondita coerente fra oggetti e sprite.
+- Pokemon stabili nelle dimensioni quando cambiano direzione; allenatori B/W
+  esistenti piu leggibili. Nessun nuovo set di personaggi originali dichiarato.
+- Pannelli squadra/inventario/menu con palette ardesia e verde petrolio;
+  ingresso battaglia continuo, copertura dell'intera finestra e movimento ridotto.
+- Testa del personaggio nel letto allineata alla profondita reale del cuscino,
+  verificata anche a zoom differenti.
+
+VERIFICHE FINALI
+16 suite native sul JAR indicato, senza sorgenti o risorse sovrapposte:
+- field_scene_test.py
+- battle_entry_test.py
+- ui_layout_test.py
+- battle_viewport_test.py
+- world_elevation_test.py
+- bw_assets_integration_test.py
+- world_mesh_batch_test.py
+- pmd_battle_visual_test.py
+- boss_battle_visual_test.py
+- authored_terrain_test.py
+- modern_world_test.py
+- terrain_readability_test.py
+- world_presentation_layers_test.py
+- landscape_smoke_test.py
+- desktop_menu_flow_test.py
+- modern_ui_smoke_test.py
+
+AuthoredTerrain: 605120 controlli, 12 seed e serializzazione delle celle.
+Terreno: 342 controlli, visibilita GPU di scale e personaggi, occlusione PMD/alberi.
+Battaglia: 1152 frame di ingresso, 4 formati e 2 modalita movimento;
+viewport su 5 formati e 6 biomi, transizioni di uscita e boss originali.
+Mondo reale: generazione, movimento, salvataggio/caricamento e 0 fallback classici.
+Il log modern-world contiene seed, copertura e quote della specifica isola.
+Audit: 157 sorgenti originali invariati, 41 con ambito esplicito, 31 aggiunte;
+29 mutazioni non autorizzate respinte. Archivio pre-modifiche conservato in
+baseline/before-structural-terrain. Controllo CPU/GPU WorldMeshBatch superato.
+
+LIMITI E PROVA
+Catalogo iniziale di moduli per interni naturali e caldera: coste, dungeon,
+labirinti ed eventi speciali mantengono la propria struttura. La copertura
+dipende dalla forma dell'isola e dai contenuti protetti; non tutti i biomi
+sono stati sostituiti con moduli. Dove non entra un bacino completo, la caldera
+usa un terreno piano sicuro, indicato dal report r0.
+Sono prove automatiche su fixture native, non una campagna manuale completa
+o una prova multiplayer. Il salvataggio personale Kiri.sav non e stato aperto.
+Queste 16 suite non sono l'intera pipeline di 28 suite richiesta per una release.
+Il vecchio confronto pixel-identico dell'intera scena e disponibile con
+--historical-parity; i nuovi criteri sono documentati in docs/STRUCTURAL-TERRAIN.md.

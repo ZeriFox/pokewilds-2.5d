@@ -23,7 +23,7 @@ public final class AuthoredTerrainTest {
         config.setInitialVisible(false); config.setWindowedMode(320, 288); config.setForegroundFPS(30);
         new Lwjgl3Application(new TestGame(), config);
         if (failure != null) { failure.printStackTrace(); System.exit(1); }
-        System.out.println("AUTHORED PASS: " + assertions + " checks; 12 seeds, reversed insertion, >50% woodland coverage, protected events and reserved actors, real three-wide slopes, collision/TileData consistency");
+        System.out.println("AUTHORED PASS: " + assertions + " checks; 12 woodland seeds, 9 biome catalogs x 4 seeds, reversed insertion, retained water/maze boundaries, protected events and actors, unlabelled habitats, real slopes, collision/TileData consistency");
         System.exit(0);
     }
     private static final class TestGame extends Game {
@@ -34,6 +34,10 @@ public final class AuthoredTerrainTest {
                 for (int seed = 0; seed < 12; seed++) run(seed);
                 checkTerraceProtection();
                 checkRejectedTerrain();
+                checkBiomeCatalogs();
+                checkRetainedBoundaries();
+                checkUnlabelledGround();
+                checkSpecialWaterBoundaries();
             } catch (Throwable error) { failure = error; }
             Gdx.app.exit();
         }
@@ -115,7 +119,7 @@ public final class AuthoredTerrainTest {
         return tiles;
     }
     private static void checkRejectedTerrain() {
-        for (String biome : new String[]{"deep_forest", "desert", "graveyard"}) {
+        for (String biome : new String[]{"volcano"}) {
             Map<Vector2, Tile> map = fixture(false, false);
             for (Tile tile : map.values()) tile.biome = biome;
             long before = ModernWorldGenerator.fingerprint(map);
@@ -126,6 +130,180 @@ public final class AuthoredTerrainTest {
         for (Tile tile : map.values()) { tile.name = "water2"; tile.init(); }
         long before = ModernWorldGenerator.fingerprint(map);
         check(AuthoredTerrain.apply(map, 13).modules == 0 && ModernWorldGenerator.fingerprint(map) == before, "water overwritten");
+    }
+
+    private static void checkBiomeCatalogs() {
+        String[][] biomes = {
+            {"desert", "desert1", "desert4"}, {"beach", "beach1", "sand1"},
+            {"oasis", "oasis1", "green1"}, {"savanna", "savanna2", "green_savanna1"},
+            {"wooded_lake", "wooded_lake1", "green_woodedlake"}, {"snow", "snow1", "snow1"},
+            {"mountain", "mountain1", "mountain3"}, {"deep_forest", "deep_forest", "green_deepforest"},
+            {"graveyard", "graveyard1", "green12"}
+        };
+        for (String[] biome : biomes) for (int seed = 0; seed < 4; seed++) {
+            Map<Vector2, Tile> map = biomeFixture(biome), reversed = new LinkedHashMap<>();
+            List<Vector2> order = new ArrayList<>(map.keySet()); Collections.reverse(order);
+            Map<Vector2, Tile> duplicate = biomeFixture(biome);
+            for (Vector2 position : order) reversed.put(position, duplicate.get(position));
+            Map<Vector2, String> protectedBefore = new HashMap<>(), profiles = new HashMap<>();
+            Map<Vector2, Route> routes = new HashMap<>();
+            for (Tile tile : map.values()) {
+                profiles.put(tile.position, BiomeProfiles.forTile(tile).id);
+                routes.put(tile.position, tile.routeBelongsTo);
+                int x = Math.round(tile.position.x / 16), y = Math.round(tile.position.y / 16);
+                if (tile.isWater || tile.isTidal || tile.hasItem != null || tile.routeBelongsTo.isDungeon
+                    || !tile.routeBelongsTo.storedPokemon.isEmpty() || tile.name.equals("tree5")
+                    || tile.nameUpper.equals("gravestone2") || tile.name.equals("desert2_trapinch_spawn")
+                    || x == 13 && y == 13) protectedBefore.put(tile.position, state(tile));
+            }
+            Set<Vector2> reserved = Collections.singleton(new Vector2(13 * 16, 13 * 16));
+            int components = ModernWorldGenerator.dryComponents(map);
+            AuthoredTerrain.Report result = AuthoredTerrain.apply(map, seed, reserved);
+            AuthoredTerrain.apply(reversed, seed, reserved);
+            check(result.modules >= 4 && result.preparedCells >= 200, "missing biome assembly " + biome[0] + ": " + result);
+            check(result.cellsRebuilt > 200, "insufficient biome room coverage " + biome[0] + ": " + result);
+            check(ModernWorldGenerator.fingerprint(map) == ModernWorldGenerator.fingerprint(reversed), "biome insertion order " + biome[0]);
+            check(ModernWorldGenerator.dryComponents(map) <= components, "biome route disconnected " + biome[0]);
+            WorldElevation elevation = new WorldElevation(); elevation.update(map);
+            for (Tile tile : map.values()) {
+                check(tile.routeBelongsTo == routes.get(tile.position), "biome route replaced " + biome[0]);
+                check(BiomeProfiles.forTile(tile).id.equals(profiles.get(tile.position)), "material/habitat identity changed " + biome[0] + " " + tile.name);
+                if (protectedBefore.containsKey(tile.position)) check(protectedBefore.get(tile.position).equals(state(tile)), "protected biome content changed " + biome[0]);
+                if (ModernWorldGenerator.isRamp(tile)) check(elevation.isSloped(tile) && ModernWorldGenerator.isWalkable(tile), "biome ramp is blocked or flat " + biome[0]);
+                Network.TileData data = new Network.TileData(tile, 100);
+                Tile loaded = Tile.get(data, tile.routeBelongsTo);
+                check(loaded.name.equals(tile.name) && loaded.nameUpper.equals(tile.nameUpper)
+                    && loaded.isSolid == tile.isSolid && loaded.isGrass == tile.isGrass && loaded.isLedge == tile.isLedge,
+                    "biome save mismatch " + biome[0]);
+            }
+            if (seed == 0) System.out.println("BIOME " + biome[0] + " " + result);
+        }
+    }
+
+    private static Map<Vector2, Tile> biomeFixture(String[] biome) {
+        Map<Vector2, Tile> map = new LinkedHashMap<>();
+        Route route = new Route(biome[1], 20), dungeon = new Route("pkmnmansion1", 20), encounter = new Route("", 20);
+        encounter.storedPokemon.add(new Pokemon("pineco", 20));
+        for (int y = -20; y <= 20; y++) for (int x = -20; x <= 20; x++) {
+            Vector2 pos = new Vector2(x * 16, y * 16);
+            String ground = biome[2], upper = "";
+            Route cellRoute = route;
+            if (y < -16) ground = "water2";
+            if (y == -16) ground = "sand4_tidalwater";
+            if (biome[0].equals("deep_forest") && y == 0 && Math.abs(x) > 3) ground = "tree5";
+            if (biome[0].equals("graveyard") && Math.floorMod(x, 12) == 0 && Math.floorMod(y, 12) == 0) upper = "gravestone2";
+            if (x == -10 && y == 10) upper = "pokeball1";
+            if (x == 10 && y == 10) cellRoute = dungeon;
+            if (x == -10 && y == -10) { upper = "tree2"; cellRoute = encounter; }
+            if (biome[0].equals("desert") && x == 10 && y == -10) ground = "desert2_trapinch_spawn";
+            Tile tile = new Tile(ground, upper, pos, true, cellRoute); tile.biome = biome[0];
+            if (x == -10 && y == 10) tile.hasItem = "rare candy";
+            map.put(pos, tile);
+        }
+        return map;
+    }
+
+    private static void checkRetainedBoundaries() {
+        for (boolean maze : new boolean[]{false, true}) {
+            Map<Vector2, Tile> map = new LinkedHashMap<>(); Map<Vector2, String> immutable = new HashMap<>();
+            Route route = new Route(maze ? "deep_forest" : "beach1", 20);
+            for (int y = -15; y <= 15; y++) for (int x = -15; x <= 15; x++) {
+                String ground = maze ? Math.abs(y) <= 1 ? "green_deepforest" : "tree5" : x == y ? "water2" : "sand1";
+                Tile tile = new Tile(ground, "", new Vector2(x * 16, y * 16), true, route);
+                tile.biome = maze ? "deep_forest" : "beach"; map.put(tile.position, tile);
+                if (tile.isSolid || tile.isWater) immutable.put(tile.position, state(tile));
+            }
+            int before = ModernWorldGenerator.dryComponents(map);
+            AuthoredTerrain.Report result = AuthoredTerrain.apply(map, 19);
+            check(result.modules > 0, "no accepted narrow corridor/bank pieces, maze=" + maze);
+            check(result.changedCells >= result.modules * 8, "pocket counted without substantial changes");
+            check(ModernWorldGenerator.dryComponents(map) == before, "diagonal water or maze topology changed");
+            for (Map.Entry<Vector2, String> entry : immutable.entrySet()) check(state(map.get(entry.getKey())).equals(entry.getValue()), "water/maze wall rewritten");
+        }
+        Map<Vector2, Tile> islands = new LinkedHashMap<>(); Route beach = new Route("beach1", 20);
+        for (int y = -10; y <= 10; y++) for (int x = -10; x <= 10; x++) {
+            boolean land = Math.abs(y) <= 1 && (x >= -5 && x <= -4 || x >= 4 && x <= 5);
+            Tile tile = new Tile(land ? "sand1" : "water2", "", new Vector2(x * 16, y * 16), true, beach);
+            tile.biome = "beach"; islands.put(tile.position, tile);
+        }
+        int before = ModernWorldGenerator.dryComponents(islands);
+        AuthoredTerrain.Report result = AuthoredTerrain.apply(islands, 19);
+        check(result.modules == 0 && ModernWorldGenerator.dryComponents(islands) == before, "tiny separated islands were connected or counted as modules");
+    }
+
+    private static void checkUnlabelledGround() {
+        for (String ground : new String[]{"desert4", "sand1", "snow1", "mountain3", "grass_graveyard1"}) {
+            Map<Vector2, Tile> map = new LinkedHashMap<>(); Map<Vector2, String> profiles = new HashMap<>();
+            for (int y = -12; y <= 12; y++) for (int x = -12; x <= 12; x++) {
+                Tile tile = new Tile(ground, "", new Vector2(x * 16, y * 16), true, null);
+                tile.biome = ""; map.put(tile.position, tile); profiles.put(tile.position, BiomeProfiles.forTile(tile).id);
+            }
+            AuthoredTerrain.apply(map, 12);
+            for (Tile tile : map.values()) check(tile.routeBelongsTo == null && tile.biome.isEmpty()
+                && BiomeProfiles.forTile(tile).id.equals(profiles.get(tile.position)), "unlabelled ground lost habitat: " + ground + " -> " + tile.name);
+        }
+    }
+
+    /** Pocket boundaries must not bypass the special-cell approach halo. The
+     * later shoreline pass must also retain already exposed special water. */
+    private static void checkSpecialWaterBoundaries() {
+        Vector2 center = new Vector2(0, 0);
+        for (boolean stored : new boolean[]{false, true}) {
+            Map<Vector2, Tile> map = specialWaterFixture(stored, true, 12);
+            Map<Vector2, String> halo = new HashMap<>();
+            for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) {
+                Vector2 pos = new Vector2(x * 16, y * 16); halo.put(pos, state(map.get(pos)));
+            }
+            Set<Vector2> reserved = stored ? Collections.emptySet() : Collections.singleton(center);
+            AuthoredTerrain.apply(map, 0, reserved);
+            for (Map.Entry<Vector2, String> entry : halo.entrySet())
+                check(state(map.get(entry.getKey())).equals(entry.getValue()), "special water lost pocket approach halo, stored=" + stored);
+
+            map = specialWaterFixture(stored, true, 12);
+            Tile water = map.get(center); Route originalRoute = water.routeBelongsTo;
+            Pokemon encounter = stored ? originalRoute.storedPokemon.get(0) : new Pokemon("milotic", 20);
+            Map<Vector2, Pokemon> early = new HashMap<>();
+            if (!stored) early.put(center, encounter);
+            ModernWorldGenerator.Report report = ModernWorldGenerator.apply(map, early);
+            check(water.isWater && water.name.equals("water2") && water.routeBelongsTo == originalRoute
+                && report.shoreCellsSmoothed == 0, "complete pipeline replaced protected pond");
+            check(stored ? originalRoute.storedPokemon.size() == 1 && originalRoute.storedPokemon.get(0) == encounter
+                : early.get(center) == encounter, "complete pipeline lost protected pond encounter");
+            for (Map.Entry<Vector2, String> entry : halo.entrySet())
+                check(state(map.get(entry.getKey())).equals(entry.getValue()), "complete pipeline changed pond approach");
+        }
+        for (String mode : new String[]{"normal", "reserved", "stored", "dungeon"}) {
+            Map<Vector2, Tile> map = specialWaterFixture(mode.equals("stored"), false, 1);
+            Tile water = map.get(center); Route originalRoute = water.routeBelongsTo;
+            if (mode.equals("dungeon")) originalRoute.isDungeon = true;
+            Map<Vector2, Pokemon> early = new HashMap<>();
+            Pokemon encounter = mode.equals("stored") ? originalRoute.storedPokemon.get(0) : new Pokemon("milotic", 20);
+            if (mode.equals("reserved")) early.put(center, encounter);
+            ModernWorldGenerator.Report report = ModernWorldGenerator.apply(map, early);
+            if (mode.equals("normal")) {
+                check(report.shoreCellsSmoothed == 1 && water.name.equals("sand3") && !water.isWater,
+                    "ordinary isolated inland water no longer smooths");
+            } else {
+                check(report.shoreCellsSmoothed == 0 && water.name.equals("water2") && water.isWater
+                    && water.routeBelongsTo == originalRoute, "exposed special water was smoothed: " + mode);
+                if (mode.equals("stored")) check(originalRoute.storedPokemon.size() == 1 && originalRoute.storedPokemon.get(0) == encounter, "stored water encounter replaced");
+                if (mode.equals("reserved")) check(early.get(center) == encounter, "reserved water actor replaced");
+            }
+        }
+        System.out.println("SPECIAL WATER PASS: reserved/stored pocket halo; public pipeline; exposed reserved/stored/dungeon water preserved; ordinary smoothing retained");
+    }
+
+    private static Map<Vector2, Tile> specialWaterFixture(boolean stored, boolean blocked, int radius) {
+        Map<Vector2, Tile> map = new LinkedHashMap<>();
+        Route forest = new Route("forest1", 20), water = new Route(stored ? "" : "river1", 20);
+        if (stored) water.storedPokemon.add(new Pokemon("goldeen", 20));
+        for (int y = -radius; y <= radius; y++) for (int x = -radius; x <= radius; x++) {
+            boolean center = x == 0 && y == 0;
+            String upper = blocked && Math.abs(x) <= 1 && Math.abs(y) <= 1 && !center ? "rock1_color" : "";
+            Tile tile = new Tile(center ? "water2" : "green1", upper, new Vector2(x * 16, y * 16), true, center ? water : forest);
+            tile.biome = "forest"; map.put(tile.position, tile);
+        }
+        return map;
     }
     private static void checkTerraceProtection() {
         Map<Vector2, Tile> original = fixture(false, false);
