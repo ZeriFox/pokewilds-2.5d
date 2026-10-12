@@ -12,50 +12,50 @@
   },
   "regions": {
     "grass": {
-      "x": 113,
+      "x": 165,
       "y": 118,
-      "width": 16,
-      "height": 16,
+      "width": 64,
+      "height": 64,
       "sampleWidth": 16,
       "sampleHeight": 16,
       "kind": "surface",
       "anchorUnits": "pixels",
       "sourceCanvas": [
-        16,
-        16
+        64,
+        64
       ]
     },
     "path": {
-      "x": 1304,
+      "x": 1476,
       "y": 218,
-      "width": 16,
-      "height": 16,
+      "width": 64,
+      "height": 64,
       "sampleWidth": 16,
       "sampleHeight": 16,
       "kind": "surface",
       "anchorUnits": "pixels",
       "sourceCanvas": [
-        16,
-        16
+        64,
+        64
       ]
     },
     "dirt": {
       "x": 1549,
       "y": 2,
-      "width": 16,
-      "height": 16,
+      "width": 64,
+      "height": 64,
       "sampleWidth": 16,
       "sampleHeight": 16,
       "kind": "surface",
       "anchorUnits": "pixels",
       "sourceCanvas": [
-        16,
-        16
+        64,
+        64
       ]
     },
     "snow": {
-      "x": 1942,
-      "y": 218,
+      "x": 119,
+      "y": 344,
       "width": 16,
       "height": 16,
       "sampleWidth": 16,
@@ -68,8 +68,8 @@
       ]
     },
     "sand": {
-      "x": 1825,
-      "y": 218,
+      "x": 2,
+      "y": 344,
       "width": 16,
       "height": 16,
       "sampleWidth": 16,
@@ -82,7 +82,7 @@
       ]
     },
     "stone_floor": {
-      "x": 291,
+      "x": 484,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -96,7 +96,7 @@
       ]
     },
     "mountain": {
-      "x": 1086,
+      "x": 1258,
       "y": 218,
       "width": 32,
       "height": 32,
@@ -160,7 +160,7 @@
       ]
     },
     "wood_floor": {
-      "x": 174,
+      "x": 362,
       "y": 493,
       "width": 16,
       "height": 16,
@@ -174,7 +174,7 @@
       ]
     },
     "tile_floor": {
-      "x": 454,
+      "x": 647,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -188,7 +188,7 @@
       ]
     },
     "wall": {
-      "x": 1787,
+      "x": 1980,
       "y": 344,
       "width": 16,
       "height": 45,
@@ -202,7 +202,7 @@
       ]
     },
     "wall_wood": {
-      "x": 1827,
+      "x": 2020,
       "y": 344,
       "width": 16,
       "height": 45,
@@ -216,7 +216,7 @@
       ]
     },
     "roof": {
-      "x": 1609,
+      "x": 1829,
       "y": 218,
       "width": 32,
       "height": 32,
@@ -224,7 +224,7 @@
       "anchorY": 0
     },
     "roof_green": {
-      "x": 1645,
+      "x": 1865,
       "y": 218,
       "width": 32,
       "height": 32,
@@ -232,7 +232,7 @@
       "anchorY": 0
     },
     "rug": {
-      "x": 1681,
+      "x": 1901,
       "y": 218,
       "width": 32,
       "height": 32,
@@ -240,7 +240,7 @@
       "anchorY": 0
     },
     "steps": {
-      "x": 271,
+      "x": 464,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -248,31 +248,31 @@
       "anchorY": 0
     },
     "grass_light": {
-      "x": 171,
+      "x": 319,
       "y": 118,
-      "width": 16,
-      "height": 16,
+      "width": 64,
+      "height": 64,
       "sampleWidth": 16,
       "sampleHeight": 16,
       "kind": "surface",
       "anchorUnits": "pixels",
       "sourceCanvas": [
-        16,
-        16
+        64,
+        64
       ]
     },
     "grass_dry": {
-      "x": 133,
+      "x": 233,
       "y": 118,
-      "width": 16,
-      "height": 16,
+      "width": 64,
+      "height": 64,
       "sampleWidth": 16,
       "sampleHeight": 16,
       "kind": "surface",
       "anchorUnits": "pixels",
       "sourceCanvas": [
-        16,
-        16
+        64,
+        64
       ]
     },
     "basalt": {
@@ -298,7 +298,7 @@
       "anchorY": 0
     },
     "volcano_path": {
-      "x": 1751,
+      "x": 1944,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -312,7 +312,7 @@
       ]
     },
     "volcano": {
-      "x": 1731,
+      "x": 1924,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -342,7 +342,7 @@
       "anchorY": 0
     },
     "ramp": {
-      "x": 1479,
+      "x": 1699,
       "y": 218,
       "width": 16,
       "height": 16,
@@ -350,7 +350,7 @@
       "anchorY": 0
     },
     "ruin_floor": {
-      "x": 1717,
+      "x": 1937,
       "y": 218,
       "width": 32,
       "height": 32,
@@ -358,7 +358,7 @@
       "anchorY": 0
     },
     "ruin_wall": {
-      "x": 1789,
+      "x": 2009,
       "y": 218,
       "width": 32,
       "height": 32,
@@ -366,7 +366,7 @@
       "anchorY": 0
     },
     "tile_pale": {
-      "x": 474,
+      "x": 667,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -382,8 +382,8 @@
       "anchorY": 0
     },
     "sand_shore": {
-      "x": 1845,
-      "y": 218,
+      "x": 22,
+      "y": 344,
       "width": 16,
       "height": 16,
       "sampleWidth": 16,
@@ -396,7 +396,7 @@
       ]
     },
     "path_dry": {
-      "x": 1324,
+      "x": 1544,
       "y": 218,
       "width": 32,
       "height": 32,
@@ -412,15 +412,15 @@
       "anchorY": 0
     },
     "water_0": {
-      "x": 1955,
-      "y": 344,
+      "x": 110,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
       "anchorY": 0
     },
     "water_shallow_0": {
-      "x": 42,
+      "x": 230,
       "y": 493,
       "width": 16,
       "height": 16,
@@ -428,7 +428,7 @@
       "anchorY": 0
     },
     "lava_0": {
-      "x": 715,
+      "x": 911,
       "y": 118,
       "width": 16,
       "height": 16,
@@ -436,15 +436,15 @@
       "anchorY": 0
     },
     "water_1": {
-      "x": 1975,
-      "y": 344,
+      "x": 130,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
       "anchorY": 0
     },
     "water_shallow_1": {
-      "x": 62,
+      "x": 250,
       "y": 493,
       "width": 16,
       "height": 16,
@@ -452,7 +452,7 @@
       "anchorY": 0
     },
     "lava_1": {
-      "x": 735,
+      "x": 931,
       "y": 118,
       "width": 16,
       "height": 16,
@@ -460,15 +460,15 @@
       "anchorY": 0
     },
     "water_2": {
-      "x": 1995,
-      "y": 344,
+      "x": 150,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
       "anchorY": 0
     },
     "water_shallow_2": {
-      "x": 82,
+      "x": 270,
       "y": 493,
       "width": 16,
       "height": 16,
@@ -476,7 +476,7 @@
       "anchorY": 0
     },
     "lava_2": {
-      "x": 755,
+      "x": 951,
       "y": 118,
       "width": 16,
       "height": 16,
@@ -484,15 +484,15 @@
       "anchorY": 0
     },
     "water_3": {
-      "x": 2015,
-      "y": 344,
+      "x": 170,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
       "anchorY": 0
     },
     "water_shallow_3": {
-      "x": 102,
+      "x": 290,
       "y": 493,
       "width": 16,
       "height": 16,
@@ -500,7 +500,7 @@
       "anchorY": 0
     },
     "lava_3": {
-      "x": 775,
+      "x": 971,
       "y": 118,
       "width": 16,
       "height": 16,
@@ -508,15 +508,15 @@
       "anchorY": 0
     },
     "water": {
-      "x": 1935,
-      "y": 344,
+      "x": 90,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
       "anchorY": 0
     },
     "water_shallow": {
-      "x": 22,
+      "x": 210,
       "y": 493,
       "width": 16,
       "height": 16,
@@ -524,7 +524,7 @@
       "anchorY": 0
     },
     "lava": {
-      "x": 695,
+      "x": 891,
       "y": 118,
       "width": 16,
       "height": 16,
@@ -532,7 +532,7 @@
       "anchorY": 0
     },
     "river": {
-      "x": 1499,
+      "x": 1719,
       "y": 218,
       "width": 16,
       "height": 16,
@@ -540,7 +540,7 @@
       "anchorY": 0
     },
     "water_ripple": {
-      "x": 2,
+      "x": 190,
       "y": 493,
       "width": 16,
       "height": 16,
@@ -612,48 +612,6 @@
       "anchorY": 0
     },
     "volcanic_basalt": {
-      "x": 1462,
-      "y": 344,
-      "width": 16,
-      "height": 16,
-      "sampleWidth": 16,
-      "sampleHeight": 16,
-      "kind": "surface",
-      "anchorUnits": "pixels",
-      "sourceCanvas": [
-        16,
-        16
-      ]
-    },
-    "volcanic_cracked": {
-      "x": 1581,
-      "y": 344,
-      "width": 16,
-      "height": 16,
-      "sampleWidth": 16,
-      "sampleHeight": 16,
-      "kind": "surface",
-      "anchorUnits": "pixels",
-      "sourceCanvas": [
-        16,
-        16
-      ]
-    },
-    "volcanic_ash": {
-      "x": 1426,
-      "y": 344,
-      "width": 32,
-      "height": 32,
-      "sampleWidth": 16,
-      "sampleHeight": 16,
-      "kind": "surface",
-      "anchorUnits": "pixels",
-      "sourceCanvas": [
-        32,
-        32
-      ]
-    },
-    "volcanic_obsidian": {
       "x": 1655,
       "y": 344,
       "width": 16,
@@ -667,8 +625,50 @@
         16
       ]
     },
+    "volcanic_cracked": {
+      "x": 1774,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
+    "volcanic_ash": {
+      "x": 1619,
+      "y": 344,
+      "width": 32,
+      "height": 32,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        32,
+        32
+      ]
+    },
+    "volcanic_obsidian": {
+      "x": 1848,
+      "y": 344,
+      "width": 16,
+      "height": 16,
+      "sampleWidth": 16,
+      "sampleHeight": 16,
+      "kind": "surface",
+      "anchorUnits": "pixels",
+      "sourceCanvas": [
+        16,
+        16
+      ]
+    },
     "volcanic_cliff": {
-      "x": 1525,
+      "x": 1718,
       "y": 344,
       "width": 16,
       "height": 32,
@@ -682,7 +682,7 @@
       ]
     },
     "volcanic_cliff_cap": {
-      "x": 1545,
+      "x": 1738,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -690,7 +690,7 @@
       "anchorY": 0
     },
     "volcanic_ramp": {
-      "x": 1675,
+      "x": 1868,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -698,7 +698,7 @@
       "anchorY": 0
     },
     "graveyard_ground": {
-      "x": 377,
+      "x": 573,
       "y": 118,
       "width": 16,
       "height": 16,
@@ -712,7 +712,7 @@
       ]
     },
     "graveyard_path": {
-      "x": 397,
+      "x": 593,
       "y": 118,
       "width": 16,
       "height": 16,
@@ -726,7 +726,7 @@
       ]
     },
     "graveyard_cliff": {
-      "x": 262,
+      "x": 458,
       "y": 118,
       "width": 32,
       "height": 32,
@@ -740,7 +740,7 @@
       ]
     },
     "graveyard_cliff_cap": {
-      "x": 298,
+      "x": 494,
       "y": 118,
       "width": 32,
       "height": 32,
@@ -748,7 +748,7 @@
       "anchorY": 0
     },
     "graveyard_ramp": {
-      "x": 417,
+      "x": 613,
       "y": 118,
       "width": 32,
       "height": 32,
@@ -770,7 +770,7 @@
       ]
     },
     "lava_bright_0": {
-      "x": 831,
+      "x": 1027,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -778,15 +778,15 @@
       "anchorY": 0
     },
     "lava_cooled_0": {
-      "x": 1955,
-      "y": 118,
+      "x": 106,
+      "y": 218,
       "width": 64,
       "height": 64,
       "anchorX": 32.0,
       "anchorY": 0
     },
     "lava_bright_1": {
-      "x": 899,
+      "x": 1095,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -794,7 +794,7 @@
       "anchorY": 0
     },
     "lava_cooled_1": {
-      "x": 2,
+      "x": 174,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -802,7 +802,7 @@
       "anchorY": 0
     },
     "lava_bright_2": {
-      "x": 1375,
+      "x": 1571,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -810,7 +810,7 @@
       "anchorY": 0
     },
     "lava_cooled_2": {
-      "x": 478,
+      "x": 650,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -818,7 +818,7 @@
       "anchorY": 0
     },
     "lava_bright_3": {
-      "x": 1443,
+      "x": 1639,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -826,7 +826,7 @@
       "anchorY": 0
     },
     "lava_cooled_3": {
-      "x": 546,
+      "x": 718,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -834,7 +834,7 @@
       "anchorY": 0
     },
     "lava_bright_4": {
-      "x": 1511,
+      "x": 1707,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -842,7 +842,7 @@
       "anchorY": 0
     },
     "lava_cooled_4": {
-      "x": 614,
+      "x": 786,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -850,7 +850,7 @@
       "anchorY": 0
     },
     "lava_bright_5": {
-      "x": 1579,
+      "x": 1775,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -858,7 +858,7 @@
       "anchorY": 0
     },
     "lava_cooled_5": {
-      "x": 682,
+      "x": 854,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -866,7 +866,7 @@
       "anchorY": 0
     },
     "lava_bright_6": {
-      "x": 1647,
+      "x": 1843,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -874,7 +874,7 @@
       "anchorY": 0
     },
     "lava_cooled_6": {
-      "x": 750,
+      "x": 922,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -882,7 +882,7 @@
       "anchorY": 0
     },
     "lava_bright_7": {
-      "x": 1715,
+      "x": 1911,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -890,7 +890,7 @@
       "anchorY": 0
     },
     "lava_cooled_7": {
-      "x": 818,
+      "x": 990,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -898,7 +898,7 @@
       "anchorY": 0
     },
     "lava_bright_8": {
-      "x": 1783,
+      "x": 1979,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -906,7 +906,7 @@
       "anchorY": 0
     },
     "lava_cooled_8": {
-      "x": 886,
+      "x": 1058,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -914,15 +914,15 @@
       "anchorY": 0
     },
     "lava_bright_9": {
-      "x": 1851,
-      "y": 118,
+      "x": 2,
+      "y": 218,
       "width": 64,
       "height": 64,
       "anchorX": 32.0,
       "anchorY": 0
     },
     "lava_cooled_9": {
-      "x": 954,
+      "x": 1126,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -930,7 +930,7 @@
       "anchorY": 0
     },
     "lava_bright_10": {
-      "x": 967,
+      "x": 1163,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -938,7 +938,7 @@
       "anchorY": 0
     },
     "lava_cooled_10": {
-      "x": 70,
+      "x": 242,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -946,7 +946,7 @@
       "anchorY": 0
     },
     "lava_bright_11": {
-      "x": 1035,
+      "x": 1231,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -954,7 +954,7 @@
       "anchorY": 0
     },
     "lava_cooled_11": {
-      "x": 138,
+      "x": 310,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -962,7 +962,7 @@
       "anchorY": 0
     },
     "lava_bright_12": {
-      "x": 1103,
+      "x": 1299,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -970,7 +970,7 @@
       "anchorY": 0
     },
     "lava_cooled_12": {
-      "x": 206,
+      "x": 378,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -978,7 +978,7 @@
       "anchorY": 0
     },
     "lava_bright_13": {
-      "x": 1171,
+      "x": 1367,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -986,7 +986,7 @@
       "anchorY": 0
     },
     "lava_cooled_13": {
-      "x": 274,
+      "x": 446,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -994,7 +994,7 @@
       "anchorY": 0
     },
     "lava_bright_14": {
-      "x": 1239,
+      "x": 1435,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -1002,7 +1002,7 @@
       "anchorY": 0
     },
     "lava_cooled_14": {
-      "x": 342,
+      "x": 514,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -1010,7 +1010,7 @@
       "anchorY": 0
     },
     "lava_bright_15": {
-      "x": 1307,
+      "x": 1503,
       "y": 118,
       "width": 64,
       "height": 64,
@@ -1018,7 +1018,7 @@
       "anchorY": 0
     },
     "lava_cooled_15": {
-      "x": 410,
+      "x": 582,
       "y": 218,
       "width": 64,
       "height": 64,
@@ -1026,7 +1026,7 @@
       "anchorY": 0
     },
     "lava_bright": {
-      "x": 795,
+      "x": 991,
       "y": 118,
       "width": 32,
       "height": 32,
@@ -1040,8 +1040,8 @@
       ]
     },
     "lava_cooled": {
-      "x": 1919,
-      "y": 118,
+      "x": 70,
+      "y": 218,
       "width": 32,
       "height": 32,
       "sampleWidth": 32,
@@ -1054,7 +1054,7 @@
       ]
     },
     "tree": {
-      "x": 510,
+      "x": 703,
       "y": 344,
       "width": 48,
       "height": 96,
@@ -1072,7 +1072,7 @@
       "worldHeight": 48.0
     },
     "tree_small": {
-      "x": 834,
+      "x": 1027,
       "y": 344,
       "width": 48,
       "height": 96,
@@ -1090,7 +1090,7 @@
       "worldHeight": 48.0
     },
     "tree_pine": {
-      "x": 782,
+      "x": 975,
       "y": 344,
       "width": 48,
       "height": 96,
@@ -1108,7 +1108,7 @@
       "worldHeight": 44.0
     },
     "tree_dry": {
-      "x": 600,
+      "x": 793,
       "y": 344,
       "width": 48,
       "height": 80,
@@ -1126,7 +1126,7 @@
       "worldHeight": 45.0
     },
     "tree_snow": {
-      "x": 886,
+      "x": 1079,
       "y": 344,
       "width": 48,
       "height": 96,
@@ -1144,7 +1144,7 @@
       "worldHeight": 44.0
     },
     "tree_oak": {
-      "x": 652,
+      "x": 845,
       "y": 344,
       "width": 126,
       "height": 122,
@@ -1178,7 +1178,7 @@
       "anchorY": 0
     },
     "tree_dead": {
-      "x": 562,
+      "x": 755,
       "y": 344,
       "width": 34,
       "height": 31,
@@ -1212,7 +1212,7 @@
       "anchorY": 0
     },
     "rock": {
-      "x": 1519,
+      "x": 1739,
       "y": 218,
       "width": 32,
       "height": 32,
@@ -1230,7 +1230,7 @@
       "worldHeight": 18.0
     },
     "rock_small": {
-      "x": 1591,
+      "x": 1811,
       "y": 218,
       "width": 14,
       "height": 11,
@@ -1238,7 +1238,7 @@
       "anchorY": 0
     },
     "rock_ice": {
-      "x": 1555,
+      "x": 1775,
       "y": 218,
       "width": 32,
       "height": 32,
@@ -1256,7 +1256,7 @@
       "worldHeight": 18.0
     },
     "grass_tuft": {
-      "x": 227,
+      "x": 423,
       "y": 118,
       "width": 14,
       "height": 12,
@@ -1264,7 +1264,7 @@
       "anchorY": 0
     },
     "grass_dry_tuft": {
-      "x": 153,
+      "x": 301,
       "y": 118,
       "width": 14,
       "height": 15,
@@ -1272,7 +1272,7 @@
       "anchorY": 0
     },
     "flowers": {
-      "x": 1885,
+      "x": 1933,
       "y": 2,
       "width": 14,
       "height": 10,
@@ -1280,7 +1280,7 @@
       "anchorY": 0
     },
     "flowers_fairy": {
-      "x": 1903,
+      "x": 1951,
       "y": 2,
       "width": 11,
       "height": 10,
@@ -1288,7 +1288,7 @@
       "anchorY": 0
     },
     "mushroom": {
-      "x": 1122,
+      "x": 1294,
       "y": 218,
       "width": 10,
       "height": 9,
@@ -1296,15 +1296,15 @@
       "anchorY": 0
     },
     "seedling": {
-      "x": 1865,
-      "y": 218,
+      "x": 42,
+      "y": 344,
       "width": 5,
       "height": 8,
       "anchorX": 2.5,
       "anchorY": 0
     },
     "plant_growing": {
-      "x": 1410,
+      "x": 1630,
       "y": 218,
       "width": 11,
       "height": 13,
@@ -1320,7 +1320,7 @@
       "anchorY": 0
     },
     "stump": {
-      "x": 311,
+      "x": 504,
       "y": 344,
       "width": 19,
       "height": 16,
@@ -1354,7 +1354,7 @@
       "anchorY": 0
     },
     "fence_wood": {
-      "x": 1710,
+      "x": 1758,
       "y": 2,
       "width": 16,
       "height": 16,
@@ -1362,7 +1362,7 @@
       "anchorY": 0
     },
     "door": {
-      "x": 1584,
+      "x": 1632,
       "y": 2,
       "width": 20,
       "height": 39,
@@ -1370,7 +1370,7 @@
       "anchorY": 0
     },
     "door_locked": {
-      "x": 1608,
+      "x": 1656,
       "y": 2,
       "width": 20,
       "height": 37,
@@ -1378,7 +1378,7 @@
       "anchorY": 0
     },
     "door_open": {
-      "x": 1632,
+      "x": 1680,
       "y": 2,
       "width": 30,
       "height": 44,
@@ -1386,7 +1386,7 @@
       "anchorY": 0
     },
     "window": {
-      "x": 122,
+      "x": 310,
       "y": 493,
       "width": 22,
       "height": 32,
@@ -1394,7 +1394,7 @@
       "anchorY": 0
     },
     "window_dark": {
-      "x": 148,
+      "x": 336,
       "y": 493,
       "width": 22,
       "height": 32,
@@ -1438,7 +1438,7 @@
       "worldHeight": 28.0
     },
     "table": {
-      "x": 370,
+      "x": 563,
       "y": 344,
       "width": 80,
       "height": 48,
@@ -1500,8 +1500,8 @@
       "worldHeight": 19.0
     },
     "shelf": {
-      "x": 1874,
-      "y": 218,
+      "x": 51,
+      "y": 344,
       "width": 32,
       "height": 32,
       "sampleWidth": 32,
@@ -1518,15 +1518,15 @@
       "worldHeight": 20.0
     },
     "wardrobe": {
-      "x": 1847,
-      "y": 344,
+      "x": 2,
+      "y": 493,
       "width": 64,
       "height": 41,
       "anchorX": 32.0,
       "anchorY": 0
     },
     "pot": {
-      "x": 1440,
+      "x": 1660,
       "y": 218,
       "width": 15,
       "height": 24,
@@ -1542,7 +1542,7 @@
       "anchorY": 0
     },
     "machine": {
-      "x": 1022,
+      "x": 1194,
       "y": 218,
       "width": 24,
       "height": 48,
@@ -1550,7 +1550,7 @@
       "anchorY": 0
     },
     "machine_active": {
-      "x": 1050,
+      "x": 1222,
       "y": 218,
       "width": 32,
       "height": 48,
@@ -1558,7 +1558,7 @@
       "anchorY": 0
     },
     "kiln": {
-      "x": 611,
+      "x": 807,
       "y": 118,
       "width": 48,
       "height": 96,
@@ -1566,15 +1566,15 @@
       "anchorY": 0
     },
     "sign": {
-      "x": 1910,
-      "y": 218,
+      "x": 87,
+      "y": 344,
       "width": 28,
       "height": 23,
       "anchorX": 14.0,
       "anchorY": 0
     },
     "lamp": {
-      "x": 663,
+      "x": 859,
       "y": 118,
       "width": 28,
       "height": 45,
@@ -1582,7 +1582,7 @@
       "anchorY": 0
     },
     "key": {
-      "x": 595,
+      "x": 791,
       "y": 118,
       "width": 12,
       "height": 7,
@@ -1590,7 +1590,7 @@
       "anchorY": 0
     },
     "item": {
-      "x": 585,
+      "x": 781,
       "y": 118,
       "width": 6,
       "height": 9,
@@ -1598,7 +1598,7 @@
       "anchorY": 0
     },
     "fossil": {
-      "x": 79,
+      "x": 131,
       "y": 118,
       "width": 30,
       "height": 26,
@@ -1606,7 +1606,7 @@
       "anchorY": 0
     },
     "ruin_gate": {
-      "x": 1753,
+      "x": 1973,
       "y": 218,
       "width": 32,
       "height": 48,
@@ -1614,15 +1614,15 @@
       "anchorY": 0
     },
     "spikes": {
-      "x": 1962,
-      "y": 218,
+      "x": 139,
+      "y": 344,
       "width": 16,
       "height": 39,
       "anchorX": 8.0,
       "anchorY": 0
     },
     "hole": {
-      "x": 549,
+      "x": 745,
       "y": 118,
       "width": 32,
       "height": 48,
@@ -1630,8 +1630,8 @@
       "anchorY": 0
     },
     "forest_tree": {
-      "x": 1970,
-      "y": 2,
+      "x": 2,
+      "y": 118,
       "width": 48,
       "height": 96,
       "sampleWidth": 48,
@@ -1648,7 +1648,7 @@
       "worldHeight": 48.0
     },
     "forest_tree_willow": {
-      "x": 2,
+      "x": 54,
       "y": 118,
       "width": 73,
       "height": 82,
@@ -1748,7 +1748,7 @@
       "anchorY": 0
     },
     "volcanic_rock": {
-      "x": 1711,
+      "x": 1904,
       "y": 344,
       "width": 16,
       "height": 32,
@@ -1766,7 +1766,7 @@
       "worldHeight": 28.0
     },
     "volcanic_crystal": {
-      "x": 1601,
+      "x": 1794,
       "y": 344,
       "width": 12,
       "height": 25,
@@ -1774,7 +1774,7 @@
       "anchorY": 0
     },
     "volcanic_charred_tree": {
-      "x": 1482,
+      "x": 1675,
       "y": 344,
       "width": 39,
       "height": 46,
@@ -1782,7 +1782,7 @@
       "anchorY": 0
     },
     "volcanic_dead_shrub": {
-      "x": 1617,
+      "x": 1810,
       "y": 344,
       "width": 34,
       "height": 31,
@@ -1790,7 +1790,7 @@
       "anchorY": 0
     },
     "graveyard_rock": {
-      "x": 453,
+      "x": 649,
       "y": 118,
       "width": 32,
       "height": 32,
@@ -1808,7 +1808,7 @@
       "worldHeight": 18.0
     },
     "graveyard_dead_tree": {
-      "x": 334,
+      "x": 530,
       "y": 118,
       "width": 39,
       "height": 46,
@@ -1816,7 +1816,7 @@
       "anchorY": 0
     },
     "graveyard_weeds": {
-      "x": 531,
+      "x": 727,
       "y": 118,
       "width": 14,
       "height": 15,
@@ -1824,7 +1824,7 @@
       "anchorY": 0
     },
     "graveyard_tomb": {
-      "x": 489,
+      "x": 685,
       "y": 118,
       "width": 17,
       "height": 19,
@@ -1832,7 +1832,7 @@
       "anchorY": 0
     },
     "graveyard_tomb_square": {
-      "x": 510,
+      "x": 706,
       "y": 118,
       "width": 17,
       "height": 16,
@@ -1840,7 +1840,7 @@
       "anchorY": 0
     },
     "grass_patch": {
-      "x": 191,
+      "x": 387,
       "y": 118,
       "width": 32,
       "height": 32,
@@ -1848,15 +1848,15 @@
       "anchorY": 0
     },
     "warp": {
-      "x": 1915,
-      "y": 344,
+      "x": 70,
+      "y": 493,
       "width": 16,
       "height": 16,
       "anchorX": 8.0,
       "anchorY": 0
     },
     "pressure_plate": {
-      "x": 1459,
+      "x": 1679,
       "y": 218,
       "width": 16,
       "height": 16,
@@ -1872,7 +1872,7 @@
       "anchorY": 0
     },
     "statue": {
-      "x": 254,
+      "x": 447,
       "y": 344,
       "width": 13,
       "height": 28,
@@ -1880,7 +1880,7 @@
       "anchorY": 0
     },
     "tree_top": {
-      "x": 938,
+      "x": 1131,
       "y": 344,
       "width": 29,
       "height": 27,
@@ -1888,7 +1888,7 @@
       "anchorY": 0
     },
     "plant": {
-      "x": 1377,
+      "x": 1597,
       "y": 218,
       "width": 29,
       "height": 27,
@@ -1896,7 +1896,7 @@
       "anchorY": 0
     },
     "palm_top": {
-      "x": 1136,
+      "x": 1308,
       "y": 218,
       "width": 126,
       "height": 122,
@@ -1904,7 +1904,7 @@
       "anchorY": 0
     },
     "palm_trunk": {
-      "x": 1266,
+      "x": 1438,
       "y": 218,
       "width": 34,
       "height": 31,
@@ -1912,7 +1912,7 @@
       "anchorY": 0
     },
     "fence": {
-      "x": 1690,
+      "x": 1738,
       "y": 2,
       "width": 16,
       "height": 16,
@@ -1920,7 +1920,7 @@
       "anchorY": 0
     },
     "door_red": {
-      "x": 1666,
+      "x": 1714,
       "y": 2,
       "width": 20,
       "height": 37,
@@ -1936,7 +1936,7 @@
       "anchorY": 0
     },
     "gravestone": {
-      "x": 245,
+      "x": 441,
       "y": 118,
       "width": 13,
       "height": 28,
@@ -1944,7 +1944,7 @@
       "anchorY": 0
     },
     "pedestal": {
-      "x": 1360,
+      "x": 1580,
       "y": 218,
       "width": 13,
       "height": 28,
@@ -1952,7 +1952,7 @@
       "anchorY": 0
     },
     "doll": {
-      "x": 1569,
+      "x": 1617,
       "y": 2,
       "width": 11,
       "height": 14,
@@ -1960,7 +1960,7 @@
       "anchorY": 0
     },
     "switch": {
-      "x": 334,
+      "x": 527,
       "y": 344,
       "width": 32,
       "height": 48,
@@ -1968,7 +1968,7 @@
       "anchorY": 0
     },
     "pokeball": {
-      "x": 1425,
+      "x": 1645,
       "y": 218,
       "width": 11,
       "height": 14,
@@ -1976,7 +1976,7 @@
       "anchorY": 0
     },
     "ultraball": {
-      "x": 1416,
+      "x": 1609,
       "y": 344,
       "width": 6,
       "height": 9,
@@ -2008,7 +2008,7 @@
       "anchorY": 0
     },
     "fire_0": {
-      "x": 1761,
+      "x": 1809,
       "y": 2,
       "width": 27,
       "height": 36,
@@ -2016,7 +2016,7 @@
       "anchorY": 0
     },
     "fire_1": {
-      "x": 1792,
+      "x": 1840,
       "y": 2,
       "width": 27,
       "height": 36,
@@ -2024,7 +2024,7 @@
       "anchorY": 0
     },
     "fire_2": {
-      "x": 1823,
+      "x": 1871,
       "y": 2,
       "width": 27,
       "height": 36,
@@ -2032,7 +2032,7 @@
       "anchorY": 0
     },
     "fire_3": {
-      "x": 1854,
+      "x": 1902,
       "y": 2,
       "width": 27,
       "height": 36,
@@ -2040,7 +2040,7 @@
       "anchorY": 0
     },
     "fire": {
-      "x": 1730,
+      "x": 1778,
       "y": 2,
       "width": 27,
       "height": 36,
@@ -2048,8 +2048,8 @@
       "anchorY": 0
     },
     "stardew_lava_0": {
-      "x": 1982,
-      "y": 218,
+      "x": 159,
+      "y": 344,
       "width": 32,
       "height": 32,
       "sampleWidth": 32,
@@ -2062,7 +2062,7 @@
       ]
     },
     "stardew_lava_cooled_0": {
-      "x": 110,
+      "x": 303,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -2076,7 +2076,7 @@
       ]
     },
     "stardew_lava_1": {
-      "x": 2,
+      "x": 195,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -2090,7 +2090,7 @@
       ]
     },
     "stardew_lava_cooled_1": {
-      "x": 146,
+      "x": 339,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -2104,7 +2104,7 @@
       ]
     },
     "stardew_lava_2": {
-      "x": 38,
+      "x": 231,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -2118,7 +2118,7 @@
       ]
     },
     "stardew_lava_cooled_2": {
-      "x": 182,
+      "x": 375,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -2132,7 +2132,7 @@
       ]
     },
     "stardew_lava_3": {
-      "x": 74,
+      "x": 267,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -2146,7 +2146,7 @@
       ]
     },
     "stardew_lava_cooled_3": {
-      "x": 218,
+      "x": 411,
       "y": 344,
       "width": 32,
       "height": 32,
@@ -2160,7 +2160,7 @@
       ]
     },
     "forest_bush": {
-      "x": 1918,
+      "x": 1966,
       "y": 2,
       "width": 48,
       "height": 48,
@@ -2214,7 +2214,7 @@
       "worldHeight": 51.0
     },
     "wall_cap": {
-      "x": 1807,
+      "x": 2000,
       "y": 344,
       "width": 16,
       "height": 16,
@@ -2246,7 +2246,7 @@
       "worldHeight": 16.0
     },
     "ui_frlg_background": {
-      "x": 971,
+      "x": 1164,
       "y": 344,
       "width": 220,
       "height": 145,
@@ -2260,7 +2260,7 @@
       ]
     },
     "ui_frlg_row": {
-      "x": 1272,
+      "x": 1465,
       "y": 344,
       "width": 140,
       "height": 19,
@@ -2274,7 +2274,7 @@
       ]
     },
     "ui_frlg_leader": {
-      "x": 1195,
+      "x": 1388,
       "y": 344,
       "width": 73,
       "height": 46,

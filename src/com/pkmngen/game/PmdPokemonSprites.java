@@ -141,6 +141,23 @@ public final class PmdPokemonSprites implements Disposable {
       return cached;
    }
 
+   /** One species/form envelope for overworld locomotion: no frame-dependent scale
+    * or foot correction. This only reads metadata and shares the existing cache. */
+   public AnimationBounds overworldBounds(Pokemon pokemon) { return overworldBounds(key(pokemon)); }
+   public AnimationBounds overworldBounds(String species) {
+      Entry entry=entry(species);if(entry==null)return null;
+      AnimationBounds found=entry.bounds.get("overworld-envelope");if(found!=null)return found;
+      float minX=Float.POSITIVE_INFINITY,minY=minX,maxX=Float.NEGATIVE_INFINITY,maxY=maxX;
+      for(String animation:new String[]{"Idle","Walk"})
+         for(String direction:new String[]{"down","down-right","right","up-right","up","up-left","left","down-left"}) {
+            AnimationBounds b=bounds(species,direction,animation);if(b==null)continue;
+            minX=Math.min(minX,b.minX);minY=Math.min(minY,b.minY);
+            maxX=Math.max(maxX,b.maxX);maxY=Math.max(maxY,b.maxY);
+         }
+      if(!Float.isFinite(minX))return null;
+      found=new AnimationBounds(minX,minY,maxX,maxY);entry.bounds.put("overworld-envelope",found);return found;
+   }
+
    /** PMD cells are timed at 60 ticks/second; stateTime is elapsed seconds. */
    public Frame frame(String species, String direction, String animation, float stateTime) {
       Entry entry = entry(species);

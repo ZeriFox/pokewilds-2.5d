@@ -109,7 +109,7 @@ def make_package(version: str, destination: Path, receipts: list[Path]) -> Path:
             add(path, "documentazione/" + path.relative_to(ROOT / "resources").as_posix())
     add(ROOT / "art-source/reference/manifest.json", "documentazione/reference-manifest.json")
     add(ROOT / "docs/ASSET-RIGHTS.md", "documentazione/ASSET-RIGHTS.md")
-    for name in ("REWORK-STATUS.md", "ASSET-COVERAGE.md", "REWORK-TESTS.md", "PACKAGING.md", "VERTICAL-SLICE.md", "JAVA-REFACTOR-STEP3.md"):
+    for name in ("REWORK-STATUS.md", "ASSET-COVERAGE.md", "REWORK-TESTS.md", "PACKAGING.md", "VERTICAL-SLICE.md", "JAVA-REFACTOR-STEP3.md", "JAVA-REFACTOR-STEP4.md"):
         path = ROOT / "docs" / name
         if path.is_file():
             add(path, "documentazione/" + name)

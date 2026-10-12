@@ -26,6 +26,7 @@ PURE = [
     "tools/test_deterministic_png.py",
     "tools/test_pmd_compatibility.py",
     "tools/test_packaging.py",
+    "tools/test_readability_assets.py",
 ]
 NATIVE = [
     ["tools/smoke_test.py"], ["tools/landscape_smoke_test.py"],
@@ -43,6 +44,7 @@ NATIVE = [
     ["tools/world_mesh_batch_test.py"],
     ["tools/world_presentation_layers_test.py"],
     ["tools/desktop_menu_flow_test.py"],
+    ["tools/world_readability_test.py"],
 ]
 
 

@@ -13,9 +13,9 @@ import java.util.*;
 
 /** Presentation only. Original actions retain ownership of input, timing and rules. */
 public final class ModernUi {
-   public static final Color INK = Color.valueOf("203e4c"), MUTED = Color.valueOf("667c80"),
-      PAPER = Color.valueOf("fffbed"), ACCENT = Color.valueOf("287e78"), GOLD = Color.valueOf("d7a955"),
-      RED = Color.valueOf("c85252"), LINE = Color.valueOf("cfddd4"), BACK = Color.valueOf("e7eee2");
+   public static final Color INK = Color.valueOf("203249"), MUTED = Color.valueOf("65758b"),
+      PAPER = Color.valueOf("f6f9fd"), ACCENT = Color.valueOf("24647f"), GOLD = Color.valueOf("dfb774"),
+      RED = Color.valueOf("c34f66"), LINE = Color.valueOf("d4dfeb"), BACK = Color.valueOf("e8eff7");
    private final Texture pixel;
    private final BitmapFont font;
    private final GlyphLayout layout = new GlyphLayout();
@@ -159,8 +159,10 @@ public final class ModernUi {
       game.uiBatch.draw(pixel,x,y,w,h); game.uiBatch.setPackedColor(saved);
    }
    public void panel(Game game,float x,float y,float w,float h) {
-      rect(game,x+1,y-1,w,h,new Color(INK.r,INK.g,INK.b,0.18f));
+      rect(game,x+1,y-1,w,h,new Color(INK.r,INK.g,INK.b,0.12f));
       rect(game,x,y,w,h,LINE); rect(game,x+0.65f,y+0.65f,w-1.3f,h-1.3f,PAPER);
+      // A thin upper highlight keeps panel hierarchy without extra ornaments.
+      if(w>4 && h>4)rect(game,x+1,y+h-1.2f,w-2,.35f,Color.WHITE);
    }
    public void panel(Game game,Box bounds) { panel(game,bounds.x,bounds.y,bounds.width,bounds.height); }
    public void fill(Game game,Color color) { rect(game,viewportX,viewportY,viewportWidth,viewportHeight,color); }

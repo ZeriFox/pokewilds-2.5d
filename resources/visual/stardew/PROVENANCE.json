@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "atlasSha256": "1b64507908d8488816e88a8f9bb1dcbfdf8bc3fa587df93228fd663bea3c3fc4",
-  "atlasRgbaSha256": "4a7b9725517cea4aade0ed4020cc2be67de935e4d6517bceeb101da4d048da38",
+  "atlasSha256": "94e24c84474c2a806a6b74e17b7b64d6df749cb14f5fd44033e8f7852346a9f7",
+  "atlasRgbaSha256": "310c3b1a74998381a31c1895923bfaee0691ea9255a1d13722a236d578207b06",
   "pngEncoding": {
     "name": "RGBA8-filter0-stored-deflate",
     "version": 1,
@@ -9,7 +9,7 @@
     "implementation": "tools/deterministic_png.py"
   },
   "encoderSha256": "fb6044da64082e548b4e28189d045a23c68894ab29659e2f2f7d380f8835ee6c",
-  "metadataSha256": "059761e6ff6845418553bc74cf550dc87e6b8e59736c76207fa3e9ee07e7bdbf",
+  "metadataSha256": "25a59a87931565afd7cf5e17d3cfe43f706cdb9fa565779fa65d205f899f5a61",
   "baseAtlasSha256": "10b4a5c31d9e01261a5a6b965845e8475c5ea131e7a574ae3909f4c68c35cc37",
   "baseMetadataSha256": "ddcb38b29a146b174e06f39a3e32b2c935fe056a8ad417d3631f47f27ad80cb2",
   "referenceManifestSha256": "bf66d4c3a7c1d1c3bbe76732bbaacd6bb35760436c59f719e572a1ab725f0004",
@@ -26,7 +26,23 @@
         16,
         16
       ],
-      "transformations": [],
+      "transformations": [
+        {
+          "calmPeriodicSurface": {
+            "size": [
+              64,
+              64
+            ],
+            "baseRgb": [
+              88,
+              130,
+              78
+            ],
+            "sourceDetailDivisor": 48,
+            "sparseTufts": 12
+          }
+        }
+      ],
       "rights": "ConcernedApe / Stardew Valley"
     },
     "path": {
@@ -39,7 +55,23 @@
         16,
         16
       ],
-      "transformations": [],
+      "transformations": [
+        {
+          "calmPeriodicSurface": {
+            "size": [
+              64,
+              64
+            ],
+            "baseRgb": [
+              157,
+              144,
+              108
+            ],
+            "sourceDetailDivisor": 48,
+            "sparseTufts": 12
+          }
+        }
+      ],
       "rights": "ConcernedApe / Stardew Valley"
     },
     "dirt": {
@@ -235,6 +267,21 @@
             "#315631",
             "#94b756"
           ]
+        },
+        {
+          "calmPeriodicSurface": {
+            "size": [
+              64,
+              64
+            ],
+            "baseRgb": [
+              96,
+              139,
+              84
+            ],
+            "sourceDetailDivisor": 48,
+            "sparseTufts": 12
+          }
         }
       ],
       "rights": "ConcernedApe / Stardew Valley"
@@ -255,6 +302,21 @@
             "#76633a",
             "#bea965"
           ]
+        },
+        {
+          "calmPeriodicSurface": {
+            "size": [
+              64,
+              64
+            ],
+            "baseRgb": [
+              155,
+              147,
+              94
+            ],
+            "sourceDetailDivisor": 48,
+            "sparseTufts": 12
+          }
         }
       ],
       "rights": "ConcernedApe / Stardew Valley"

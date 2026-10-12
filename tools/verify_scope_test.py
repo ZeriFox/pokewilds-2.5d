@@ -19,7 +19,7 @@ def main() -> int:
             raise RuntimeError("Test copy escaped the intended temporary directory")
         shutil.copytree(verifier.ROOT / "src", root / "src")
         shutil.copytree(verifier.ROOT / verifier.CLASSIC_SOURCES, root / verifier.CLASSIC_SOURCES)
-        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE]:
+        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE, *verifier.STEP4_ARCHIVE]:
             target = root / source
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / source, target)
@@ -89,6 +89,8 @@ def main() -> int:
         for name in verifier.STEP3_ARCHIVE:
             reject("pre-interface review archive changed " + name, name, append)
         reject("original setup launch logic changed", verifier.PREFIX + "DrawSetupMenu.java", append)
+        reject("readability source changed after freeze", verifier.PREFIX + "WorldReadability.java", append)
+        for name in verifier.STEP4_ARCHIVE: reject("pre-readability archive changed " + name, name, append)
         verifier.audit(root)
     report = destination / "results.txt"
     report.write_text("\n".join(results) + f"\nSCOPE NEGATIVE PASS: {len(results)} mutations rejected\n", encoding="utf-8", newline="\n")

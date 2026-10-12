@@ -359,28 +359,44 @@ public final class JohtoBattleRenderer {
    }
 
    public void drawIntro(Game game, Action action, int remaining) {
-      ModernUi ui = ModernUi.get(game);
-      float p = progress(action, remaining);
-      float pulse = 0.10f + 0.13f * (0.5f + 0.5f * MathUtils.sin(p * MathUtils.PI * 6f));
-      ui.rect(game, -320, -288, 800, 720, tint.set(0.08f, 0.22f, 0.26f, pulse));
-      float band = MathUtils.clamp(p * 5f, 0f, 1f);
-      ui.rect(game, 0, 60, 160 * band, 25, tint.set(0.08f, 0.24f, 0.28f, 0.94f));
-      ui.rect(game, 0, 59, 160 * band, 1, ModernUi.GOLD);
-      if (band > 0.9f) {
-         ui.text(game, "WILD ENCOUNTER", 18, 80, 4f, ModernUi.PAPER);
-         if (game.battle.oppPokemon != null) ui.fitText(game, game.battle.oppPokemon.nickname, 18, 72, 6f, 126, ModernUi.PAPER);
+      ModernUi ui=ModernUi.get(game);
+      float p=progress(action,remaining),enter=WorldReadability.ease(p/.30f);
+      boolean reduced=ui.desktop.preferences.reducedMotion;
+      float w=canvasWidth,h=canvasHeight,left=(160-w)*.5f,bottom=(144-h)*.5f;
+      ui.rect(game,left,bottom,w,h,tint.set(ModernUi.INK).mul(1,1,1,.12f+.14f*enter));
+      float slide=reduced?0:(1-enter)*w;
+      ui.rect(game,left-slide,70,w,21,tint.set(ModernUi.INK).mul(1,1,1,.96f));
+      ui.rect(game,left+slide,52,w,18,tint.set(ModernUi.ACCENT).mul(1,1,1,.96f));
+      ui.rect(game,left-slide,90,w,.8f,ModernUi.GOLD);
+      ui.rect(game,left+slide,52,w,.8f,ModernUi.GOLD);
+      if(enter>.96f) {
+         float angle=reduced?0:p*1.5f;
+         for(int i=0;i<32;i++) {
+            float a=i*MathUtils.PI2/32+angle;
+            ui.rect(game,19+MathUtils.cos(a)*8,71+MathUtils.sin(a)*8,1.25f,1.25f,ModernUi.PAPER);
+         }
+         ui.rect(game,11,70.5f,16,1.2f,ModernUi.PAPER);ui.panel(game,16.5f,68.5f,5,5);
+         ui.fitText(game,"WILD ENCOUNTER",36,84,4,113,ModernUi.GOLD);
+         String name=game.battle!=null&&game.battle.oppPokemon!=null?
+            (game.battle.oppPokemon.isGhost?"Unknown Pokemon":game.battle.oppPokemon.nickname):"A challenger appears";
+         ui.fitText(game,name,36,76,7,113,ModernUi.PAPER);
+         ui.fitText(game,"Get ready",36,63,4,113,ModernUi.PAPER);
       }
       countTransition();
    }
 
    public void drawWipe(Game game, Action action, int remaining) {
-      ModernUi ui = ModernUi.get(game);
-      int total = total(action, remaining);
-      float p = MathUtils.clamp((total - remaining + 1f) / Math.min(28f, total), 0f, 1f);
-      ui.rect(game, -320, -288, 800, 288 + 72 * p, ModernUi.INK);
-      ui.rect(game, -320, 144 - 72 * p, 800, 432, ModernUi.INK);
-      ui.rect(game, 0, 72 * p, 160, 1, ModernUi.GOLD);
-      ui.rect(game, 0, 143 - 72 * p, 160, 1, ModernUi.GOLD);
+      ModernUi ui=ModernUi.get(game);int total=total(action,remaining);
+      float p=WorldReadability.ease((total-remaining+1f)/Math.min(28f,total));
+      float w=canvasWidth,h=canvasHeight,left=(160-w)*.5f,bottom=(144-h)*.5f;
+      if(ui.desktop.preferences.reducedMotion)ui.rect(game,left,bottom,w,h,tint.set(ModernUi.INK).mul(1,1,1,p));
+      else {
+         float cover=h*.5f*p;
+         ui.rect(game,left,bottom,w,cover,ModernUi.INK);
+         ui.rect(game,left,bottom+h-cover,w,cover,ModernUi.INK);
+         ui.rect(game,left,bottom+cover-.8f,w,.8f,ModernUi.GOLD);
+         ui.rect(game,left,bottom+h-cover,w,.8f,ModernUi.GOLD);
+      }
       countTransition();
    }
 

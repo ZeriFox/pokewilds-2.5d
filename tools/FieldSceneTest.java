@@ -334,8 +334,8 @@ public final class FieldSceneTest {
          Object mesh=groups.get(region.getTexture());require(mesh!=null,"No submitted furniture/trainer mesh");
          FloatArray vertices=(FloatArray)field(mesh,"vertices");
          for(int offset=0;offset+47<vertices.size;offset+=48){
-            float[] data=vertices.items;boolean isActor=data[offset+6]>3.5f;
-            if(isActor!=actor)continue;
+            float[] data=vertices.items;boolean footPlane=data[offset+6]>3.5f;
+            if(footPlane!=(actor || WorldReadability.enabled()))continue;
             if(!actor&&(Math.abs(data[offset+4]-region.getU())>.00001f
                ||Math.abs(data[offset+5]-region.getV2())>.00001f
                ||Math.abs(data[offset+12]-region.getU2())>.00001f))continue;

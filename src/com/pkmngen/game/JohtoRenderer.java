@@ -61,6 +61,9 @@ public final class JohtoRenderer {
    private final WorldElevation elevation = new WorldElevation();
    private float surfaceLift;
    private float actorPlaneZ;
+   private long featheredEdges, markedRamps;
+   public long getFeatheredEdges(){return featheredEdges;}
+   public long getMarkedRamps(){return markedRamps;}
    private final Vector3 projectedAnchor = new Vector3();
    private final BoundingBox wallOcclusionBounds = new BoundingBox();
    private final Ray wallOcclusionRay = new Ray();
@@ -337,7 +340,10 @@ public final class JohtoRenderer {
             if(next!=null&&!next.isLava){ground=assets.cell(profile.string("fluid","cooledLava","lava_cooled"),x,y,seconds);break;}
          }
       }
+      if(WorldReadability.enabled() && elevation.isSloped(tile) && !tile.isWater && !tile.isLava && !tile.isWaterfall)
+         ground=assets.cell(profile.terrain("path"),x,y,seconds);
       if(!tile.isWaterfall&&!names.contains("lavafall")) terrainSurface(tile,ground);
+      if(WorldReadability.enabled()) terrainFeather(game,tile);
       if(!tile.isWater && !tile.isLava && (tile.isTidal || lower.contains("puddle"))) {
          // High tide is a walkable film over sand, not an opaque deep-water tile.
          // Read the live tide flag: CycleDayNight changes names before init().
@@ -350,7 +356,8 @@ public final class JohtoRenderer {
       if (tile.isWater && !tile.isLava) coast(game, tile);
       if(tile.isWaterfall || names.contains("lavafall")) { waterfall(tile,profile);return; }
       terrainEdges(game,tile,profile);
-      if (ModernWorldGenerator.isRamp(tile) && elevation.isSloped(tile)) ramp(tile,profile);
+      if (elevation.isSloped(tile) && !tile.isWater && !tile.isLava && !tile.isWaterfall
+         && (ModernWorldGenerator.isRamp(tile) || WorldReadability.enabled())) ramp(tile,profile);
       if (ModernWorldGenerator.isRamp(tile)) return;
       // The growing action owns its one animated sprout, not a second static prop.
       if (growingPlants.contains(tile.position)) return;
@@ -447,19 +454,54 @@ public final class JohtoRenderer {
       float x=tile.position.x,y=tile.position.y,previousLift=surfaceLift;surfaceLift=0;
       float a=elevation.height(x+.01f,y+.01f),b=elevation.height(x+15.99f,y+.01f);
       float c=elevation.height(x+15.99f,y+15.99f),d=elevation.height(x+.01f,y+15.99f);
-      // Subtle treads follow the actual incline; a flat tile never gets a staircase.
       boolean horizontal=Math.abs((b+c)-(a+d))>Math.abs((c+d)-(a+b));
-      for(int step=1;step<5;step++) {
-         float f=step/5f,px=horizontal?x+16*f:x,py=horizontal?y:y+16*f;
-         float ex=px+(horizontal?.45f:16),ey=py+(horizontal?16:.45f);
+      boolean clear=WorldReadability.enabled();
+      if(clear)markedRamps++;
+      for(int step=1;step<5;step++)for(int layer=0;layer<(clear?2:1);layer++) {
+         float f=step/5f,margin=clear?1f:0f,thickness=clear?(layer==0?.95f:.35f):.45f;
+         float shift=layer==0?0f:.95f;
+         float px=horizontal?x+16*f+shift:x+margin,py=horizontal?y+margin:y+16*f+shift;
+         float ex=px+(horizontal?thickness:16-2*margin),ey=py+(horizontal?16-2*margin:thickness);
          float h0=elevation.height(MathUtils.clamp(px,x+.01f,x+15.99f),MathUtils.clamp(py,y+.01f,y+15.99f));
          float h1=elevation.height(MathUtils.clamp(ex,x+.01f,x+15.99f),MathUtils.clamp(py,y+.01f,y+15.99f));
          float h2=elevation.height(MathUtils.clamp(ex,x+.01f,x+15.99f),MathUtils.clamp(ey,y+.01f,y+15.99f));
          float h3=elevation.height(MathUtils.clamp(px,x+.01f,x+15.99f),MathUtils.clamp(ey,y+.01f,y+15.99f));
-         quad(translucent.buffer(whiteTexture),px,h0+.06f,-py,ex,h1+.06f,-py,ex,h2+.06f,-ey,px,h3+.06f,-ey,
-            white,Color.toFloatBits(.72f,.69f,.62f,.34f));
+         float tint=clear?(layer==0?Color.toFloatBits(.22f,.26f,.25f,.68f):Color.toFloatBits(.87f,.87f,.74f,.60f))
+            :Color.toFloatBits(.72f,.69f,.62f,.34f);
+         quad(translucent.buffer(whiteTexture),px,h0+.06f,-py,ex,h1+.06f,-py,ex,h2+.06f,-ey,px,h3+.06f,-ey,white,tint);
       }
       surfaceLift=previousLift;
+   }
+
+   /** Only one side owns a seam. Never feather a cliff, a wet boundary, a puzzle
+    * or a building; the four vertices follow the actual shared upper surface. */
+   private void terrainFeather(Game game,Tile tile) {
+      if(WorldReadability.materialRank(tile)<0 || elevation.isSloped(tile))return;
+      float x=tile.position.x,y=tile.position.y,previous=surfaceLift;surfaceLift=0;
+      try {
+         for(int side=0;side<4;side++) {
+            int dx=side==2?-1:side==3?1:0,dy=side==0?-1:side==1?1:0;
+            Tile other=game.map.tiles.get(lookup.set(x+16*dx,y+16*dy));
+            if(!WorldReadability.feather(tile,other)||elevation.isSloped(other))continue;
+            float cx=x+8+8*dx,cy=y+8+8*dy;
+            float h=elevation.height(cx-dx*.01f,cy-dy*.01f),nh=elevation.height(cx+dx*.01f,cy+dy*.01f);
+            if(Math.abs(h-nh)>.08f)continue;
+            float x0=x,y0=y,x1=x+16,y1=y+16,w=3f;
+            if(side==0)y1=y+w;else if(side==1)y0=y+16-w;else if(side==2)x1=x+w;else x0=x+16-w;
+            TextureRegion uv=assets.cell(WorldMaterials.terrainName(other),x,y,seconds);if(uv==null)continue;
+            float u0=MathUtils.lerp(uv.getU(),uv.getU2(),(x0-x)/16),u1=MathUtils.lerp(uv.getU(),uv.getU2(),(x1-x)/16);
+            float v0=MathUtils.lerp(uv.getV2(),uv.getV(),(y0-y)/16),v1=MathUtils.lerp(uv.getV2(),uv.getV(),(y1-y)/16);
+            float a0=(side==0||side==2)?1:0,a1=(side==0||side==3)?1:0;
+            float a2=(side==1||side==3)?1:0,a3=(side==1||side==2)?1:0;
+            Buffer buffer=translucent.buffer(uv.getTexture());
+            seamVertex(buffer,x0,y0,h,u0,v0,a0);seamVertex(buffer,x1,y0,h,u1,v0,a1);seamVertex(buffer,x1,y1,h,u1,v1,a2);
+            seamVertex(buffer,x1,y1,h,u1,v1,a2);seamVertex(buffer,x0,y1,h,u0,v1,a3);seamVertex(buffer,x0,y0,h,u0,v0,a0);
+            featheredEdges++;
+         }
+      } finally {surfaceLift=previous;}
+   }
+   private void seamVertex(Buffer mesh,float x,float y,float height,float u,float v,float alpha) {
+      vertex(mesh,x,height+.035f,-y,Color.toFloatBits(1,1,1,alpha*.85f),u,v,0);
    }
 
    private void waterfall(Tile tile,BiomeProfiles.Profile profile) {
@@ -701,6 +743,11 @@ public final class JohtoRenderer {
       if (frame != null) {
          PmdPokemonSprites.Frame idle = sprites.frame(pokemon, "down", "Idle", 0f);
          float scale = Math.min(.85f, 30f / Math.max(1f, idle == null ? Math.max(frame.width, frame.height) : Math.max(idle.width, idle.height)));
+         PmdPokemonSprites.AnimationBounds envelope=WorldReadability.enabled()?sprites.overworldBounds(pokemon):null;
+         if(envelope!=null)scale=Math.min(.85f,30f/Math.max(1,Math.max(envelope.width,envelope.height)));
+         float contactLift=.15f;
+         if(envelope!=null && !(pokemon.inWater && pokemon.drawUpper!=null))
+            contactLift-=Math.min(0,envelope.minY)*scale*MathUtils.cosDeg(50f);
          float anchorY = frame.anchorY;
          TextureRegion region = frame.region;
          if (pokemon.inWater && pokemon.drawUpper != null) {
@@ -708,7 +755,7 @@ public final class JohtoRenderer {
             spritePart.setRegion(region); spritePart.setRegionHeight(region.getRegionHeight() - hidden);
             region = spritePart; anchorY -= hidden;
          } else shadow(pokemon.position.x + 8, pokemon.position.y + 7, Math.min(7, frame.width * scale * .25f), 2.5f);
-         anchored(region, pokemon.position.x + 8, pokemon.position.y + 7, .15f,
+         anchored(region, pokemon.position.x + 8, pokemon.position.y + 7, contactLift,
             frame.anchorX, anchorY, scale);
          return;
       }
@@ -1013,7 +1060,10 @@ public final class JohtoRenderer {
    }
 
    private void upright(TextureRegion region, float x, float y, float base, float width, float height, float tint) {
-      upright(region, x, y, base, width, height, tint, 0f);
+      // Use the same vertical depth plane as actors. Mixing a camera-facing
+      // tree plane with an actor foot plane made leaves slice through bodies.
+      actorPlaneZ=-y;
+      upright(region, x, y, base, width, height, tint, WorldReadability.enabled()?4f:0f);
    }
 
    private void upright(TextureRegion region, float x, float y, float base, float width, float height, float tint, float style) {

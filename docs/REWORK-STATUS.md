@@ -1,3 +1,7 @@
+# Readability checkpoint (step 4)
+
+See JAVA-REFACTOR-STEP4.md. Acceptance is recorded in build/native/package receipts.
+
 # Checkpoint interfaccia Java / passaggio 3
 
 Base: main `500a9c9c`. Sorgenti implementati: titolo/home/setup, modifica testo esplicita, controlli configurabili con bozza, catalogo classico opzionale e inventario a due colonne.

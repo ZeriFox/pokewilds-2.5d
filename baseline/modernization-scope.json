@@ -5,7 +5,7 @@
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "d6e27133c94941a29fe088e2a9383f594d496fc7d2a8cbb6232a4c3a82cefe37",
+  "reviewed_patch_sha256": "fa51026a40d390a316f675470e3fd48705d038b0f36fef88edf5409d56082a09",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/CheckEndOfBattle.java",
@@ -245,12 +245,12 @@
       "scope": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration."
     },
     "src/com/pkmngen/game/JohtoBattleRenderer.java": {
-      "reviewed_sha256": "1866c69c86c5cdf3096f04c0bd4f2a0b0940301f73239bcd0fd848b564de3b8a",
-      "scope": "Modern biome battle arenas/HUD, full-viewport composition, preserved-world transitions and presentation helpers for special boss actions."
+      "scope": "Modern biome battle arenas/HUD, full-viewport composition, preserved-world transitions and presentation helpers for special boss actions. Step 4: explicitly reviewed calmer presentation, whole-actor depth/locomotion anchoring, visible ramps/seams, slate/teal panels and eased full-viewport encounter entrance as applicable; original rule/action clocks and save data unchanged.",
+      "reviewed_sha256": "df726f9d1ff4698f9fc846a2f9c47d943bb468bff244b3d7946ef785d8344265"
     },
     "src/com/pkmngen/game/JohtoRenderer.java": {
-      "scope": "Exclusive perspective world drawing with shared derived terrain heights, continuous cliff/ramp geometry and contact shading, coherent biome materials/atmosphere, aspect-preserving decor, configurable sprite dimensions/anchors, proportional trainer crops and building-wall classification, modern intentional ghost presentation, anchored PMD actors and original field-action feedback; no persisted terrain or collision changes. Step 3 only changes the sleeping-player trainer lookup to the color-aware overload.",
-      "reviewed_sha256": "537c40ceab89bef1269b8f0060524a7a23f10cf0b3caa74ec1db76cfa56ea42f"
+      "scope": "Exclusive perspective world drawing with shared derived terrain heights, continuous cliff/ramp geometry and contact shading, coherent biome materials/atmosphere, aspect-preserving decor, configurable sprite dimensions/anchors, proportional trainer crops and building-wall classification, modern intentional ghost presentation, anchored PMD actors and original field-action feedback; no persisted terrain or collision changes. Step 3 only changes the sleeping-player trainer lookup to the color-aware overload. Step 4: explicitly reviewed calmer presentation, whole-actor depth/locomotion anchoring, visible ramps/seams, slate/teal panels and eased full-viewport encounter entrance as applicable; original rule/action clocks and save data unchanged.",
+      "reviewed_sha256": "2d5e6c4729f3fa3994ed8a7b4d2aeb2a228daf60ed09bb7badd5594f7f37fc9b"
     },
     "src/com/pkmngen/game/ModernBatch.java": {
       "reviewed_sha256": "f02a0d0fd3f6e2e2a38a975c2a1a0ada4197770a5371c1d73d08e06474d44cd4",
@@ -265,8 +265,8 @@
       "scope": "Modern setup/party/storage/nickname UI, full animated summary actors on all three pages and configured control hints. Step 3 delegates setup visuals to ModernStartupUi, adds a settings hint and uses the selected color-aware trainer image."
     },
     "src/com/pkmngen/game/ModernUi.java": {
-      "reviewed_sha256": "780558baed3e4b7300ad13f74bf0ac92ae2d5c2aac2be7296151dcc221a493fc",
-      "scope": "Modern typography, shared logical viewport and anchored panel layout, dialogs, event backgrounds and menu rendering dispatch. Step 3 coordinates the separate desktop menu controller and startup presenter; unchanged original actions continue outside explicitly handled UI contexts."
+      "scope": "Modern typography, shared logical viewport and anchored panel layout, dialogs, event backgrounds and menu rendering dispatch. Step 3 coordinates the separate desktop menu controller and startup presenter; unchanged original actions continue outside explicitly handled UI contexts. Step 4: explicitly reviewed calmer presentation, whole-actor depth/locomotion anchoring, visible ramps/seams, slate/teal panels and eased full-viewport encounter entrance as applicable; original rule/action clocks and save data unchanged.",
+      "reviewed_sha256": "9e112a1debc41b20ccd751dcd7b316b0310ce0ff2de1336f1e4cdeee732f1fe9"
     },
     "src/com/pkmngen/game/ModernWorldGenerator.java": {
       "reviewed_sha256": "8154e84b81847c3ebeba5f536fcfa1d03d2eb3fcfc83256b47ed17e5521bff3d",
@@ -277,8 +277,8 @@
       "scope": "Exact PMD battle/event actors with diagonal battle-facing poses, complete animation-envelope fit and ground anchoring, trimmed trainers, hidden-identity ghost presentation and visual effects. Step 3 only passes Player to the trainer-presentation lookup; Pokemon actors and combat formulas unchanged."
     },
     "src/com/pkmngen/game/PmdPokemonSprites.java": {
-      "reviewed_sha256": "47d1f1e5a438e5eea91a273e5209b356c31d51232c7646cea06afab1bd4b9543",
-      "scope": "Pinned PMD portrait/animation loading, timing/directions, bounded texture cache and complete animation bounds for uncropped actors."
+      "scope": "Pinned PMD portrait/animation loading, timing/directions, bounded texture cache and complete animation bounds for uncropped actors. Step 4: explicitly reviewed calmer presentation, whole-actor depth/locomotion anchoring, visible ramps/seams, slate/teal panels and eased full-viewport encounter entrance as applicable; original rule/action clocks and save data unchanged.",
+      "reviewed_sha256": "c7d090f96e957863267e9409ac53ebe48ef89621697597e77a4023ff512ebc9c"
     },
     "src/com/pkmngen/game/TrainerModel3D.java": {
       "reviewed_sha256": "ec80bc26b0410598ef1a23248ae4cfb58b9391a435de879a28dec6215d0611b3",
@@ -343,6 +343,10 @@
     "src/com/pkmngen/game/TrainerCatalog.java": {
       "scope": "Opt-in existing classic trainer/mod artwork with identity-preserving directional frames, costume color and owned bounded cache; detailed B/W remains available, no new source PNGs or saved Player schema.",
       "reviewed_sha256": "7d9d7b97c0e712261eb4b6029cc914de4b1a0211359425c108d162a6f6079191"
+    },
+    "src/com/pkmngen/game/WorldReadability.java": {
+      "scope": "Presentation-only natural-ground boundary eligibility, diagnostic A/B switch and smooth easing. No Tile, movement, input, collision, RNG, combat or save mutation.",
+      "reviewed_sha256": "5f79cf591126cfc9711ce7bdb85a854ea307067f8d2c33318ad3707b3bb8d621"
     }
   },
   "review_notes": [
@@ -374,7 +378,8 @@
     "Java structure step 1: reviewed extraction of mesh storage/upload/draw/dispose only, from 3da27238. Preserve the old renderer as a checksum-pinned test reference; original rules, shaders, scene transforms and all PNGs unchanged.",
     "Step 2 on base 392411be: explicitly reviewed WorldMaterials extraction, typed prop/structure/decal dispatch and source-bound subtle WorldAmbientOverlay. No other production or PNG changes. Historical overlay-OFF mesh parity is retained; new accents are covered by independent ON/OFF native pixel/readability/RNG tests. Prior manifest/verifier archived immutably in baseline/java-material-step2.",
     "Step 3 on main 500a9c9c: explicitly reviewed title/setup/options and trainer presentation; transactional text focus fixes WASD editing traps, draft validated controls persist separately, inventory pointer/description navigation retains original item operations. DrawSetupMenu, Player, saves, combat rules and every original PNG remain byte-identical. Prior manifest/verifier archived in baseline/java-interface-step3. Actual acceptance receipts are required before merging or packaging.",
-    "Step 3 pointer safety review: popup rows share the presenter hitboxes; a click on a different choice selects without confirming the old YES/USE selection, a subsequent click delegates the original action. Outside clicks do not act. Keyboard controls remain unchanged."
+    "Step 3 pointer safety review: popup rows share the presenter hitboxes; a click on a different choice selects without confirming the old YES/USE selection, a subsequent click delegates the original action. Outside clicks do not act. Keyboard controls remain unchanged.",
+    "Step 4 on ac526d14: calm periodic lawn/path atlas surfaces, flat natural boundary feathering, readable true slopes, consistent prop/actor depth and complete PMD locomotion envelope; shared slate/teal UI and eased full-viewport encounter entrance. No player/battle-rule/world-save/input/height solver changes. Source sheets and original test assertions retained; new ON tests separate from historical geometry parity OFF."
   ],
   "historical_v2": "baseline/modernization-v2/archive.json",
   "historical_v3": "baseline/modernization-v3/",

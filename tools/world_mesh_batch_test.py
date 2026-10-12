@@ -38,9 +38,9 @@ def main():
     commands = [
         [javac, '--release', '17', '-encoding', 'UTF-8', '-proc:none', '-cp', str(JAR), '-d', str(classes),
          str(reference), str(ROOT / 'tools/WorldMeshBatchTest.java'), str(ROOT / 'tools/WorldRendererParityTest.java')],
-        [java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off', '-Dpokewilds.ambientOverlays=off', '-cp', cp,
+        [java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off', '-Dpokewilds.ambientOverlays=off', "-Dpokewilds.readability=off", '-cp', cp,
          'com.pkmngen.game.WorldMeshBatchTest'],
-        [java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off', '-Dpokewilds.ambientOverlays=off', '-cp', cp,
+        [java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off', '-Dpokewilds.ambientOverlays=off', "-Dpokewilds.readability=off", '-cp', cp,
          'com.pkmngen.game.WorldRendererParityTest'],
     ]
     with log_path.open('w', encoding='utf-8') as log:

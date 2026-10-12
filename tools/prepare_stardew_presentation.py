@@ -195,6 +195,35 @@ def prepare(output=OUTPUT):
     add('graveyard_path', 'desert', (16,64,16,16), tint=('#656d62','#929780'))
     add('graveyard_cliff', 'mines', (144,80,32,32), tint=('#3e4a45','#828a77'))
 
+    # Readability step 4: palette-controlled derived surface, not a full-scene filter.
+    # Integer-only periodic field: reproducible across Python/platform versions.
+    def calm_surface(key, base):
+        source=materials[key]
+        art=Image.new('RGBA',(64,64))
+        def wave(n):
+            n=n%64
+            return (n if n<32 else 63-n)-16
+        for y in range(64):
+            for x in range(64):
+                r,g,b,a=source.getpixel((x%source.width,y%source.height))
+                residual=((r*77+g*150+b*29)//256-128)//48
+                broad=(wave(x)+wave(y)+wave(x+y))//12
+                value=broad+residual
+                art.putpixel((x,y),tuple(max(0,min(255,c+value)) for c in base)+(255,))
+        # Sparse tiny blades, away from cell borders. No solid checkerboard tiles.
+        for j in range(12):
+            x=3+(j*29)%57;y=3+(j*17)%57
+            for dx,dy in ((0,0),(1,-1),(1,-2)):
+                art.putpixel((x+dx,y+dy),tuple(min(255,c+7) for c in base)+(255,))
+        materials[key]=art
+        metadata[key].update(sampleWidth=16,sampleHeight=16,sourceCanvas=[64,64])
+        provenance[key]['transformations'].append({'calmPeriodicSurface':{'size':[64,64],'baseRgb':list(base),'sourceDetailDivisor':48,'sparseTufts':12}})
+    calm_surface('grass',(88,130,78))
+    calm_surface('grass_light',(96,139,84))
+    calm_surface('grass_dry',(155,147,94))
+    calm_surface('path',(157,144,108))
+    alias('dirt','path')
+
     # Full isolated props: exclude adjacent terrain/props, preserve source canvas.
     add('tree','spring',(48,0,48,96),prop=True,size=(24,48),component=(24,48))
     add('tree_pine','spring',(160,0,48,96),prop=True,size=(22,46),component=(24,48))
