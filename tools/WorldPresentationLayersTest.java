@@ -85,7 +85,8 @@ public final class WorldPresentationLayersTest {
          require(WorldMaterials.kind(t,WorldMaterials.objectName(t))==WorldMaterials.Kind.FURNITURE,"Furniture became a wall");
          t.name="bridge1";t.nameUpper="rock1";
          require(WorldMaterials.kind(t,WorldMaterials.objectName(t))==WorldMaterials.Kind.ROCK,"Bridge swallowed its upper rock");
-         JohtoRenderer renderer=renderer();field(renderer,"assets").set(renderer,BwAssets.get());
+         JohtoRenderer renderer=renderer();
+         require(renderer.render(this),"Semantic fixture did not initialize the world renderer");
          Method building=JohtoRenderer.class.getDeclaredMethod("building",Game.class,Tile.class,float.class,float.class,String.class);
          building.setAccessible(true);
          require(!(Boolean)building.invoke(renderer,this,t,0f,0f,"bridge1 rock1"),"Actual building dispatch swallowed the rock");
@@ -96,6 +97,11 @@ public final class WorldPresentationLayersTest {
          t.name="volcano1";t.nameUpper="volcano_cracked";t.biome="volcano";
          require(WorldMaterials.objectName(t).equals("volcanic_cracked"),"Volcanic crack material missing");
          require(WorldMaterials.kind(t,"volcanic_cracked")==WorldMaterials.Kind.GROUND_DETAIL,"Volcanic crack is upright");
+         // The private tile dispatch requires the live neighbours/elevation collected
+         // by render(). Put the sample in that world and prepare its actual context
+         // before isolating its emitted geometry; an assets-only setup is incomplete.
+         map.tiles.put(t.position,t);map.refreshCache=true;
+         require(renderer.render(this),"Crack fixture did not prepare its world context");
          // Inspect the real tile dispatch: this detail is emitted at one world height.
          for(String group:new String[]{"geometry","translucent","shadows","emotes"})((WorldMeshBatch)field(renderer,group).get(renderer)).clear();
          field(renderer,"surfaceLift").setFloat(renderer,0);
