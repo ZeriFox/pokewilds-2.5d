@@ -19,6 +19,7 @@ jobs:
     env:
       LIBGL_ALWAYS_SOFTWARE: 'true'
       ALSOFT_DRIVERS: 'null'
+      PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -237,8 +238,6 @@ jobs:
           try:
               verifier.verify(archive,output)
               receipt=json.loads((output/'windows-package-verification.json').read_text());assert receipt['status']=='passed'
-              # Ready-to-play artifact contains the folder directly: one extraction,
-              # no nested ZIP. Only original candidate files, never Mesa test DLLs.
               ready=Path('build/download');ready.mkdir(parents=True,exist_ok=True)
               with zipfile.ZipFile(archive) as z:z.extractall(ready)
               (output/'test-environment.txt').write_text('Windows Server; Mesa 26.2.4 llvmpipe in temporary test extraction only. Candidate ZIP unchanged; driver not delivered. Automated fixtures, not a manual campaign.\n')
