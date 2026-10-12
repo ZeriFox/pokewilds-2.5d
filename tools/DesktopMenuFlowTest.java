@@ -25,7 +25,7 @@ public final class DesktopMenuFlowTest {
       c.setInitialVisible(false);c.useVsync(false);c.setForegroundFPS(60);
       new Lwjgl3Application(probe,c);
       check(probe.complete,"UI flow incomplete");
-      System.out.println("DESKTOP MENU FLOW PASS: "+checks+" assertions; "+captures+" captures; explicit text focus, release barriers, settings persistence, 19 classic identities + 2 B/W choices, pointer bag and reorder cancel");
+      System.out.println("DESKTOP MENU FLOW PASS: "+checks+" assertions; "+captures+" captures; explicit text focus, release barriers, settings persistence, 19 B/W-style identities and costume accents, pointer bag and reorder cancel");
       System.exit(0);
    }
    private static final class Probe extends Game {
@@ -98,20 +98,31 @@ public final class DesktopMenuFlowTest {
          int old=InputProcessor.keyboardUp;press(Keys.F1);release();modernUi.desktop.draft.bindings[0]=Keys.I;press(Keys.ESCAPE);release();check(InputProcessor.keyboardUp==old,"Discard changed live binding");
       }
       void trainers() {
-         DrawSetupMenu.currIndex=5;press(Keys.ENTER);release();check(modernUi.desktop.screen==DesktopMenuController.Screen.TRAINERS,"Trainer picker not opened");capture("07-trainers-detailed-and-classic.png");
-         Set<Integer> handles=new HashSet<>();
+         DrawSetupMenu.currIndex=5;press(Keys.ENTER);release();check(modernUi.desktop.screen==DesktopMenuController.Screen.TRAINERS,"Trainer picker not opened");capture("07-trainers-bw-style.png");
+         check(modernUi.desktop.trainerCount()==19,"Built-in identities must appear once, without duplicate classic choices");
+         Set<String> choices=new HashSet<>();
          for(String id:TrainerCatalog.CAST) {
             check(TrainerCatalog.complete(id),"Incomplete selectable trainer: "+id);
-            TextureRegion r=BwAssets.get().classicTrainer(id,"down",0,false,null);
-            check(r!=null&&r.getRegionWidth()==32&&r.getRegionHeight()==32,"Invalid whole frame "+id);handles.add(r.getTexture().getTextureObjectHandle());
-            for(String dir:new String[]{"down","up","left","right"})for(float t:new float[]{0,.15f,.3f,.45f})check(BwAssets.get().classicTrainer(id,dir,t,true,null)!=null,"Missing direction/frame");
+            TextureRegion r=BwAssets.get().detailedTrainer(id,"down",0,false);
+            check(r!=null&&r.getRegionWidth()==32&&r.getRegionHeight()==32,"Invalid whole frame "+id);
+            choices.add(modernUi.desktop.trainerId(choices.size()));
+            for(String dir:new String[]{"down","up","left","right"})for(float t:new float[]{0,.15f,.3f,.45f})check(BwAssets.get().trainer(id,dir,t,true)!=null,"Missing direction/frame");
          }
-         check(handles.size()==19,"Classic identities collapsed onto generic avatar");
-         modernUi.desktop.trainerIndex=20;modernUi.desktop.trainerPage=2;step();capture("08-lyra-picker.png");press(Keys.ENTER);release();
-         check(player.character.equals("lyra")&&modernUi.desktop.preferences.classicCast,"Lyra not selected/saved");
-         check(BwAssets.get().trainer(player,0,false).getTexture()!=BwAssets.get().detailedTrainer("lyra","down",0,false).getTexture(),"Selected classic appearance not used in world API");
-         press(Keys.ENTER);release();modernUi.desktop.trainerIndex=1;press(Keys.ENTER);release();
-         check(player.character.equals("hilda")&&!modernUi.desktop.preferences.classicCast,"Detailed B/W appearance could not be restored");
+         check(choices.size()==19&&choices.containsAll(Arrays.asList(TrainerCatalog.CAST)),"Missing or duplicate trainer choices");
+         modernUi.desktop.trainerIndex=modernUi.desktop.trainerChoices.indexOf("lyra");modernUi.desktop.trainerPage=1;step();capture("08-lyra-picker.png");press(Keys.ENTER);release();
+         check(player.character.equals("lyra")&&!modernUi.desktop.preferences.classicCast,"B/W-style Lyra not selected/saved");
+         TextureRegion selected=BwAssets.get().trainer(player,0,false);
+         check(selected==BwAssets.get().detailedTrainer("lyra","down",0,false),"Selected appearance not used in world API");
+         modernUi.desktop.preferences.classicCast=true;
+         check(BwAssets.get().trainer(player,0,false)==selected,"Old preferences restored classic artwork");
+         press(Keys.ENTER);release();check(modernUi.desktop.trainerId(modernUi.desktop.trainerIndex).equals("lyra"),"Picker reopened on a different identity");
+         int color=modernUi.desktop.trainerColor;press(Keys.V);release();check(modernUi.desktop.trainerColor!=color,"B/W-style costume accents could not be changed");
+         TextureRegion preview=BwAssets.get().trainerPreview("lyra","down",0,false,setup.colors.get(modernUi.desktop.trainerColor));
+         check(preview!=selected,"Costume preview did not change");press(Keys.ENTER);release();
+         check(BwAssets.get().trainer(player,"down",0,false)==preview,"Applied costume differs from picker preview");
+         press(Keys.ENTER);release();
+         modernUi.desktop.trainerIndex=modernUi.desktop.trainerChoices.indexOf("hilda");press(Keys.ENTER);release();
+         check(player.character.equals("hilda")&&!modernUi.desktop.preferences.classicCast,"Original B/W Hilda could not be selected");
       }
       void bag() {
          actionStack.clear();modernUi.desktop.text.cancel();DrawPlayerMenu parent=new DrawPlayerMenu(this,null);parent.disabled=true;

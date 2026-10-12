@@ -1,0 +1,26 @@
+{
+  "id": "gold",
+  "kind": "AI-assisted fan-art redraw",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: stylized-concept. Asset type: production pixel-art overworld sprite sheet for a 2.5D Pokemon fangame.\nCreate a NEW sprite sheet of GOLD / ETHAN, the male Pokemon Gold/Silver playable trainer, reinterpreted in the exact pixel density, overhead camera angle, chibi proportions, dark selective outlines and shading of the Pokemon Black/White overworld characters in reference1. Preserve his backwards yellow-and-black cap, dark hair, red and black jacket with yellow trim, black shorts, red/white sneakers and yellow backpack. Reference2 is the legacy character identity, reference3 is its back view. Redraw with more DS-era detail. This is one character only.\nThe first reference image is STYLE ONLY; the other references preserve identity and costume. Do not copy reference sheet layout.\nOUTPUT: transparent background, no ground, no shadows, no labels, no borders, no visible grid. Canvas portrait 768x1024. EXACTLY twelve sprites arranged in a perfectly even 3-column x 4-row grid, each invisible cell 256x256. Sprite is originally 32x32 logical pixel art enlarged exactly 8x with nearest-neighbor block pixels. Each sprite about 20 pixels wide and 28 pixels high, feet centered at local logical pixel (16,29), identical scale in all cells, with transparent margin.\nROW 1 faces DOWN toward viewer. ROW 2 faces UP away from viewer (back of hat/hair). ROW 3 faces LEFT. ROW 4 faces RIGHT.\nIn EVERY row, COLUMN 1 walking with left foot forward, COLUMN 2 neutral standing with feet together, COLUMN 3 walking with right foot forward. Alternate arms and feet for a real three-frame walk cycle, head/outfit identity stable. Side profiles actually face the required direction. Do not duplicate the standing pose in walking columns. Strictly no illustration rendering, no anti-aliased vector style, no high-resolution facial detail, no realistic proportions. Match the tiny Nintendo DS game sprites of the reference.",
+  "references": [
+    "visual/unova/sources/heroes.png",
+    "upstream-runtime.jar:player/gold-walking.png",
+    "upstream-runtime.jar:player/gold-back.png"
+  ],
+  "layout": {
+    "columns": 3,
+    "rows": 4,
+    "directions": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ],
+    "frames": [
+      "left-step",
+      "idle",
+      "right-step"
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "character": "summer",
+  "generation_tool": "built-in image_gen",
+  "prompt": "Use case: stylized-concept.\nAsset type: production pixel-art overworld trainer sprite sheet for a Pokémon Black/White-inspired Nintendo DS 2.5D game.\nCreate a NEW redrawn sheet of the ONE specified character, preserving the identity in reference images 1 (legacy walking) and 2 (legacy back). Reference image 3 is the authentic Black/White visual style only; reference image 4 is the approved Leaf sheet and is the exact layout, pixel density and scale-consistency target. Do not turn the character into Leaf, Hilbert or Hilda.\nLayout: portrait 768×1024 transparent canvas, EXACTLY 3 columns ×4 equally spaced rows, 12 whole-body sprites, one per slot. Use transparent space between every slot. Row1 all facing DOWN/toward viewer; row2 all facing UP/away (only back of head visible); row3 all facing LEFT, row4 all facing RIGHT. Columns: left-leg walking step, neutral standing with both feet planted, right-leg walking step. Keep the same top-down 3/4 camera and same head/body scale in all frames. Distinct foot/arm positions so walk animation reads clearly.\nPixel style: genuine chunky low-resolution DS-era sprite construction, approximately 20–24 pixels wide ×28 pixels tall inside a logical32×32 cell then nearest-neighbor enlarged8× for delivery, dark1logical-pixel outlines, compact muted palettes, crisp square pixels, minimal2–3tone shading, large head and short body in the exact proportions of the Leaf sheet. No smooth gradients, antialiasing, tall doll anatomy, elaborate modern illustration or painted texture.\nActual transparent alpha background. No ground shadows, scene, text, labels, grid lines, borders, logos, props outside the costume, extra characters, duplicated frames or cropping. Every frame has clear transparent margin on all sides.\nSubject: Summer, female Pokémon Ranger Guardian Signs protagonist: young girl with long brown hair tied in a high ponytail, red cap/headgear with large pale ranger goggles, red ranger jacket with white trim, dark shorts, tall dark boots and compact ranger pack. Preserve her red headgear and high ponytail silhouette from the references.",
+  "reference_images": [
+    {
+      "path": "build/trainer-references/summer-walking.png",
+      "role": "original low-resolution character identity reference, extracted byte-exact from lib/upstream-runtime.jar"
+    },
+    {
+      "path": "build/trainer-references/summer-back.png",
+      "role": "original character identity and costume reference, extracted byte-exact from lib/upstream-runtime.jar"
+    },
+    {
+      "path": "resources/visual/unova/sources/heroes.png",
+      "role": "authentic BW sprite style reference; extraction credited to Barubary"
+    },
+    {
+      "path": "C:/Users/Utente/.codex/generated_images/01a10397-8c14-78f1-b39f-0b0996682eb4/exec-f2a77e20-120d-49ac-8353-c385510c7ad7.png",
+      "role": "approved generated Leaf sheet; 3x4 layout and scale consistency reference"
+    }
+  ],
+  "identity_notes": "Summer, female Pokémon Ranger Guardian Signs protagonist: young girl with long brown hair tied in a high ponytail, red cap/headgear with large pale ranger goggles, red ranger jacket with white trim, dark shorts, tall dark boots and compact ranger pack. Preserve her red headgear and high ponytail silhouette from the references.",
+  "authorship": "New AI-adapted pixel-art redraw based on existing Pokémon character references; not an official Black/White rip or original Nintendo asset.",
+  "generated_source_path": "C:/Users/Utente/.codex/generated_images/01a130a9-272d-71a3-8ab8-6c84943d38f7/exec-ab0f49a1-f17b-4829-bc64-f88b268682e8.png",
+  "layout": {
+    "columns": 3,
+    "rows": 4,
+    "row_directions": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ],
+    "column_poses": [
+      "left_step",
+      "neutral",
+      "right_step"
+    ]
+  },
+  "review": "12 whole-body slots inspected; directions, costume identity, transparent margins and distinct step/neutral poses retained. Source copied byte-exact; no crop or normalization in this task.",
+  "source_sha256": "e2057a5a92c68dce62d7491632a83859069ac5d442f21056cd6fdf6a69b08c2f",
+  "source_dimensions": [
+    1086,
+    1448
+  ],
+  "content_row_bands_alpha128": [
+    [
+      91,
+      370
+    ],
+    [
+      431,
+      709
+    ],
+    [
+      750,
+      1031
+    ],
+    [
+      1082,
+      1366
+    ]
+  ],
+  "normalization_note": "Logical 3x4 layout, not guaranteed equal pixel subdivisions. The generated sheet includes external margins and low-alpha fringe noise. Detect content row bands or use the recorded alpha>=128 bands expanded into adjacent empty row gaps; do not blindly slice source height by four. Source PNG remains byte-exact."
+}

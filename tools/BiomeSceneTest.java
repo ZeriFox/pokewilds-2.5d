@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.FloatArray;
@@ -231,18 +234,8 @@ public final class BiomeSceneTest {
          for(int y=0;y<height;y++)for(int x=0;x<width;x++){int i=(y*width+x)*4;int rgb=(pixels[i]&255)<<16|(pixels[i+1]&255)<<8|(pixels[i+2]&255);colors.add(rgb);image.setRGB(x,height-1-y,rgb);}
          try{ImageIO.write(image,"png",new File(name));}catch(Exception e){throw new IllegalStateException(e);}
          require(colors.size()>20,"Biome frame blank "+name);
-         if(name.equals("06b-ramp-middle.png")||name.equals("06-plateau-ramp.png"))checkActorContinuity(image,name);
-         if(name.equals("07-waterfall.png")) {
-            int capPixels=0;
-            // His feet stand in front of the ledge; its raised surface must not remove the cap.
-            // This crop excludes the tan rock, and cap red has blue > green unlike skin/shoes.
-            for(int py=200;py<370;py++)for(int px=70;px<220;px++) {
-               int rgb=image.getRGB(px,py),r=rgb>>16&255,g=rgb>>8&255,b=rgb&255;
-               if(r>100&&r>g*1.15f&&b>g*1.04f)capPixels++;
-            }
-            require(capPixels>200,"Cliff behind the trainer clipped his head: only "+capPixels+" cap pixels");
-            System.out.println("BIOME SCENE front-of-cliff actor capPixels="+capPixels);
-         }
+         if(name.equals("06b-ramp-middle.png")||name.equals("06-plateau-ramp.png")||name.equals("07-waterfall.png"))
+            checkActorContinuity(image,name);
          System.out.println("BIOME SCENE image="+name+" fog="+renderer().getFogDensity()+" colors="+colors.size());
       }
       void checkActorContinuity(BufferedImage image,String name) {
@@ -259,7 +252,7 @@ public final class BiomeSceneTest {
             require(buffer!=null,"Trainer texture absent from ramp geometry "+name);
             FloatArray vertices=(FloatArray)read(buffer,"vertices");
             require(vertices.size==48,"Expected one trainer quad in ramp fixture "+name);
-            Pixmap atlas=new Pixmap(Gdx.files.internal("visual/unova/world-atlas.png"));
+            Pixmap atlas=texturePixels(trainer.getTexture());
             try {
                int[] result=trainerSamples(image,vertices,camera,atlas);
                require(result[0]>=150&&result[2]>=20,"Insufficient real trainer texels "+name);
@@ -277,6 +270,24 @@ public final class BiomeSceneTest {
                   +" opaqueRows="+result[2]+" missingRows="+result[3]+" negativeSliceRows="+sliced[3]);
             }finally{atlas.dispose();}
          }catch(ReflectiveOperationException error){throw new IllegalStateException(error);}
+      }
+      Pixmap texturePixels(Texture texture) {
+         // A selected character may own a recolored uploaded texture. Read the
+         // actual GL image, never assume an atlas path or consume a freed Pixmap.
+         int width=texture.getWidth(),height=texture.getHeight();
+         FrameBuffer target=new FrameBuffer(Pixmap.Format.RGBA8888,width,height,false);
+         SpriteBatch batch=new SpriteBatch();Pixmap raw=null,result=null;
+         try {
+            target.begin();Gdx.gl.glClearColor(0,0,0,0);Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            batch.disableBlending();batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0,0,width,height));
+            batch.begin();batch.draw(texture,0,0);batch.end();
+            raw=ScreenUtils.getFrameBufferPixmap(0,0,width,height);
+            result=new Pixmap(width,height,Pixmap.Format.RGBA8888);result.setBlending(Pixmap.Blending.None);
+            for(int y=0;y<height;y++)for(int x=0;x<width;x++)result.drawPixel(x,y,raw.getPixel(x,height-1-y));
+            return result;
+         }catch(RuntimeException error){if(result!=null)result.dispose();throw error;}
+         finally{target.end();if(raw!=null)raw.dispose();batch.dispose();target.dispose();
+            Gdx.gl.glViewport(0,0,Gdx.graphics.getBackBufferWidth(),Gdx.graphics.getBackBufferHeight());}
       }
       Object read(Object object,String name)throws ReflectiveOperationException {
          Field f=object.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(object);

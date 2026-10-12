@@ -172,7 +172,8 @@ final class DesktopMenuController {
       }
       if(screen==Screen.TRAINERS) {
          int total=trainerCount();
-         if(InputProcessor.lJustPressed||InputProcessor.rJustPressed)trainerColor=Math.floorMod(trainerColor+(InputProcessor.rJustPressed?1:-1),setup.colors.size());
+         if(TrainerCatalog.costumeColors(trainerId(trainerIndex))&&(InputProcessor.lJustPressed||InputProcessor.rJustPressed))
+            trainerColor=Math.floorMod(trainerColor+(InputProcessor.rJustPressed?1:-1),setup.colors.size());
          if(vertical!=0||horizontal!=0)trainerIndex=Math.floorMod(trainerIndex+vertical*5+horizontal,total);
          if(wheel!=0)trainerIndex=Math.floorMod(trainerIndex+(wheel>0?10:-10),total);
          trainerPage=trainerIndex/10;
@@ -214,16 +215,17 @@ final class DesktopMenuController {
       }
       return true;
    }
-   void openTrainers(){trainerIndex=preferences.classicCast?2+Math.max(0,trainerChoices.indexOf(setup.playerTypes.get(setup.playerTypeIndex))):Game.staticGame.player.character.equals("hilda")?1:0;
+   void openTrainers(){trainerIndex=Math.max(0,trainerChoices.indexOf(Game.staticGame.player.character));
       trainerColor=setup.avatarColorIndex;trainerPage=trainerIndex/10;change(Screen.TRAINERS);}
-   int trainerCount(){return 2+trainerChoices.size();}
-   String trainerId(int i){return i==0?"hilbert":i==1?"hilda":trainerChoices.get(Math.max(0,Math.min(trainerChoices.size()-1,i-2)));}
+   int trainerCount(){return trainerChoices.size();}
+   String trainerId(int i){return trainerChoices.get(Math.max(0,Math.min(trainerChoices.size()-1,i)));}
    private void applyTrainer(Game game) {
       String id=trainerId(trainerIndex);if(!TrainerCatalog.complete(id)){message="This trainer is missing a required pose.";return;}
       if(!setup.playerTypes.contains(id))setup.playerTypes.add(id);setup.playerTypeIndex=setup.playerTypes.indexOf(id);
       setup.avatarColorIndex=trainerColor;game.player.character=id;game.player.setColor(setup.colors.get(setup.avatarColorIndex));
       setup.avatarSprites.clear();setup.avatarSprites.add(game.player.standingSprites.get("down"));setup.avatarSprites.add(game.player.movingSprites.get("down"));setup.avatarSprites.add(game.player.altMovingSprites.get("down"));
-      preferences.classicCast=trainerIndex>=2;
+      // Kept only for older preference readers; built-in appearance is now per identity.
+      preferences.classicCast=TrainerCatalog.hasMod(id);
       try{preferences.save();change(Screen.SETUP);}catch(java.io.IOException e){message="Trainer applied this session; settings could not be saved.";}
    }
    void openOptions(Action owner){optionsOwner=owner;draft=preferences.copy();optionIndex=0;capture=-1;message="";InputProcessor.blockHeldInputs();clearEvents();}

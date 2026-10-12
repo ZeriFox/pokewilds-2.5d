@@ -34,6 +34,8 @@ public final class BwAssets {
    private final Map<String, Float> anchorsX = new HashMap<>();
    private final Map<String, Float> anchorsY = new HashMap<>();
    private final TrainerCatalog trainers = new TrainerCatalog();
+   private final Set<String> customRegions = new HashSet<>();
+   private static final SpriteLayout TRAINER_LAYOUT = new SpriteLayout();
    private final Set<String> missing = new HashSet<>();
 
    private BwAssets() {
@@ -117,6 +119,7 @@ public final class BwAssets {
       anchorsX.put(entry.name, layout.anchorX(.5f) * width);
       anchorsY.put(entry.name, layout.anchorY(0f) * height);
       if (!builtin) {
+         customRegions.add(entry.name);
          // Replacing an animation alias is an explicit static override; replacing
          // an individual frame instead preserves the original animation sequence.
          animations.remove(entry.name);
@@ -154,6 +157,7 @@ public final class BwAssets {
       anchorsX.clear();
       anchorsY.clear();
       missing.clear();
+      customRegions.clear();
    }
 
    private static int integer(JsonValue object, String key, int fallback) {
@@ -202,6 +206,11 @@ public final class BwAssets {
       public final float offsetX, offsetY, elevation;
       public final boolean customized;
 
+      private SpriteLayout() {
+         worldWidth=worldHeight=anchorX=anchorY=Float.NaN;
+         offsetX=offsetY=elevation=0f;customized=false;
+      }
+
       private SpriteLayout(JsonValue entry, int width, int height, boolean builtin) {
          worldWidth = optionalPositive(entry, "worldWidth");
          worldHeight = optionalPositive(entry, "worldHeight");
@@ -230,7 +239,10 @@ public final class BwAssets {
    public static BwAssets get() { if (shared == null) shared = new BwAssets(); return shared; }
    public static void disposeShared() { if (shared != null) { shared.disposeTextures(); shared = null; } }
    public TextureRegion named(String name) { return regions.get(name); }
-   public SpriteLayout layout(TextureRegion region) { return layouts.get(region); }
+   public SpriteLayout layout(TextureRegion region) {
+      SpriteLayout result=layouts.get(region);
+      return result==null&&trainers.owns(region)?TRAINER_LAYOUT:result;
+   }
    public float worldWidth(TextureRegion region, float fallback) {
       SpriteLayout layout = layouts.get(region);
       return layout == null ? fallback : layout.width(region, fallback);
@@ -270,24 +282,58 @@ public final class BwAssets {
       return trainer(player, player==null?"down":player.dirFacing,seconds,moving);
    }
    public TextureRegion trainer(Player player,String direction,float seconds,boolean moving) {
-      if(classicCast() && player!=null) {TextureRegion r=trainers.frame(player.character,direction,seconds,moving,player.color);if(r!=null)return r;}
-      return detailedTrainer(player==null?"gold":player.character,direction,seconds,moving);
+      return trainerFrame(player==null?"gold":player.character,direction,seconds,moving,
+         running(player,moving),player==null?null:player.color);
    }
    public TextureRegion classicTrainer(String character,String direction,float seconds,boolean moving,com.badlogic.gdx.graphics.Color color) { return trainers.frame(character,direction,seconds,moving,color); }
-   private boolean classicCast(){return Game.staticGame!=null&&Game.staticGame.modernUi!=null&&Game.staticGame.modernUi.desktop.preferences.classicCast;}
    public TextureRegion trainer(String character, String direction, float seconds, boolean moving) {
-      if(classicCast()){TextureRegion r=trainers.frame(character,direction,seconds,moving,null);if(r!=null)return r;}
-      return detailedTrainer(character,direction,seconds,moving);
+      return trainerFrame(character,direction,seconds,moving,false,null);
    }
    public TextureRegion detailedTrainer(String character, String direction, float seconds, boolean moving) {
-      String name = lower(character);
-      boolean female = name.equals("kris") || name.equals("lyra") || name.equals("leaf") || name.equals("may")
-         || name.equals("dawn") || name.equals("hilda") || name.equals("rosa") || name.equals("serena")
-         || name.equals("selene") || name.equals("gloria") || name.equals("elaine") || name.equals("summer");
+      return trainerFrame(character,direction,seconds,moving,false,null);
+   }
+   /** Menu previews share exactly the world appearance, including installed mods. */
+   TextureRegion trainerPreview(String character,String direction,float seconds,boolean moving,com.badlogic.gdx.graphics.Color color) {
+      return trainerFrame(character,direction,seconds,moving,false,color);
+   }
+   private static boolean running(Player player,boolean moving) {
+      Game game=Game.staticGame;
+      if(!moving||player==null||game==null||player.isSleeping||player.isSitting
+         ||player.isFishing||player.currFieldMove!=null&&!player.currFieldMove.isEmpty())return false;
+      // The action owns motion; held buttons and stale currState are not a run state.
+      for(Action action:game.actionStack)
+         if(action instanceof PlayerRunning&&((PlayerRunning)action).player==player)return true;
+      return false;
+   }
+   private TextureRegion trainerFrame(String character,String direction,float seconds,boolean moving,
+         boolean running,com.badlogic.gdx.graphics.Color color) {
+      String name=character==null?"gold":character;
+      String id=lower(name);
+      boolean female = id.equals("kris") || id.equals("lyra") || id.equals("leaf") || id.equals("may")
+         || id.equals("dawn") || id.equals("hilda") || id.equals("rosa") || id.equals("serena")
+         || id.equals("selene") || id.equals("gloria") || id.equals("elaine") || id.equals("summer")||id.equals("mint");
       String dir = "up".equals(direction) || "left".equals(direction) || "right".equals(direction) ? direction : "down";
-      int step = (int)(seconds * 8f) & 3;
-      int frame = moving ? (step == 3 ? 1 : step) : 1;
-      return named("trainer_" + (female ? "female" : "male") + "_walk_" + dir + "_" + frame);
+      int frame=TrainerCatalog.animationFrame(seconds,moving,running);
+      String sex=female?"female":"male",pose=running?"run":"walk";
+      TextureRegion override=trainerOverride(id,pose,dir,frame);
+      if(override==null&&running)override=trainerOverride(id,"walk",dir,frame);
+      // Existing generic custom atlas keys retain their original idle=1 contract.
+      if(override==null)override=trainerOverride(sex,pose,dir,frame);
+      if(override==null&&running)override=trainerOverride(sex,"walk",dir,frame);
+      if(override!=null)return override;
+      if(TrainerCatalog.hasMod(name)) {
+         TextureRegion mod=trainers.frame(name,dir,seconds,moving,running,color);
+         if(mod!=null)return mod;
+      }
+      TextureRegion modern=trainers.modernFrame(id,dir,seconds,moving,running,color);
+      if(modern!=null)return modern;
+      // Original B/W sheets place idle first: left step, idle, right step, idle.
+      int originalFrame=frame==0?1:frame==1?0:2;
+      return named("trainer_"+sex+"_"+pose+"_"+dir+"_"+originalFrame);
+   }
+   private TextureRegion trainerOverride(String id,String pose,String direction,int frame) {
+      String key="trainer_"+id+"_"+pose+"_"+direction+"_"+frame;
+      return customRegions.contains(key)?named(key):null;
    }
    public TextureRegion terrain(Tile tile) { return terrain(tile, 0f); }
    /** Total terrain mapping: even unknown biome tiles use an explicit modern material. */

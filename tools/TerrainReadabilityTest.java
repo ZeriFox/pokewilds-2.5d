@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.kryonet.Server;
@@ -166,7 +168,7 @@ public final class TerrainReadabilityTest {
          require(buffer!=null,"Trainer has no geometry: "+stage);
          FloatArray vertices=(FloatArray)field(buffer.getClass(),"vertices").get(buffer);
          require(vertices.size==48,"Expected exactly one trainer quad: "+stage);
-         Pixmap atlas=new Pixmap(Gdx.files.internal("visual/unova/world-atlas.png"));
+         Pixmap atlas=texturePixels(trainer.getTexture());
          Pixmap screen=ScreenUtils.getFrameBufferPixmap(0,0,800,640);
          int expected=0,visible=0;
          try {
@@ -195,6 +197,24 @@ public final class TerrainReadabilityTest {
          if(visible<expected*.7f)capture("failure-trainer-"+stage+".png");
          require(visible>=expected*.7f,"Trainer disappeared after composition: "+stage+", visible="+visible+"/"+expected);
          System.out.println("READABILITY visible trainer "+stage+": "+visible+"/"+expected+" projected opaque samples");
+      }
+      Pixmap texturePixels(Texture texture) {
+         // Trainer identities and costume variants own separate uploaded sheets.
+         // UV coordinates refer to that exact texture, not the old common atlas.
+         int width=texture.getWidth(),height=texture.getHeight();
+         FrameBuffer target=new FrameBuffer(Pixmap.Format.RGBA8888,width,height,false);
+         SpriteBatch batch=new SpriteBatch();Pixmap raw=null,result=null;
+         try {
+            target.begin();Gdx.gl.glClearColor(0,0,0,0);Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            batch.disableBlending();batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0,0,width,height));
+            batch.begin();batch.draw(texture,0,0);batch.end();
+            raw=ScreenUtils.getFrameBufferPixmap(0,0,width,height);
+            result=new Pixmap(width,height,Pixmap.Format.RGBA8888);result.setBlending(Pixmap.Blending.None);
+            for(int y=0;y<height;y++)for(int x=0;x<width;x++)result.drawPixel(x,y,raw.getPixel(x,height-1-y));
+            return result;
+         }catch(RuntimeException error){if(result!=null)result.dispose();throw error;}
+         finally{target.end();if(raw!=null)raw.dispose();batch.dispose();target.dispose();
+            Gdx.gl.glViewport(0,0,Gdx.graphics.getBackBufferWidth(),Gdx.graphics.getBackBufferHeight());}
       }
       @SuppressWarnings("unchecked")
       void reverseTextureOrder()throws Exception {

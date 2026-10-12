@@ -1,72 +1,68 @@
-VERIFICA - mare, luci, chiome e battaglie animate, 12 ottobre 2026
+VERIFICA - cast giocabile in stile Bianco e Nero, 12 ottobre 2026
 
 VERSIONE LOCALE
-Base: f3b55100391b8dbcdd93fbed7606bcfe6d92298b.
+Base: 5df682645ed6925608e939efac76781883fe733e.
 Ramo: work/local-terrain-2026-10-12.
-Backup: backup/before-cinematic-nature-2026-10-12.
-Nessun push, tag o nuova release. Avvio con AVVIA-POKEWILDS.cmd
-oppure con il collegamento desktop "PokeWilds 2.5D - Prova locale".
-Gli effetti funzionano anche sui mondi salvati: non serve una nuova isola.
-La generazione del terreno e le regole di gioco non cambiano in questa revisione.
+Backup: backup/before-trainer-redraw-2026-10-12.
+Avvio: AVVIA-POKEWILDS.cmd oppure "PokeWilds 2.5D - Prova locale" sul desktop.
+Funziona anche con i personaggi dei salvataggi esistenti. Nessuna nuova isola
+o migrazione del salvataggio. Nessun push, tag o nuova release GitHub.
 
 ARTEFATTO VERIFICATO
 dist/pokewilds-rebuilt.jar
-SHA-256: 07b37a476cb0a9623842c4e7fc79cc192e76c2b139ff4bfc8f17025f526349bb
-Dimensione: 298082731 byte; 108951 voci ZIP.
-Java 17, 231 sorgenti, 492 classi compilate.
-Modelli GLB esclusi; zero classi di gioco copiate dal runtime upstream.
+SHA-256: 47d14f1325bfb05b377b34afcd7bbcbdc2b009fdd983b9d50afdd3e30c101d53
+Dimensione: 309645014 byte; 109021 voci ZIP.
+Java 17; 231 sorgenti; 492 classi compilate.
+Modelli GLB esclusi; zero classi di gioco recuperate dal runtime upstream.
 Sorgenti, risorse e librerie corrispondono al build report.
-Digest sorgenti: 0f791e1dd9275ff10afb67172d6485457b42402b6b9a8c9431120dfcc3aa3e96
-Ricevuta con hash dei log: build/cinematic-verification/final.json.
-Avvio reale java -jar: 120 frame, uscita regolare, Java incluso,
-cartella isolata build/cinematic-launcher.
+Digest sorgenti: 40ab8e25d17821e898df04daa6eb848422d1e23175c71f3a17195f72c9f1887b
+Avvio reale java -jar: 120 frame e uscita regolare in build/trainer-launcher.
+Ricevuta completa: build/trainer-verification/final.json.
 
 MODIFICHE
-- Onde ampie, increspature incrociate e riflessi continui anche in mare aperto;
-  gradiente di profondita piu marcato, schiuma e risacca sulle coste reali.
-- Vento sulle chiome degli alberi vivi selezionati, con tronchi e radici fissi.
-  Alberi secchi e oggetti rigidi conservano la forma. Taglio, crescita e
-  Bottintesta mantengono la propria animazione di azione.
-- Ombre morbide delle chiome adattate alla quota del suolo asciutto,
-  contrasto diurno e luce locale piu calda. Ombre approssimate, non shadow map.
-- Fondali animati per otto ambienti di battaglia: acqua, luce, nuvole,
-  vegetazione, lava, nebbia. Parallasse lenta della camera sullo sfondo 2.5D;
-  pedane, combattenti e interfaccia mantengono i rispettivi ancoraggi.
-- Movimento ridotto congela gli effetti ambientali e la parallasse.
-  Le animazioni delle azioni e le regole di gioco continuano normalmente.
-- Risorse raster esistenti riutilizzate; nessun pacchetto sprite sostituito.
+- 19 identita uniche nel selettore; Hilbert e Hilda originali B/W, altri 17
+  ridisegnati con image_gen nello stesso stile. I nuovi sono adattamenti
+  fan art assistiti da IA, non sprite ufficiali estratti da B/W.
+- 12 fotogrammi per ogni nuovo personaggio, quattro direzioni. Corsa a
+  cadenza piu rapida; i due originali usano anche la propria grafica di corsa.
+- Preview, mondo, scheda giocatore e apparizione in battaglia coerenti;
+  Surf, pesca, cavalcatura e riposo mantengono le composizioni 2.5D esistenti.
+- Maschere sugli abiti per i colori personalizzati dei 17 personaggi nuovi;
+  pelle e capelli invariati. I due originali mantengono la palette nativa.
+- Vecchia preferenza classicCast non ripristina gli sprite piccoli.
+  Override espliciti e mod conservati. Le mod prive di back.png non vengono
+  proposte come complete, prevenendo il fallimento del caricamento originale.
+- Shader, terreno, meccaniche, azioni e formato dei salvataggi invariati.
 
-VERIFICHE FINALI
-14 suite native sul JAR indicato, senza sorgenti o risorse sovrapposte:
-- tools/nature_animation_test.py: NATURE ANIMATION PASS: checks=40957, scenes=15, captures=45, animated open ocean/coast/vegetation/crowns, rooted trunks, directional and local light/shadows, shore seams, deterministic frames, reduced motion, unchanged tiles/RNG
-- tools/battle_scenery_test.py: BATTLE SCENERY PASS: checks=2905, scenes=32, captures=24, four aspects, real shader motion, fixed actor/stage/UI anchors, reduced motion, cache/disposal, batch state, gameplay/RNG unchanged
-- tools/terrain_readability_test.py: TERRAIN READABILITY PASS: checks=402, screenshots=6, frames=110, flat/inclined stairs, material boundaries, PMD/tree overlap, B/W trainer
-- tools/world_presentation_layers_test.py: WORLD PRESENTATION LAYERS PASS: 714143 checks; semantic roles, whole rectangular sprites, flat volcanic cracks, seven on/off scenes, UI/focus budgets, deterministic RNG-free accents, indoor reset
+VERIFICHE
+10 suite native sul JAR indicato, senza sorgenti o risorse sovrapposte:
+- tools/trainer_style_test.py: TRAINER STYLE PASS: checks=421133, identities=19, walkFrames=228, worldPoses=76, captures=10, unique cast and selector, legacy preference, walk/run clocks, rooted complete sprites, mod art and costume, cache/dispose
+- tools/desktop_menu_flow_test.py: DESKTOP MENU FLOW PASS: 417 assertions; 10 captures; explicit text focus, release barriers, settings persistence, 19 B/W-style identities and costume accents, pointer bag and reorder cancel
 - tools/field_scene_test.py: FIELD PASS: exclusive modern world; POWER/BUILD/DIG/SURF/FLY/RIDE activation; real BUILD placement/collision/resources, DIG excavation/refill/resources, cancellation without consumption; Surf/Ride movement and FLY takeoff/key movement/RMB landing; CUT/HEADBUTT/plant clocks and next actions; original couch enter/exit, bed sleep/wake, kiln enter/cancel, filtered-empty fishing and rod-restricted catch into battle; furniture geometry/projection and previews/light/pose snapshots
-- tools/world_mesh_batch_test.py: WORLD MESH BATCH PASS: 2097471 assertions; real GL, chunk boundaries, reuse, eviction, borrowed textures
+- tools/terrain_readability_test.py: TERRAIN READABILITY PASS: checks=402, screenshots=6, frames=110, flat/inclined stairs, material boundaries, PMD/tree overlap, B/W trainer
 - tools/biome_scene_test.py: BIOME SCENE PASS: dedicated desert art; volcanic/graveyard day/night; closed plateau and continuous ramp; waterfall; walkable high/low tides and localized puddles with visible sand bed; real SpawnGhost/DrawGhost/DespawnGhost lifecycle with zero post-despawn draws
-- tools/landscape_smoke_test.py: LANDSCAPE PASS: day/night, relief/ramp, caldera, interior, real EnterBuilding/exit, PMD/BW GPU rendering
-- tools/battle_entry_test.py: BATTLE ENTRY PASS sizes=4 motionModes=2 originalIntroFrames=74 originalWipeFrames=70 coveredFrames=1152 captures=64 reducedMotion=stationaryFade
-- tools/battle_viewport_test.py: BATTLE VIEWPORT PASS sizes=5 biomes=6 zooms=5 exitFrames=170 captures=82 panoramaMarginPixels=12154480 missingWorldGap=opaque
+- tools/bw_assets_integration_test.py: BW ASSETS PASS: 8759 checks; 218 complete built-in regions; 24 animation frames; custom 64px and rectangular GPU sampling; normalized/pixel anchors; actual renderer trainer crops/feet/offset geometry; strict invalid overrides; disposal/recovery
 - tools/pmd_battle_visual_test.py: PMD BATTLE VISUAL PASS captures=18 originalActions=EnemyFaint,FriendlyFaint,ThrowOutPokemonCrystal,EvolutionAnim,EggHatchAnim,PokemonFrame
-- tools/boss_battle_visual_test.py: BOSS VISUAL PASS captures=18 mewtwoIntroFrames=641 gengarIntroFrames=391 regigigasSpecialFrames=201 originalRocksAndRipple=PASS cleanup=PASS
-- tools/modern_world_test.py: WORLD PASS: original S generation, native rendering, one movement, save/load, clean close
+- tools/battle_entry_test.py: BATTLE ENTRY PASS sizes=4 motionModes=2 originalIntroFrames=74 originalWipeFrames=70 coveredFrames=1152 captures=64 reducedMotion=stationaryFade
 - tools/modern_ui_smoke_test.py: UI PASS: original input, menus, crafting, NPC encounter, battle turn, flee, capture and save/load
+- tools/landscape_smoke_test.py: LANDSCAPE PASS: day/night, relief/ramp, caldera, interior, real EnterBuilding/exit, PMD/BW GPU rendering
 
-Nature: 40957 controlli, 15 scene, 45 PNG.
-Mare aperto distribuito, movimento fra frame dello stesso atlas, radici fisse,
-chiome flessibili, luci locali, riduzione del movimento, terreno e RNG invariati.
-BattleScenery: otto biomi per quattro proporzioni della finestra, 32 scene e
-24 PNG; shader/batch ripristinati, arena riutilizzata, pedane e comandi fissi,
-invarianti combattenti/mappa/RNG e ciclo di vita delle risorse.
-Mondo reale: generazione originale, movimento, salvataggio/caricamento;
-9 anteprime effettive in build/modern-world. Dettagli e seed nella ricevuta.
+TrainerStyle: 421133 controlli, 19 identita,
+228 fotogrammi, 76 pose nel mondo e 10 PNG.
+Verificati pixel effettivi delle texture GPU e continuita del corpo con
+controllo negativo che simula una fascia nascosta dal terreno; selezione,
+colori, risorse, cache, mod incomplete/complete e invarianti di mappa/RNG.
+Le prove BiomeScene e TerrainReadability leggono ora la texture del personaggio
+effettivo, anche ricolorata: non presumono l'atlante o il cappello rosso del
+precedente avatar Hilbert. Le soglie di visibilita sono conservate.
+Preparazione deterministica: 17 identita, 34 PNG, controllo senza scritture.
+Revisione visiva dei 204 frame nuovi e delle maschere costume.
+Ambito: 157 sorgenti originali invariati, 41 con ambito esplicito, 33 aggiunte;
+40 mutazioni non autorizzate respinte. Archivio baseline/before-trainer-redraw.
 
-AUDIT E LIMITI
-157 sorgenti originali invariati, 41 con ambito esplicito, 33 aggiunte;
-37 mutazioni non autorizzate respinte. Archivio precedente in
-baseline/before-cinematic-nature. Dettagli in docs/CINEMATIC-NATURE.md.
-Prove automatiche sulla GPU disponibile, non una campagna manuale completa,
-una prova multiplayer o un benchmark su altre macchine.
-Il salvataggio personale Kiri.sav non e stato aperto.
-Queste 14 suite non sono l'intera pipeline di 30 suite native per una release.
+LIMITI
+Test automatici sulla GPU disponibile, non una campagna manuale completa,
+una prova multiplayer o un benchmark su altre macchine. Non e l'intera
+pipeline di 31 suite native. Il salvataggio personale Kiri.sav non e stato aperto.
+Dettagli, provenienza e prompt: docs/TRAINERS-BW.md e
+resources/visual/trainers-bw/PROVENANCE.json (sorgenti conservate in sources/).

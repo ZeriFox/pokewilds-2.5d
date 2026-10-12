@@ -1,0 +1,6 @@
+Pokemon characters: Nintendo / Game Freak / The Pokemon Company.
+Seventeen B/W-style trainer sheets are AI-assisted fan-art redraws generated with image_gen, using the existing character identities and costumes as references. They are not extracted official B/W sprites.
+Hilbert and Hilda still use the original Pokemon Black/White overworld sheets in visual/unova; extracted by Barubary, The Spriters Resource, asset 34024. Their source credits remain in visual/unova/CREDITS.txt.
+The original generated images and exact prompts/layout notes are preserved in sources/.
+Preparation: deterministic source-cell packing, nearest-neighbor size normalization, binary alpha, and clothing-only costume masks. No new character pixels are drawn by the preparation script.
+Character artwork and references are not declared MIT, CC0 or freely licensed.

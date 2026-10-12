@@ -5,7 +5,7 @@
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "6f84f11c380f98ffecf067944eaabef72e3a27996a036ccac788a51ac1bd74f1",
+  "reviewed_patch_sha256": "198e0c61e10e9207fc532925d742404911de556b3b6bbbb396ad83c9e3220483",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/CheckEndOfBattle.java",
@@ -233,8 +233,8 @@
       "scope": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state."
     },
     "src/com/pkmngen/game/BwAssets.java": {
-      "scope": "Lazy, disposable local landscape atlas access, biome-specific semantic materials, validated optional texture overrides and sampling independent of the simulation grid, contextual missing-asset diagnostics and separate Black/White trainer assets. Step 3 delegates opt-in classic trainer presentation to a separate owned catalog with explicit color-aware Player overloads; detailed B/W defaults and existing texture override contracts retained.",
-      "reviewed_sha256": "501521789d34cda4c1d616e8b1b633d3a8904f12e0bc4707b4cb84f070526901"
+      "reviewed_sha256": "efb0ce680879642537974036885cffc80d0069a0475fd739a8c8bc516ebb330d",
+      "scope": "Shared landscape atlas and custom sampling contracts preserved; unified identity-specific trainer presentation across menus, world and battles. Explicit generic/per-character atlas overrides retain priority; installed mods preserved; genuine B/W idle and running frames corrected. Ignores obsolete global classic-cast selection for bundled characters, preserves owned texture lifecycle and layout metadata; no gameplay or save writes."
     },
     "src/com/pkmngen/game/DesktopControls.java": {
       "reviewed_sha256": "f26c3782ef83d8648c94212dc01bd2e6723815a8dcbdb9e68d65eb381cfc25d5",
@@ -329,20 +329,20 @@
       "reviewed_sha256": "75df770e8b1918253ee729f8cfc160cb61224bf340cdd4b8422903186cc0af35"
     },
     "src/com/pkmngen/game/DesktopMenuController.java": {
-      "scope": "Desktop title/home/setup state, explicit transactional text focus, input-context release barriers, complete trainer/mod selection and F1 options; native Go delegates untouched original setup operations once; pointer inventory selection uses existing action data without item creation or use/toss rule changes.",
-      "reviewed_sha256": "b6fc16b410c20ad98cbaca44f10b6806c54d754cdbe4a2f161f8ec508b4db6d8"
+      "reviewed_sha256": "dfc8af2aa7647ddc21089ea1e62392165738ccfb3c93a66ceedd28acf405ea3a",
+      "scope": "Existing desktop setup, controls and menu navigation retained. Trainer picker lists nineteen distinct identities plus complete installed mods, restores saved identity independent of obsolete global style, applies existing costume colors and original setup routines, with unchanged input-context and saved Player schema."
     },
     "src/com/pkmngen/game/MenuTextSession.java": {
       "scope": "Explicit reversible setup text draft with caret/deletion, length/character constraints and IPv4 validation; selection alone never consumes WASD as text.",
       "reviewed_sha256": "86eccf7738bc82f6669581ae8cd818dc070d64885178819dd84a8e8f24d0ea24"
     },
     "src/com/pkmngen/game/ModernStartupUi.java": {
-      "scope": "Skippable animated title scenery from bundled art, home/adventure setup, complete trainer selector and controls/display cards with shared hitboxes and reduced menu motion; no RNG, generated world or battle rules.",
-      "reviewed_sha256": "714d0498199cb9e13813e83d8fe3f9885bdcd59ed812d77fc9def0f280fcec30"
+      "reviewed_sha256": "b81a2a85cef7b741b3bb2083df41342d1c320dc89fe5ab9fbd08eeedca1e116f",
+      "scope": "Existing desktop title/setup/options presentation with a unified nineteen-character B/W-style selector. Preview shares actual world appearance and clothing accent selection; truthful native B/W/mod color affordances. No gameplay, RNG or save-format changes."
     },
     "src/com/pkmngen/game/TrainerCatalog.java": {
-      "scope": "Opt-in existing classic trainer/mod artwork with identity-preserving directional frames, costume color and owned bounded cache; detailed B/W remains available, no new source PNGs or saved Player schema.",
-      "reviewed_sha256": "7d9d7b97c0e712261eb4b6029cc914de4b1a0211359425c108d162a6f6079191"
+      "reviewed_sha256": "7873fa7026c46479fcf4b41cbbd3daa147002b2801ec817c0eae5018ff4a98e7",
+      "scope": "Identity-specific B/W-style sheets for seventeen redrawn built-ins, clothing-only masked palette variants, and original installed-mod artwork. Owned bounded cache with per-frame disposal guard, consistent directional frame selection and complete required-pose checks including back art. No saved Player schema, original sprite mutation or game rules."
     },
     "src/com/pkmngen/game/AuthoredTerrain.java": {
       "reviewed_sha256": "c6b34f2cdba1abfb785b87d24e56578af2837ecda595698ba0f0e000dc714bc6",
@@ -389,7 +389,8 @@
     "Step 3 pointer safety review: popup rows share the presenter hitboxes; a click on a different choice selects without confirming the old YES/USE selection, a subsequent click delegates the original action. Outside clicks do not act. Keyboard controls remain unchanged.",
     "2026-10-12: recovered ac526d14 unchanged, then reviewed authored generation modules, terrain/billboard readability and modern UI/encounter presentation; pre-change review archived; battle/save/controller sources outside this scope unchanged. Native results are separate.",
     "2026-10-12 living world: reviewed biome-specific structural modules and boundary retention, world-space nature rendering/shore heights, regional materials and reduced-motion accents. Previous local 5dd0db06 manifest/verifier/verification archived; original combat, Player, save and map sources unchanged. Native evidence remains separate.",
-    "2026-10-12 cinematic nature: reviewed stronger offshore water and grounded canopy motion/lighting plus biome battle background animation and 2.5D parallax. Four presentation helpers only; original combat, Player, save and terrain generation unchanged from accepted f3b55100. Prior manifest/verifier/verification archived in before-cinematic-nature; native evidence separate."
+    "2026-10-12 cinematic nature: reviewed stronger offshore water and grounded canopy motion/lighting plus biome battle background animation and 2.5D parallax. Four presentation helpers only; original combat, Player, save and terrain generation unchanged from accepted f3b55100. Prior manifest/verifier/verification archived in before-cinematic-nature; native evidence separate.",
+    "2026-10-12 trainer redraw: reviewed four presentation/menu helpers for nineteen identity-specific B/W-style trainers, clothing accents, native idle/run frames, custom-art priority and complete mod validation. Seventeen AI-assisted sheets preserve source prompts/provenance; two original B/W heroes retained. Combat, Player, saves, terrain and cinematic nature remain unchanged from 5df68264. Prior review archived in before-trainer-redraw."
   ],
   "historical_v2": "baseline/modernization-v2/archive.json",
   "historical_v3": "baseline/modernization-v3/",

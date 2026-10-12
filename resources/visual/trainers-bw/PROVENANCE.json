@@ -1,0 +1,6234 @@
+{
+  "schema": 1,
+  "complete": true,
+  "preparation": "tools/prepare_trainer_assets.py",
+  "encoding": {
+    "name": "RGBA8-filter0-stored-deflate",
+    "version": 1,
+    "blockBytes": 65535,
+    "implementation": "tools/deterministic_png.py"
+  },
+  "parameters": {
+    "cellSize": [
+      32,
+      32
+    ],
+    "columns": 3,
+    "rows": 4,
+    "directions": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ],
+    "frames": [
+      "left-step",
+      "idle",
+      "right-step"
+    ],
+    "scale": "one uniform factor per identity; fit max height 28 and width 26",
+    "resample": "nearest",
+    "alphaThreshold": 128,
+    "sourceRows": "recorded alpha128 content bands, otherwise density>=20 with gaps<=20 merged; six-pixel padding",
+    "alignment": "horizontal silhouette center at x16; lowest visible row y30",
+    "anchor": [
+      16,
+      30
+    ],
+    "maskBodyBounds": {
+      "leaf": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "gold": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "kris": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "brendan": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "may": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "rosa": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "calem": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "serena": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "chase": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "elaine": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "gloria": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "mark": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "mint": [
+        12,
+        25,
+        20,
+        28
+      ],
+      "lunick": [
+        10,
+        23,
+        22,
+        28
+      ],
+      "summer": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "kellyn": [
+        10,
+        22,
+        22,
+        27
+      ],
+      "lyra": [
+        10,
+        22,
+        22,
+        27
+      ]
+    },
+    "mask": "binary alpha; saturated character-specific clothing hue inside body bounds"
+  },
+  "identities": {
+    "leaf": {
+      "source": "sources/leaf.png",
+      "sourceSha256": "b186abfa05d0bea795406d298beef4267ab904a594274dd0140b1d59522da67e",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/leaf.json",
+      "metadataSha256": "b863f402c6b05aef45d6e304dd897e012dce8eff644b232ddf411e25d6ea2337",
+      "kind": "AI-assisted fan-art redraw",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset type: production pixel-art overworld sprite sheet for a 2.5D Pokemon fangame.\nCreate a NEW sprite sheet of LEAF, the female Pokemon FireRed/LeafGreen playable trainer, reinterpreted in the exact pixel density, overhead camera angle, chibi proportions, dark selective outlines and shading of the Pokemon Black/White overworld characters in the supplied style reference. Preserve Leaf's recognizable large white sunhat with red band, long light brown hair, blue sleeveless shirt, short red skirt, dark socks, white shoes and small yellow shoulder bag. This is one character only.\nThe reference image is STYLE ONLY; do not copy the reference sheet layout or its characters.\nOUTPUT: transparent background, no ground, no shadows, no labels, no borders, no visible grid. Canvas portrait 768x1024. EXACTLY twelve sprites arranged in a perfectly even 3-column x 4-row grid, each invisible cell 256x256. Sprite is originally 32x32 logical pixel art enlarged exactly 8x with nearest-neighbor block pixels. Each sprite about 20 pixels wide and 28 pixels high, feet centered at local logical pixel (16,29), identical scale in all cells, with transparent margin.\nROW 1 faces DOWN toward viewer. ROW 2 faces UP away from viewer (back of hat/hair). ROW 3 faces LEFT. ROW 4 faces RIGHT.\nIn EVERY row, COLUMN 1 walking with left foot forward, COLUMN 2 neutral standing with feet together, COLUMN 3 walking with right foot forward. Alternate arms and feet for a real three-frame walk cycle, head/outfit identity stable. Side profiles actually face the required direction. Do not duplicate the standing pose in walking columns. Strictly no illustration rendering, no anti-aliased vector style, no high-resolution facial detail, no realistic proportions. Match the tiny Nintendo DS game sprites of the reference.",
+      "references": [
+        "visual/unova/sources/heroes.png"
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "frames": [
+          "left-step",
+          "idle",
+          "right-step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          98,
+          350
+        ],
+        [
+          427,
+          680
+        ],
+        [
+          754,
+          1013
+        ],
+        [
+          1092,
+          1348
+        ]
+      ],
+      "uniformScale": 0.1076923076923077,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            92,
+            362,
+            357
+          ],
+          "silhouetteBounds": [
+            122,
+            6,
+            303,
+            259
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            92,
+            724,
+            357
+          ],
+          "silhouetteBounds": [
+            91,
+            6,
+            271,
+            253
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            92,
+            1086,
+            357
+          ],
+          "silhouetteBounds": [
+            58,
+            6,
+            239,
+            259
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            421,
+            362,
+            687
+          ],
+          "silhouetteBounds": [
+            122,
+            6,
+            303,
+            260
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            421,
+            724,
+            687
+          ],
+          "silhouetteBounds": [
+            91,
+            6,
+            271,
+            260
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            421,
+            1086,
+            687
+          ],
+          "silhouetteBounds": [
+            58,
+            6,
+            239,
+            260
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            748,
+            362,
+            1020
+          ],
+          "silhouetteBounds": [
+            129,
+            6,
+            309,
+            266
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            748,
+            724,
+            1020
+          ],
+          "silhouetteBounds": [
+            91,
+            6,
+            265,
+            266
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            748,
+            1086,
+            1020
+          ],
+          "silhouetteBounds": [
+            55,
+            6,
+            231,
+            266
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1086,
+            362,
+            1355
+          ],
+          "silhouetteBounds": [
+            128,
+            6,
+            305,
+            263
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1086,
+            724,
+            1355
+          ],
+          "silhouetteBounds": [
+            96,
+            6,
+            272,
+            263
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1086,
+            1086,
+            1355
+          ],
+          "silhouetteBounds": [
+            55,
+            6,
+            233,
+            263
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        }
+      ],
+      "costumeAccent": "blue",
+      "maskedPixelsByCell": [
+        7,
+        5,
+        7,
+        0,
+        2,
+        1,
+        6,
+        1,
+        5,
+        4,
+        1,
+        5
+      ],
+      "outputs": {
+        "leaf.png": "b823b9d472912c5d7c8815dff44935f099c9677eb89ac056e8dced8472cca990",
+        "leaf-mask.png": "af551351d2ffa6a27cba5d57fd21518b70bc8ee9fd23567c9875ba794cced9f8"
+      }
+    },
+    "gold": {
+      "source": "sources/gold.png",
+      "sourceSha256": "c4d34cc49e39470bd52c36de30aea2547eeeb2a6445d88835a1c59bc7b7c87fa",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/gold.json",
+      "metadataSha256": "2f29789e514bf11e509151f7e5c2034f4592ab149114c585a54b5f68364bced9",
+      "kind": "AI-assisted fan-art redraw",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset type: production pixel-art overworld sprite sheet for a 2.5D Pokemon fangame.\nCreate a NEW sprite sheet of GOLD / ETHAN, the male Pokemon Gold/Silver playable trainer, reinterpreted in the exact pixel density, overhead camera angle, chibi proportions, dark selective outlines and shading of the Pokemon Black/White overworld characters in reference1. Preserve his backwards yellow-and-black cap, dark hair, red and black jacket with yellow trim, black shorts, red/white sneakers and yellow backpack. Reference2 is the legacy character identity, reference3 is its back view. Redraw with more DS-era detail. This is one character only.\nThe first reference image is STYLE ONLY; the other references preserve identity and costume. Do not copy reference sheet layout.\nOUTPUT: transparent background, no ground, no shadows, no labels, no borders, no visible grid. Canvas portrait 768x1024. EXACTLY twelve sprites arranged in a perfectly even 3-column x 4-row grid, each invisible cell 256x256. Sprite is originally 32x32 logical pixel art enlarged exactly 8x with nearest-neighbor block pixels. Each sprite about 20 pixels wide and 28 pixels high, feet centered at local logical pixel (16,29), identical scale in all cells, with transparent margin.\nROW 1 faces DOWN toward viewer. ROW 2 faces UP away from viewer (back of hat/hair). ROW 3 faces LEFT. ROW 4 faces RIGHT.\nIn EVERY row, COLUMN 1 walking with left foot forward, COLUMN 2 neutral standing with feet together, COLUMN 3 walking with right foot forward. Alternate arms and feet for a real three-frame walk cycle, head/outfit identity stable. Side profiles actually face the required direction. Do not duplicate the standing pose in walking columns. Strictly no illustration rendering, no anti-aliased vector style, no high-resolution facial detail, no realistic proportions. Match the tiny Nintendo DS game sprites of the reference.",
+      "references": [
+        "visual/unova/sources/heroes.png",
+        "upstream-runtime.jar:player/gold-walking.png",
+        "upstream-runtime.jar:player/gold-back.png"
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "frames": [
+          "left-step",
+          "idle",
+          "right-step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          115,
+          335
+        ],
+        [
+          431,
+          650
+        ],
+        [
+          749,
+          976
+        ],
+        [
+          1079,
+          1306
+        ]
+      ],
+      "uniformScale": 0.12280701754385964,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            109,
+            362,
+            342
+          ],
+          "silhouetteBounds": [
+            142,
+            6,
+            315,
+            227
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            109,
+            724,
+            342
+          ],
+          "silhouetteBounds": [
+            93,
+            6,
+            269,
+            225
+          ],
+          "sampledSize": [
+            22,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            109,
+            1086,
+            342
+          ],
+          "silhouetteBounds": [
+            49,
+            6,
+            222,
+            225
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            425,
+            362,
+            657
+          ],
+          "silhouetteBounds": [
+            141,
+            6,
+            315,
+            226
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            425,
+            724,
+            657
+          ],
+          "silhouetteBounds": [
+            93,
+            6,
+            269,
+            226
+          ],
+          "sampledSize": [
+            22,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            425,
+            1086,
+            657
+          ],
+          "silhouetteBounds": [
+            48,
+            6,
+            223,
+            226
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            743,
+            362,
+            983
+          ],
+          "silhouetteBounds": [
+            138,
+            6,
+            316,
+            234
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            743,
+            724,
+            983
+          ],
+          "silhouetteBounds": [
+            91,
+            6,
+            268,
+            234
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            743,
+            1086,
+            983
+          ],
+          "silhouetteBounds": [
+            45,
+            6,
+            223,
+            234
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1073,
+            362,
+            1313
+          ],
+          "silhouetteBounds": [
+            138,
+            6,
+            316,
+            231
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1073,
+            724,
+            1313
+          ],
+          "silhouetteBounds": [
+            94,
+            6,
+            270,
+            234
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1073,
+            1086,
+            1313
+          ],
+          "silhouetteBounds": [
+            47,
+            6,
+            225,
+            234
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        }
+      ],
+      "costumeAccent": "red",
+      "maskedPixelsByCell": [
+        10,
+        9,
+        12,
+        1,
+        2,
+        2,
+        7,
+        7,
+        6,
+        7,
+        7,
+        4
+      ],
+      "outputs": {
+        "gold.png": "b741a0917ea6ba5e1dbdc613ba5a9387f079a8eb2a4a64afd261ee364d005047",
+        "gold-mask.png": "218415a8e846e76b16a877096c468c7337fbcd439a4120dab040fd942021a539"
+      }
+    },
+    "kris": {
+      "source": "sources/kris.png",
+      "sourceSha256": "3cc563d0b23508aedc553797675869f8006dd71b3396e5566f04b502857ebda0",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/kris.json",
+      "metadataSha256": "8d868d9ae4f66df883cfa1d64c259d447a69d4a524d00ee13d8605fb89055744",
+      "kind": "AI-assisted fan-art redraw",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset type: production pixel-art overworld sprite sheet for a 2.5D Pokemon fangame.\nCreate a NEW sprite sheet of KRIS, the female Pokemon Crystal playable trainer, reinterpreted in the exact pixel density, overhead camera angle, chibi proportions, dark selective outlines and shading of the Pokemon Black/White overworld characters in reference1. Preserve her swept cyan-blue hair with two outward pigtails, white cap with pink/red band, white and red sporty jacket, blue shorts, white knee socks, yellow/black shoes and small backpack. Reference2 is the legacy character identity, reference3 is its back view. Redraw with more DS-era detail. This is one character only.\nThe first reference image is STYLE ONLY; the other references preserve identity and costume. Do not copy reference sheet layout.\nOUTPUT: transparent background, no ground, no shadows, no labels, no borders, no visible grid. Canvas portrait 768x1024. EXACTLY twelve sprites arranged in a perfectly even 3-column x 4-row grid, each invisible cell 256x256. Sprite is originally 32x32 logical pixel art enlarged exactly 8x with nearest-neighbor block pixels. Each sprite about 20 pixels wide and 28 pixels high, feet centered at local logical pixel (16,29), identical scale in all cells, with transparent margin.\nROW 1 faces DOWN toward viewer. ROW 2 faces UP away from viewer (back of hat/hair). ROW 3 faces LEFT. ROW 4 faces RIGHT.\nIn EVERY row, COLUMN 1 walking with left foot forward, COLUMN 2 neutral standing with feet together, COLUMN 3 walking with right foot forward. Alternate arms and feet for a real three-frame walk cycle, head/outfit identity stable. Side profiles actually face the required direction. Do not duplicate the standing pose in walking columns. Strictly no illustration rendering, no anti-aliased vector style, no high-resolution facial detail, no realistic proportions. Match the tiny Nintendo DS game sprites of the reference.",
+      "references": [
+        "visual/unova/sources/heroes.png",
+        "upstream-runtime.jar:player/kris-walking.png",
+        "upstream-runtime.jar:player/kris-back.png"
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "frames": [
+          "left-step",
+          "idle",
+          "right-step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          102,
+          350
+        ],
+        [
+          443,
+          689
+        ],
+        [
+          770,
+          1010
+        ],
+        [
+          1088,
+          1326
+        ]
+      ],
+      "uniformScale": 0.11244979919678715,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            96,
+            362,
+            357
+          ],
+          "silhouetteBounds": [
+            107,
+            6,
+            320,
+            255
+          ],
+          "sampledSize": [
+            24,
+            28
+          ],
+          "outputOffset": [
+            4,
+            3
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            96,
+            724,
+            357
+          ],
+          "silhouetteBounds": [
+            71,
+            7,
+            285,
+            245
+          ],
+          "sampledSize": [
+            24,
+            27
+          ],
+          "outputOffset": [
+            4,
+            4
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            96,
+            1086,
+            357
+          ],
+          "silhouetteBounds": [
+            40,
+            6,
+            255,
+            255
+          ],
+          "sampledSize": [
+            24,
+            28
+          ],
+          "outputOffset": [
+            4,
+            3
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            437,
+            362,
+            696
+          ],
+          "silhouetteBounds": [
+            108,
+            6,
+            323,
+            253
+          ],
+          "sampledSize": [
+            24,
+            28
+          ],
+          "outputOffset": [
+            4,
+            3
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            437,
+            724,
+            696
+          ],
+          "silhouetteBounds": [
+            70,
+            6,
+            288,
+            244
+          ],
+          "sampledSize": [
+            25,
+            27
+          ],
+          "outputOffset": [
+            3,
+            4
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            437,
+            1086,
+            696
+          ],
+          "silhouetteBounds": [
+            38,
+            6,
+            254,
+            253
+          ],
+          "sampledSize": [
+            24,
+            28
+          ],
+          "outputOffset": [
+            4,
+            3
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            764,
+            362,
+            1017
+          ],
+          "silhouetteBounds": [
+            126,
+            6,
+            317,
+            240
+          ],
+          "sampledSize": [
+            21,
+            26
+          ],
+          "outputOffset": [
+            5,
+            5
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            764,
+            724,
+            1017
+          ],
+          "silhouetteBounds": [
+            93,
+            7,
+            279,
+            247
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            764,
+            1086,
+            1017
+          ],
+          "silhouetteBounds": [
+            56,
+            6,
+            246,
+            239
+          ],
+          "sampledSize": [
+            21,
+            26
+          ],
+          "outputOffset": [
+            5,
+            5
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1082,
+            362,
+            1333
+          ],
+          "silhouetteBounds": [
+            117,
+            6,
+            307,
+            244
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1082,
+            724,
+            1333
+          ],
+          "silhouetteBounds": [
+            80,
+            6,
+            267,
+            245
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1082,
+            1086,
+            1333
+          ],
+          "silhouetteBounds": [
+            38,
+            6,
+            230,
+            244
+          ],
+          "sampledSize": [
+            22,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        }
+      ],
+      "costumeAccent": "pink",
+      "maskedPixelsByCell": [
+        1,
+        9,
+        2,
+        1,
+        4,
+        1,
+        5,
+        5,
+        5,
+        3,
+        3,
+        7
+      ],
+      "outputs": {
+        "kris.png": "1ff50357b61469f59d5d236de11468a87724e7b301f419609fe612587b47b3f9",
+        "kris-mask.png": "d5217e611fee614e94e529092dcf727d09c1962b4eec119acc8766efcc160974"
+      }
+    },
+    "brendan": {
+      "source": "sources/brendan.png",
+      "sourceSha256": "b9273948bda50d8abe133d25b9b6e1da0910383057e13c2d11e6258ba85757d4",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/brendan.json",
+      "metadataSha256": "24e467512238515036bc4fa21d7041500893ab90ac32b0a3efd6b4022a11aea3",
+      "kind": "AI-assisted fan-art redraw",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset type: production pixel-art overworld sprite sheet for a 2.5D Pokemon fangame.\nCreate a NEW sprite sheet of BRENDAN, the male Pokemon Ruby/Sapphire playable trainer, using the exact pixel density, overhead camera angle, chibi proportions, dark selective outlines and shading of the Pokemon Black/White overworld characters in reference1. Preserve his iconic white knit cap with black band (a hat, not white hair), dark short hair, red and black short-sleeve trainer shirt, dark trousers, red and white shoes and shoulder backpack. Reference2 is the original low-detail character's identity; reference3 its back view. Redraw in detailed DS pixel-art style. One character only.\nReference1 is STYLE ONLY; references2/3 preserve identity. Do not copy the reference sheet layout.\nOUTPUT: transparent background, no ground, no shadows, no labels, no borders, no visible grid. Canvas portrait 768x1024. EXACTLY twelve sprites arranged in a perfectly even 3-column x 4-row grid, each invisible cell 256x256. Sprite is originally 32x32 logical pixel art enlarged exactly 8x with nearest-neighbor block pixels. Each sprite about 20 pixels wide and 28 pixels high, feet centered at local logical pixel (16,29), identical scale in all cells, with transparent margin.\nROW 1 faces DOWN toward viewer. ROW 2 faces UP away from viewer (back of hat/hair). ROW 3 faces LEFT. ROW 4 faces RIGHT.\nIn EVERY row, COLUMN 1 walking with left foot forward, COLUMN 2 neutral standing with feet together, COLUMN 3 walking with right foot forward. Alternate arms and feet for a real three-frame walk cycle, head/outfit identity stable. Side profiles actually face the required direction. Do not duplicate the standing pose in walking columns. Strictly no illustration rendering, no anti-aliased vector style, no high-resolution facial detail, no realistic proportions. Match the tiny Nintendo DS game sprites of the reference.",
+      "references": [
+        "visual/unova/sources/heroes.png",
+        "upstream-runtime.jar:player/brendan-walking.png",
+        "upstream-runtime.jar:player/brendan-back.png"
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "frames": [
+          "left-step",
+          "idle",
+          "right-step"
+        ],
+        "cellMap": [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            3,
+            4,
+            5
+          ],
+          [
+            6,
+            7,
+            11
+          ],
+          [
+            9,
+            10,
+            8
+          ]
+        ],
+        "note": "Directional packing: source right-step side profiles occupy opposite row slots; read the actual left-facing source cell11 into left row, right-facing source cell8 into right row. Source PNG untouched."
+      },
+      "contentRowBands": [
+        [
+          113,
+          353
+        ],
+        [
+          434,
+          676
+        ],
+        [
+          748,
+          994
+        ],
+        [
+          1069,
+          1316
+        ]
+      ],
+      "uniformScale": 0.11290322580645161,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            107,
+            362,
+            360
+          ],
+          "silhouetteBounds": [
+            142,
+            6,
+            324,
+            247
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            107,
+            724,
+            360
+          ],
+          "silhouetteBounds": [
+            91,
+            6,
+            273,
+            245
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            107,
+            1086,
+            360
+          ],
+          "silhouetteBounds": [
+            38,
+            6,
+            221,
+            247
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            428,
+            362,
+            683
+          ],
+          "silhouetteBounds": [
+            142,
+            6,
+            324,
+            249
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            428,
+            724,
+            683
+          ],
+          "silhouetteBounds": [
+            91,
+            6,
+            273,
+            241
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            428,
+            1086,
+            683
+          ],
+          "silhouetteBounds": [
+            38,
+            6,
+            221,
+            249
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            742,
+            362,
+            1001
+          ],
+          "silhouetteBounds": [
+            153,
+            6,
+            330,
+            252
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            742,
+            724,
+            1001
+          ],
+          "silhouetteBounds": [
+            99,
+            6,
+            275,
+            253
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1063,
+            1086,
+            1323
+          ],
+          "silhouetteBounds": [
+            41,
+            6,
+            216,
+            254
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1063,
+            362,
+            1323
+          ],
+          "silhouetteBounds": [
+            145,
+            6,
+            322,
+            254
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1063,
+            724,
+            1323
+          ],
+          "silhouetteBounds": [
+            93,
+            6,
+            270,
+            254
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            742,
+            1086,
+            1001
+          ],
+          "silhouetteBounds": [
+            32,
+            6,
+            208,
+            253
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        }
+      ],
+      "costumeAccent": "red",
+      "maskedPixelsByCell": [
+        10,
+        6,
+        11,
+        3,
+        1,
+        2,
+        6,
+        7,
+        7,
+        6,
+        5,
+        7
+      ],
+      "outputs": {
+        "brendan.png": "0ef8862a741414b53b30d729b0ac7207dfdee7526bb288df9342fd52b2921059",
+        "brendan-mask.png": "b427059b93e0c049e48934824b48650576ddeaaf7c22f4b043d5d7e5d2b709f2"
+      }
+    },
+    "may": {
+      "source": "sources/may.png",
+      "sourceSha256": "dd25b419358d097957f1553306632e92769e8200e9aec6cdec39e172723db630",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/may.json",
+      "metadataSha256": "90340b5780ecc583ab77f376040e7e13f3724375a338665ff3f27d5c394dc8b4",
+      "kind": "AI-assisted fan-art redraw",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset type: production pixel-art overworld sprite sheet for a 2.5D Pokemon fangame.\nCreate a NEW sprite sheet of MAY, the female Pokemon Ruby/Sapphire playable trainer, using the exact pixel density, overhead camera angle, chibi proportions, dark selective outlines and shading of the Pokemon Black/White overworld characters in reference1. Preserve her red bandana tied with two bow-like ends, chestnut brown hair with outward side locks, red short-sleeve collared top over black undershirt, dark shorts over pale leg coverings, yellow belt pouch and red/white shoes. Reference2 is the original low-detail character's identity; reference3 its back view. Redraw in detailed DS pixel-art style. One character only.\nReference1 is STYLE ONLY; references2/3 preserve identity. Do not copy the reference sheet layout.\nOUTPUT: transparent background, no ground, no shadows, no labels, no borders, no visible grid. Canvas portrait 768x1024. EXACTLY twelve sprites arranged in a perfectly even 3-column x 4-row grid, each invisible cell 256x256. Sprite is originally 32x32 logical pixel art enlarged exactly 8x with nearest-neighbor block pixels. Each sprite about 20 pixels wide and 28 pixels high, feet centered at local logical pixel (16,29), identical scale in all cells, with transparent margin.\nROW 1 faces DOWN toward viewer. ROW 2 faces UP away from viewer (back of hat/hair). ROW 3 faces LEFT. ROW 4 faces RIGHT.\nIn EVERY row, COLUMN 1 walking with left foot forward, COLUMN 2 neutral standing with feet together, COLUMN 3 walking with right foot forward. Alternate arms and feet for a real three-frame walk cycle, head/outfit identity stable. Side profiles actually face the required direction. Do not duplicate the standing pose in walking columns. Strictly no illustration rendering, no anti-aliased vector style, no high-resolution facial detail, no realistic proportions. Match the tiny Nintendo DS game sprites of the reference.",
+      "references": [
+        "visual/unova/sources/heroes.png",
+        "upstream-runtime.jar:player/may-walking.png",
+        "upstream-runtime.jar:player/may-back.png"
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "frames": [
+          "left-step",
+          "idle",
+          "right-step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          103,
+          350
+        ],
+        [
+          450,
+          683
+        ],
+        [
+          769,
+          1006
+        ],
+        [
+          1080,
+          1318
+        ]
+      ],
+      "uniformScale": 0.11290322580645161,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            97,
+            362,
+            357
+          ],
+          "silhouetteBounds": [
+            119,
+            6,
+            313,
+            253
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            97,
+            724,
+            357
+          ],
+          "silhouetteBounds": [
+            83,
+            14,
+            277,
+            248
+          ],
+          "sampledSize": [
+            22,
+            26
+          ],
+          "outputOffset": [
+            5,
+            5
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            97,
+            1086,
+            357
+          ],
+          "silhouetteBounds": [
+            50,
+            6,
+            244,
+            254
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            444,
+            362,
+            690
+          ],
+          "silhouetteBounds": [
+            119,
+            6,
+            314,
+            239
+          ],
+          "sampledSize": [
+            22,
+            26
+          ],
+          "outputOffset": [
+            5,
+            5
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            444,
+            724,
+            690
+          ],
+          "silhouetteBounds": [
+            83,
+            7,
+            279,
+            231
+          ],
+          "sampledSize": [
+            22,
+            25
+          ],
+          "outputOffset": [
+            5,
+            6
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            444,
+            1086,
+            690
+          ],
+          "silhouetteBounds": [
+            48,
+            6,
+            243,
+            240
+          ],
+          "sampledSize": [
+            22,
+            26
+          ],
+          "outputOffset": [
+            5,
+            5
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            763,
+            362,
+            1013
+          ],
+          "silhouetteBounds": [
+            130,
+            6,
+            316,
+            244
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            763,
+            724,
+            1013
+          ],
+          "silhouetteBounds": [
+            97,
+            6,
+            282,
+            242
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            763,
+            1086,
+            1013
+          ],
+          "silhouetteBounds": [
+            58,
+            6,
+            246,
+            244
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1074,
+            362,
+            1325
+          ],
+          "silhouetteBounds": [
+            121,
+            6,
+            308,
+            245
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1074,
+            724,
+            1325
+          ],
+          "silhouetteBounds": [
+            83,
+            8,
+            268,
+            244
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1074,
+            1086,
+            1325
+          ],
+          "silhouetteBounds": [
+            49,
+            8,
+            233,
+            245
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        }
+      ],
+      "costumeAccent": "red",
+      "maskedPixelsByCell": [
+        11,
+        14,
+        8,
+        4,
+        6,
+        4,
+        2,
+        2,
+        3,
+        1,
+        1,
+        3
+      ],
+      "outputs": {
+        "may.png": "fbf8c36ae13d53d3c8bd77a463f73eb552d38c344a30d758bc00fafc9223950f",
+        "may-mask.png": "69c1de8dd41eed00e923a83ccc1e82151e33dd210e6b2174f3e1fe09f7dcd931"
+      }
+    },
+    "rosa": {
+      "source": "sources/rosa.png",
+      "sourceSha256": "1dc21e2486d7b86d3778b0651a131641006100727f954e446ada66b387bd08f9",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/rosa.json",
+      "metadataSha256": "b14a51dc81e219c108f398b85297cecc77d3dfb7daf09fb9a38e42cd55af5863",
+      "kind": "AI-assisted fan-art redraw",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset type: production pixel-art overworld sprite sheet for a 2.5D Pokemon fangame.\nCreate a NEW sprite sheet of ROSA, the female Pokemon Black 2/White 2 playable trainer, using the exact pixel density, overhead camera angle, chibi proportions, dark selective outlines and shading of Pokemon Black/White overworld characters in reference1. Preserve her white visor with pink brim, very long dark brown hair with two large round side buns and twin tails, pale blue short-sleeve raglan shirt, yellow tiny bag, pink shorts over black leg coverings, blue/white sneakers. Reference2 is the original low-detail character identity, reference3 its back view. Redraw in detailed DS pixel-art style. One character only.\nReference1 is STYLE ONLY; references2/3 preserve identity. Do not copy the reference sheet layout.\nOUTPUT: transparent background, no ground, no shadows, no labels, no borders, no visible grid. Canvas portrait 768x1024. EXACTLY twelve sprites arranged in a perfectly even 3-column x 4-row grid, each invisible cell 256x256. Sprite is originally 32x32 logical pixel art enlarged exactly 8x with nearest-neighbor block pixels. Each sprite about 20 pixels wide and 28 pixels high, feet centered at local logical pixel (16,29), identical scale in all cells, with transparent margin.\nROW 1 faces DOWN toward viewer. ROW 2 faces UP away from viewer (back of hat/hair). ROW 3 faces LEFT. ROW 4 faces RIGHT.\nIn EVERY row, COLUMN 1 walking with left foot forward, COLUMN 2 neutral standing with feet together, COLUMN 3 walking with right foot forward. Alternate arms and feet for a real three-frame walk cycle, head/outfit identity stable. Side profiles actually face the required direction. Do not duplicate the standing pose in walking columns. Strictly no illustration rendering, no anti-aliased vector style, no high-resolution facial detail, no realistic proportions. Match the tiny Nintendo DS game sprites of the reference.",
+      "references": [
+        "visual/unova/sources/heroes.png",
+        "upstream-runtime.jar:player/rosa-walking.png",
+        "upstream-runtime.jar:player/rosa-back.png"
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "frames": [
+          "left-step",
+          "idle",
+          "right-step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          96,
+          342
+        ],
+        [
+          418,
+          665
+        ],
+        [
+          733,
+          981
+        ],
+        [
+          1062,
+          1312
+        ]
+      ],
+      "uniformScale": 0.1111111111111111,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            90,
+            362,
+            349
+          ],
+          "silhouetteBounds": [
+            110,
+            8,
+            333,
+            253
+          ],
+          "sampledSize": [
+            25,
+            27
+          ],
+          "outputOffset": [
+            3,
+            4
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            90,
+            724,
+            349
+          ],
+          "silhouetteBounds": [
+            70,
+            6,
+            292,
+            246
+          ],
+          "sampledSize": [
+            25,
+            27
+          ],
+          "outputOffset": [
+            3,
+            4
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            90,
+            1086,
+            349
+          ],
+          "silhouetteBounds": [
+            29,
+            7,
+            252,
+            253
+          ],
+          "sampledSize": [
+            25,
+            27
+          ],
+          "outputOffset": [
+            3,
+            4
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            412,
+            362,
+            672
+          ],
+          "silhouetteBounds": [
+            108,
+            6,
+            333,
+            253
+          ],
+          "sampledSize": [
+            25,
+            27
+          ],
+          "outputOffset": [
+            3,
+            4
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            412,
+            724,
+            672
+          ],
+          "silhouetteBounds": [
+            69,
+            6,
+            293,
+            246
+          ],
+          "sampledSize": [
+            25,
+            27
+          ],
+          "outputOffset": [
+            3,
+            4
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            412,
+            1086,
+            672
+          ],
+          "silhouetteBounds": [
+            29,
+            6,
+            254,
+            254
+          ],
+          "sampledSize": [
+            25,
+            28
+          ],
+          "outputOffset": [
+            3,
+            3
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            727,
+            362,
+            988
+          ],
+          "silhouetteBounds": [
+            113,
+            6,
+            300,
+            255
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            727,
+            724,
+            988
+          ],
+          "silhouetteBounds": [
+            74,
+            6,
+            258,
+            255
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            727,
+            1086,
+            988
+          ],
+          "silhouetteBounds": [
+            32,
+            6,
+            226,
+            253
+          ],
+          "sampledSize": [
+            22,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1056,
+            362,
+            1319
+          ],
+          "silhouetteBounds": [
+            127,
+            6,
+            319,
+            258
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1056,
+            724,
+            1319
+          ],
+          "silhouetteBounds": [
+            93,
+            6,
+            284,
+            256
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1056,
+            1086,
+            1319
+          ],
+          "silhouetteBounds": [
+            46,
+            6,
+            246,
+            255
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        }
+      ],
+      "costumeAccent": "pink",
+      "maskedPixelsByCell": [
+        11,
+        14,
+        12,
+        10,
+        12,
+        9,
+        7,
+        4,
+        7,
+        7,
+        3,
+        6
+      ],
+      "outputs": {
+        "rosa.png": "8f89167ee692c93e58db7bdb73f6b810ce0fee0ec573063aa22cc405c8240059",
+        "rosa-mask.png": "ed13b11b1e791d32ba8d3bce48056cf2f9f2b29c588184dfd86452ab4275f39e"
+      }
+    },
+    "calem": {
+      "source": "sources/calem.png",
+      "sourceSha256": "b9621cc81e6bcd3c9a4aa675b818c1ae1fd49c5ab4948c5d1db3798286f25c78",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/calem.json",
+      "metadataSha256": "d372cfd341139c258dcdbd2485f55fb9df0390df5fc729c092ea26bdfee064f1",
+      "kind": "AI-assisted fan-art redraw",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset type: production pixel-art overworld sprite sheet for a 2.5D Pokemon fangame.\nCreate a NEW sprite sheet of CALEM, the male Pokemon X/Y playable trainer, using the exact pixel density, overhead camera angle, chibi proportions, dark selective outlines and shading of Pokemon Black/White overworld characters in reference1. Preserve his red cap with black round sunglasses perched on the brim, dark brown hair, blue zip jacket with white stripe accents, charcoal trousers, black tall boots, and dark shoulder satchel. Reference2 is the original low-detail character identity, reference3 its back view. Redraw in detailed DS pixel-art style. One character only.\nReference1 is STYLE ONLY; references2/3 preserve identity. Do not copy the reference sheet layout.\nOUTPUT: transparent background, no ground, no shadows, no labels, no borders, no visible grid. Canvas portrait 768x1024. EXACTLY twelve sprites arranged in a perfectly even 3-column x 4-row grid, each invisible cell 256x256. Sprite is originally 32x32 logical pixel art enlarged exactly 8x with nearest-neighbor block pixels. Each sprite about 20 pixels wide and 28 pixels high, feet centered at local logical pixel (16,29), identical scale in all cells, with transparent margin.\nROW 1 faces DOWN toward viewer. ROW 2 faces UP away from viewer (back of hat/hair). ROW 3 faces LEFT. ROW 4 faces RIGHT.\nIn EVERY row, COLUMN 1 walking with left foot forward, COLUMN 2 neutral standing with feet together, COLUMN 3 walking with right foot forward. Alternate arms and feet for a real three-frame walk cycle, head/outfit identity stable. Side profiles actually face the required direction. Do not duplicate the standing pose in walking columns. Strictly no illustration rendering, no anti-aliased vector style, no high-resolution facial detail, no realistic proportions. Match the tiny Nintendo DS game sprites of the reference.",
+      "references": [
+        "visual/unova/sources/heroes.png",
+        "upstream-runtime.jar:player/calem-walking.png",
+        "upstream-runtime.jar:player/calem-back.png"
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "frames": [
+          "left-step",
+          "idle",
+          "right-step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          122,
+          374
+        ],
+        [
+          423,
+          675
+        ],
+        [
+          731,
+          986
+        ],
+        [
+          1047,
+          1304
+        ]
+      ],
+      "uniformScale": 0.10810810810810811,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            116,
+            362,
+            381
+          ],
+          "silhouetteBounds": [
+            124,
+            6,
+            301,
+            259
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            116,
+            724,
+            381
+          ],
+          "silhouetteBounds": [
+            91,
+            5,
+            271,
+            251
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            116,
+            1086,
+            381
+          ],
+          "silhouetteBounds": [
+            63,
+            5,
+            240,
+            259
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            417,
+            362,
+            682
+          ],
+          "silhouetteBounds": [
+            122,
+            6,
+            301,
+            259
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            417,
+            724,
+            682
+          ],
+          "silhouetteBounds": [
+            91,
+            6,
+            271,
+            251
+          ],
+          "sampledSize": [
+            19,
+            26
+          ],
+          "outputOffset": [
+            6,
+            5
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            417,
+            1086,
+            682
+          ],
+          "silhouetteBounds": [
+            63,
+            6,
+            240,
+            259
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            725,
+            362,
+            993
+          ],
+          "silhouetteBounds": [
+            113,
+            6,
+            299,
+            262
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            725,
+            724,
+            993
+          ],
+          "silhouetteBounds": [
+            81,
+            6,
+            268,
+            262
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            725,
+            1086,
+            993
+          ],
+          "silhouetteBounds": [
+            49,
+            6,
+            236,
+            262
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1041,
+            362,
+            1311
+          ],
+          "silhouetteBounds": [
+            121,
+            6,
+            314,
+            264
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1041,
+            724,
+            1311
+          ],
+          "silhouetteBounds": [
+            90,
+            6,
+            282,
+            265
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1041,
+            1086,
+            1311
+          ],
+          "silhouetteBounds": [
+            56,
+            6,
+            250,
+            265
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        }
+      ],
+      "costumeAccent": "blue",
+      "maskedPixelsByCell": [
+        10,
+        14,
+        8,
+        8,
+        17,
+        9,
+        5,
+        6,
+        10,
+        9,
+        7,
+        10
+      ],
+      "outputs": {
+        "calem.png": "fee53a83662e892952d061c6ff0e9936acc9f197b8c4ea17f6b4b0337eccbccd",
+        "calem-mask.png": "2504b861aa8f6f521f593153981a851803b1a22419ca5560d87a535d23087cc2"
+      }
+    },
+    "serena": {
+      "source": "sources/serena.png",
+      "sourceSha256": "94a8d83244646d5962ffdf2da0fc65b756189a7abf515f51ac0b400fcacb3014",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/serena.json",
+      "metadataSha256": "2d3125ef96de067776aab57358beb845ff4afa92de319ee1ff3cd51d57dc06b3",
+      "kind": "New AI-adapted pixel-art redraw based on existing Pokémon character references; not an official Black/White rip or original Nintendo asset.",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept.\nAsset type: production pixel-art overworld trainer sprite sheet for a Pokémon Black/White-inspired Nintendo DS 2.5D game.\nCreate a NEW redrawn sheet of the ONE specified character, preserving the identity in reference images 1 (legacy walking) and 2 (legacy back). Reference image 3 is the authentic Black/White visual style only; reference image 4 is the approved Leaf sheet and is the exact layout, pixel density and scale-consistency target. Do not turn the character into Leaf, Hilbert or Hilda.\nLayout: portrait 768×1024 transparent canvas, EXACTLY 3 columns ×4 equally spaced rows, 12 whole-body sprites, one per slot. Use transparent space between every slot. Row1 all facing DOWN/toward viewer; row2 all facing UP/away (only back of head visible); row3 all facing LEFT, row4 all facing RIGHT. Columns: left-leg walking step, neutral standing with both feet planted, right-leg walking step. Keep the same top-down 3/4 camera and same head/body scale in all frames. Distinct foot/arm positions so walk animation reads clearly.\nPixel style: genuine chunky low-resolution DS-era sprite construction, approximately 20–24 pixels wide ×28 pixels tall inside a logical32×32 cell then nearest-neighbor enlarged8× for delivery, dark1logical-pixel outlines, compact muted palettes, crisp square pixels, minimal2–3tone shading, large head and short body in the exact proportions of the Leaf sheet. No smooth gradients, antialiasing, tall doll anatomy, elaborate modern illustration or painted texture.\nActual transparent alpha background. No ground shadows, scene, text, labels, grid lines, borders, logos, props outside the costume, extra characters, duplicated frames or cropping. Every frame has clear transparent margin on all sides.\nSubject: Serena: girl with long honey/light-brown hair, red rounded brimmed hat with dark hat band and sunglasses atop it, black sleeveless upper garment, red pleated skirt, black knee-high socks, dark shoes, a small side shoulder bag. Preserve her unmistakable red hat and long hair silhouette from the references.",
+      "references": [
+        {
+          "path": "build/trainer-references/serena-walking.png",
+          "role": "original low-resolution character identity reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "build/trainer-references/serena-back.png",
+          "role": "original character identity and costume reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "resources/visual/unova/sources/heroes.png",
+          "role": "authentic BW sprite style reference; extraction credited to Barubary"
+        },
+        {
+          "path": "C:/Users/Utente/.codex/generated_images/01a10397-8c14-78f1-b39f-0b0996682eb4/exec-f2a77e20-120d-49ac-8353-c385510c7ad7.png",
+          "role": "approved generated Leaf sheet; 3x4 layout and scale consistency reference"
+        }
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "row_directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "column_poses": [
+          "left_step",
+          "neutral",
+          "right_step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          92,
+          357
+        ],
+        [
+          419,
+          693
+        ],
+        [
+          747,
+          1025
+        ],
+        [
+          1083,
+          1357
+        ]
+      ],
+      "uniformScale": 0.10071942446043165,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            86,
+            362,
+            364
+          ],
+          "silhouetteBounds": [
+            111,
+            6,
+            313,
+            271
+          ],
+          "sampledSize": [
+            20,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            86,
+            724,
+            364
+          ],
+          "silhouetteBounds": [
+            80,
+            6,
+            283,
+            266
+          ],
+          "sampledSize": [
+            20,
+            26
+          ],
+          "outputOffset": [
+            6,
+            5
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            86,
+            1086,
+            364
+          ],
+          "silhouetteBounds": [
+            51,
+            6,
+            252,
+            271
+          ],
+          "sampledSize": [
+            20,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            413,
+            362,
+            700
+          ],
+          "silhouetteBounds": [
+            107,
+            6,
+            309,
+            280
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            413,
+            724,
+            700
+          ],
+          "silhouetteBounds": [
+            83,
+            6,
+            280,
+            275
+          ],
+          "sampledSize": [
+            20,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            413,
+            1086,
+            700
+          ],
+          "silhouetteBounds": [
+            53,
+            6,
+            255,
+            280
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            741,
+            362,
+            1032
+          ],
+          "silhouetteBounds": [
+            114,
+            6,
+            309,
+            284
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            741,
+            724,
+            1032
+          ],
+          "silhouetteBounds": [
+            85,
+            6,
+            280,
+            284
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            741,
+            1086,
+            1032
+          ],
+          "silhouetteBounds": [
+            55,
+            6,
+            256,
+            284
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1077,
+            362,
+            1364
+          ],
+          "silhouetteBounds": [
+            107,
+            7,
+            309,
+            280
+          ],
+          "sampledSize": [
+            20,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1077,
+            724,
+            1364
+          ],
+          "silhouetteBounds": [
+            81,
+            7,
+            278,
+            280
+          ],
+          "sampledSize": [
+            20,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1077,
+            1086,
+            1364
+          ],
+          "silhouetteBounds": [
+            46,
+            6,
+            246,
+            280
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        }
+      ],
+      "costumeAccent": "red",
+      "maskedPixelsByCell": [
+        22,
+        21,
+        19,
+        19,
+        14,
+        20,
+        20,
+        16,
+        18,
+        17,
+        17,
+        19
+      ],
+      "outputs": {
+        "serena.png": "feadbfa6e269f45df8ec4e47abd2cd9a7d8c15f7aa7a5b056e0937f25691e4c4",
+        "serena-mask.png": "9c1d45a194ff7504f1dad5bcf42622e5d735ad4638f82aa0ab45c33a25ff2ec8"
+      }
+    },
+    "chase": {
+      "source": "sources/chase.png",
+      "sourceSha256": "5da0b420a4d80760ecd517dae754f7e6d9a1049b4ebee616ccc49664bbc997fb",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/chase.json",
+      "metadataSha256": "54eeff4f905209c0c7c9ba3a4cbe9737203d99a90dc1898a39eea875c6366e10",
+      "kind": "New AI-adapted pixel-art redraw based on existing Pokémon character references; not an official Black/White rip or original Nintendo asset.",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept.\nAsset type: production pixel-art overworld trainer sprite sheet for a Pokémon Black/White-inspired Nintendo DS 2.5D game.\nCreate a NEW redrawn sheet of the ONE specified character, preserving the identity in reference images 1 (legacy walking) and 2 (legacy back). Reference image 3 is the authentic Black/White visual style only; reference image 4 is the approved Leaf sheet and is the exact layout, pixel density and scale-consistency target. Do not turn the character into Leaf, Hilbert or Hilda.\nLayout: portrait 768×1024 transparent canvas, EXACTLY 3 columns ×4 equally spaced rows, 12 whole-body sprites, one per slot. Use transparent space between every slot. Row1 all facing DOWN/toward viewer; row2 all facing UP/away (only back of head visible); row3 all facing LEFT, row4 all facing RIGHT. Columns: left-leg walking step, neutral standing with both feet planted, right-leg walking step. Keep the same top-down 3/4 camera and same head/body scale in all frames. Distinct foot/arm positions so walk animation reads clearly.\nPixel style: genuine chunky low-resolution DS-era sprite construction, approximately 20–24 pixels wide ×28 pixels tall inside a logical32×32 cell then nearest-neighbor enlarged8× for delivery, dark1logical-pixel outlines, compact muted palettes, crisp square pixels, minimal2–3tone shading, large head and short body in the exact proportions of the Leaf sheet. No smooth gradients, antialiasing, tall doll anatomy, elaborate modern illustration or painted texture.\nActual transparent alpha background. No ground shadows, scene, text, labels, grid lines, borders, logos, props outside the costume, extra characters, duplicated frames or cropping. Every frame has clear transparent margin on all sides.\nSubject: Chase: boy with brown spiky hair, red-and-white baseball cap, dark short-sleeved shirt with a white shoulder/chest detail, short blue trousers and sneakers, compact backpack. Preserve the brimmed cap, short messy hair and athletic child silhouette of the references.",
+      "references": [
+        {
+          "path": "build/trainer-references/chase-walking.png",
+          "role": "original low-resolution character identity reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "build/trainer-references/chase-back.png",
+          "role": "original character identity and costume reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "resources/visual/unova/sources/heroes.png",
+          "role": "authentic BW sprite style reference; extraction credited to Barubary"
+        },
+        {
+          "path": "C:/Users/Utente/.codex/generated_images/01a10397-8c14-78f1-b39f-0b0996682eb4/exec-f2a77e20-120d-49ac-8353-c385510c7ad7.png",
+          "role": "approved generated Leaf sheet; 3x4 layout and scale consistency reference"
+        }
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "row_directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "column_poses": [
+          "left_step",
+          "neutral",
+          "right_step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          94,
+          358
+        ],
+        [
+          438,
+          705
+        ],
+        [
+          756,
+          1025
+        ],
+        [
+          1083,
+          1354
+        ]
+      ],
+      "uniformScale": 0.1033210332103321,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            88,
+            362,
+            365
+          ],
+          "silhouetteBounds": [
+            117,
+            6,
+            304,
+            270
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            88,
+            724,
+            365
+          ],
+          "silhouetteBounds": [
+            90,
+            6,
+            273,
+            259
+          ],
+          "sampledSize": [
+            19,
+            26
+          ],
+          "outputOffset": [
+            6,
+            5
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            88,
+            1086,
+            365
+          ],
+          "silhouetteBounds": [
+            57,
+            6,
+            244,
+            270
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            432,
+            362,
+            712
+          ],
+          "silhouetteBounds": [
+            117,
+            6,
+            306,
+            273
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            432,
+            724,
+            712
+          ],
+          "silhouetteBounds": [
+            86,
+            6,
+            273,
+            262
+          ],
+          "sampledSize": [
+            19,
+            26
+          ],
+          "outputOffset": [
+            6,
+            5
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            432,
+            1086,
+            712
+          ],
+          "silhouetteBounds": [
+            56,
+            6,
+            245,
+            273
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            750,
+            362,
+            1032
+          ],
+          "silhouetteBounds": [
+            105,
+            6,
+            306,
+            275
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            750,
+            724,
+            1032
+          ],
+          "silhouetteBounds": [
+            82,
+            6,
+            272,
+            273
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            750,
+            1086,
+            1032
+          ],
+          "silhouetteBounds": [
+            48,
+            6,
+            246,
+            271
+          ],
+          "sampledSize": [
+            20,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1077,
+            362,
+            1361
+          ],
+          "silhouetteBounds": [
+            114,
+            6,
+            317,
+            277
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1077,
+            724,
+            1361
+          ],
+          "silhouetteBounds": [
+            82,
+            6,
+            279,
+            277
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1077,
+            1086,
+            1361
+          ],
+          "silhouetteBounds": [
+            52,
+            6,
+            254,
+            277
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        }
+      ],
+      "costumeAccent": "blue",
+      "maskedPixelsByCell": [
+        15,
+        10,
+        13,
+        5,
+        10,
+        4,
+        13,
+        4,
+        14,
+        12,
+        4,
+        12
+      ],
+      "outputs": {
+        "chase.png": "f2849454ab157e8404057c9e52c352719fb20b1d39ae63c277ce090f83e03731",
+        "chase-mask.png": "5cef790b93aa36a359380f21f241210ccaa5bd7796d030a3a74fbb322b92ca92"
+      }
+    },
+    "elaine": {
+      "source": "sources/elaine.png",
+      "sourceSha256": "e689aaaac40177886a58414bc33dce1096856a228347da03d7fd97ff82fce98f",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/elaine.json",
+      "metadataSha256": "6f09618ab9f8a12a103bd323a932a5484c07127488f6cba508a313c6347069da",
+      "kind": "New AI-adapted pixel-art redraw based on existing Pokémon character references; not an official Black/White rip or original Nintendo asset.",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept.\nAsset type: production pixel-art overworld trainer sprite sheet for a Pokémon Black/White-inspired Nintendo DS 2.5D game.\nCreate a NEW redrawn sheet of the ONE specified character, preserving the identity in reference images 1 (legacy walking) and 2 (legacy back). Reference image 3 is the authentic Black/White visual style only; reference image 4 is the approved Leaf sheet and is the exact layout, pixel density and scale-consistency target. Do not turn the character into Leaf, Hilbert or Hilda.\nLayout: portrait 768×1024 transparent canvas, EXACTLY 3 columns ×4 equally spaced rows, 12 whole-body sprites, one per slot. Use transparent space between every slot. Row1 all facing DOWN/toward viewer; row2 all facing UP/away (only back of head visible); row3 all facing LEFT, row4 all facing RIGHT. Columns: left-leg walking step, neutral standing with both feet planted, right-leg walking step. Keep the same top-down 3/4 camera and same head/body scale in all frames. Distinct foot/arm positions so walk animation reads clearly.\nPixel style: genuine chunky low-resolution DS-era sprite construction, approximately 20–24 pixels wide ×28 pixels tall inside a logical32×32 cell then nearest-neighbor enlarged8× for delivery, dark1logical-pixel outlines, compact muted palettes, crisp square pixels, minimal2–3tone shading, large head and short body in the exact proportions of the Leaf sheet. No smooth gradients, antialiasing, tall doll anatomy, elaborate modern illustration or painted texture.\nActual transparent alpha background. No ground shadows, scene, text, labels, grid lines, borders, logos, props outside the costume, extra characters, duplicated frames or cropping. Every frame has clear transparent margin on all sides.\nSubject: Elaine: girl with long brown high ponytail coming from a white cap with a red brim, dark sleeveless shirt with a pale horizontal chest detail, short blue shorts, sneakers and small shoulder bag. Preserve the cap and ponytail identity in the source references.",
+      "references": [
+        {
+          "path": "build/trainer-references/elaine-walking.png",
+          "role": "original low-resolution character identity reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "build/trainer-references/elaine-back.png",
+          "role": "original character identity and costume reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "resources/visual/unova/sources/heroes.png",
+          "role": "authentic BW sprite style reference; extraction credited to Barubary"
+        },
+        {
+          "path": "C:/Users/Utente/.codex/generated_images/01a10397-8c14-78f1-b39f-0b0996682eb4/exec-f2a77e20-120d-49ac-8353-c385510c7ad7.png",
+          "role": "approved generated Leaf sheet; 3x4 layout and scale consistency reference"
+        }
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "row_directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "column_poses": [
+          "left_step",
+          "neutral",
+          "right_step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          89,
+          361
+        ],
+        [
+          432,
+          696
+        ],
+        [
+          745,
+          1022
+        ],
+        [
+          1079,
+          1354
+        ]
+      ],
+      "uniformScale": 0.10071942446043165,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            83,
+            362,
+            368
+          ],
+          "silhouetteBounds": [
+            130,
+            6,
+            323,
+            278
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            83,
+            724,
+            368
+          ],
+          "silhouetteBounds": [
+            102,
+            6,
+            293,
+            274
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            83,
+            1086,
+            368
+          ],
+          "silhouetteBounds": [
+            59,
+            6,
+            254,
+            282
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            426,
+            362,
+            703
+          ],
+          "silhouetteBounds": [
+            129,
+            6,
+            295,
+            270
+          ],
+          "sampledSize": [
+            17,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            426,
+            724,
+            703
+          ],
+          "silhouetteBounds": [
+            100,
+            6,
+            265,
+            269
+          ],
+          "sampledSize": [
+            17,
+            26
+          ],
+          "outputOffset": [
+            7,
+            5
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            426,
+            1086,
+            703
+          ],
+          "silhouetteBounds": [
+            65,
+            6,
+            229,
+            270
+          ],
+          "sampledSize": [
+            17,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            739,
+            362,
+            1029
+          ],
+          "silhouetteBounds": [
+            118,
+            6,
+            326,
+            275
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            739,
+            724,
+            1029
+          ],
+          "silhouetteBounds": [
+            87,
+            6,
+            293,
+            283
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            739,
+            1086,
+            1029
+          ],
+          "silhouetteBounds": [
+            53,
+            5,
+            256,
+            283
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1073,
+            362,
+            1361
+          ],
+          "silhouetteBounds": [
+            108,
+            7,
+            312,
+            279
+          ],
+          "sampledSize": [
+            21,
+            27
+          ],
+          "outputOffset": [
+            5,
+            4
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1073,
+            724,
+            1361
+          ],
+          "silhouetteBounds": [
+            82,
+            7,
+            287,
+            281
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1073,
+            1086,
+            1361
+          ],
+          "silhouetteBounds": [
+            43,
+            6,
+            251,
+            281
+          ],
+          "sampledSize": [
+            21,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        }
+      ],
+      "costumeAccent": "blue",
+      "maskedPixelsByCell": [
+        10,
+        9,
+        7,
+        7,
+        9,
+        7,
+        10,
+        3,
+        5,
+        5,
+        2,
+        6
+      ],
+      "outputs": {
+        "elaine.png": "eec518ca5fd9de6e71ca08de41e0aec7d1b740c86d56ea0d004756f1b795fe71",
+        "elaine-mask.png": "21b73f515e960ea76600955914868f74680ebf88b9406bf0b81e3792210be49b"
+      }
+    },
+    "gloria": {
+      "source": "sources/gloria.png",
+      "sourceSha256": "ba09af2c534a243d6bd9f461deea1ed4b3bfd6a2f79e2fcbf23ead1c100cbbf4",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/gloria.json",
+      "metadataSha256": "5c7fc82d193750ff0f6424f399267e6a3ee1d04ce8e0c8bbc4578e583e00c466",
+      "kind": "New AI-adapted pixel-art redraw based on existing Pokémon character references; not an official Black/White rip or original Nintendo asset.",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept.\nAsset type: production pixel-art overworld trainer sprite sheet for a Pokémon Black/White-inspired Nintendo DS 2.5D game.\nCreate a NEW redrawn sheet of the ONE specified character, preserving the identity in reference images 1 (legacy walking) and 2 (legacy back). Reference image 3 is the authentic Black/White visual style only; reference image 4 is the approved Leaf sheet and is the exact layout, pixel density and scale-consistency target. Do not turn the character into Leaf, Hilbert or Hilda.\nLayout: portrait 768×1024 transparent canvas, EXACTLY 3 columns ×4 equally spaced rows, 12 whole-body sprites, one per slot. Use transparent space between every slot. Row1 all facing DOWN/toward viewer; row2 all facing UP/away (only back of head visible); row3 all facing LEFT, row4 all facing RIGHT. Columns: left-leg walking step, neutral standing with both feet planted, right-leg walking step. Keep the same top-down 3/4 camera and same head/body scale in all frames. Distinct foot/arm positions so walk animation reads clearly.\nPixel style: genuine chunky low-resolution DS-era sprite construction, approximately 20–24 pixels wide ×28 pixels tall inside a logical32×32 cell then nearest-neighbor enlarged8× for delivery, dark1logical-pixel outlines, compact muted palettes, crisp square pixels, minimal2–3tone shading, large head and short body in the exact proportions of the Leaf sheet. No smooth gradients, antialiasing, tall doll anatomy, elaborate modern illustration or painted texture.\nActual transparent alpha background. No ground shadows, scene, text, labels, grid lines, borders, logos, props outside the costume, extra characters, duplicated frames or cropping. Every frame has clear transparent margin on all sides.\nSubject: Gloria: girl with brown bob-length hair, round dark green Scottish beret with a small pom-pom, gray/green long-sleeved tunic sweater dress with contrasting collar, brown shoes and dark socks, a compact brown backpack. Keep her distinctive beret and bob haircut, matching the reference.",
+      "references": [
+        {
+          "path": "build/trainer-references/gloria-walking.png",
+          "role": "original low-resolution character identity reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "build/trainer-references/gloria-back.png",
+          "role": "original character identity and costume reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "resources/visual/unova/sources/heroes.png",
+          "role": "authentic BW sprite style reference; extraction credited to Barubary"
+        },
+        {
+          "path": "C:/Users/Utente/.codex/generated_images/01a10397-8c14-78f1-b39f-0b0996682eb4/exec-f2a77e20-120d-49ac-8353-c385510c7ad7.png",
+          "role": "approved generated Leaf sheet; 3x4 layout and scale consistency reference"
+        }
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "row_directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "column_poses": [
+          "left_step",
+          "neutral",
+          "right_step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          89,
+          360
+        ],
+        [
+          431,
+          695
+        ],
+        [
+          755,
+          1022
+        ],
+        [
+          1089,
+          1354
+        ]
+      ],
+      "uniformScale": 0.1033210332103321,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            83,
+            362,
+            367
+          ],
+          "silhouetteBounds": [
+            128,
+            6,
+            298,
+            277
+          ],
+          "sampledSize": [
+            18,
+            28
+          ],
+          "outputOffset": [
+            7,
+            3
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            83,
+            724,
+            367
+          ],
+          "silhouetteBounds": [
+            94,
+            6,
+            264,
+            276
+          ],
+          "sampledSize": [
+            18,
+            28
+          ],
+          "outputOffset": [
+            7,
+            3
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            83,
+            1086,
+            367
+          ],
+          "silhouetteBounds": [
+            63,
+            6,
+            232,
+            277
+          ],
+          "sampledSize": [
+            17,
+            28
+          ],
+          "outputOffset": [
+            7,
+            3
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            425,
+            362,
+            702
+          ],
+          "silhouetteBounds": [
+            125,
+            8,
+            297,
+            270
+          ],
+          "sampledSize": [
+            18,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            425,
+            724,
+            702
+          ],
+          "silhouetteBounds": [
+            99,
+            6,
+            265,
+            270
+          ],
+          "sampledSize": [
+            17,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            425,
+            1086,
+            702
+          ],
+          "silhouetteBounds": [
+            63,
+            8,
+            234,
+            270
+          ],
+          "sampledSize": [
+            18,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            749,
+            362,
+            1029
+          ],
+          "silhouetteBounds": [
+            137,
+            6,
+            301,
+            273
+          ],
+          "sampledSize": [
+            17,
+            28
+          ],
+          "outputOffset": [
+            7,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            749,
+            724,
+            1029
+          ],
+          "silhouetteBounds": [
+            105,
+            5,
+            265,
+            273
+          ],
+          "sampledSize": [
+            17,
+            28
+          ],
+          "outputOffset": [
+            7,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            749,
+            1086,
+            1029
+          ],
+          "silhouetteBounds": [
+            71,
+            6,
+            234,
+            273
+          ],
+          "sampledSize": [
+            17,
+            28
+          ],
+          "outputOffset": [
+            7,
+            3
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1083,
+            362,
+            1361
+          ],
+          "silhouetteBounds": [
+            129,
+            6,
+            296,
+            269
+          ],
+          "sampledSize": [
+            17,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1083,
+            724,
+            1361
+          ],
+          "silhouetteBounds": [
+            98,
+            6,
+            265,
+            271
+          ],
+          "sampledSize": [
+            17,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1083,
+            1086,
+            1361
+          ],
+          "silhouetteBounds": [
+            65,
+            6,
+            231,
+            269
+          ],
+          "sampledSize": [
+            17,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        }
+      ],
+      "costumeAccent": "gray",
+      "maskedPixelsByCell": [
+        19,
+        19,
+        15,
+        0,
+        3,
+        3,
+        6,
+        6,
+        10,
+        12,
+        3,
+        12
+      ],
+      "outputs": {
+        "gloria.png": "b558ce2b9b992f515a6c4dceba435f81458d1eb8b190103a5dca478a694142c4",
+        "gloria-mask.png": "e9df071268e40f6d6c6657cf7c925a271592b7fbef4f38ecfdd16459cd50525f"
+      }
+    },
+    "mark": {
+      "source": "sources/mark.png",
+      "sourceSha256": "6542872d5013b61ec07151dd0361b609bc6ca329fe61fdd2439ff7a554f3874b",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/mark.json",
+      "metadataSha256": "49d47df203a10bd687c213d316bde4db74e25d00cb0d4e103d166a597bbcf4f9",
+      "kind": "New AI-adapted pixel-art redraw based on existing Pokémon character references; not an official Black/White rip or original Nintendo asset.",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept.\nAsset type: production pixel-art overworld trainer sprite sheet for a Pokémon Black/White-inspired Nintendo DS 2.5D game.\nCreate a NEW redrawn sheet of the ONE specified character, preserving the identity in reference images 1 (legacy walking) and 2 (legacy back). Reference image 3 is the authentic Black/White visual style only; reference image 4 is the approved Leaf sheet and is the exact layout, pixel density and scale-consistency target. Do not turn the character into Leaf, Hilbert or Hilda.\nLayout: portrait 768×1024 transparent canvas, EXACTLY 3 columns ×4 equally spaced rows, 12 whole-body sprites, one per slot. Use transparent space between every slot. Row1 all facing DOWN/toward viewer; row2 all facing UP/away (only back of head visible); row3 all facing LEFT, row4 all facing RIGHT. Columns: left-leg walking step, neutral standing with both feet planted, right-leg walking step. Keep the same top-down 3/4 camera and same head/body scale in all frames. Distinct foot/arm positions so walk animation reads clearly.\nPixel style: genuine chunky low-resolution DS-era sprite construction, approximately 20–24 pixels wide ×28 pixels tall inside a logical32×32 cell then nearest-neighbor enlarged8× for delivery, dark1logical-pixel outlines, compact muted palettes, crisp square pixels, minimal2–3tone shading, large head and short body in the exact proportions of the Leaf sheet. No smooth gradients, antialiasing, tall doll anatomy, elaborate modern illustration or painted texture.\nActual transparent alpha background. No ground shadows, scene, text, labels, grid lines, borders, logos, props outside the costume, extra characters, duplicated frames or cropping. Every frame has clear transparent margin on all sides.\nSubject: Mark, the male Pokémon Trading Card Game protagonist: boy with a red baseball cap worn backward, brown hair, a red jacket over a light shirt, dark/blue trousers and sneakers. Match the backward-cap and red-jacket identity of the supplied original Mark references. This is Mark, not Red or Hilbert.",
+      "references": [
+        {
+          "path": "build/trainer-references/mark-walking.png",
+          "role": "original low-resolution character identity reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "build/trainer-references/mark-back.png",
+          "role": "original character identity and costume reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "resources/visual/unova/sources/heroes.png",
+          "role": "authentic BW sprite style reference; extraction credited to Barubary"
+        },
+        {
+          "path": "C:/Users/Utente/.codex/generated_images/01a10397-8c14-78f1-b39f-0b0996682eb4/exec-f2a77e20-120d-49ac-8353-c385510c7ad7.png",
+          "role": "approved generated Leaf sheet; 3x4 layout and scale consistency reference"
+        }
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "row_directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "column_poses": [
+          "left_step",
+          "neutral",
+          "right_step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          96,
+          348
+        ],
+        [
+          428,
+          681
+        ],
+        [
+          752,
+          1016
+        ],
+        [
+          1088,
+          1352
+        ]
+      ],
+      "uniformScale": 0.10606060606060606,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            90,
+            362,
+            355
+          ],
+          "silhouetteBounds": [
+            120,
+            6,
+            303,
+            258
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            90,
+            724,
+            355
+          ],
+          "silhouetteBounds": [
+            90,
+            6,
+            272,
+            248
+          ],
+          "sampledSize": [
+            19,
+            26
+          ],
+          "outputOffset": [
+            6,
+            5
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            90,
+            1086,
+            355
+          ],
+          "silhouetteBounds": [
+            59,
+            6,
+            242,
+            258
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            422,
+            362,
+            688
+          ],
+          "silhouetteBounds": [
+            120,
+            6,
+            303,
+            259
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            422,
+            724,
+            688
+          ],
+          "silhouetteBounds": [
+            90,
+            6,
+            272,
+            252
+          ],
+          "sampledSize": [
+            19,
+            26
+          ],
+          "outputOffset": [
+            6,
+            5
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            422,
+            1086,
+            688
+          ],
+          "silhouetteBounds": [
+            59,
+            6,
+            242,
+            259
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            746,
+            362,
+            1023
+          ],
+          "silhouetteBounds": [
+            126,
+            6,
+            310,
+            266
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            746,
+            724,
+            1023
+          ],
+          "silhouetteBounds": [
+            90,
+            6,
+            273,
+            270
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            746,
+            1086,
+            1023
+          ],
+          "silhouetteBounds": [
+            56,
+            6,
+            241,
+            268
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1082,
+            362,
+            1359
+          ],
+          "silhouetteBounds": [
+            119,
+            7,
+            302,
+            269
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1082,
+            724,
+            1359
+          ],
+          "silhouetteBounds": [
+            90,
+            6,
+            272,
+            269
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1082,
+            1086,
+            1359
+          ],
+          "silhouetteBounds": [
+            53,
+            7,
+            235,
+            270
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        }
+      ],
+      "costumeAccent": "red",
+      "maskedPixelsByCell": [
+        7,
+        10,
+        7,
+        0,
+        2,
+        0,
+        10,
+        4,
+        5,
+        7,
+        4,
+        5
+      ],
+      "outputs": {
+        "mark.png": "ae528282708d0b397063c023bb985f349de63db013a89a5aa6bea97836faf273",
+        "mark-mask.png": "90a0840bfebb2a37b83d848995962b25e969f29a46c9052b4faf907fe8c610f1"
+      }
+    },
+    "mint": {
+      "source": "sources/mint.png",
+      "sourceSha256": "2a79c92f137750d5a3f82251c0fdd0ea3d9f0adb9a9adb496c206e1836efb791",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/mint.json",
+      "metadataSha256": "1fb527f35a2f417c8fcbcf535bc4ed2e25b7a6e979b8f351334a27116a1711d6",
+      "kind": "New AI-adapted pixel-art redraw based on existing Pokémon character references; not an official Black/White rip or original Nintendo asset.",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept.\nAsset type: production pixel-art overworld trainer sprite sheet for a Pokémon Black/White-inspired Nintendo DS 2.5D game.\nCreate a NEW redrawn sheet of the ONE specified character, preserving the identity in reference images 1 (legacy walking) and 2 (legacy back). Reference image 3 is the authentic Black/White visual style only; reference image 4 is the approved Leaf sheet and is the exact layout, pixel density and scale-consistency target. Do not turn the character into Leaf, Hilbert or Hilda.\nLayout: portrait 768×1024 transparent canvas, EXACTLY 3 columns ×4 equally spaced rows, 12 whole-body sprites, one per slot. Use transparent space between every slot. Row1 all facing DOWN/toward viewer; row2 all facing UP/away (only back of head visible); row3 all facing LEFT, row4 all facing RIGHT. Columns: left-leg walking step, neutral standing with both feet planted, right-leg walking step. Keep the same top-down 3/4 camera and same head/body scale in all frames. Distinct foot/arm positions so walk animation reads clearly.\nPixel style: genuine chunky low-resolution DS-era sprite construction, approximately 20–24 pixels wide ×28 pixels tall inside a logical32×32 cell then nearest-neighbor enlarged8× for delivery, dark1logical-pixel outlines, compact muted palettes, crisp square pixels, minimal2–3tone shading, large head and short body in the exact proportions of the Leaf sheet. No smooth gradients, antialiasing, tall doll anatomy, elaborate modern illustration or painted texture.\nActual transparent alpha background. No ground shadows, scene, text, labels, grid lines, borders, logos, props outside the costume, extra characters, duplicated frames or cropping. Every frame has clear transparent margin on all sides.\nSubject: Mint, the female Pokémon Trading Card Game protagonist: girl with a distinctive round blue beret, dark blue hair in a low side ponytail, blue sleeveless outer top over a light shirt, dark blue shorts/skirt and sneakers. Match the recognizable blue beret/hair silhouette of the supplied original Mint references. This is Mint, not Kris.",
+      "references": [
+        {
+          "path": "build/trainer-references/mint-walking.png",
+          "role": "original low-resolution character identity reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "build/trainer-references/mint-back.png",
+          "role": "original character identity and costume reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "resources/visual/unova/sources/heroes.png",
+          "role": "authentic BW sprite style reference; extraction credited to Barubary"
+        },
+        {
+          "path": "C:/Users/Utente/.codex/generated_images/01a10397-8c14-78f1-b39f-0b0996682eb4/exec-f2a77e20-120d-49ac-8353-c385510c7ad7.png",
+          "role": "approved generated Leaf sheet; 3x4 layout and scale consistency reference"
+        }
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "row_directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "column_poses": [
+          "left_step",
+          "neutral",
+          "right_step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          96,
+          356
+        ],
+        [
+          427,
+          691
+        ],
+        [
+          749,
+          1019
+        ],
+        [
+          1085,
+          1352
+        ]
+      ],
+      "uniformScale": 0.1033210332103321,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            90,
+            362,
+            363
+          ],
+          "silhouetteBounds": [
+            114,
+            7,
+            304,
+            266
+          ],
+          "sampledSize": [
+            20,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            90,
+            724,
+            363
+          ],
+          "silhouetteBounds": [
+            86,
+            6,
+            275,
+            259
+          ],
+          "sampledSize": [
+            20,
+            26
+          ],
+          "outputOffset": [
+            6,
+            5
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            90,
+            1086,
+            363
+          ],
+          "silhouetteBounds": [
+            55,
+            6,
+            243,
+            266
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            421,
+            362,
+            698
+          ],
+          "silhouetteBounds": [
+            118,
+            6,
+            306,
+            270
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            421,
+            724,
+            698
+          ],
+          "silhouetteBounds": [
+            88,
+            6,
+            275,
+            262
+          ],
+          "sampledSize": [
+            19,
+            26
+          ],
+          "outputOffset": [
+            6,
+            5
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            421,
+            1086,
+            698
+          ],
+          "silhouetteBounds": [
+            57,
+            6,
+            245,
+            270
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            743,
+            362,
+            1026
+          ],
+          "silhouetteBounds": [
+            124,
+            6,
+            310,
+            277
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            743,
+            724,
+            1026
+          ],
+          "silhouetteBounds": [
+            85,
+            6,
+            270,
+            271
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            743,
+            1086,
+            1026
+          ],
+          "silhouetteBounds": [
+            55,
+            6,
+            240,
+            276
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1079,
+            362,
+            1359
+          ],
+          "silhouetteBounds": [
+            114,
+            6,
+            307,
+            273
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1079,
+            724,
+            1359
+          ],
+          "silhouetteBounds": [
+            84,
+            6,
+            276,
+            271
+          ],
+          "sampledSize": [
+            20,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1079,
+            1086,
+            1359
+          ],
+          "silhouetteBounds": [
+            54,
+            6,
+            245,
+            273
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        }
+      ],
+      "costumeAccent": "blue",
+      "maskedPixelsByCell": [
+        9,
+        6,
+        7,
+        7,
+        12,
+        6,
+        5,
+        5,
+        6,
+        8,
+        7,
+        6
+      ],
+      "outputs": {
+        "mint.png": "a2aeb6f02a7ca8395b150c9b5e19edc9dc2f79dbcd169f75a9bd2f9ff5ab5b78",
+        "mint-mask.png": "e69b1db120c82aa93479cd9a504049b94cf0bd41c1e8387e626839361bd83315"
+      }
+    },
+    "lunick": {
+      "source": "sources/lunick.png",
+      "sourceSha256": "9dcdf3ad85c75de58e193c9113102e4a7f110f591a2bdb9a4bfb3df322e02134",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/lunick.json",
+      "metadataSha256": "876661e37e95d1ccc404c1418d0e6d8bb2924075a029134c5c699deb1c04ade8",
+      "kind": "New AI-adapted pixel-art redraw based on existing Pokémon character references; not an official Black/White rip or original Nintendo asset.",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept.\nAsset type: production pixel-art overworld trainer sprite sheet for a Pokémon Black/White-inspired Nintendo DS 2.5D game.\nCreate a NEW redrawn sheet of the ONE specified character, preserving the identity in reference images 1 (legacy walking) and 2 (legacy back). Reference image 3 is the authentic Black/White visual style only; reference image 4 is the approved Leaf sheet and is the exact layout, pixel density and scale-consistency target. Do not turn the character into Leaf, Hilbert or Hilda.\nLayout: portrait 768×1024 transparent canvas, EXACTLY 3 columns ×4 equally spaced rows, 12 whole-body sprites, one per slot. Use transparent space between every slot. Row1 all facing DOWN/toward viewer; row2 all facing UP/away (only back of head visible); row3 all facing LEFT, row4 all facing RIGHT. Columns: left-leg walking step, neutral standing with both feet planted, right-leg walking step. Keep the same top-down 3/4 camera and same head/body scale in all frames. Distinct foot/arm positions so walk animation reads clearly.\nPixel style: genuine chunky low-resolution DS-era sprite construction, approximately 20–24 pixels wide ×28 pixels tall inside a logical32×32 cell then nearest-neighbor enlarged8× for delivery, dark1logical-pixel outlines, compact muted palettes, crisp square pixels, minimal2–3tone shading, large head and short body in the exact proportions of the Leaf sheet. No smooth gradients, antialiasing, tall doll anatomy, elaborate modern illustration or painted texture.\nActual transparent alpha background. No ground shadows, scene, text, labels, grid lines, borders, logos, props outside the costume, extra characters, duplicated frames or cropping. Every frame has clear transparent margin on all sides.\nSubject: Lunick, male Pokémon Ranger protagonist: young boy with spiky brown hair, a wide red visor/headband with its characteristic goggles, red ranger jacket with dark blue and pale accents, dark trousers, sturdy boots and a small ranger backpack. Preserve his distinctive brown hair and red visor, matching the original references.",
+      "references": [
+        {
+          "path": "build/trainer-references/lunick-walking.png",
+          "role": "original low-resolution character identity reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "build/trainer-references/lunick-back.png",
+          "role": "original character identity and costume reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "resources/visual/unova/sources/heroes.png",
+          "role": "authentic BW sprite style reference; extraction credited to Barubary"
+        },
+        {
+          "path": "C:/Users/Utente/.codex/generated_images/01a10397-8c14-78f1-b39f-0b0996682eb4/exec-f2a77e20-120d-49ac-8353-c385510c7ad7.png",
+          "role": "approved generated Leaf sheet; 3x4 layout and scale consistency reference"
+        }
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "row_directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "column_poses": [
+          "left_step",
+          "neutral",
+          "right_step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          78,
+          358
+        ],
+        [
+          405,
+          692
+        ],
+        [
+          733,
+          1024
+        ],
+        [
+          1069,
+          1354
+        ]
+      ],
+      "uniformScale": 0.09621993127147767,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            72,
+            362,
+            365
+          ],
+          "silhouetteBounds": [
+            114,
+            5,
+            309,
+            286
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            72,
+            724,
+            365
+          ],
+          "silhouetteBounds": [
+            84,
+            11,
+            275,
+            276
+          ],
+          "sampledSize": [
+            18,
+            25
+          ],
+          "outputOffset": [
+            7,
+            6
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            72,
+            1086,
+            365
+          ],
+          "silhouetteBounds": [
+            53,
+            5,
+            249,
+            286
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            399,
+            362,
+            699
+          ],
+          "silhouetteBounds": [
+            114,
+            6,
+            310,
+            293
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            399,
+            724,
+            699
+          ],
+          "silhouetteBounds": [
+            84,
+            15,
+            278,
+            281
+          ],
+          "sampledSize": [
+            19,
+            26
+          ],
+          "outputOffset": [
+            6,
+            5
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            399,
+            1086,
+            699
+          ],
+          "silhouetteBounds": [
+            53,
+            6,
+            249,
+            293
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            727,
+            362,
+            1031
+          ],
+          "silhouetteBounds": [
+            115,
+            6,
+            310,
+            297
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            727,
+            724,
+            1031
+          ],
+          "silhouetteBounds": [
+            83,
+            6,
+            279,
+            297
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            727,
+            1086,
+            1031
+          ],
+          "silhouetteBounds": [
+            53,
+            6,
+            252,
+            297
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1063,
+            362,
+            1361
+          ],
+          "silhouetteBounds": [
+            114,
+            6,
+            310,
+            290
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1063,
+            724,
+            1361
+          ],
+          "silhouetteBounds": [
+            84,
+            6,
+            279,
+            291
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1063,
+            1086,
+            1361
+          ],
+          "silhouetteBounds": [
+            53,
+            6,
+            249,
+            290
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        }
+      ],
+      "costumeAccent": "red",
+      "maskedPixelsByCell": [
+        9,
+        14,
+        12,
+        3,
+        9,
+        4,
+        12,
+        3,
+        9,
+        10,
+        6,
+        12
+      ],
+      "outputs": {
+        "lunick.png": "a9cb120789ed4a7693408e9826c594ccbb506bb43a51e1d9c647abbf27f4fb94",
+        "lunick-mask.png": "76bdd4e7da5b4ac472cecd1880aee2633583181fbca1f34d3df95b7af4c4ee19"
+      }
+    },
+    "summer": {
+      "source": "sources/summer.png",
+      "sourceSha256": "e2057a5a92c68dce62d7491632a83859069ac5d442f21056cd6fdf6a69b08c2f",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/summer.json",
+      "metadataSha256": "466496f9244553e1519669e7cac406b2ce4c77cf00c6f46317c636f371e73ac8",
+      "kind": "New AI-adapted pixel-art redraw based on existing Pokémon character references; not an official Black/White rip or original Nintendo asset.",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept.\nAsset type: production pixel-art overworld trainer sprite sheet for a Pokémon Black/White-inspired Nintendo DS 2.5D game.\nCreate a NEW redrawn sheet of the ONE specified character, preserving the identity in reference images 1 (legacy walking) and 2 (legacy back). Reference image 3 is the authentic Black/White visual style only; reference image 4 is the approved Leaf sheet and is the exact layout, pixel density and scale-consistency target. Do not turn the character into Leaf, Hilbert or Hilda.\nLayout: portrait 768×1024 transparent canvas, EXACTLY 3 columns ×4 equally spaced rows, 12 whole-body sprites, one per slot. Use transparent space between every slot. Row1 all facing DOWN/toward viewer; row2 all facing UP/away (only back of head visible); row3 all facing LEFT, row4 all facing RIGHT. Columns: left-leg walking step, neutral standing with both feet planted, right-leg walking step. Keep the same top-down 3/4 camera and same head/body scale in all frames. Distinct foot/arm positions so walk animation reads clearly.\nPixel style: genuine chunky low-resolution DS-era sprite construction, approximately 20–24 pixels wide ×28 pixels tall inside a logical32×32 cell then nearest-neighbor enlarged8× for delivery, dark1logical-pixel outlines, compact muted palettes, crisp square pixels, minimal2–3tone shading, large head and short body in the exact proportions of the Leaf sheet. No smooth gradients, antialiasing, tall doll anatomy, elaborate modern illustration or painted texture.\nActual transparent alpha background. No ground shadows, scene, text, labels, grid lines, borders, logos, props outside the costume, extra characters, duplicated frames or cropping. Every frame has clear transparent margin on all sides.\nSubject: Summer, female Pokémon Ranger Guardian Signs protagonist: young girl with long brown hair tied in a high ponytail, red cap/headgear with large pale ranger goggles, red ranger jacket with white trim, dark shorts, tall dark boots and compact ranger pack. Preserve her red headgear and high ponytail silhouette from the references.",
+      "references": [
+        {
+          "path": "build/trainer-references/summer-walking.png",
+          "role": "original low-resolution character identity reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "build/trainer-references/summer-back.png",
+          "role": "original character identity and costume reference, extracted byte-exact from lib/upstream-runtime.jar"
+        },
+        {
+          "path": "resources/visual/unova/sources/heroes.png",
+          "role": "authentic BW sprite style reference; extraction credited to Barubary"
+        },
+        {
+          "path": "C:/Users/Utente/.codex/generated_images/01a10397-8c14-78f1-b39f-0b0996682eb4/exec-f2a77e20-120d-49ac-8353-c385510c7ad7.png",
+          "role": "approved generated Leaf sheet; 3x4 layout and scale consistency reference"
+        }
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "row_directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "column_poses": [
+          "left_step",
+          "neutral",
+          "right_step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          91,
+          370
+        ],
+        [
+          431,
+          709
+        ],
+        [
+          750,
+          1031
+        ],
+        [
+          1082,
+          1366
+        ]
+      ],
+      "uniformScale": 0.09859154929577464,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            85,
+            362,
+            377
+          ],
+          "silhouetteBounds": [
+            102,
+            6,
+            306,
+            285
+          ],
+          "sampledSize": [
+            20,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            85,
+            724,
+            377
+          ],
+          "silhouetteBounds": [
+            66,
+            6,
+            262,
+            285
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            85,
+            1086,
+            377
+          ],
+          "silhouetteBounds": [
+            37,
+            6,
+            232,
+            285
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            425,
+            362,
+            716
+          ],
+          "silhouetteBounds": [
+            132,
+            6,
+            325,
+            283
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            425,
+            724,
+            716
+          ],
+          "silhouetteBounds": [
+            100,
+            6,
+            292,
+            284
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            425,
+            1086,
+            716
+          ],
+          "silhouetteBounds": [
+            65,
+            6,
+            257,
+            284
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            744,
+            362,
+            1038
+          ],
+          "silhouetteBounds": [
+            103,
+            6,
+            322,
+            286
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            744,
+            724,
+            1038
+          ],
+          "silhouetteBounds": [
+            71,
+            6,
+            290,
+            287
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            744,
+            1086,
+            1038
+          ],
+          "silhouetteBounds": [
+            41,
+            6,
+            260,
+            287
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1076,
+            362,
+            1373
+          ],
+          "silhouetteBounds": [
+            104,
+            6,
+            326,
+            290
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1076,
+            724,
+            1373
+          ],
+          "silhouetteBounds": [
+            70,
+            6,
+            291,
+            290
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1076,
+            1086,
+            1373
+          ],
+          "silhouetteBounds": [
+            25,
+            6,
+            248,
+            290
+          ],
+          "sampledSize": [
+            22,
+            28
+          ],
+          "outputOffset": [
+            5,
+            3
+          ]
+        }
+      ],
+      "costumeAccent": "red",
+      "maskedPixelsByCell": [
+        11,
+        10,
+        11,
+        11,
+        13,
+        10,
+        7,
+        6,
+        12,
+        6,
+        8,
+        8
+      ],
+      "outputs": {
+        "summer.png": "5b6afb20e95e4ab8456869835e1552a48d58e34b580adf358487d8d632cd8eb1",
+        "summer-mask.png": "3b01184173e95fcbb376204c5ce42887c7e6a424d0978807df658bc5764687ff"
+      }
+    },
+    "kellyn": {
+      "source": "sources/kellyn.png",
+      "sourceSha256": "c29538e6042783c5079328cca90ce41503ad8ed577e78504ea1d78e4cd4ef8c5",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/kellyn.json",
+      "metadataSha256": "572d5d0c1d3551d98d00d2893c179914bc9dbdd5799af51bc3ba022da72950a5",
+      "kind": "AI-assisted fan-art redraw",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset type: production pixel-art overworld sprite sheet for a 2.5D Pokemon fangame.\nCreate a NEW sprite sheet of KELLYN, the male Pokemon Ranger Shadows of Almia playable ranger, using the exact pixel density, overhead camera angle, chibi proportions, dark selective outlines and shading of Pokemon Black/White overworld characters in reference1. Preserve his spiky dark brown hair, bright red headband, red ranger jacket with dark navy trim, red fingerless wrist accents, dark trousers, sturdy boots and small ranger pack; no baseball cap. Reference2 is the original low-detail character identity, reference3 its back view. Redraw in detailed DS pixel-art style. One character only.\nReference1 is STYLE ONLY; references2/3 preserve identity. Do not copy the reference sheet layout.\nOUTPUT: transparent background, no ground, no shadows, no labels, no borders, no visible grid. Canvas portrait 768x1024. EXACTLY twelve sprites arranged in a perfectly even 3-column x 4-row grid, each invisible cell 256x256. Sprite is originally 32x32 logical pixel art enlarged exactly 8x with nearest-neighbor block pixels. Each sprite about 20 pixels wide and 28 pixels high, feet centered at local logical pixel (16,29), identical scale in all cells, with transparent margin.\nROW 1 faces DOWN toward viewer. ROW 2 faces UP away from viewer (back of hat/hair). ROW 3 faces LEFT. ROW 4 faces RIGHT.\nIn EVERY row, COLUMN 1 walking with left foot forward, COLUMN 2 neutral standing with feet together, COLUMN 3 walking with right foot forward. Alternate arms and feet for a real three-frame walk cycle, head/outfit identity stable. Side profiles actually face the required direction. Do not duplicate the standing pose in walking columns. Strictly no illustration rendering, no anti-aliased vector style, no high-resolution facial detail, no realistic proportions. Match the tiny Nintendo DS game sprites of the reference.",
+      "references": [
+        "visual/unova/sources/heroes.png",
+        "upstream-runtime.jar:player/kellyn-walking.png",
+        "upstream-runtime.jar:player/kellyn-back.png"
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "frames": [
+          "left-step",
+          "idle",
+          "right-step"
+        ]
+      },
+      "contentRowBands": [
+        [
+          112,
+          358
+        ],
+        [
+          445,
+          689
+        ],
+        [
+          777,
+          1017
+        ],
+        [
+          1102,
+          1339
+        ]
+      ],
+      "uniformScale": 0.11336032388663968,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            106,
+            362,
+            365
+          ],
+          "silhouetteBounds": [
+            130,
+            6,
+            288,
+            253
+          ],
+          "sampledSize": [
+            18,
+            28
+          ],
+          "outputOffset": [
+            7,
+            3
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            106,
+            724,
+            365
+          ],
+          "silhouetteBounds": [
+            102,
+            6,
+            259,
+            243
+          ],
+          "sampledSize": [
+            18,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            106,
+            1086,
+            365
+          ],
+          "silhouetteBounds": [
+            70,
+            6,
+            228,
+            253
+          ],
+          "sampledSize": [
+            18,
+            28
+          ],
+          "outputOffset": [
+            7,
+            3
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            439,
+            362,
+            696
+          ],
+          "silhouetteBounds": [
+            128,
+            6,
+            293,
+            251
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            439,
+            724,
+            696
+          ],
+          "silhouetteBounds": [
+            100,
+            6,
+            266,
+            242
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            439,
+            1086,
+            696
+          ],
+          "silhouetteBounds": [
+            69,
+            6,
+            235,
+            251
+          ],
+          "sampledSize": [
+            19,
+            28
+          ],
+          "outputOffset": [
+            6,
+            3
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            771,
+            362,
+            1024
+          ],
+          "silhouetteBounds": [
+            130,
+            8,
+            293,
+            247
+          ],
+          "sampledSize": [
+            18,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            771,
+            724,
+            1024
+          ],
+          "silhouetteBounds": [
+            102,
+            8,
+            263,
+            247
+          ],
+          "sampledSize": [
+            18,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            771,
+            1086,
+            1024
+          ],
+          "silhouetteBounds": [
+            72,
+            6,
+            234,
+            246
+          ],
+          "sampledSize": [
+            18,
+            27
+          ],
+          "outputOffset": [
+            7,
+            4
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1096,
+            362,
+            1346
+          ],
+          "silhouetteBounds": [
+            130,
+            5,
+            302,
+            245
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1096,
+            724,
+            1346
+          ],
+          "silhouetteBounds": [
+            106,
+            6,
+            270,
+            241
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1096,
+            1086,
+            1346
+          ],
+          "silhouetteBounds": [
+            70,
+            6,
+            238,
+            244
+          ],
+          "sampledSize": [
+            19,
+            27
+          ],
+          "outputOffset": [
+            6,
+            4
+          ]
+        }
+      ],
+      "costumeAccent": "red",
+      "maskedPixelsByCell": [
+        5,
+        19,
+        7,
+        1,
+        10,
+        1,
+        5,
+        4,
+        7,
+        6,
+        7,
+        4
+      ],
+      "outputs": {
+        "kellyn.png": "4282e7e3cf51a09cef5bead1405d2ac2f6d7f96037e33c84027353fc12188026",
+        "kellyn-mask.png": "0fa2a718d2f58aaceac45e04463b570ef086b38a49611da3732c4d4cac4fe0b9"
+      }
+    },
+    "lyra": {
+      "source": "sources/lyra.png",
+      "sourceSha256": "4cf9b164b58e8f8050433111f25446c02bf258b73ba9fcf3fb75f35df63cb94b",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "metadata": "sources/lyra.json",
+      "metadataSha256": "cf713c80a6fa0cf7665ad95c11f82e54df5d61b284e85e54203b3e7c6d8aa299",
+      "kind": "AI-assisted fan-art redraw",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset type: production pixel-art overworld sprite sheet for a 2.5D Pokemon fangame.\nCreate a NEW sprite sheet of LYRA, the female Pokemon HeartGold/SoulSilver playable trainer, using the exact pixel density, overhead camera angle, chibi proportions, dark selective outlines and shading of Pokemon Black/White overworld characters in reference1. Preserve her large rounded white cap with red bow accents, brown hair in short pigtails, red top under dark-blue overalls, white socks, red shoes and yellow shoulder bag. Reference2 is the original low-detail character identity, reference3 its back view. Redraw in detailed DS pixel-art style. One character only.\nReference1 is STYLE ONLY; references2/3 preserve identity. Do not copy the reference sheet layout.\nOUTPUT: transparent background, no ground, no shadows, no labels, no borders, no visible grid. Canvas portrait 768x1024. EXACTLY twelve sprites arranged in a perfectly even 3-column x 4-row grid, each invisible cell 256x256. Sprite is originally 32x32 logical pixel art enlarged exactly 8x with nearest-neighbor block pixels. Each sprite about 20 pixels wide and 28 pixels high, feet centered at local logical pixel (16,29), identical scale in all cells, with transparent margin.\nROW 1 faces DOWN toward viewer. ROW 2 faces UP away from viewer (back of hat/hair). ROW 3 faces LEFT. ROW 4 faces RIGHT.\nIn EVERY row, COLUMN 1 walking with left foot forward, COLUMN 2 neutral standing with feet together, COLUMN 3 walking with right foot forward. Alternate arms and feet for a real three-frame walk cycle, head/outfit identity stable. Side profiles actually face the required direction. Do not duplicate the standing pose in walking columns. Strictly no illustration rendering, no anti-aliased vector style, no high-resolution facial detail, no realistic proportions. Match the tiny Nintendo DS game sprites of the reference.",
+      "references": [
+        "visual/unova/sources/heroes.png",
+        "upstream-runtime.jar:player/lyra-walking.png",
+        "upstream-runtime.jar:player/lyra-back.png"
+      ],
+      "layout": {
+        "columns": 3,
+        "rows": 4,
+        "directions": [
+          "down",
+          "up",
+          "left",
+          "right"
+        ],
+        "frames": [
+          "left-step",
+          "idle",
+          "right-step"
+        ],
+        "cellMap": [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            3,
+            4,
+            5
+          ],
+          [
+            6,
+            7,
+            11
+          ],
+          [
+            9,
+            10,
+            8
+          ]
+        ],
+        "note": "Actual side profile directions: sourcecell11isleft-facingstep and sourcecell8isright-facingstep. Pack into matching directions; sourcePNGuntouched."
+      },
+      "contentRowBands": [
+        [
+          130,
+          356
+        ],
+        [
+          449,
+          679
+        ],
+        [
+          776,
+          1003
+        ],
+        [
+          1101,
+          1326
+        ]
+      ],
+      "uniformScale": 0.11607142857142858,
+      "cells": [
+        {
+          "sourceCell": 0,
+          "cellBounds": [
+            0,
+            124,
+            362,
+            363
+          ],
+          "silhouetteBounds": [
+            114,
+            6,
+            338,
+            233
+          ],
+          "sampledSize": [
+            26,
+            26
+          ],
+          "outputOffset": [
+            3,
+            5
+          ]
+        },
+        {
+          "sourceCell": 1,
+          "cellBounds": [
+            362,
+            124,
+            724,
+            363
+          ],
+          "silhouetteBounds": [
+            70,
+            6,
+            294,
+            229
+          ],
+          "sampledSize": [
+            26,
+            26
+          ],
+          "outputOffset": [
+            3,
+            5
+          ]
+        },
+        {
+          "sourceCell": 2,
+          "cellBounds": [
+            724,
+            124,
+            1086,
+            363
+          ],
+          "silhouetteBounds": [
+            24,
+            6,
+            248,
+            233
+          ],
+          "sampledSize": [
+            26,
+            26
+          ],
+          "outputOffset": [
+            3,
+            5
+          ]
+        },
+        {
+          "sourceCell": 3,
+          "cellBounds": [
+            0,
+            443,
+            362,
+            686
+          ],
+          "silhouetteBounds": [
+            114,
+            6,
+            338,
+            237
+          ],
+          "sampledSize": [
+            26,
+            27
+          ],
+          "outputOffset": [
+            3,
+            4
+          ]
+        },
+        {
+          "sourceCell": 4,
+          "cellBounds": [
+            362,
+            443,
+            724,
+            686
+          ],
+          "silhouetteBounds": [
+            71,
+            7,
+            293,
+            237
+          ],
+          "sampledSize": [
+            26,
+            27
+          ],
+          "outputOffset": [
+            3,
+            4
+          ]
+        },
+        {
+          "sourceCell": 5,
+          "cellBounds": [
+            724,
+            443,
+            1086,
+            686
+          ],
+          "silhouetteBounds": [
+            24,
+            6,
+            248,
+            237
+          ],
+          "sampledSize": [
+            26,
+            27
+          ],
+          "outputOffset": [
+            3,
+            4
+          ]
+        },
+        {
+          "sourceCell": 6,
+          "cellBounds": [
+            0,
+            770,
+            362,
+            1010
+          ],
+          "silhouetteBounds": [
+            135,
+            6,
+            338,
+            234
+          ],
+          "sampledSize": [
+            24,
+            26
+          ],
+          "outputOffset": [
+            4,
+            5
+          ]
+        },
+        {
+          "sourceCell": 7,
+          "cellBounds": [
+            362,
+            770,
+            724,
+            1010
+          ],
+          "silhouetteBounds": [
+            95,
+            6,
+            284,
+            234
+          ],
+          "sampledSize": [
+            22,
+            26
+          ],
+          "outputOffset": [
+            5,
+            5
+          ]
+        },
+        {
+          "sourceCell": 11,
+          "cellBounds": [
+            724,
+            1095,
+            1086,
+            1333
+          ],
+          "silhouetteBounds": [
+            46,
+            6,
+            248,
+            230
+          ],
+          "sampledSize": [
+            23,
+            26
+          ],
+          "outputOffset": [
+            4,
+            5
+          ]
+        },
+        {
+          "sourceCell": 9,
+          "cellBounds": [
+            0,
+            1095,
+            362,
+            1333
+          ],
+          "silhouetteBounds": [
+            114,
+            5,
+            318,
+            230
+          ],
+          "sampledSize": [
+            24,
+            26
+          ],
+          "outputOffset": [
+            4,
+            5
+          ]
+        },
+        {
+          "sourceCell": 10,
+          "cellBounds": [
+            362,
+            1095,
+            724,
+            1333
+          ],
+          "silhouetteBounds": [
+            75,
+            6,
+            268,
+            232
+          ],
+          "sampledSize": [
+            22,
+            26
+          ],
+          "outputOffset": [
+            5,
+            5
+          ]
+        },
+        {
+          "sourceCell": 8,
+          "cellBounds": [
+            724,
+            770,
+            1086,
+            1010
+          ],
+          "silhouetteBounds": [
+            24,
+            6,
+            228,
+            234
+          ],
+          "sampledSize": [
+            24,
+            26
+          ],
+          "outputOffset": [
+            4,
+            5
+          ]
+        }
+      ],
+      "costumeAccent": "red",
+      "maskedPixelsByCell": [
+        8,
+        11,
+        8,
+        4,
+        7,
+        4,
+        3,
+        2,
+        5,
+        4,
+        3,
+        4
+      ],
+      "outputs": {
+        "lyra.png": "ded4906a5a0aca4c4e1424cb99f459d6791833842980b1b5394af7bc40236ec7",
+        "lyra-mask.png": "e7645b0ed770ba948c1e9d9d00f4c23022f8feed96549639d65f346422289064"
+      }
+    }
+  },
+  "originalBWHeroes": {
+    "ids": [
+      "hilbert",
+      "hilda"
+    ],
+    "provenance": "../unova/PROVENANCE.json"
+  }
+}

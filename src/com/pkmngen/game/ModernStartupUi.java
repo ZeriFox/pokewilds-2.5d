@@ -96,27 +96,29 @@ final class ModernStartupUi {
          case NAME:return m.name.isEmpty()?"Your name   [confirm to edit]":letters(m.name);
          case ADDRESS:return m.serverIp.isEmpty()?"127.0.0.1   [confirm to edit]":letters(m.serverIp);
          case FILE:return m.fileNames.isEmpty()?"No saves available":"< "+m.fileNames.get(Math.floorMod(m.fileIndex,m.fileNames.size()))+" >";
-         case TRAINER:return Game.capitalize(game.player.character)+" / "+(c.preferences.classicCast?"Classic":"Detailed B/W")+"  [choose]";
+         case TRAINER:return Game.capitalize(game.player.character)+" / "+(TrainerCatalog.hasMod(game.player.character)?"Custom":"B/W style")+"  [choose]";
          default:return m.localHostJoinIndex==2?"Join adventure":m.newLoadIndex==1?"Continue adventure":"Begin adventure";
       }
    }
    private static String letters(List<Character> list){StringBuilder s=new StringBuilder();for(char c:list)s.append(c);return s.toString();}
    private void trainers(ModernUi ui,Game game,DesktopMenuController c) {
-      ui.fullScreen(game,"CHOOSE YOUR TRAINER","2 detailed B/W appearances + 19 complete classic trainer sets");
+      ui.fullScreen(game,"CHOOSE YOUR TRAINER","19 individual B/W-style trainers + your installed player mods");
       int total=c.trainerCount();
       for(int i=0;i<10&&c.trainerPage*10+i<total;i++) {
          int at=c.trainerPage*10+i;ModernUi.Box b=DesktopMenuController.trainerBox(i);
          ui.panel(game,b);if(at==c.trainerIndex)ui.rect(game,b.x,b.y,b.width,1.5f,ModernUi.ACCENT);
          String id=c.trainerId(at);
          boolean animate=at==c.trainerIndex&&!c.preferences.reducedMotion;
-         TextureRegion image=at<2?BwAssets.get().detailedTrainer(id,"down",c.clock,animate):BwAssets.get().classicTrainer(id,"down",c.clock,animate,c.setup.colors.get(c.trainerColor));
+         TextureRegion image=BwAssets.get().trainerPreview(id,"down",c.clock,animate,c.setup.colors.get(c.trainerColor));
          region(ui,game,image,b.x+5,b.y+6,17,19);
          ui.fitText(game,Game.capitalize(id),b.x+2,b.y+4.8f,4.5f,b.width-4,ModernUi.INK);
       }
       ui.fitText(game,"PAGE "+(c.trainerPage+1)+" / "+((total+9)/10)+"  -  Tab or mouse wheel",8,115,5.3f,144,ModernUi.MUTED);
-      ui.fitText(game,Game.capitalize(c.trainerId(c.trainerIndex))+"  /  "+(c.trainerIndex<2?"Detailed B/W":"Classic original artwork"),9,37,6,143,ModernUi.ACCENT);
-      ui.fitText(game,DesktopControls.label(InputProcessor.keyboardL)+" / "+DesktopControls.label(InputProcessor.keyboardR)+" Costume color (classic set)",9,26,4.8f,128,ModernUi.MUTED);
-      ui.rect(game,142,20,8,8,c.setup.colors.get(c.trainerColor));
+      boolean mod=TrainerCatalog.hasMod(c.trainerId(c.trainerIndex));
+      boolean costume=TrainerCatalog.costumeColors(c.trainerId(c.trainerIndex));
+      ui.fitText(game,Game.capitalize(c.trainerId(c.trainerIndex))+"  /  "+(mod?"Installed custom artwork":"B/W style"),9,37,6,143,ModernUi.ACCENT);
+      ui.fitText(game,costume?DesktopControls.label(InputProcessor.keyboardL)+" / "+DesktopControls.label(InputProcessor.keyboardR)+" Costume accents":"Original outfit colors  /  Four-direction animation",9,26,4.8f,128,ModernUi.MUTED);
+      if(costume)ui.rect(game,142,20,8,8,c.setup.colors.get(c.trainerColor));
       if(!c.message.isEmpty())ui.fitText(game,c.message,8,17,4.3f,145,ModernUi.RED);
       ui.footer(game,DesktopControls.movement()+" Choose   LMB / Enter Apply   Esc Back");
    }

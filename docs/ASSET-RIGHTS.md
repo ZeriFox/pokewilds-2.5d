@@ -9,3 +9,15 @@ The selected environment page is <https://www.spriters-resource.com/pc_computer/
 No general redistribution permission was verified for these new Stardew/FRLG derivatives. Do not label them MIT, CC0 or original artwork, and do not treat the repository's availability or a sheet credit as permission. The local playable package is an implementation/review build using the supplied assets; public release publication is not automated. Rights clearance remains an explicit limitation of R12/M9 before wider distribution. No access restriction was bypassed.
 
 The deterministic importer supports reproducing the atlas from the exact supplied source hashes. Raw sheets are outside `resources/` and are excluded from the playable package; this exclusion does not change the rights of the derived atlas. Existing landscape, Unova and PMD credits must accompany the package as well.
+
+## Trainer redraws, 2026-10-12
+
+The seventeen sheets in `resources/visual/trainers-bw` are AI-assisted fan-art
+redraws made with the built-in image_gen tool. They adapt the existing playable
+character identities to a B/W-inspired presentation; they are not official
+extracted B/W sheets. Hilbert and Hilda retain the genuine B/W art already
+credited in `visual/unova`. Generated source images, exact prompts and references
+are preserved in `visual/trainers-bw/sources`; its `PROVENANCE.json` records
+deterministic normalization and clothing masks. The character rights remain
+with their respective holders; this addition does not assert an open artwork
+licence or change the distribution status recorded above.

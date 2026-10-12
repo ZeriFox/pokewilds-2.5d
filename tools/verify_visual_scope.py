@@ -20,8 +20,13 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "835e48420251cbeb252e3ef0f716969f06c4e5509a8a0f8b3cf73432e0df4a66"
+FROZEN_MANIFEST_SHA256 = "f2c1f39f4c9abfd42bcb92d1c1580c10ce8fd2bb6c4665e5077b002f7081d574"
 PREFIX = "src/com/pkmngen/game/"
+TRAINER_REDRAW_ARCHIVE = {
+    "baseline/before-trainer-redraw/modernization-scope.json": "835e48420251cbeb252e3ef0f716969f06c4e5509a8a0f8b3cf73432e0df4a66",
+    "baseline/before-trainer-redraw/verify_visual_scope.py": "c2b822bf4e69d622c4ecbf70299925580fbd2675b4f4a162194197dcd2310f43",
+    "baseline/before-trainer-redraw/VERIFICA.txt": "f1a4395114625c89446bf77aec2571c1e907b939c7d8dc451185bd1cb296428f",
+}
 # Immutable local build accepted before stronger nature/battle presentation.
 CINEMATIC_NATURE_ARCHIVE = {
     "baseline/before-cinematic-nature/modernization-scope.json": "6a4d1767b748c53ae6e7ec1c10470f8cf09091af2cc356175fbbbe4fa5ff1a67",
@@ -113,17 +118,17 @@ ADDED_SCOPES = {
     "WorldNatureMotion.java": "Pure coordinate-derived bounded vegetation/crown wind and nearby shore/sand masks. Fixed trunk/root region, deterministic selected live trees, excludes rigid/dead objects and elevation discontinuities; no textures, gameplay clocks, RNG, map mutation or persisted state.",
     "AuthoredTerrain.java": "Generation-only reconstruction and deterministic 17/9/5-cell authored modules for ten natural biome families. Region-specific footprints, minimum useful pocket area, immutable water/tidal/maze boundaries, protected event and encounter access, biome/route preservation, dry connectivity and no save-load regeneration.",
     'DesktopInterfaceSettings.java': 'Explicit local UI/control preferences, draft validation, reserved menu keys and duplicate rejection, atomic save with backup; no game-save schema or legacy settings-file rewrite.',
-    'DesktopMenuController.java': 'Desktop title/home/setup state, explicit transactional text focus, input-context release barriers, complete trainer/mod selection and F1 options; native Go delegates untouched original setup operations once; pointer inventory selection uses existing action data without item creation or use/toss rule changes.',
+    "DesktopMenuController.java": "Existing desktop setup, controls and menu navigation retained. Trainer picker lists nineteen distinct identities plus complete installed mods, restores saved identity independent of obsolete global style, applies existing costume colors and original setup routines, with unchanged input-context and saved Player schema.",
     'MenuTextSession.java': 'Explicit reversible setup text draft with caret/deletion, length/character constraints and IPv4 validation; selection alone never consumes WASD as text.',
-    'ModernStartupUi.java': 'Skippable animated title scenery from bundled art, home/adventure setup, complete trainer selector and controls/display cards with shared hitboxes and reduced menu motion; no RNG, generated world or battle rules.',
-    'TrainerCatalog.java': 'Opt-in existing classic trainer/mod artwork with identity-preserving directional frames, costume color and owned bounded cache; detailed B/W remains available, no new source PNGs or saved Player schema.',
+    "ModernStartupUi.java": "Existing desktop title/setup/options presentation with a unified nineteen-character B/W-style selector. Preview shares actual world appearance and clothing accent selection; truthful native B/W/mod color affordances. No gameplay, RNG or save-format changes.",
+    "TrainerCatalog.java": "Identity-specific B/W-style sheets for seventeen redrawn built-ins, clothing-only masked palette variants, and original installed-mod artwork. Owned bounded cache with per-frame disposal guard, consistent directional frame selection and complete required-pose checks including back art. No saved Player schema, original sprite mutation or game rules.",
 
     "WorldMaterials.java": "Presentation-only semantic terrain/prop resolver, natural dry transitions, regional tree selection and cave floor caps. Upper objects override floor-name heuristics; whole rocks remain props and volcanic cracks remain flat. No asset ownership, Tile mutations or saved-data changes.",
     "WorldAmbientOverlay.java": "Sparse deterministic world-space mist, embers, fireflies, dust, snow and water glints with count/opacity budgets, protected actor focus, depth testing and separate shader ownership. Respects ambient toggle and freezes environmental motion with reduced motion; no gameplay RNG, indoor/UI overlays or saved-state writes.",
     "WorldMeshBatch.java": "CPU vertex storage, identity-based texture grouping, triangle-aligned mesh upload/reuse and GPU ownership extracted from JohtoRenderer; no camera, scene state, shader uniforms, texture ownership, gameplay or saved data.",
     "ActorModelRenderer.java": "Existing optional 3D helper, disabled by the modern sprite launcher.",
     "BiomeProfiles.java": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state.",
-    "BwAssets.java": "Lazy, disposable local landscape atlas access, biome-specific semantic materials, validated optional texture overrides and sampling independent of the simulation grid, contextual missing-asset diagnostics and separate Black/White trainer assets. Step 3 delegates opt-in classic trainer presentation to a separate owned catalog with explicit color-aware Player overloads; detailed B/W defaults and existing texture override contracts retained.",
+    "BwAssets.java": "Shared landscape atlas and custom sampling contracts preserved; unified identity-specific trainer presentation across menus, world and battles. Explicit generic/per-character atlas overrides retain priority; installed mods preserved; genuine B/W idle and running frames corrected. Ignores obsolete global classic-cast selection for bundled characters, preserves owned texture lifecycle and layout metadata; no gameplay or save writes.",
     "DesktopControls.java": "Authorized desktop binding parser, exact legacy-preset migration, text-entry detection and truthful dynamic hints. Step 3 treats only an explicitly active setup edit as text focus; highlighting a row is navigation.",
     "StartupVerification.java": "Opt-in packaged-launch probe inside the delivered Game: observe 120 original menu frames, verify nonempty framebuffer, save capture and exit normally; disabled in ordinary play.",
     "ExpansionDex.java": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration.",
@@ -155,6 +160,9 @@ def sha256(path: Path) -> str:
 
 
 def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
+    for archived, expected in TRAINER_REDRAW_ARCHIVE.items():
+        if sha256(root / archived) != expected:
+            raise RuntimeError("Pre-trainer redraw archive changed: " + archived)
     for archived, expected in CINEMATIC_NATURE_ARCHIVE.items():
         if sha256(root / archived) != expected:
             raise RuntimeError("Pre-cinematic nature archive changed: " + archived)
