@@ -20,7 +20,7 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "9c461c966bc7f303fc71ce4d7020a1b519e97541e100432c0ae882a9314434f0"
+FROZEN_MANIFEST_SHA256 = "bacee0c943378321ad78d68a32f872047a68780d9772fa156c2c6607220aa41d"
 PREFIX = "src/com/pkmngen/game/"
 NATURAL_WORLD_ARCHIVE = {'baseline/before-natural-world-2026-10-14/modernization-scope.json': 'de53c924dc3dcfa4e27c6ae0f7a7999fec7906df1826cfc24e2c497c5063431d', 'baseline/before-natural-world-2026-10-14/VERIFICA.txt': '1a89c2a2a5ca1e1b2ce9b0b3aaa719056cb7dbc9c911838c83596ee250d20a89', 'baseline/before-natural-world-2026-10-14/verify_scope_test.py': 'd84e08cb77da5e6228df62a29d2241137d1f96245a5ae9133edf63d6c8e2a63d', 'baseline/before-natural-world-2026-10-14/verify_visual_scope.py': '69a4ff13404fa237771ba8f4942e5663b2a51ee4fadd41d630216d4d4a631e7c'}
 

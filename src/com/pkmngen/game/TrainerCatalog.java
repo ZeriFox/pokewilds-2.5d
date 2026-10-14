@@ -19,7 +19,10 @@ final class TrainerCatalog {
       final Texture texture;final Pixmap pixels;final TextureRegion[][] frames=new TextureRegion[4][3];long used;
       Sheet(Pixmap source){pixels=new Pixmap(source.getWidth(),source.getHeight(),Pixmap.Format.RGBA8888);
          pixels.setBlending(Pixmap.Blending.None);pixels.drawPixmap(source,0,0);
-         texture=new Texture(pixels);texture.setFilter(Texture.TextureFilter.Nearest,Texture.TextureFilter.Nearest);
+         // Keep the upload source separate from our retained readable copy.
+         // Existing normalized battle frames preserve their complete UV bounds
+         // after the caller releases source; mounted composition reads pixels.
+         texture=new Texture(source);texture.setFilter(Texture.TextureFilter.Nearest,Texture.TextureFilter.Nearest);
          for(int d=0;d<4;d++)for(int f=0;f<3;f++)frames[d][f]=new TextureRegion(texture,f*32,d*32,32,32);}
       void dispose(){texture.dispose();pixels.dispose();}
    }

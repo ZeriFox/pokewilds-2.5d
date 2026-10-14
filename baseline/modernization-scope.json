@@ -5,7 +5,7 @@
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "2becb783d6346c04ed15f7159c3312d4f43c93ff25c1c3e8035841a006dcfcb5",
+  "reviewed_patch_sha256": "a707fadb0e25dd4341756a2730be8354c7ae43f4d1ec09892641e824475dc58e",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/CheckEndOfBattle.java",
@@ -411,7 +411,7 @@
       "reviewed_sha256": "99bf81af552aa08f254cbfa9886b8859e4f6669beb3c83ad274e3883bea6d6dc"
     },
     "src/com/pkmngen/game/TrainerCatalog.java": {
-      "reviewed_sha256": "2e64c0092e2652f4b2c431664287945a66dbacd76752ec0da0028d264c40d302",
+      "reviewed_sha256": "d57a313958fbf552fc61d2a991f2d958e8bcefeb96e49fa8e953e783cf9cc59f",
       "scope": "Nineteen-trainer appearance resolution, custom-sheet priority and bounded frame cache; retains owned CPU copies for deterministic mounted composition and disposes them with textures. Existing style/wardrobe/head identity unchanged."
     },
     "src/com/pkmngen/game/TrainerModel3D.java": {
@@ -514,6 +514,8 @@
     "2026-10-14 native follow-up: restored the existing 0.12 foreground-wall occlusion alpha after the original vertical regression found an obstruction at 0.42. Interior texture fixes remain. Independent active-resize oracle now projects actual PNG texels into the full-orbit camera, checks strict alpha coverage, exact opaque pixels and fixed HUD; no move production logic changed. Only JohtoRenderer source hash changed after the coordinated freeze; pre-playtest archive remains immutable.",
     "Relief refinement preserves WorldElevation, procedural tile state, collision, normal saves and combat rules; rendered contour and material changes are tested on isolated native scenes.",
     "2026-10-14 natural world, explicit user scope after published johto.5: reviewed complete coordinated diff for natural relief/fluid shader and materials, full seated trainer bodies and mount envelopes, local creation-mode draft hook, sourced habitat route overrides, rigid cylindrical panorama and actor-only metadata plus move particles. Pre-change schema 8 manifest/verifier/negative tests/VERIFICA archived unchanged. Independent terrain review fixed missing-fluid fallback to fail clearly. Classic combat/save sources and exact nonpresentation boundaries remain protected. Native acceptance is separate.",
+    "2026-10-14 natural world, explicit user scope after published johto.5: reviewed complete coordinated diff for natural relief/fluid shader and materials, full seated trainer bodies and mount envelopes, local creation-mode draft hook, sourced habitat route overrides, rigid cylindrical panorama and actor-only metadata plus move particles. Pre-change schema 8 manifest/verifier/negative tests/VERIFICA archived unchanged. Independent terrain review fixed missing-fluid fallback to fail clearly. Classic combat/save sources and exact nonpresentation boundaries remain protected. Native acceptance is separate.",
+    "Final native regression at 7e49a8ac caught TrainerCatalog uploading from retained CPU pixels, unintentionally enabling alpha trimming of normalized battle-entry wardrobe frames. Reviewed minimal ownership fix uploads from the caller source as before, retains only a separate CPU copy for mounted composition, and preserves the existing full-frame PMD oracle. No oracle weakened or other production helper changed; all 41 final suites must be rerun on the rebuilt JAR.",
     "2026-10-14 natural world, explicit user scope after published johto.5: reviewed complete coordinated diff for natural relief/fluid shader and materials, full seated trainer bodies and mount envelopes, local creation-mode draft hook, sourced habitat route overrides, rigid cylindrical panorama and actor-only metadata plus move particles. Pre-change schema 8 manifest/verifier/negative tests/VERIFICA archived unchanged. Independent terrain review fixed missing-fluid fallback to fail clearly. Classic combat/save sources and exact nonpresentation boundaries remain protected. Native acceptance is separate."
   ],
   "historical_v2": "baseline/modernization-v2/archive.json",
