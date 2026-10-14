@@ -1,0 +1,56 @@
+VERIFICA - rilievi, roccia e scale - 14 ottobre 2026
+
+BUILD JOHTO.5
+Base pubblicata: 037f8c09b24d4bfa8bb601aac23679259466aa3f (johto.4).
+Avvio: run-johto.cmd. Destinazione: release v0.8.11-johto.5, con pacchetto Windows x64.
+I salvataggi personali non sono usati dalle prove automatiche.
+La precedente prova locale (26ffcf6f) e archiviata in baseline/before-relief-refinement/.
+
+ARTEFATTO COMPILATO
+dist/pokewilds-rebuilt.jar
+SHA-256: 714adf0b7cebefab8093f2bd5d23076cc30efed38dd79575286a58083867b2fd
+Dimensione: 333650578 byte; 109084 voci ZIP.
+Java 17; 242 sorgenti; 508 classi compilate.
+Modelli GLB esclusi; zero classi di gioco recuperate dal runtime upstream.
+Digest sorgenti: 65ab1cf4f7111ba8af69a2152a75547ca526b252e71eaf8f95283a034de9bbbb
+Build report: build/build-report.json (hash di ogni sorgente e risorsa).
+
+CONTROLLI
+Build e controlli statici/deterministici completati: build/rework-verification/build.json.
+Scope: 143 sorgenti originali invariati, 55 modificati con ambito esplicito, 44 aggiunte.
+73 mutazioni non autorizzate respinte, comprese regole/tempi di cattura e
+serializzazione dell'inventario reale in modalita Creativa.
+Le 40 suite native obbligatorie sono elencate in tools/verify_rework.py.
+Esito, commit, hash del JAR e log per ciascuna suite:
+  build/rework-verification/native.json
+La ricevuta nativa identifica questa build solo se status=passed e jar_sha256
+corrisponde all'hash sopra. I singoli runner non caricano classi di produzione
+sovrapposte al JAR; --sources identifica invece le diagnostiche di sviluppo.
+
+MODIFICHE
+- Angoli convessi curvi con contorno superiore/parete/fondale condiviso; cunei
+  chiusi alla quota inferiore. Roccia geologica dedicata, strati continui,
+  ombre e luce leggibili nei biomi. Sei fasce di gradini e scale larghe unite
+  tra le celle, con nasi consumati e raccordi laterali.
+- Rotazione continua dell'intera arena a 360 gradi in 48 secondi, anche durante
+  mosse e catture. Panorama, pavimento, attori ed effetti condividono la camera;
+  comandi e schede HP restano fermi per essere leggibili.
+- Rialzi saltabili con quota, bordo terroso e ombra; pavimenti interni e strutture
+  visibili. Radici e basamenti rendono riconoscibili gli ingombri solidi.
+- Sagome diverse per gli alberi secondo i requisiti reali di Taglio; compagno
+  indipendente nella presentazione, con pose attive durante le abilita.
+- Nessuna anticipazione della specie prima dell'ingresso nell'arena.
+- 470 associazioni di strumenti, piante di bacche con fasi/animazioni e Pokeball
+  dai fogli forniti; catture con identita corretta e tempi/esiti originali.
+- Bagliori Shiny nel mondo, in lotta e nel riepilogo. Fantasmi e uova esclusi.
+- Creative sandbox: menu partita > F1 > Creative sandbox. Catalogo Pokemon,
+  livello 1-100, scelta Shiny e materiali illimitati. Inventario reale conservato;
+  preferenza persistente con il salvataggio normale, solo nelle partite locali.
+
+ISTRUZIONI E LIMITI
+Dettagli: docs/RELIEF-REFINEMENT.md, docs/PLAYTEST-2026-10-14.md
+e docs/CREATIVE-MODE.md.
+Panorama illustrato ciclico e sprite in prospettiva: presentazione 2.5D.
+Non e una certificazione di ogni mappa, partita completa o sessione multiplayer.
+Gli originali dei fogli e i loro crediti sono conservati in visual/supplied.
+Texture nuove e prompt: resources/visual/terrain-relief/.

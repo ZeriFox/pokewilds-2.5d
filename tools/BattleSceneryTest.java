@@ -68,7 +68,7 @@ public final class BattleSceneryTest {
          if(failure!=null)return;
          try {
             if(!ready){super.render();if(++boot<15)return;initialize();}
-            if(sizeIndex==sizes.length){lifecycle();complete=true;Gdx.app.exit();return;}
+            if(sizeIndex==sizes.length){rigidCylinder();lifecycle();complete=true;Gdx.app.exit();return;}
             int[] size=sizes[sizeIndex];
             if(!requested){Gdx.graphics.setWindowedMode(size[0],size[1]);requested=true;settle=2;return;}
             if(settle-->0)return;
@@ -196,6 +196,40 @@ public final class BattleSceneryTest {
       }
       int changed(byte[] a,byte[] b,int x,int y,int w,int h){
          int count=0;for(int row=y;row<y+h;row++)for(int col=x;col<x+w;col++){int i=(row*width()+col)*4;if(a[i]!=b[i]||a[i+1]!=b[i+1]||a[i+2]!=b[i+2])count++;}return count;
+      }
+      void rigidCylinder()throws Exception {
+         // Calibration art with high-contrast rigid columns/rows. Color-only
+         // lighting may animate; every geometric feature must keep its texel.
+         Pixmap grid=new Pixmap(192,108,Pixmap.Format.RGBA8888);
+         for(int y=0;y<108;y++)for(int x=0;x<192;x++){
+            grid.setColor((x/12+y/12)%2==0?new Color(.8f,.15f,.15f,1):new Color(.15f,.8f,.15f,1));grid.drawPixel(x,y);
+         }
+         Texture texture=new Texture(grid);grid.dispose();texture.setFilter(Texture.TextureFilter.Nearest,Texture.TextureFilter.Nearest);
+         BattleScenery scenery=(BattleScenery)field(JohtoBattleRenderer.class,"scenery").get(johtoBattleRenderer);
+         byte[][] images=new byte[4][];
+         try{
+            for(int frame=0;frame<4;frame++){
+               johtoBattleRenderer.prepareFrame(this,false);uiBatch.begin();uiBatch.setColor(Color.WHITE);
+               float aspect=width()/(float)height(),w=Math.max(160,144*aspect),h=Math.max(144,160/aspect);
+               scenery.draw(uiBatch,texture,"forest",frame==1?27f:1f,.37f+(frame==2?MathUtils.PI2:frame==3?.08f:0),(160-w)*.5f,(144-h)*.5f,w,h);
+               uiBatch.end();johtoBattleRenderer.finishFrame(this);
+               images[frame]=ScreenUtils.getFrameBufferPixels(0,0,width(),height(),false);
+            }
+            int drift=0,seam=0,samples=0,negative=0;
+            for(int y=height()/2;y<height()-1;y++)for(int x=1;x<width()-1;x++){
+               int i=(y*width()+x)*4;
+               if(Math.abs((images[0][i]&255)-(images[0][i+1]&255))<40)continue;
+               boolean a=(images[0][i]&255)>(images[0][i+1]&255),b=(images[1][i]&255)>(images[1][i+1]&255),c=(images[2][i]&255)>(images[2][i+1]&255);
+               if(a!=b)drift++;if(a!=c)seam++;
+               if(a!=((images[3][i]&255)>(images[3][i+1]&255)))negative++;samples++;
+            }
+            require(samples>width()*height()/3,"Insufficient unambiguous rigid-cylinder samples");
+            require(negative>samples/100,"Geometry comparator accepted a real camera shift");
+            require(drift==0,"Time bent rigid cylindrical scenery texels: "+drift);
+            require(seam<samples/1000,"Full cylinder turn changed geometry: "+seam);
+            require(Gdx.gl.glGetError()==GL20.GL_NO_ERROR,"Cylinder calibration leaked GL error");
+            System.out.println("RIGID CYLINDER fixed-yaw texture classification unchanged="+samples+" seamDifferences="+seam+" rejectedCameraShift="+negative);
+         }finally{texture.dispose();}
       }
       void lifecycle()throws Exception {
          byte[] previousFrame=draw(24f,false,true,null);

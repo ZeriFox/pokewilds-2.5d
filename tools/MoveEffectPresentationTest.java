@@ -27,12 +27,12 @@ public final class MoveEffectPresentationTest {
       config.setWindowedMode(W,H);config.setInitialVisible(false);config.setDecorated(false);
       config.setForegroundFPS(0);config.useVsync(false);
       try {new Lwjgl3Application(game,config);require(game.complete,"Incomplete real move animation test");
-         System.out.println("MOVE EFFECT PRESENTATION PASS: real Surf/Tackle/Rain Dance/Thunder; full viewport rows; local bounds; HUD; GL restoration; original frame progression; real Dig PMD shrink; local Water Gun/Teleport/Double Team row operations");System.exit(0);
+         System.out.println("MOVE EFFECT PRESENTATION PASS: real Surf/Tackle/Rain Dance/Thunder; actor-only metadata; stable panorama; modern particles; local bounds; HUD; GL restoration; original frame progression; real Dig PMD shrink");System.exit(0);
       }catch(Throwable failure){failure.printStackTrace();System.exit(1);}
    }
    static int[] gl(int name,int count){IntBuffer b=BufferUtils.newIntBuffer(count);Gdx.gl.glGetIntegerv(name,b);int[] a=new int[count];for(int i=0;i<count;i++)a[i]=b.get(i);return a;}
    static final class Sample extends Game {
-      final String[] moves={"surf","tackle","rain dance","thunder","dig","water gun","teleport","double team"};
+      final String[] moves={"surf","tackle","rain dance","thunder","dig","water gun","teleport","double team","flamethrower","razor leaf","ice beam","shadow ball","rock throw","sludge"};
       final Matrix4 projection=new Matrix4().setToOrtho2D(0,0,160,144);
       int index,frames,wideChanges,localChanges,snapshotWidth,snapshotHeight;
       boolean complete,saved,hadInverse,identityChecked,quittingFixture;
@@ -49,6 +49,7 @@ public final class MoveEffectPresentationTest {
          player.position.set(0,0);player.spawnLoc.set(0,0);player.name="MoveEffectsTest";start();player.setCurrPokemon();actionStack.clear();
          own=new Pokemon("machop",10);enemy=new Pokemon("pikachu",10);player.currPokemon=own;battle.oppPokemon=enemy;
          own.backSprite.setPosition(16,48);enemy.sprite.setPosition(96,88);
+         DrawBattle.shouldDrawOwnPokemon=DrawBattle.shouldDrawOppPokemon=true;DrawBattle.hideOwnPokemon=DrawBattle.hideOppPokemon=false;
          battle.drawAction=new DrawBattle(this);battle.drawAction.drawEnemyHealthAction=new DrawEnemyHealthGen2(this);
          battle.drawAction.drawFriendlyHealthAction=new DrawFriendlyHealthGen2(this);
          battle.drawAction.drawFriendlyHealthAction.currHealth=48;
@@ -126,7 +127,7 @@ public final class MoveEffectPresentationTest {
          if(view!=null){snapshotWidth=Math.max(snapshotWidth,view.getSnapshotWidth());snapshotHeight=Math.max(snapshotHeight,view.getSnapshotHeight());}
          String properties=animation.metadata.getOrDefault(frame,"");
          if(properties.contains("inverse_colors"))hadInverse=true;
-         boolean useful=index==0&&properties.contains("row_copy:")&&outside>0||index==1&&inside>0||index==2&&outside>0||index==3&&properties.contains("inverse_colors")&&outside>0||index==4&&properties.contains("shrink:")||index>=5&&(properties.contains("row_copy:")||properties.contains("row_displace:")||properties.contains("row_split:"));
+         boolean useful=index==0&&properties.contains("row_copy:")&&outside>0||index==1&&inside>0||index==2&&outside>0||index==3&&properties.contains("inverse_colors")&&inside>0||index==4&&properties.contains("shrink:")||index>=5&&index<8&&(properties.contains("row_copy:")||properties.contains("row_displace:")||properties.contains("row_split:"))||index>=8&&inside>0&&frame>ModernMoveEffects.duration(animation.name)*.38f;
          if(!saved&&useful){save(after,moves[index].replace(' ','-')+"-real-frame-"+frame+".png");saved=true;}
          before.dispose();after.dispose();uiBatch.end();johtoBattleRenderer.finishFrame(this);
          require(Arrays.equals(projection.val,uiBatch.getProjectionMatrix().val),"Battle projection not restored");
@@ -136,9 +137,10 @@ public final class MoveEffectPresentationTest {
          if(index==0){require(wideChanges>0&&view.getRowFrames()>0,"Surf row copies did not reach expanded field");require(snapshotWidth==W&&snapshotHeight==H,"Surf snapshot cropped to legacy canvas");}
          if(index==1){require(wideChanges==0&&localChanges>0,"Tackle changed pixels outside local canvas");require(view.getLocalFrames()==frames&&view.getScreenFrames()==0,"Tackle scope changed");}
          if(index==2)require(wideChanges>0&&view.getScreenFrames()==frames,"Weather did not reach expanded field");
-         if(index==3)require(hadInverse&&view.getColorFrames()>0&&wideChanges>0,"Real Thunder global flash metadata not applied");
+         if(index==3)require(hadInverse&&view.getColorFrames()>0&&wideChanges==0&&view.getModernFrames()==frames,"Thunder must pulse actors without inverting the panorama");
          if(index==4)require(view.getShrinkFrames()>0,"Dig never rendered PMD shrink metadata");
-         if(index>=5)require(view.getRowFrames()>0&&wideChanges==0,"Target-only row effect leaked into expanded margins: "+moves[index]);
+         if(index>=5&&index<8)require(view.getRowFrames()>0&&wideChanges==0&&view.getModernFrames()==frames,"Target-only modern effect leaked into expanded margins: "+moves[index]);
+         if(index>=8)require(localChanges>0&&wideChanges==0&&view.getModernFrames()==frames,"Missing modern particle family or local effect escaped: "+moves[index]);
          require(view.getSnapshotWidth()==0,"Completed move leaked FBO");
          System.out.println("MOVE "+moves[index]+" frames="+frames+" expandedPixelChanges="+wideChanges+" rows="+view.getRowFrames()+" colors="+view.getColorFrames()+" snapshot="+snapshotWidth+"x"+snapshotHeight);
          index++;next();
@@ -150,8 +152,7 @@ public final class MoveEffectPresentationTest {
       }
       void verifyOrientation(Pixmap baseline) {
          MoveEffectPresentation identity=new MoveEffectPresentation("surf_player_gsc");
-         identity.drawMetadata(this,animation,"screenshot:0,0,160,144 row_copy:60,60");
-         // Read the actual FBO independently: final compositing remains bit-exact.
+         identity.drawMetadata(this,animation,"screenshot:0,0,160,144 row_copy:60,60 inverse_colors");
          uiBatch.flush();Pixmap capturedShot;
          int previousFramebuffer=gl(GL20.GL_FRAMEBUFFER_BINDING,1)[0];
          try {
@@ -161,84 +162,51 @@ public final class MoveEffectPresentationTest {
             capturedShot=ScreenUtils.getFrameBufferPixmap(0,0,W,H);
          } catch(ReflectiveOperationException failure) {throw new RuntimeException(failure);}
          finally {Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER,previousFramebuffer);}
-         com.badlogic.gdx.graphics.g2d.Sprite empty=new com.badlogic.gdx.graphics.g2d.Sprite(
-            com.pkmngen.game.util.TextureCache.get(Gdx.files.internal("attacks/surf_player_gsc/output/frame-001.png")));
-         Pixmap transparent=new Pixmap(Gdx.files.internal("attacks/surf_player_gsc/output/frame-001.png"));
-         for(int y=0;y<transparent.getHeight();y++)for(int x=0;x<transparent.getWidth();x++)
-            require((transparent.getPixel(x,y)&255)==0,"Identity test needs the actual transparent intro frame");
-         transparent.dispose();identity.drawFrame(this,empty,"");uiBatch.flush();
-         Pixmap identityShot=ScreenUtils.getFrameBufferPixmap(0,0,W,H);
-         int copiedPixels=0;
-         float centralScale=Math.min(W/160f,H/144f);
-         int marginLeft=(int)Math.floor((W-160*centralScale)*.5f),marginRight=(int)Math.ceil((W+160*centralScale)*.5f);
-         float canvasHeight=Math.max(144f,160f*H/W),canvasBottom=(144-canvasHeight)*.5f;
-         int firstArenaRow=(int)Math.ceil((48-canvasBottom)*H/canvasHeight);
-         for(int y=firstArenaRow;y<H;y++)for(int x=0;x<W;x++)if(x<marginLeft||x>=marginRight) {
-            boolean exact=capturedShot.getPixel(x,y)==identityShot.getPixel(x,y);
-            if(!exact){save(capturedShot,"identity-captured-fbo.png");save(identityShot,"identity-actual.png");}
-            require(exact,"Snapshot composite changed captured FBO pixel "+x+","+y);
-            copiedPixels++;
+         Pixmap after=ScreenUtils.getFrameBufferPixmap(0,0,W,H);
+         int actorPixels=0,stableBackground=0,transparent=0;
+         float scale=Math.min(W/160f,H/144f),left=(W-160*scale)*.5f,bottom=(H-144*scale)*.5f;
+         for(int y=0;y<H;y++)for(int x=0;x<W;x++){
+            int alpha=capturedShot.getPixel(x,y)&255;
+            if(alpha>0){
+               actorPixels++;
+               require(x>left+80*scale,"Actor snapshot captured friendly Pokemon or panorama");
+               require(y>bottom+75*scale&&y<bottom+130*scale,"Actor snapshot inverted or captured non-actor pixels");
+            }else transparent++;
+            // This independent mask allows only the documented <=1.2 logical
+            // pixel horizontal afterimage, plus rasterization border texels.
+            boolean masked=false;
+            for(int dx=-(int)Math.ceil(2*scale);dx<=(int)Math.ceil(2*scale);dx++){
+               int sx=x+dx;if(sx>=0&&sx<W&&(capturedShot.getPixel(sx,y)&255)>0){masked=true;break;}
+            }
+            if(!masked){require(baseline.getPixel(x,y)==after.getPixel(x,y),"Legacy metadata changed scenery/HUD at "+x+","+y);stableBackground++;}
          }
-         capturedShot.dispose();require(copiedPixels>0,"Snapshot FBO comparison has no margin pixels");
-         System.out.println("Snapshot FBO-to-composite strict identity PASS ("+copiedPixels+" pixels)");
-         int arenaHeight;
-         try {
-            java.lang.reflect.Field arenaField=JohtoBattleRenderer.class.getDeclaredField("arena");arenaField.setAccessible(true);
-            arenaHeight=((com.badlogic.gdx.graphics.Texture)arenaField.get(johtoBattleRenderer)).getHeight();
-         } catch(ReflectiveOperationException failure) {throw new RuntimeException(failure);}
-         int comparisons=0,strictComparisons=0,nearestBoundaryMatches=0,invertedRejected=0,shiftedRejected=0;
-         // Exact color/position everywhere except a mathematically exact NEAREST tie.
-         // Mesa rerasterizes those ties onto either adjoining source texel in the FBO;
-         // the copy itself was verified pixel-identical to the captured FBO.
-         for(int y=H/2;y<H-2;y+=11)for(int x:new int[]{3,21,W-22,W-4}) {
-            int actual=identityShot.getPixel(x,y);
-            boolean exact=baseline.getPixel(x,y)==actual;
-            boolean matches=snapshotPixelMatches(baseline,x,y,actual,arenaHeight);
-            if(!matches){save(baseline,"identity-expected.png");save(identityShot,"identity-actual.png");}
-            require(matches,"Snapshot orientation/identity changed arena pixel "+x+","+y);
-            if(!nearestTieRow(y,arenaHeight))strictComparisons++;
-            if(!exact)nearestBoundaryMatches++;
-            // Negative controls use the identical comparator: a vertical inversion or
-            // a general one-pixel translation must not be accepted as a tie-break.
-            if(!snapshotPixelMatches(baseline,x,y,identityShot.getPixel(x,H-1-y),arenaHeight))invertedRejected++;
-            if(!snapshotPixelMatches(baseline,x,y,identityShot.getPixel(x,y+1),arenaHeight))shiftedRejected++;
-            comparisons++;
+         require(actorPixels>50&&transparent>W*H*.9,"Target buffer is missing actor or contains environment: actor="+actorPixels+" transparent="+transparent);
+         require(stableBackground>W*H*.9,"Insufficient unaffected scenery coverage");
+         capturedShot.dispose();after.dispose();identity.dispose();
+         MoveEffectPresentation explicit=new MoveEffectPresentation("water_gun_player_gsc");
+         require(Gdx.gl.glGetError()==GL20.GL_NO_ERROR,"Before explicit target test GL error");
+         explicit.drawMetadata(this,animation,"row_displace:1 displace_target:player");uiBatch.flush();
+         require(Gdx.gl.glGetError()==GL20.GL_NO_ERROR,"Explicit target capture GL error");
+         int binding=gl(GL20.GL_FRAMEBUFFER_BINDING,1)[0];Pixmap playerOnly;
+         try{
+            java.lang.reflect.Field f=MoveEffectPresentation.class.getDeclaredField("snapshot");f.setAccessible(true);
+            com.badlogic.gdx.graphics.glutils.FrameBuffer fb=(com.badlogic.gdx.graphics.glutils.FrameBuffer)f.get(explicit);
+            Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER,fb.getFramebufferHandle());playerOnly=ScreenUtils.getFrameBufferPixmap(0,0,W,H);
+         }catch(ReflectiveOperationException failure){throw new RuntimeException(failure);}
+         finally{Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER,binding);}
+         int friendlyPixels=0;
+         for(int y=0;y<H;y++)for(int x=0;x<W;x++)if((playerOnly.getPixel(x,y)&255)>0){
+            require(x<left+80*scale,"Explicit player metadata selected enemy instead");friendlyPixels++;
          }
-         require(strictComparisons>comparisons/2,"Insufficient strict non-boundary identity samples");
-         require(invertedRejected>comparisons/2,"Snapshot comparator accepted inverted image");
-         require(shiftedRejected>0,"Snapshot comparator accepted a general pixel translation");
-         System.out.println("Snapshot identity strict="+strictComparisons+" exactNearestBoundaryAlternatives="+nearestBoundaryMatches
-            +" rejectedInversion="+invertedRejected+" rejectedTranslation="+shiftedRejected+" arenaHeight="+arenaHeight);
-         identityShot.dispose();identity.dispose();
-         // Compare expanded actual Surf image against normal Sprite geometry, including UV orientation.
-         johtoBattleRenderer.drawBackground(this);uiBatch.flush();
-         com.badlogic.gdx.graphics.g2d.Sprite original=new com.badlogic.gdx.graphics.g2d.Sprite(
-            com.pkmngen.game.util.TextureCache.get(Gdx.files.internal("attacks/surf_player_gsc/output/frame-013.png")));
-         com.badlogic.gdx.graphics.g2d.Sprite expected=new com.badlogic.gdx.graphics.g2d.Sprite(original);
-         float width=144f*W/H;
-         expected.setBounds((160-width)*.5f,0,width,144);expected.draw(uiBatch);uiBatch.flush();
-         Pixmap expectedShot=ScreenUtils.getFrameBufferPixmap(0,0,W,H);
-         johtoBattleRenderer.drawBackground(this);
-         MoveEffectPresentation global=new MoveEffectPresentation("surf_player_gsc");global.drawFrame(this,original,"");uiBatch.flush();
-         Pixmap actualShot=ScreenUtils.getFrameBufferPixmap(0,0,W,H);
-         for(int y=(int)(49*H/144f);y<H-2;y+=3)for(int x:new int[]{3,21,W-22,W-4})
-            require(expectedShot.getPixel(x,y)==actualShot.getPixel(x,y),"Actual screen PNG was inverted at "+x+","+y);
-         expectedShot.dispose();actualShot.dispose();global.dispose();
-         // Restore the same frame for the real action and its before/after comparison.
+         require(friendlyPixels>50,"Explicit metadata lost friendly target");playerOnly.dispose();explicit.dispose();
+         require(Gdx.gl.glGetError()==GL20.GL_NO_ERROR,"Explicit target dispose GL error");
+         // Restore exactly the frame used by the actual-action progression test.
          johtoBattleRenderer.drawBackground(this);own.backSprite.draw(uiBatch);enemy.sprite.draw(uiBatch);
          if(DrawFriendlyHealth.shouldDraw)johtoBattleRenderer.drawFriendlyHealth(this,battle.drawAction.drawFriendlyHealthAction);
          if(DrawEnemyHealth.shouldDraw)johtoBattleRenderer.drawEnemyHealth(this,battle.drawAction.drawEnemyHealthAction);
          modernUi.rect(this,-320,-288,800,335,new Color(.8f,.04f,.6f,1));uiBatch.flush();
-         System.out.println("Snapshot and real PNG orientation PASS ("+comparisons+" arena samples)");
-      }
-      static boolean nearestTieRow(int y,int sourceHeight) {
-         // Pixel center maps to an integer source-texel edge, using exact integers.
-         return ((2L*y+1)*sourceHeight)%(2L*H)==0;
-      }
-      static boolean snapshotPixelMatches(Pixmap baseline,int x,int y,int actual,int sourceHeight) {
-         if(baseline.getPixel(x,y)==actual)return true;
-         if(!nearestTieRow(y,sourceHeight))return false;
-         return y>0&&baseline.getPixel(x,y-1)==actual||y+1<H&&baseline.getPixel(x,y+1)==actual;
+         require(Gdx.gl.glGetError()==GL20.GL_NO_ERROR,"Restored scene GL error");
+         System.out.println("Actor-only snapshot PASS: visible="+actorPixels+" transparent="+transparent+" unchangedScenery="+stableBackground);
       }
       void save(Pixmap shot,String filename){PixmapIO.PNG png=new PixmapIO.PNG();png.setFlipY(true);try{png.write(Gdx.files.local(filename),shot);}catch(java.io.IOException failure){throw new RuntimeException(failure);}finally{png.dispose();}}
    }

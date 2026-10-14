@@ -83,7 +83,12 @@ def main() -> None:
         normalized = normalize(source)
         pixels = list(normalized.getdata())
         lumas = [(p[0] * 299 + p[1] * 587 + p[2] * 114) / 1000 for p in pixels]
-        if min(lumas) < 25 or not 65 <= sum(lumas) / len(lumas) <= 190:
+        # Lava deliberately contains dark cooled crust beside luminous magma.
+        # Require a broad hot surface, rather than applying the dry-face floor.
+        lava = asset["file"] == "lava-surface.png"
+        if lava and sum(p[0] > 180 and p[0] > p[2] * 2 for p in pixels) / len(pixels) < .30:
+            raise ValueError(f"Lava lacks a visible molten surface: {source}")
+        if min(lumas) < (12 if lava else 25) or not 65 <= sum(lumas) / len(lumas) <= 190:
             raise ValueError(f"Material has a near-black or unreadable palette: {source}")
         data = rgba_png_bytes(normalized)
         target = ASSETS / asset["file"]

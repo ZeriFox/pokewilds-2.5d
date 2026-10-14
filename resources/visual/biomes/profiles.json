@@ -910,13 +910,9 @@
         "seaking",
         "remoraid",
         "octillery",
-        "finneon",
-        "lumineon",
         "wishiwashi",
         "arrokuda",
         "barraskewda",
-        "basculin",
-        "basculegion",
         "luvdisc",
         "alomomola",
         "wailmer",
@@ -934,12 +930,6 @@
         "overqwil",
         "mantyke",
         "mantine",
-        "frillish",
-        "jellicent",
-        "skrelp",
-        "dragalge",
-        "clauncher",
-        "clawitzer",
         "dondozo",
         "veluza"
       ],
@@ -986,6 +976,145 @@
       ],
       "minDepth": 1,
       "weight": 3
+    },
+    {
+      "species": [
+        "snover",
+        "abomasnow",
+        "snom",
+        "frosmoth",
+        "bergmite",
+        "avalugg",
+        "cubchoo",
+        "beartic",
+        "cryogonal"
+      ],
+      "requires": [
+        "cold"
+      ],
+      "forbids": [
+        "lava"
+      ],
+      "spawnRoutes": [
+        "snow1"
+      ],
+      "weight": 20
+    },
+    {
+      "species": [
+        "finneon",
+        "lumineon",
+        "frillish",
+        "jellicent",
+        "skrelp",
+        "dragalge",
+        "clauncher",
+        "clawitzer"
+      ],
+      "requires": [
+        "water",
+        "saltwater"
+      ],
+      "minDepth": 1,
+      "spawnRoutes": [
+        "beach2_water",
+        "ocean1"
+      ],
+      "weight": 20
+    },
+    {
+      "species": [
+        "barboach",
+        "whiscash",
+        "basculin",
+        "basculegion"
+      ],
+      "requires": [
+        "water",
+        "freshwater"
+      ],
+      "minDepth": 1,
+      "spawnRoutes": [
+        "wooded_lake_water1"
+      ],
+      "weight": 20
+    },
+    {
+      "species": [
+        "salandit",
+        "salazzle"
+      ],
+      "anyBiomeTags": [
+        "volcanic",
+        "arid",
+        "rocky"
+      ],
+      "forbids": [
+        "water",
+        "lava"
+      ],
+      "spawnRoutes": [
+        "volcano1",
+        "desert1",
+        "mountain1"
+      ],
+      "weight": 20
+    },
+    {
+      "species": [
+        "morelull",
+        "shiinotic"
+      ],
+      "requires": [
+        "woodland"
+      ],
+      "forbids": [
+        "water",
+        "lava"
+      ],
+      "nightUnlessTags": [
+        "sheltered"
+      ],
+      "spawnRoutes": [
+        "forest1",
+        "deep_forest",
+        "wooded_lake1"
+      ],
+      "weight": 20
+    },
+    {
+      "species": [
+        "sandygast",
+        "palossand"
+      ],
+      "requires": [
+        "coastal"
+      ],
+      "forbids": [
+        "water",
+        "lava"
+      ],
+      "spawnRoutes": [
+        "beach2"
+      ],
+      "weight": 20
+    },
+    {
+      "species": [
+        "maractus"
+      ],
+      "requires": [
+        "arid"
+      ],
+      "forbids": [
+        "water",
+        "lava"
+      ],
+      "spawnRoutes": [
+        "desert1",
+        "savanna2"
+      ],
+      "weight": 20
     }
   ]
 }

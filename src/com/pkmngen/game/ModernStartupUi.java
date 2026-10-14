@@ -47,26 +47,29 @@ final class ModernStartupUi {
       ui.fullScreen(game,"ADVENTURE SETUP","Select a field first; confirm only when you want to edit it.");
       List<DesktopMenuController.Row> rows=c.rows();int selected=c.selected(rows);
       for(int i=0;i<rows.size();i++) {
-         DesktopMenuController.Row r=rows.get(i);ModernUi.Box b=DesktopMenuController.setupBox(i);
+         DesktopMenuController.Row r=rows.get(i);ModernUi.Box b=DesktopMenuController.setupBox(i,rows.size());
          boolean active=i==selected;ui.panel(game,b);
          if(active){ui.rect(game,b.x+1,b.y+1,b.width-2,b.height-2,SOFT);ui.rect(game,b.x,b.y,2,b.height,ModernUi.ACCENT);}
          String label=label(r.field),value=value(game,c,r.field);
          if(r.field==DesktopMenuController.Field.GO){ui.row(game,value,b.x,b.y,b.width,b.height,active);continue;}
-         ui.fitText(game,label,b.x+5,b.y+8.4f,5.3f,44,ModernUi.MUTED);
+         float baseline=b.y+b.height-3.4f;
+         ui.fitText(game,label,b.x+5,baseline,5.3f,44,ModernUi.MUTED);
          if(c.text.active()&&active) {
             value=c.text.draft.substring(0,c.text.cursor)+"|"+c.text.draft.substring(c.text.cursor);
             ui.rect(game,b.x+50,b.y+1,b.width-52,b.height-2,ModernUi.PAPER);
          }
-         ui.fitText(game,value,b.x+53,b.y+8.4f,6,86,ModernUi.INK);
+         ui.fitText(game,value,b.x+53,baseline,6,86,ModernUi.INK);
       }
       String hint=c.text.active()?"Typing: Enter / LMB Save   Esc / RMB Cancel   Tab Next":"WASD or arrows Navigate   LMB / Enter Edit   F1 Settings";
+      if(rows.get(selected).field==DesktopMenuController.Field.WORLD_MODE&&c.message.isEmpty())
+         ui.fitText(game,c.creativeWorldDraft?"Unlimited building materials / choose Pokemon from Menu > F1":"Explore and gather resources normally",9,17,4.4f,142,ModernUi.ACCENT);
       if(!c.message.isEmpty())ui.fitText(game,c.message,9,17,4.4f,142,ModernUi.RED);
       if(c.text.active()&&!c.text.error.isEmpty())ui.fitText(game,c.text.error,9,17,4.4f,142,ModernUi.RED);
       ui.footer(game,hint.replace("WASD",DesktopControls.movement()));
    }
    private static String label(DesktopMenuController.Field f) {
       switch(f){case MODE:return "Play mode";case ADVENTURE:return "Adventure";case SAVE:return "Save name";
-         case SIZE:return "World size";case NAME:return "Your name";case TRAINER:return "Trainer";case FILE:return "Save file";
+         case SIZE:return "World size";case NAME:return "Your name";case TRAINER:return "Trainer";case WORLD_MODE:return "Game mode";case FILE:return "Save file";
          case ADDRESS:return "Server IP";default:return "";}
    }
    private String value(Game game,DesktopMenuController c,DesktopMenuController.Field f) {
@@ -74,6 +77,7 @@ final class ModernStartupUi {
       switch(f) {
          case MODE:return new String[]{"< Local >","< Host >","< Join >"}[Math.floorMod(m.localHostJoinIndex,3)];
          case ADVENTURE:return m.newLoadIndex==0?"< New island >":"< Load saved island >";
+         case WORLD_MODE:return c.creativeWorldDraft?"< Creative >":"< Adventure >";
          case SAVE:return letters(m.mapName).isEmpty()?"default   [confirm to edit]":letters(m.mapName);
          case SIZE:return "< "+new String[]{game.debugInputEnabled?"Test island":"Default (Small)","Small","Medium","Large","Extra large","Vast"}[Math.max(0,Math.min(5,m.sizeIndex))]+" >";
          case NAME:return m.name.isEmpty()?"Your name   [confirm to edit]":letters(m.name);

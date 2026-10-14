@@ -20,8 +20,10 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "de53c924dc3dcfa4e27c6ae0f7a7999fec7906df1826cfc24e2c497c5063431d"
+FROZEN_MANIFEST_SHA256 = "9c461c966bc7f303fc71ce4d7020a1b519e97541e100432c0ae882a9314434f0"
 PREFIX = "src/com/pkmngen/game/"
+NATURAL_WORLD_ARCHIVE = {'baseline/before-natural-world-2026-10-14/modernization-scope.json': 'de53c924dc3dcfa4e27c6ae0f7a7999fec7906df1826cfc24e2c497c5063431d', 'baseline/before-natural-world-2026-10-14/VERIFICA.txt': '1a89c2a2a5ca1e1b2ce9b0b3aaa719056cb7dbc9c911838c83596ee250d20a89', 'baseline/before-natural-world-2026-10-14/verify_scope_test.py': 'd84e08cb77da5e6228df62a29d2241137d1f96245a5ae9133edf63d6c8e2a63d', 'baseline/before-natural-world-2026-10-14/verify_visual_scope.py': '69a4ff13404fa237771ba8f4942e5663b2a51ee4fadd41d630216d4d4a631e7c'}
+
 RELIEF_ARCHIVE = {'baseline/before-relief-refinement/modernization-scope.json': '6449bde64b50c3a5cf5c3dd804b824af1c7b355a2e6caa5178adab1060c50dfe', 'baseline/before-relief-refinement/verify_visual_scope.py': '43d6398d747ec99e1ca5496b0d8811c1751e360891a06a28d36ecc0c65f55e0b', 'baseline/before-relief-refinement/verify_scope_test.py': '5a5b4e9b5c55d8c6991af9468a83fcc813abc6fe86dfc3ad1efb50d0eba1aed1', 'baseline/before-relief-refinement/VERIFICA.txt': '7b8dc3ab46ad3535a3d545aef90b42d7807afd86d5a4989b475d6abb6c8a2b49'}
 
 PLAYTEST_ARCHIVE = {'baseline/before-playtest-2026-10-14/modernization-scope.json': '67a078821afeee2595a1a7274bc8ec775b431333eb100b320cd327729ba1cf3b',
@@ -94,7 +96,7 @@ MODIFIED_SCOPES = {
     "CatchPokemonWobbles2Times.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
     "CatchPokemonWobbles1Time.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
     "CatchPokemonWobbles0Times.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
-    "DrawSetupMenu.java": "One exact CreativeMode.newWorld hook after new PkmnMap construction when creating a world. Existing setup/load/network dispatch remains classic.",
+    "DrawSetupMenu.java": "One exact CreativeMode.newWorld(game, this) hook after new PkmnMap construction when creating a world, passing the attached local setup draft. Existing setup/load/network dispatch remains classic.",
     "PkmnMap.java": "Exact Creative sidecar save call after existing map/minimap saves and dedicated IOException reporting. Existing serialized map format, load path and all other map logic remain classic.",
     "Network.java": "Exact stored-inventory accessor substitution in PlayerData so virtual Creative supply never enters network or save payloads. Every other byte of network/schema logic remains classic.",
     "Player.java": "Explicit local Creative mode: virtual recipe/material inventory reads and non-consuming writes, with stored inventory accessor and sorting bridge. Exact reviewed methods only; all fields, combat/player behavior and serialized schema remain classic.",
@@ -141,43 +143,44 @@ MODIFIED_SCOPES = {
     "util/SpriteProxy.java": "Presentation: known projected actors first, then full-screen or orbit-anchored effects; gameplay Sprite transforms remain read-only.",
 }
 ADDED_SCOPES = {
-    "TerrainReliefAssets.java": "Read-only dedicated geological face and stair texture loader, nearest sampling, repeatable rock strata UVs, fluid-bank fallback, bounded shared texture ownership and dispose/reload. No tiles, elevations, collision, gameplay RNG or save writes.",
+    "ModernMoveEffects.java": "Deterministic family-based particles for reviewed move animation names, projected through the existing rotating arena camera. Retains original frame counts and audio/gameplay actions, bounded shader/texture lifecycle, HUD clipping and reduced-motion behavior; no gameplay RNG or camera resets.",
+    "MountedTrainerSprites.java": "Presentation-only seated Ride, Surf and Fly body composition, preserving resolved idle identity/head/wardrobe materials and explicit mounted mod priority. Bounded texture cache, read-only retained CPU pixels and deterministic pose sway; no player, move, collision, clock, save or RNG writes.",
+    "TerrainReliefAssets.java": "Read-only shared earth, rock, stair, lava and water material loader with nearest filtering, repeating world fluids/strata, dry-only face fallback and bounded dispose/reload. Required fluids fail clearly rather than scrolling atlas UVs. No tile, height, collision, gameplay RNG or save writes.",
     "WorldReadability.java": "Read-only semantic helpers for jumpable ledges, exact CUT requirement tree tiers, interior material classification and action-aware companion presentation. Saved tiles, hitboxes, interactions and field-action clocks remain authoritative.",
     "UserSpriteAssets.java": "Read-only supplied atlas loader with 470 explicit item identities, distinct capture balls, status/party badges and 64 berry identities with growth/animation frames. Alpha-trimmed source regions, validated semantic mappings, bounded cache and disposal/reload; no item or capture mechanics.",
     "ShinyVisuals.java": "Visible four-point sparkle cue for shiny actors, shared battle/party rendering, reduced-motion static cue; hidden ghosts and eggs excluded. No invented palettes or gameplay state changes.",
     "CaptureBallVisual.java": "Supplied named ball sprite selection and camera-projected throw/wobble/poof rendering on unchanged legacy capture action clocks. No catch probability or result changes.",
     "CreativeModeUi.java": "Creative menu draft/search/level/shiny selectors and explicit local mode toggles routed through CreativeMode; bounded pointer rows and input focus isolation; no autonomous Pokemon or resource grants.",
-    "CreativeMode.java": "User-requested opt-in Local-only Creative mode: validated sidecar persistence with atomic backup, virtual unlimited recipe/material supply, searchable supported species grant with level and genuine shiny choice. Full-party grant refuses replacement; no multiplayer activation, save-schema changes or virtual inventory serialization.",
+    "CreativeMode.java": "Explicit local Creative resource/species grants and optional new-world setup draft; load remains sidecar-based, host/join excluded, inventory serialization uses owned items. Save-mode sidecar and grants preserve existing party limits and game/save schemas.",
     "GhostVisualAssets.java": "Shared four-frame transparent concealed spirit artwork with finite-clock selection and explicit texture disposal/reload. Does not inspect or reveal the hidden Pokemon species.",
     "StartupCinematic.java": "Skippable 7.2-second opening using authored coast/forest artwork and selected trainer/companion, bounded parallax, title fade and full viewport bars. Disabled for reduced motion; owns/disposes artwork; no map, RNG, save or action mutations.",
     "MenuMotion.java": "Bounded presentation-only selection and entrance easing, fixed layout and immediate reduced-motion state; no input or gameplay state.",
     "CharacterAppearance.java": "Validated local per-name/trainer cosmetic profiles with atomic file persistence and backup, independent generated outfit/backpack/shoes/headwear/hair variants and colors, face-preserving layered composition and run anticipation. No game-save schema, inventory, network or Pokemon changes.",
-    "BattleScenery.java": "Full 360-degree 48-second 2.5D orbit with shared actor/effect floor projection and surrounding cylindrical illustrated biome vista. Continuous during commands, turns and captures; deterministic finite geometry, shader restoration, no gameplay mutations.",
+    "BattleScenery.java": "Rigid periodic cylindrical battle panorama and a rotating world floor; no mirrored scenery or time-driven panorama UV warps. Continuous full camera orbit, environment color/weather accents only, fixed HUD, reduced motion and GPU state retained.",
     "WorldNatureMotion.java": "Pure coordinate-derived rooted vegetation movement, shore distance and same-height live tidal adjacency masks. No simulation clocks, map mutation, gameplay RNG or saved state.",
     "AuthoredTerrain.java": "Generation-only reconstruction and deterministic 17/9/5-cell authored modules for ten natural biome families. Region-specific footprints, minimum useful pocket area, immutable water/tidal/maze boundaries, protected event and encounter access, biome/route preservation, dry connectivity and no save-load regeneration.",
     'DesktopInterfaceSettings.java': 'Explicit local UI/control preferences, draft validation, reserved menu keys and duplicate rejection, atomic save with backup; no game-save schema or legacy settings-file rewrite.',
-    "DesktopMenuController.java": "Desktop setup/control navigation, nineteen-trainer picker, skippable opening and independent cosmetic wardrobe. Adds explicit local Creative submenu with keyboard/pointer focus, search isolation and lifecycle synchronization; mode toggles and grants delegated to CreativeMode. Original launch dispatch, Player schema and gamepad semantics retained.",
+    "DesktopMenuController.java": "Desktop menu/text/trainer/wardrobe state plus explicit Adventure/Creative row only for new local worlds, sharing count-aware presenter and pointer hitboxes. Original dispatch indexes, text-entry isolation, host/join/load flow and draft behavior retained.",
     'MenuTextSession.java': 'Explicit reversible setup text draft with caret/deletion, length/character constraints and IPv4 validation; selection alone never consumes WASD as text.',
-    "ModernStartupUi.java": "Modern title/setup/options, nineteen-trainer picker and wardrobe preview with matching pointer hit boxes. Delegates explicit Creative submenu presentation from the settings list; no gameplay RNG or serialized format changes.",
-    "TrainerCatalog.java": "Nineteen identity-preserving B/W-style trainers with clothing accents, generated modular part composition and run anticipation. Bounded owned texture cache, mod/custom-art priority, direction/frame and complete required-pose validation retained. No Player schema or gameplay changes.",
-
+    "ModernStartupUi.java": "Modern startup/options/trainer/wardrobe presentation with an accessible eight-row local-world setup including Adventure/Creative and explanatory hint. Uses controller hitboxes and preserves original launch/load actions.",
+    "TrainerCatalog.java": "Nineteen-trainer appearance resolution, custom-sheet priority and bounded frame cache; retains owned CPU copies for deterministic mounted composition and disposes them with textures. Existing style/wardrobe/head identity unchanged.",
     "WorldMaterials.java": "Presentation-only semantic terrain/prop resolver with actual upper-layer indoor floors, solid interior walls, visible jump-ledges and distinct tree species for existing CUT requirement tiers. Natural dry transitions, regional trees and cave floor caps retained; no Tile mutations or saved-data changes.",
     "WorldAmbientOverlay.java": "Sparse deterministic world-space mist, embers, fireflies, dust, snow and water glints with count/opacity budgets, protected actor focus, depth testing and separate shader ownership. Respects ambient toggle and freezes environmental motion with reduced motion; no gameplay RNG, indoor/UI overlays or saved-state writes.",
     "WorldMeshBatch.java": "CPU vertex storage, identity-based texture grouping, triangle-aligned mesh upload/reuse and GPU ownership extracted from JohtoRenderer; no camera, scene state, shader uniforms, texture ownership, gameplay or saved data.",
     "ActorModelRenderer.java": "Existing optional 3D helper, disabled by the modern sprite launcher.",
     "BiomeProfiles.java": "Shared data-driven biome identity, materials, geometry rules, atmosphere, transitions and spawn habitats, derived from existing Tile/Route state.",
-    "BwAssets.java": "Shared landscape/custom sampling contracts with unified player appearance composition across world, preview and battle, native B/W run/idle and explicit mod/atlas override priority. Resolves local appearance without changing Player or game saves; disposes owned trainer textures.",
+    "BwAssets.java": "Read-only terrain/prop/trainer region resolution, current wardrobe and custom art priority, plus complete dedicated mounted pose selection; shared owned textures and explicit custom mounted overrides. No gameplay state or saved terrain writes.",
     "DesktopControls.java": "Authorized desktop binding parser, exact legacy-preset migration, text-entry detection and truthful dynamic hints. Step 3 treats only an explicitly active setup edit as text focus; highlighting a row is navigation.",
     "StartupVerification.java": "Opt-in packaged-launch probe inside the delivered Game: observe 120 original menu frames, verify nonempty framebuffer, save capture and exit normally; disabled in ordinary play.",
-    "ExpansionDex.java": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration.",
+    "ExpansionDex.java": "Imported roster initialization and habitat-aware expansion route registration, with sourced family spawnRoutes overriding incomplete later-generation habitat/type defaults. Preserves existing species data, growth/audio/schema, rarity and script-owned creatures.",
     "JohtoBattleRenderer.java": "Continuous whole-arena orbit across command and action phases, fixed top HUD, actor depth clearing and projected legacy effect anchors, identity-concealing encounter transition and full viewport coverage; reduced motion and exact original action timing retained.",
-    "JohtoRenderer.java": "Exclusive perspective world presentation with rounded multi-segment convex relief edges, matching upper/rock/lower contours, geological cliff textures with continuous strata and biome shading, visible tread noses and coherent stair transitions. Retains shore wash, fields, actors and all previous visual systems; preserves saved tiles, elevations, hitboxes, player/Pokemon positions, action clocks, encounter identity and interior foreground visibility.",
+    "JohtoRenderer.java": "Exclusive perspective world presentation with rounded natural relief, distinct earth/rock/lava/water materials and continuous fluid UVs, grass-capped cliffs without directional glyphs, stronger waves/shore foam and dedicated complete mounted trainer poses. Preserves saved terrain/elevation/collision, player/Pokemon positions, gameplay RNG/action clocks and interior foreground visibility.",
     "ModernBatch.java": "Suppress legacy draw submissions while original menu actions advance.",
     "ModernInventoryUi.java": "Modern inventory/item/crafting/guide presentation with supplied identity-mapped icons, five pocket tabs, quantity-safe rows and details. Shows INF/Unlimited only for explicit Creative virtual supplies; original item-use, sorting and crafting actions remain authoritative.",
     "ModernPartyUi.java": "Modern party/storage/nickname UI with shared cards, supplied party-ball/status badges, full animated summary actors and shiny sparkle cues. Existing hitboxes, setup delegation, reduced-motion preferences and action semantics retained.",
     "ModernUi.java": "Shared viewport, modern card typography, palettes and bounded easing at fixed hit boxes. Delegates original menu actions; disposes opening artwork, supplied atlas resources and dedicated relief textures. No gameplay rules or inventory writes.",
     "ModernWorldGenerator.java": "Authorized deterministic procedural terrain generation, version 3, with biome-authored modules and the existing connected single-depth caldera. Preserves dungeon routes, deep-forest maze walls, graveyards, ruins and special pits during volcanic finishing; shoreline smoothing excludes reserved actors, stored encounters and dungeon water while retaining normal inland smoothing. No save schema change.",
-    "MoveEffectPresentation.java": "Semantic local/screen effect classification, continuously refreshed full-viewport snapshots, projected target rows and normal move frames, depth-enabled FBOs and GL restoration. Original action frame clocks and effects metadata retained.",
+    "MoveEffectPresentation.java": "Modern move raster presentation: legacy row/recolor metadata composites only the transparent target actor buffer; never distorts the battle panorama. Retains authored normal-move PNG projection, shrink stages, original timing, target registration, resize/FBO/GL restoration and fixed HUD.",
     "PmdBattleSprites.java": "Eight-direction projected PMD billboards, stable animation bounds, transparent-aware ground depth sorting across legacy action layers, orbit-aware trainer/send-out fragments, genuine original shiny-art fallback and sparkle overlay. No species leak or combat changes.",
     "PmdPokemonSprites.java": "Pinned PMD portrait/animation loading, timing/directions, bounded texture cache and complete animation bounds for uncropped actors.",
     "TrainerModel3D.java": "Existing optional experimental trainer model helper.",
@@ -250,7 +253,7 @@ CLASSIC_HOOK_REPLACEMENTS = {'Player.java': [('   Map<String, Integer> getItemsD
                    '         this.itemsDict = player.getItemsDict();')],
  'DrawSetupMenu.java': [('                  game.map = new PkmnMap(mapName);\n'
                          '                  if (this.newLoadIndex == 0) '
-                         'CreativeMode.newWorld(game);',
+                         'CreativeMode.newWorld(game, this);',
                          '                  game.map = new PkmnMap(mapName);')],
  'PkmnMap.java': [('         Save.saveMinimap(this, this.id + ".sav/map" + this.currMapId + '
                    '".png");\n'
@@ -302,6 +305,9 @@ def sha256(path: Path) -> str:
 
 
 def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
+    for archived, expected in NATURAL_WORLD_ARCHIVE.items():
+        if sha256(root / archived) != expected:
+            raise RuntimeError("Immutable pre-natural-world checkpoint changed: " + archived)
     for archived, expected in RELIEF_ARCHIVE.items():
         if sha256(root / archived) != expected:
             raise RuntimeError("Immutable pre-relief checkpoint changed: " + archived)
@@ -390,8 +396,8 @@ def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
             "missing_additions": sorted(expected_added - set(added)),
         }))
     manifest = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
-    if manifest.get("schema") != 8 or manifest.get("classic_report_sha256") != CLASSIC_REPORT_SHA256:
-        raise RuntimeError("Expected schema 8 manifest bound to classic source baseline")
+    if manifest.get("schema") != 9 or manifest.get("classic_report_sha256") != CLASSIC_REPORT_SHA256:
+        raise RuntimeError("Expected schema 9 manifest bound to classic source baseline")
     if set(manifest.get("modified_original_sources", {})) != expected_changed:
         raise RuntimeError("Manifest changes differ from explicit source allowlist")
     if set(manifest.get("added_sources", {})) != expected_added:
@@ -430,7 +436,7 @@ def audit(root: Path = ROOT, inventory: bool = False) -> tuple[dict, str]:
         raise RuntimeError("Complete source diff differs from reviewed patch digest")
     result = {
         "status": "inventory_not_approved" if inventory else "success",
-        "manifest_schema": 8, "baseline_source_count": len(original), "current_source_count": len(current),
+        "manifest_schema": 9, "baseline_source_count": len(original), "current_source_count": len(current),
         "unchanged_original_sources": len(original) - len(changed),
         "modified_original_sources": changed, "added_sources": added,
         "modified_source_scopes": {PREFIX + key: value for key, value in MODIFIED_SCOPES.items()},

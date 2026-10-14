@@ -37,6 +37,11 @@ final class CreativeMode {
       } catch(IOException|RuntimeException error) {warning="Creative settings could not be read. Adventure mode retained.";}
    }
    static void newWorld(Game game) {world=game.map;owner=game.player;enabled=false;warning="";materials=collectMaterials(owner);}
+   /** Apply only the attached new-world draft; loading a save never passes through this hook. */
+   static void newWorld(Game game,DrawSetupMenu setup) {
+      newWorld(game);
+      enabled=local(game)&&game.modernUi!=null&&game.modernUi.desktop.creativeNewWorld(setup);
+   }
    static void reload(Game game) {world=null;owner=null;sync(game);}
    static boolean active(Player player) {
       Game game=Game.staticGame;

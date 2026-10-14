@@ -26,7 +26,7 @@ def main() -> int:
     java, javac = find_jdk()
     sources = [ROOT / 'tools/BattleSceneryTest.java']
     if args.sources:
-        sources += [ROOT / 'src/com/pkmngen/game' / name for name in ('JohtoBattleRenderer.java', 'BattleScenery.java', 'PmdBattleSprites.java', 'GhostVisualAssets.java', 'ShinyVisuals.java', 'MoveEffectPresentation.java')]
+        sources += [ROOT / 'src/com/pkmngen/game' / name for name in ('JohtoBattleRenderer.java', 'BattleScenery.java', 'PmdBattleSprites.java', 'GhostVisualAssets.java', 'ShinyVisuals.java', 'MoveEffectPresentation.java', 'ModernMoveEffects.java')]
     cp = os.pathsep.join(map(str, [classes, *([ROOT / 'resources'] if args.sources else []), JAR]))
     commands = [
         [javac, '--release', '17', '-encoding', 'UTF-8', '-proc:none', '-cp', cp, '-d', str(classes), *map(str, sources)],

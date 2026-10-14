@@ -66,7 +66,7 @@ public final class CreativeModeTest {
          type=Type.SERVER;check(!CreativeMode.active(player),"Hosted game receives local creative rules");type=null;
          CreativeMode.setEnabled(this,false);check(player.getItemAmount("log")==3&&!player.hasItem("mystic soil"),"Disabling changed original inventory");
          player.removeItem(recipe.name);check(original.equals(player.getStoredItemsDict()),"Original inventory not restored exactly");
-         controller();CreativeMode.setEnabled(this,true);player.setCurrPokemon();
+         creationSelection();controller();CreativeMode.setEnabled(this,true);player.setCurrPokemon();
          Gdx.files.local("creative-fixture.sav").mkdirs();Gdx.files.local("creative-fixture.sav/.test").writeString("Disposable creative fixture",false);saveGame();
          check(Gdx.files.local("creative-fixture.sav/creative-mode.json").readString().contains("true"),"Save omitted creative state");
          actionStack.clear();Pixmap previous=map.minimap;map=new PkmnMap("creative-fixture");player=new Player();start();map.loadFromFile(this);previous.dispose();
@@ -78,6 +78,29 @@ public final class CreativeModeTest {
          Gdx.files.local("creative-fixture.sav/creative-mode.json").writeString("{malformed",false);CreativeMode.reload(this);
          check(!CreativeMode.active(player)&&!CreativeMode.warning.isEmpty(),"Invalid mode file enables creative");
          check(original.equals(player.getStoredItemsDict()),"Invalid sidecar changed player inventory");
+      }
+      void creationSelection() {
+         DesktopMenuController c=modernUi.desktop;
+         DrawSetupMenu setup=new DrawSetupMenu(this,null);c.attach(setup);c.screen=DesktopMenuController.Screen.SETUP;
+         check(!c.creativeWorldDraft&&!CreativeMode.active(player),"New-world selection inherited the active world mode");
+         check(c.rows().size()==8&&c.rows().get(6).field==DesktopMenuController.Field.WORLD_MODE,"New Local setup has no explicit game mode");
+         for(int i=0;i<8;i++) {
+            ModernUi.Box b=DesktopMenuController.setupBox(i,8);check(b.y>22&&b.top()<115,"Setup game-mode row overlaps header or help");
+            if(i>0)check(b.top()<DesktopMenuController.setupBox(i-1,8).y,"Setup rows overlap");
+         }
+         actionStack.clear();actionStack.add(setup);DrawSetupMenu.currIndex=7;InputProcessor.blockHeldInputs();InputProcessor.rightJustPressed=true;
+         check(c.beforeAction(this,setup)&&c.creativeWorldDraft&&!CreativeMode.active(player),"Choosing Creative changed the current adventure before creation");InputProcessor.blockHeldInputs();
+         setup.localHostJoinIndex=1;check(c.rows().stream().noneMatch(r->r.field==DesktopMenuController.Field.WORLD_MODE),"Hosted setup offers local Creative");
+         CreativeMode.newWorld(this,setup);check(!CreativeMode.active(player),"Host setup draft enabled Creative");
+         setup.localHostJoinIndex=2;check(c.rows().stream().noneMatch(r->r.field==DesktopMenuController.Field.WORLD_MODE),"Join setup offers local Creative");
+         setup.localHostJoinIndex=0;setup.newLoadIndex=1;
+         check(c.rows().stream().noneMatch(r->r.field==DesktopMenuController.Field.WORLD_MODE),"Load setup offers a replacement mode instead of saved state");
+         CreativeMode.newWorld(this,setup);check(!CreativeMode.active(player),"Load draft enabled Creative");
+         setup.newLoadIndex=0;CreativeMode.newWorld(this,setup);check(CreativeMode.active(player),"Selected Creative did not become active at creation");
+         type=Type.SERVER;CreativeMode.newWorld(this,setup);check(!CreativeMode.active(player),"Networking bypassed local-only creation guard");type=null;
+         DrawSetupMenu stale=new DrawSetupMenu(this,null);CreativeMode.newWorld(this,stale);check(!CreativeMode.active(player),"An unattached setup reused another draft");
+         c.attach(stale);check(!c.creativeWorldDraft,"New setup reused the previous draft");CreativeMode.newWorld(this,stale);check(!CreativeMode.active(player),"Default new world no longer starts in Adventure");
+         actionStack.clear();InputProcessor.blockHeldInputs();
       }
       void controller()throws Exception {
          DrawPlayerMenu menu=new DrawPlayerMenu(this,null);actionStack.clear();actionStack.add(menu);

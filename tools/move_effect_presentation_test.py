@@ -16,7 +16,7 @@ def main():
     java, javac = find_jdk()
     sources=[ROOT/'tools/MoveEffectPresentationTest.java']
     if args.sources:
-        sources += [ROOT/'src/com/pkmngen/game'/name for name in ('JohtoBattleRenderer.java','BattleScenery.java','PmdBattleSprites.java','MoveEffectPresentation.java','GhostVisualAssets.java', 'ShinyVisuals.java')]
+        sources += [ROOT/'src/com/pkmngen/game'/name for name in ('JohtoBattleRenderer.java','BattleScenery.java','PmdBattleSprites.java','MoveEffectPresentation.java', 'ModernMoveEffects.java','GhostVisualAssets.java', 'ShinyVisuals.java')]
     cp=os.pathsep.join(map(str,[classes,*([ROOT/'resources'] if args.sources else []),JAR]))
     logpath = destination / 'move-effects.log'
     with logpath.open('w', encoding='utf-8', newline='\n') as log:

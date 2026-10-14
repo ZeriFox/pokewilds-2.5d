@@ -209,9 +209,12 @@ public final class ExpansionDex {
             if (!value.getBoolean("spawnable") || value.getInt("evolvesFrom") != 0) continue;
             List<String> types = Arrays.asList(value.get("types").asStringArray());
             int habitat = value.getInt("habitatId", 0);
+            JsonValue rule = BiomeProfiles.speciesRule(item.getKey());
+            JsonValue reviewedRoutes = rule == null ? null : rule.get("spawnRoutes");
             // Habitat records are incomplete for later generations. Keep the old
             // type-derived route defaults only for those explicitly unknown records.
-            boolean matches = habitat != 0 ? habitatRoute(habitat, route)
+            boolean matches = reviewedRoutes != null ? Arrays.asList(reviewedRoutes.asStringArray()).contains(route)
+                : habitat != 0 ? habitatRoute(habitat, route)
                 : route.equals("volcano1") ? types.contains("FIRE")
                 : route.equals("snow1") ? types.contains("ICE")
                 : route.equals("graveyard1") ? types.contains("GHOST")

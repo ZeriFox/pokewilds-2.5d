@@ -283,7 +283,15 @@ public final class ReliefPresentationTest {
          require(original.getTexture().getUWrap()==Texture.TextureWrap.Repeat,"Long mountain faces cannot repeat dedicated rock art");
          require(original.getTexture().getMinFilter()==Texture.TextureFilter.Nearest,"Dedicated pixel-art face was blurred by sampling");
          Map<?,?> textures=(Map<?,?>)field(type,"textures").get(assets);
-         require(textures.size()==2,"Relief texture cache grew beyond the two geological materials");
+         Tile mountain=new Tile("mountain3","",new Vector2(0,0),true);mountain.biome="mountain";
+         TextureRegion rock=(TextureRegion)face.invoke(assets,mountain,BiomeProfiles.named("mountain"));
+         TextureRegion earth=(TextureRegion)type.getMethod("earth").invoke(assets);
+         TextureRegion lava=(TextureRegion)type.getMethod("lava").invoke(assets);
+         TextureRegion water=(TextureRegion)type.getMethod("water").invoke(assets);
+         require(rock!=earth&&earth!=steps&&lava!=rock,"Earth, mountain and lava materials lost their distinct identity");
+         require(lava.getTexture().getUWrap()==Texture.TextureWrap.Repeat,"Lava cannot flow continuously across tiles");
+         require(water!=lava&&water.getTexture().getUWrap()==Texture.TextureWrap.Repeat,"Water lacks its own continuous wave material");
+         require(textures.size()==5,"Terrain cache grew beyond the five shared materials");
          for(String fluid:new String[]{"water1","lava1"}) {
             Tile tile=new Tile(fluid,"",new Vector2(0,0),true);tile.biome="mountain";
             require(face.invoke(assets,tile,profile)==null,"Dry rock replacement leaked onto a fluid bank");
@@ -297,7 +305,7 @@ public final class ReliefPresentationTest {
          require(renderer().render(this),"World composition failed after relief material recreation");
          require(fingerprint==ModernWorldGenerator.fingerprint(map.tiles),"Material recreation mutated saved terrain");
          require(Gdx.gl.glGetError()==GL20.GL_NO_ERROR,"Relief material recreation left a GL error");
-         System.out.println("RELIEF materials: two cached shared textures, dry-only face, Repeat+Nearest, disposal/recreation PASS");
+         System.out.println("RELIEF materials: five cached shared textures, distinct earth/rock/lava/water/stairs, dry-only face, Repeat+Nearest, disposal/recreation PASS");
       }
       void capture(String name) {
          Pixmap pixels=com.badlogic.gdx.utils.ScreenUtils.getFrameBufferPixmap(0,0,960,720);PixmapIO.PNG png=new PixmapIO.PNG();png.setFlipY(true);

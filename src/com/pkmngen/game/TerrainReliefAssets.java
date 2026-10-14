@@ -20,10 +20,24 @@ public final class TerrainReliefAssets {
    }
    public TextureRegion face(Tile tile, BiomeProfiles.Profile profile) {
       // Fluid banks retain their own wet material; this set describes dry relief.
-      return tile != null && (tile.isWater || tile.isLava) ? null : region("rock-face.png");
+      if (tile != null && (tile.isWater || tile.isLava)) return null;
+      return region(earth(tile,profile) ? "earth-face.png" : "rock-face.png");
    }
    public TextureRegion stair(Tile tile, BiomeProfiles.Profile profile) {
       return region("stair-stone.png");
+   }
+   public TextureRegion earth() { return region("earth-face.png"); }
+   public TextureRegion lava() { return required("lava-surface.png"); }
+   public TextureRegion water() { return required("water-surface.png"); }
+   private TextureRegion required(String name) {
+      TextureRegion art=region(name);
+      if(art==null)throw new IllegalStateException("Missing continuous fluid material: visual/terrain-relief/"+name);
+      return art;
+   }
+   public static boolean earth(Tile tile,BiomeProfiles.Profile profile) {
+      if (tile == null || profile == null) return false;
+      return WorldReadability.smallJumpLedge(tile) || profile.tags().contains("woodland")
+         || profile.id.equals("plains") || profile.id.equals("savanna") || profile.id.equals("wetland");
    }
    private TextureRegion region(String name) {
       if (regions.containsKey(name)) return regions.get(name);
@@ -33,7 +47,7 @@ public final class TerrainReliefAssets {
       Texture texture = new Texture(Gdx.files.internal(path));
       try {
          texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-         Texture.TextureWrap wrap = name.equals("rock-face.png") ? Texture.TextureWrap.Repeat : Texture.TextureWrap.ClampToEdge;
+         Texture.TextureWrap wrap = name.equals("stair-stone.png") ? Texture.TextureWrap.ClampToEdge : Texture.TextureWrap.Repeat;
          texture.setWrap(wrap, wrap);
          TextureRegion region = new TextureRegion(texture);
          textures.put(name, texture);

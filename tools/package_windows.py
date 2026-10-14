@@ -24,11 +24,15 @@ REQUIRED_JAR = (*NATIVES, "com/pkmngen/game/desktop/DesktopLauncher.class",
                 "com/pkmngen/game/PmdBattleSprites.class",
                 "com/pkmngen/game/CreativeMode.class", "com/pkmngen/game/CreativeModeUi.class",
                 "com/pkmngen/game/TerrainReliefAssets.class", "com/pkmngen/game/WorldReadability.class",
+                "com/pkmngen/game/MountedTrainerSprites.class", "com/pkmngen/game/ModernMoveEffects.class",
                 "com/pkmngen/game/UserSpriteAssets.class", "com/pkmngen/game/CaptureBallVisual.class",
                 "com/pkmngen/game/ShinyVisuals.class", "visual/pmd/catalog.json",
                 "visual/stardew/world-atlas.png", "visual/stardew/world-atlas.json",
                 "visual/stardew/PROVENANCE.json", "visual/biomes/profiles.json",
                 "visual/terrain-relief/rock-face.png", "visual/terrain-relief/stair-stone.png",
+                "visual/terrain-relief/earth-face.png", "visual/terrain-relief/lava-surface.png",
+                "visual/terrain-relief/water-surface.png", "visual/mounted-trainers/bodies.png",
+                "visual/mounted-trainers/PROVENANCE.json", "visual/biomes/HABITAT-SOURCES.json",
                 "visual/terrain-relief/PROVENANCE.json", "visual/supplied/PROVENANCE.json",
                 "visual/supplied/item-regions.json", "visual/supplied/berry-plants.png")
 
@@ -118,13 +122,17 @@ def make_package(version: str, destination: Path, receipts: list[Path]) -> Path:
     add(ROOT / "docs/ASSET-RIGHTS.md", "documentazione/ASSET-RIGHTS.md")
     for name in ("REWORK-STATUS.md", "ASSET-COVERAGE.md", "REWORK-TESTS.md", "PACKAGING.md", "VERTICAL-SLICE.md", "JAVA-REFACTOR-STEP3.md",
                  "CINEMATIC-CUSTOMIZATION.md", "TRAINERS-BW.md", "LIVING-WORLD.md", "CINEMATIC-NATURE.md",
-                 "CREATIVE-MODE.md", "PLAYTEST-2026-10-14.md", "RELIEF-REFINEMENT.md"):
+                 "CREATIVE-MODE.md", "PLAYTEST-2026-10-14.md", "RELIEF-REFINEMENT.md",
+                 "NATURAL-WORLD-2026-10-14.md", "HABITAT-REFINEMENT.md"):
         path = ROOT / "docs" / name
         if path.is_file():
             add(path, "documentazione/" + name)
     relief_readme = ROOT / "resources/visual/terrain-relief/README.md"
     if relief_readme.is_file():
         add(relief_readme, "documentazione/TERRAIN-RELIEF-ASSETS.md")
+    mounted_readme = ROOT / "resources/visual/mounted-trainers/README.txt"
+    if mounted_readme.is_file():
+        add(mounted_readme, "documentazione/MOUNTED-TRAINER-ASSETS.txt")
     for index, receipt in enumerate(verification):
         payload[f"documentazione/verification-{index + 1}.json"] = (json.dumps(receipt, indent=2) + "\n").encode()
     payload["LEGGIMI.txt"] = f'''POKEWILDS 2.5D - {version} - WINDOWS X64
@@ -155,12 +163,15 @@ Puoi disattivare l'apertura o attivare il movimento ridotto nelle impostazioni.
 Dettagli: documentazione/CINEMATIC-CUSTOMIZATION.md.
 Impostazioni interfaccia in interface-settings.json.
 
-NOVITA JOHTO.5
+NOVITA DELLA REVISIONE
 Arena con rotazione completa a 360 gradi anche durante mosse e catture.
 Nuove icone, piante di bacche animate, Pokeball ed effetti Shiny.
 Angoli arrotondati, pareti rocciose dedicate e scale larghe raccordate.
+Acqua e lava distinte, bordi naturali senza frecce e pose Ride/Surf/Volo.
+Fondale cilindrico stabile, effetti delle mosse senza deformare l'ambiente.
 
 MODALITA CREATIVA
+Nuovo mondo: Local > New island > Game mode > Creative, poi avvia.
 Durante una partita Local: Invio > F1 > Creative sandbox.
 Attiva Creative mode, cerca una specie, scegli livello e Shiny e premi
 Add to party. Con la squadra piena libera prima un posto tramite Drop.

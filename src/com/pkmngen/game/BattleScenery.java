@@ -58,7 +58,7 @@ final class BattleScenery {
       try{
          batch.setShader(shader);shader.setUniformf("u_time",time);shader.setUniformf("u_yaw",yaw);
          shader.setUniformf("u_kind",kind(biome));shader.setUniformf("u_canvas",x,y,w,h);
-         shader.setUniformf("u_size",arena.getWidth(),arena.getHeight());batch.draw(arena,x,y,w,h);
+         batch.draw(arena,x,y,w,h);
       }finally{batch.setShader(previous);}
    }
    void dispose(){if(shader!=null){shader.dispose();shader=null;}}
@@ -72,13 +72,32 @@ final class BattleScenery {
       precision mediump float;
       #endif
       varying vec4 v_color;varying vec2 v_texCoords;
-      uniform sampler2D u_texture;uniform vec4 u_canvas;uniform vec2 u_size;
+      uniform sampler2D u_texture;uniform vec4 u_canvas;
       uniform float u_time,u_kind,u_yaw;
       float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
-      // A mirrored wrap closes the illustrated panorama without clamping its
-      // edges. Every azimuth is visible; no stationary outer frame or disk mask.
-      float mirror(float x){return 1.0-abs(fract(x*.5)*2.0-1.0);}
+      // Fixed illustrations live on a cylinder: yaw changes azimuth only.
+      // A narrow color crossfade closes the texture seam without reflecting or
+      // stretching scenery. There is no time-dependent UV displacement.
+      vec4 panoramaSample(float azimuth,float v){
+         // Three upright illustrated sectors avoid stretching one flat image
+         // around an entire circumference; every sector remains rigid.
+         float u=fract(.5+azimuth*.477464829);
+         vec4 sample=texture2D(u_texture,vec2(.015+.97*u,v));
+         vec4 seam=.5*(texture2D(u_texture,vec2(.015,v))+texture2D(u_texture,vec2(.985,v)));
+         float edge=smoothstep(0.0,.055,min(u,1.0-u));
+         return mix(seam,sample,edge);
+      }
+      vec4 floorSample(vec2 world){
+         vec2 f=fract(world/160.0+.5);
+         // Fixed clearing patch, wrapped with a small material crossfade.
+         vec2 uv=vec2(.35+.30*f.x,.52+.27*f.y);
+         vec4 sample=texture2D(u_texture,uv);
+         vec4 acrossX=.5*(texture2D(u_texture,vec2(.35,uv.y))+texture2D(u_texture,vec2(.65,uv.y)));
+         sample=mix(acrossX,sample,smoothstep(0.0,.09,min(f.x,1.0-f.x)));
+         vec4 acrossY=.5*(texture2D(u_texture,vec2(uv.x,.52))+texture2D(u_texture,vec2(uv.x,.79)));
+         return mix(acrossY,sample,smoothstep(0.0,.09,min(f.y,1.0-f.y)));
+      }
       vec2 floorWorld(vec2 p){
          float dy=min(p.y,155.0)-74.0;
          float rz=dy/(.32-dy/300.0),rx=(p.x-80.0)*(1.0+rz/300.0);
@@ -90,21 +109,13 @@ final class BattleScenery {
          vec2 point=vec2(u_canvas.x+uv.x*u_canvas.z,u_canvas.y+(1.0-uv.y)*u_canvas.w);
          vec2 world=floorWorld(point);
          float azimuth=atan((point.x-80.0)/145.0)+u_yaw;
-         float panoX=mirror(.5+azimuth/3.14159265);
-         vec2 sampleUv=vec2(.015+.97*panoX,clamp((144.0-point.y)/86.0,0.0,.62));
-         vec4 panorama=texture2D(u_texture,sampleUv);
-         float vegetation=smoothstep(.035,.15,panorama.g-panorama.r)*smoothstep(.025,.12,panorama.g-panorama.b);
-         if(u_kind>2.5&&u_kind<4.5){
-            sampleUv.x+=sin(u_time*1.3+sampleUv.y*31.0+sampleUv.x*13.0)*.0018*vegetation;
-            panorama=texture2D(u_texture,clamp(sampleUv,.5/u_size,1.0-.5/u_size));
-         }
-         // Only the empty clearing is sampled for the full ground plane. Upright
-         // painted trunks and rocks belong to the surrounding cylindrical vista.
-         vec2 groundUv=vec2(.35+.30*mirror(world.x/110.0),.52+.27*mirror(world.y/110.0));
-         vec4 ground=texture2D(u_texture,groundUv);
-         float horizon=smoothstep(95.0,116.0,point.y);
+         float panoramaV=clamp((150.0-point.y)/112.0,0.0,.62);
+         vec4 panorama=panoramaSample(azimuth,panoramaV);
+         vec4 ground=floorSample(world);
+         float horizon=smoothstep(76.0,94.0,point.y);
          vec4 base=mix(ground,panorama,horizon);
-         sampleUv=mix(groundUv,sampleUv,horizon);
+         // Lighting and weather change color, never the camera/illustration UVs.
+         vec2 sampleUv=mix(world/160.0,vec2(sin(azimuth),cos(azimuth))*2.0+panoramaV,horizon);
          float edge=smoothstep(.65,1.0,abs(uv.x-.5)*2.0);
          vec3 color=base.rgb;
          float clouds=noise(sampleUv*vec2(5.0,7.0)+vec2(-u_time*.023,u_time*.004));

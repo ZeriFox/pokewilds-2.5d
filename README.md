@@ -1,5 +1,7 @@
 # PokeWilds 2.5D — biomi, interfaccia e rilievi
 
+La revisione locale successiva a johto.5 aggiunge [terreno naturale, onde, pose montate e lotte senza deformazioni](docs/NATURAL-WORLD-2026-10-14.md). Per provarla nel checkout avvia `run-johto.cmd`; la release online johto.5 resta il pacchetto precedente finché non viene pubblicato un nuovo aggiornamento.
+
 Una ricostruzione PC di PokeWilds 0.8.11 in Java/LibGDX, con mondo prospettico, sprite animati [PMDCollab](https://sprites.pmdcollab.org/) e 19 allenatori in stile Pokémon Black / White. Il rework usa un atlante ambientale di 218 regioni e sei sequenze animate, pannelli moderni, arredi completi e mosse con effetti estesi al viewport. Il mondo aggiunge moduli di terreno per bioma, vento nella vegetazione, onde e risacca sulla sabbia. I Pokémon PMD e il sistema di rilievi vengono conservati. Fonti, trasformazioni e limiti di distribuzione sono registrati in [ASSET-RIGHTS.md](docs/ASSET-RIGHTS.md).
 
 La versione aggiunge **552 specie giocabili** alle 410 della base, per **962 specie totali**, una caldera vulcanica e rampe percorribili tra alcune terrazze montane. La mappa resta procedurale: il nuovo passaggio di generazione modifica davvero terreno e collisioni. La presentazione predefinita usa sprite 2D e la build normale esclude i modelli GLB. È una versione Windows PC x64, non un port Nintendo 3DS.

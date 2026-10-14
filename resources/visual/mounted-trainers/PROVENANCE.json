@@ -1,0 +1,292 @@
+{
+  "schema": 1,
+  "tool": "OpenAI built-in image_gen",
+  "source_sha256": "4335d339e1404fa0ffe5f0311724d4af88ac266116044d7e48ccb254f8172344",
+  "prompt": "PROMPT.txt",
+  "sheet": "bodies.png",
+  "frame_size": 32,
+  "directions": [
+    "down",
+    "up",
+    "left",
+    "right"
+  ],
+  "modes": [
+    "ride",
+    "surf",
+    "fly"
+  ],
+  "png_encoding": {
+    "name": "RGBA8-filter0-stored-deflate",
+    "version": 1,
+    "blockBytes": 65535,
+    "implementation": "tools/deterministic_png.py"
+  },
+  "crops": [
+    {
+      "mode": "ride",
+      "direction": "down",
+      "source": [
+        0,
+        0,
+        362,
+        360
+      ],
+      "alpha_bounds": [
+        99,
+        112,
+        303,
+        303
+      ],
+      "target": [
+        7,
+        18,
+        18,
+        13
+      ]
+    },
+    {
+      "mode": "surf",
+      "direction": "down",
+      "source": [
+        362,
+        0,
+        724,
+        360
+      ],
+      "alpha_bounds": [
+        106,
+        112,
+        261,
+        290
+      ],
+      "target": [
+        9,
+        18,
+        14,
+        13
+      ]
+    },
+    {
+      "mode": "fly",
+      "direction": "down",
+      "source": [
+        724,
+        0,
+        1086,
+        360
+      ],
+      "alpha_bounds": [
+        85,
+        126,
+        230,
+        288
+      ],
+      "target": [
+        8,
+        18,
+        15,
+        13
+      ]
+    },
+    {
+      "mode": "ride",
+      "direction": "up",
+      "source": [
+        0,
+        360,
+        362,
+        710
+      ],
+      "alpha_bounds": [
+        97,
+        74,
+        304,
+        259
+      ],
+      "target": [
+        7,
+        18,
+        18,
+        13
+      ]
+    },
+    {
+      "mode": "surf",
+      "direction": "up",
+      "source": [
+        362,
+        360,
+        724,
+        710
+      ],
+      "alpha_bounds": [
+        111,
+        75,
+        254,
+        253
+      ],
+      "target": [
+        9,
+        18,
+        14,
+        13
+      ]
+    },
+    {
+      "mode": "fly",
+      "direction": "up",
+      "source": [
+        724,
+        360,
+        1086,
+        710
+      ],
+      "alpha_bounds": [
+        90,
+        91,
+        225,
+        259
+      ],
+      "target": [
+        8,
+        18,
+        15,
+        13
+      ]
+    },
+    {
+      "mode": "ride",
+      "direction": "left",
+      "source": [
+        0,
+        710,
+        362,
+        1015
+      ],
+      "alpha_bounds": [
+        112,
+        48,
+        261,
+        242
+      ],
+      "target": [
+        8,
+        18,
+        15,
+        13
+      ]
+    },
+    {
+      "mode": "surf",
+      "direction": "left",
+      "source": [
+        362,
+        710,
+        724,
+        1015
+      ],
+      "alpha_bounds": [
+        116,
+        58,
+        246,
+        227
+      ],
+      "target": [
+        8,
+        18,
+        15,
+        13
+      ]
+    },
+    {
+      "mode": "fly",
+      "direction": "left",
+      "source": [
+        724,
+        710,
+        1086,
+        1015
+      ],
+      "alpha_bounds": [
+        82,
+        58,
+        242,
+        221
+      ],
+      "target": [
+        7,
+        18,
+        17,
+        13
+      ]
+    },
+    {
+      "mode": "ride",
+      "direction": "right",
+      "source": [
+        0,
+        1015,
+        362,
+        1448
+      ],
+      "alpha_bounds": [
+        132,
+        53,
+        282,
+        242
+      ],
+      "target": [
+        8,
+        18,
+        15,
+        13
+      ]
+    },
+    {
+      "mode": "surf",
+      "direction": "right",
+      "source": [
+        362,
+        1015,
+        724,
+        1448
+      ],
+      "alpha_bounds": [
+        116,
+        63,
+        246,
+        231
+      ],
+      "target": [
+        8,
+        18,
+        15,
+        13
+      ]
+    },
+    {
+      "mode": "fly",
+      "direction": "right",
+      "source": [
+        724,
+        1015,
+        1086,
+        1448
+      ],
+      "alpha_bounds": [
+        90,
+        63,
+        250,
+        227
+      ],
+      "target": [
+        7,
+        18,
+        17,
+        13
+      ]
+    }
+  ],
+  "composition": "Generated seated/folded bodies beneath resolved idle identity head; runtime material recoloring and outfit sampling. No walking frames or trainer leg crops."
+}

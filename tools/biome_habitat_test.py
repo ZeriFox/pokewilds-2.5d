@@ -18,7 +18,7 @@ def main() -> int:
     sources = [ROOT / 'tools/BiomeHabitatTest.java']
     if args.sources:
         sources += [ROOT / 'src/com/pkmngen/game' / name for name in
-                    ('BiomeProfiles.java', 'WildSpawnRules.java', 'GenIsland1.java', 'PlayerStanding.java', 'Pokemon.java')]
+                    ('BiomeProfiles.java', 'WildSpawnRules.java', 'ExpansionDex.java', 'GenIsland1.java', 'PlayerStanding.java', 'Pokemon.java')]
     classpath = [str(classes)] + ([str(ROOT / 'resources')] if args.sources else []) + [str(JAR)]
     commands = [[javac, '--release', '17', '-encoding', 'UTF-8', '-proc:none', '-classpath', str(JAR), '-d', str(classes), *map(str, sources)],
                 [java, '-Xmx2g', '-Dfile.encoding=UTF-8', '-Dpokewilds.visual=johto', '-Dpokewilds.models=off',

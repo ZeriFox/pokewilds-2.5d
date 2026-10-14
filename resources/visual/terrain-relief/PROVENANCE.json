@@ -57,6 +57,66 @@
         "horizontalNeighborMeanRgbDifference": 10.8161,
         "verticalNeighborMeanRgbDifference": 17.3544
       }
+    },
+    {
+      "file": "lava-surface.png",
+      "source": "sources/lava-surface-source.png",
+      "sourceSha256": "2d0ca59fbc9f28d44e5ddefeddd66b0b2e34255f569125400cf8a05d71b89836",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "sources/lava-surface-prompt.txt",
+      "promptSha256": "094f82f396805c7e1029f220ffc6cf033d4d1e4e5c46aee75fa2a3ee49e0caf0",
+      "generatedOutputName": "exec-406770b0-8991-41bc-9476-66023ffcdfb2.png",
+      "suggestedWrapMode": "Repeat",
+      "sha256": "a649eb8849ff18712230546c662ae1fbb6ff2943fddadaf36e2a319a98cf3701",
+      "edgeMetrics": {
+        "leftRightMeanRgbDifference": 14.5729,
+        "topBottomMeanRgbDifference": 13.0755,
+        "horizontalNeighborMeanRgbDifference": 19.1173,
+        "verticalNeighborMeanRgbDifference": 21.7633
+      }
+    },
+    {
+      "file": "earth-face.png",
+      "source": "sources/earth-face-source.png",
+      "sourceSha256": "d7bb19a50603d439989095879dd457ec99f370e90fdc933c2d6e0d33055fd1b4",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "sources/earth-face-prompt.txt",
+      "promptSha256": "671aa54b580e627ff04c4fb64412f8c97c55e09299a215d18126ed2503a81718",
+      "generatedOutputName": "exec-b4b8a79e-7f75-41f4-8f8a-c915a88440e1.png",
+      "suggestedWrapMode": "Repeat",
+      "sha256": "4c52eb12598c1b701dcdf552fbedda4e04b33669103999b315f6a180fadcff6b",
+      "edgeMetrics": {
+        "leftRightMeanRgbDifference": 6.5156,
+        "topBottomMeanRgbDifference": 12.5651,
+        "horizontalNeighborMeanRgbDifference": 12.2782,
+        "verticalNeighborMeanRgbDifference": 14.763
+      }
+    },
+    {
+      "file": "water-surface.png",
+      "source": "sources/water-surface-source.png",
+      "sourceSha256": "e1c31767384498ac44a8a8af4a63df08c477e667bbec5d9acdbc3d9c2b739663",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "sources/water-surface-prompt.txt",
+      "promptSha256": "62fd66fdb0c5c9dc54473e48b642e80d2b5c3341058d862c640c0b7d029d66d9",
+      "generatedOutputName": "exec-37ce52c6-9eab-4e0a-9d09-1974acbf9b73.png",
+      "suggestedWrapMode": "Repeat",
+      "sha256": "a24e89eb3010157d4dcb264d247b6d404066a6d5c38ca130518f784c88ac7ff4",
+      "edgeMetrics": {
+        "leftRightMeanRgbDifference": 5.0156,
+        "topBottomMeanRgbDifference": 11.0964,
+        "horizontalNeighborMeanRgbDifference": 11.4249,
+        "verticalNeighborMeanRgbDifference": 21.7494
+      }
     }
   ]
 }

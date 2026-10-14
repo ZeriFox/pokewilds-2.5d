@@ -50,3 +50,15 @@ treads. The selected source PNGs, exact prompts and hashes are preserved there.
 The importer performs deterministic nearest sampling to 128 pixels and canonical
 lossless PNG encoding. Runtime geometry and biome lighting provide the rounded
 contour and elevation; the pictures do not replace map or collision data.
+
+
+## Materiali naturali e pose montate, 14 ottobre 2026
+
+Acqua, lava, terra e corpi montati sono nuova arte generata con il tool integrato
+image_gen. Originali, prompt esatti, hash e trasformazioni deterministiche sono
+registrati in resources/visual/terrain-relief/PROVENANCE.json e
+resources/visual/mounted-trainers/PROVENANCE.json. I corpi montati vengono
+composti a runtime con le teste e i materiali degli allenatori già risolti:
+questa operazione non modifica l'origine o le condizioni degli asset preesistenti.
+I controlli prepare_terrain_relief.py --check e prepare_mounted_trainers.py --check
+riproducono i PNG consumati dal gioco.

@@ -10,7 +10,7 @@ import java.util.*;
 /** Desktop UI state only. Launching/loading and all inventory operations stay in original actions. */
 final class DesktopMenuController {
    enum Screen { TITLE, HOME, SETUP, TRAINERS, WARDROBE }
-   enum Field { MODE, ADVENTURE, SAVE, SIZE, NAME, TRAINER, FILE, ADDRESS, GO }
+   enum Field { MODE, ADVENTURE, SAVE, SIZE, NAME, TRAINER, WORLD_MODE, FILE, ADDRESS, GO }
    static final class Row {
       final Field field;final int legacyIndex;
       Row(Field field,int index){this.field=field;legacyIndex=index;}
@@ -30,6 +30,7 @@ final class DesktopMenuController {
    String wardrobeId="gold",wardrobeName="";
    int wardrobeSlot,wardrobeDirection;
    boolean wardrobeFromOptions;
+   boolean creativeWorldDraft;
    final Map<String,CharacterAppearance> selectedAppearances=new HashMap<>();
    boolean enter,back,settingsRequest,tab,editConfirm,editCancel,opened;
    float wheel;
@@ -87,7 +88,7 @@ final class DesktopMenuController {
    }
    void attach(DrawSetupMenu value) {
       if(setup==value)return;
-      text.cancel();appearanceDraft=null;selectedAppearances.clear();setup=value;
+      text.cancel();appearanceDraft=null;selectedAppearances.clear();creativeWorldDraft=false;setup=value;
       if(Game.staticGame!=null && setup.playerTypes.contains(Game.staticGame.player.character))setup.playerTypeIndex=setup.playerTypes.indexOf(Game.staticGame.player.character);
       if(!setup.playerTypes.contains("lyra")&&TrainerCatalog.complete("lyra"))setup.playerTypes.add("lyra");
       trainerChoices.clear();
@@ -113,12 +114,13 @@ final class DesktopMenuController {
          r.add(new Row(Field.ADVENTURE,1));r.add(new Row(Field.FILE,2));r.add(new Row(Field.GO,3));
       } else {
          r.add(new Row(Field.ADVENTURE,1));r.add(new Row(Field.SAVE,2));r.add(new Row(Field.SIZE,3));
-         if(setup.localHostJoinIndex==0){r.add(new Row(Field.NAME,4));r.add(new Row(Field.TRAINER,5));r.add(new Row(Field.GO,6));}
+         if(setup.localHostJoinIndex==0){r.add(new Row(Field.NAME,4));r.add(new Row(Field.TRAINER,5));r.add(new Row(Field.WORLD_MODE,7));r.add(new Row(Field.GO,6));}
          else r.add(new Row(Field.GO,4));
       }return r;
    }
    int selected(List<Row> rows){for(int i=0;i<rows.size();i++)if(rows.get(i).legacyIndex==DrawSetupMenu.currIndex)return i;return 0;}
-   static ModernUi.Box setupBox(int i){return new ModernUi.Box(7,102-i*13.2f,146,11.8f);}
+   static ModernUi.Box setupBox(int i,int count){float step=count>7?11.2f:13.2f;return new ModernUi.Box(7,102-i*step,146,step-1.4f);}
+   boolean creativeNewWorld(DrawSetupMenu value){return setup==value&&value.localHostJoinIndex==0&&value.newLoadIndex==0&&creativeWorldDraft;}
    static ModernUi.Box homeBox(int i){return new ModernUi.Box(27,69-i*13,106,11.5f);}
    static ModernUi.Box trainerBox(int i){return new ModernUi.Box(7+(i%5)*29.5f,75-(i/5)*30,27,27);}
    static ModernUi.Box optionBox(int i){return new ModernUi.Box(7,110-i*6.2f,146,5.9f);}
@@ -204,14 +206,15 @@ final class DesktopMenuController {
       if(cancel){change(Screen.HOME);return true;}
       List<Row> r=rows();int selected=selected(r);
       if(vertical!=0){selected=Math.floorMod(selected+vertical,r.size());DrawSetupMenu.currIndex=r.get(selected).legacyIndex;}
-      if(pointerButton==Buttons.LEFT)for(int i=0;i<r.size();i++)if(hit(setupBox(i))){selected=i;DrawSetupMenu.currIndex=r.get(i).legacyIndex;confirm=true;}
+      if(pointerButton==Buttons.LEFT)for(int i=0;i<r.size();i++)if(hit(setupBox(i,r.size()))){selected=i;DrawSetupMenu.currIndex=r.get(i).legacyIndex;confirm=true;}
       Row row=r.get(selected);
-      if(confirm && horizontal==0 && (row.field==Field.MODE||row.field==Field.ADVENTURE||row.field==Field.SIZE||row.field==Field.FILE))horizontal=1;
+      if(confirm && horizontal==0 && (row.field==Field.MODE||row.field==Field.ADVENTURE||row.field==Field.SIZE||row.field==Field.FILE||row.field==Field.WORLD_MODE))horizontal=1;
       if(horizontal!=0) {
          switch(row.field) {
             case MODE: setup.localHostJoinIndex=Math.floorMod(setup.localHostJoinIndex+horizontal,3);setup.newLoadIndex=0;DrawSetupMenu.currIndex=0;break;
             case ADVENTURE: setup.newLoadIndex=1-setup.newLoadIndex;break;
             case SIZE: setup.sizeIndex=Math.max(0,Math.min(5,setup.sizeIndex+horizontal));break;
+            case WORLD_MODE: creativeWorldDraft=!creativeWorldDraft;break;
             case FILE: if(!setup.fileNames.isEmpty())setup.fileIndex=Math.floorMod(setup.fileIndex+horizontal,setup.fileNames.size());break;
             case TRAINER: openTrainers();break;
             default: break;
@@ -320,7 +323,7 @@ final class DesktopMenuController {
       else if(optionIndex==12){draft.bindings=DesktopInterfaceSettings.defaults();message="Default controls restored in this draft. Save to apply.";}
       else if(optionIndex==15)openWardrobe(true);
       else if(optionIndex==16) {
-         if(optionsOwner instanceof DrawSetupMenu||!CreativeMode.local(Game.staticGame))message="Open a Local adventure, then Menu > F1 > Creative sandbox.";
+         if(optionsOwner instanceof DrawSetupMenu||!CreativeMode.local(Game.staticGame))message="Choose Creative in New Local adventure setup, or Menu > F1 while playing.";
          else {creative=new CreativeModeUi();InputProcessor.blockHeldInputs();}
       }
       else closeOptions(optionIndex==13);

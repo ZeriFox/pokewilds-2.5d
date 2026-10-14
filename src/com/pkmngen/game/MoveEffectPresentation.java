@@ -20,14 +20,17 @@ import java.nio.IntBuffer;
 public final class MoveEffectPresentation {
    public enum Scope { LOCAL, SCREEN }
    private final Scope scope;
+   private final String animationName;
+   private final ModernMoveEffects modern=new ModernMoveEffects();
+   private final int duration;
+   private int modernFrames;
    private FrameBuffer snapshot;
    private ShaderProgram colors;
-   private boolean captured;
    private int captureCount, rowFrames, screenFrames, localFrames, colorFrames, shrinkFrames;
    private final float[] orbitVertices=new float[20*20];
    private final com.badlogic.gdx.math.Vector3 projected=new com.badlogic.gdx.math.Vector3();
 
-   public MoveEffectPresentation(String animationName) { scope=scopeFor(animationName); }
+   public MoveEffectPresentation(String animationName) { this.animationName=animationName;scope=scopeFor(animationName);duration=ModernMoveEffects.family(animationName)>0?ModernMoveEffects.duration(animationName):1; }
 
    /** Explicit semantic classification, independent of transparent pixel bounds. */
    public static Scope scopeFor(String name) {
@@ -51,93 +54,32 @@ public final class MoveEffectPresentation {
       boolean recolor=has(properties,"inverse_colors")||has(properties,"darken_effect1")
          ||has(properties,"darken_effect2")||has(properties,"darken_effect3")
          ||has(properties,"lighten_effect1")||has(properties,"lighten_effect2");
-      if(!rows&&!recolor){if(properties.contains("screenshot:"))capture(game);return true;}
-      // Each distorted frame samples the current camera. Keeping the first turn
-      // screenshot would freeze the orbit behind Water Gun / Teleport / weather.
-      capture(game);
-      SpriteBatch batch=game.uiBatch;
-      ShaderProgram oldShader=batch.getShader();Color oldColor=new Color(batch.getColor());
-      boolean untargetedDistortion=properties.contains("row_displace:")&&!properties.contains("displace_target:");
-      boolean fullField=scope==Scope.SCREEN||recolor||untargetedDistortion;
-      Clip clip=new Clip(batch,bottom(),height(),!fullField);
-      try {
-         batch.setColor(Color.WHITE);
-         if(recolor) {
-            ensureShader();batch.setShader(colors);
-            colors.setUniformf("u_inverse",has(properties,"inverse_colors")?1f:0f);
-            colors.setUniformf("u_dark",has(properties,"darken_effect3")?1f:has(properties,"darken_effect2")?.66f:has(properties,"darken_effect1")?.33f:0f);
-            colors.setUniformf("u_light",has(properties,"lighten_effect2")?.66f:has(properties,"lighten_effect1")?.33f:0f);
-            colorFrames++;
+      Pokemon visualTarget=properties.contains("displace_target:player")?game.player.currPokemon:
+         properties.contains("displace_target:enemy")?game.battle.oppPokemon:action.target;
+      if(!rows&&!recolor){if(properties.contains("screenshot:"))capture(game,visualTarget);return true;}
+      // Legacy rows/inversions were authored for the flat monochrome field. On
+      // the modern arena their visual meaning is an actor pulse/afterimage; the
+      // environment is never copied, split, displaced or color-inverted.
+      capture(game,visualTarget);
+      if(rows){
+         rowFrames++;
+         if(properties.contains("row_displace:")){
+            double speed=Double.parseDouble(value(properties,"row_displace:"));
+            if(action.frameNum>=action.dispLastFrame+1.0/speed){action.dispLastFrame=action.frameNum;action.dispProgress++;}
          }
-         // Local rows replace only their authored target bands; repainting the whole
-         // snapshot would unnecessarily freeze/resample the untouched modern field.
-         if(fullField)strip(batch,left(),bottom(),width(),height(),left(),bottom(),width(),height());
-         if(rows) {
-            rowFrames++;
-            boolean ignorePlayer=action.name.contains("player")&&scope!=Scope.SCREEN;
-            boolean ignoreEnemy=action.name.contains("enemy")&&scope!=Scope.SCREEN;
-            for(String token:properties.split("\\s+"))if(token.startsWith("row_copy:")) {
-               String[] pair=token.substring(9).split(",");
-               int targetY=144-Integer.parseInt(pair[0]),sourceY=144-Integer.parseInt(pair[1]);
-               float x0=ignorePlayer&&targetY<112?86:scope==Scope.SCREEN?left():0;
-               float x1=ignoreEnemy&&targetY>=88?96:scope==Scope.SCREEN?left()+width():160;
-               if(scope==Scope.LOCAL)orbitStrip(game,x0,targetY,x1-x0,1,x0,sourceY,x1-x0,1);
-               else strip(batch,x0,targetY,x1-x0,1,x0,sourceY,x1-x0,1);
-            }
-            if(properties.contains("row_displace:")) {
-               double speed=Double.parseDouble(value(properties,"row_displace:"));
-               // Same progress accumulator and threshold as the original action.
-               if(action.frameNum>=action.dispLastFrame+1.0/speed) {
-                  action.dispLastFrame=action.frameNum;action.dispProgress++;
-               }
-               ignorePlayer=properties.contains("displace_target:enemy");
-               ignoreEnemy=properties.contains("displace_target:player");
-               for(int y=48;y<Math.ceil(bottom()+height());y++)
-                  if((!ignorePlayer||y>=88)&&(!ignoreEnemy||y<92)) {
-                     int shift=(int)(5.0*Math.sin((Math.PI/6)*(y+action.dispProgress)));
-                     displacedRow(game,y,shift,ignorePlayer,ignoreEnemy);
-                  }
-            }
-            if(properties.contains("row_split:")) {
-               int progress=Integer.parseInt(value(properties,"row_split:"));
-               ignorePlayer=action.name.contains("enemy");ignoreEnemy=action.name.contains("player");
-               for(int y=48;y<Math.ceil(bottom()+height());y++)
-                  if((!ignorePlayer||y>=88)&&(!ignoreEnemy||y<92))
-                     displacedRow(game,y,progress*(y%2==0?-1:1),ignorePlayer,ignoreEnemy);
-            }
-         }
-      } finally {
-         batch.flush();batch.setShader(oldShader);batch.setColor(oldColor);clip.close(batch);
       }
+      if(recolor)colorFrames++;
+      SpriteBatch batch=game.uiBatch;ShaderProgram incoming=batch.getShader();Color color=new Color(batch.getColor());
+      Clip clip=new Clip(batch,bottom(),height());
+      try{
+         batch.setColor(Color.WHITE);ensureShader();batch.setShader(colors);
+         colors.setUniformf("u_tint",recolor?.65f:.25f);
+         colors.setUniformf("u_alpha",recolor?.34f:.23f);
+         float shake=rows&&!ModernUi.get(game).reducedMotion()?(float)Math.sin(action.frameNum*.55)*1.2f:0;
+         Texture actor=snapshot.getColorBufferTexture();
+         batch.draw(actor,left()+shake,bottom(),width(),height(),0,0,1,1);
+      }finally{batch.flush();batch.setShader(incoming);batch.setColor(color);clip.close(batch);}
       return true;
-   }
-
-   private void displacedRow(Game game,int y,int shift,boolean ignorePlayer,boolean ignoreEnemy) {
-      float x0=ignorePlayer?86:ignoreEnemy?0:left(),x1=ignoreEnemy?96:ignorePlayer?160:left()+width();
-      // Keep the source band, shift its copied pixels, and clip only at viewport/UI.
-      if(scope==Scope.LOCAL&&(ignorePlayer||ignoreEnemy))orbitStrip(game,x0+shift,y,x1-x0,1,x0,y,x1-x0,1);
-      else strip(game.uiBatch,x0+shift,y,x1-x0,1,x0,y,x1-x0,1);
-   }
-
-   /** Targeted raster distortion follows the same orbit as its target, including
-    * reversed sides after half a revolution. UVs sample the current projected FBO. */
-   private void orbitStrip(Game game,float x,float y,float w,float h,float sx,float sy,float sw,float sh){
-      float packed=Color.WHITE.toFloatBits();int at=0;
-      for(int column=0;column<20;column++)for(int corner=0;corner<4;corner++){
-         float tx=(column+(corner>=2?1:0))/20f,ty=corner==1||corner==2?1:0;
-         game.johtoBattleRenderer.projectScenePoint(game,x+w*tx,y+h*ty,projected);
-         orbitVertices[at++]=projected.x;orbitVertices[at++]=projected.y;orbitVertices[at++]=packed;
-         game.johtoBattleRenderer.projectScenePoint(game,sx+sw*tx,sy+sh*ty,projected);
-         orbitVertices[at++]=(projected.x-left())/width();orbitVertices[at++]=(projected.y-bottom())/height();
-      }
-      game.uiBatch.draw(snapshot.getColorBufferTexture(),orbitVertices,0,at);
-   }
-
-   private void strip(SpriteBatch batch,float x,float y,float w,float h,float sx,float sy,float sw,float sh) {
-      Texture texture=snapshot.getColorBufferTexture();
-      float u=(sx-left())/width(),v=(sy-bottom())/height();
-      // This explicit-UV overload takes the lower edge first; FBO v=0 is bottom.
-      batch.draw(texture,x,y,w,h,u,v,u+sw/width(),v+sh/height());
    }
 
    /** Dig's two authored shrink stages retain the current PMD actor and foot anchor. */
@@ -163,7 +105,14 @@ public final class MoveEffectPresentation {
 
    /** Draw actual normal-move Sprite, not the SpriteProxy-only compatibility hook. */
    void drawFrame(Game game,Sprite frame,String properties) {
-      if(scope==Scope.SCREEN) {
+      boolean modernMove=false;
+      if(ModernMoveEffects.family(animationName)>0){
+         Clip clip=new Clip(game.uiBatch,bottom(),height());
+         try{modernMove=modern.draw(game,animationName,localFrames+screenFrames+1,duration);modernFrames++;}
+         finally{clip.close(game.uiBatch);}
+      }
+      if(modernMove){if(scope==Scope.SCREEN)screenFrames++;else localFrames++;}
+      else if(scope==Scope.SCREEN) {
          Clip clip=new Clip(game.uiBatch,bottom(),height());
          try {game.uiBatch.draw(frame.getTexture(),left(),bottom(),width(),height(),
             frame.getU(),frame.getV2(),frame.getU2(),frame.getV());screenFrames++;}
@@ -200,8 +149,8 @@ public final class MoveEffectPresentation {
       }
    }
 
-   /** Repaint only arena and actors to a viewport-sized target: no HUD, no action.step(). */
-   private void capture(Game game) {
+   /** Transparent target-actor buffer. No scenery/HUD pixels can enter row effects. */
+   private void capture(Game game,Pokemon target) {
       SpriteBatch batch=game.uiBatch;batch.flush();
       GlState state=new GlState();
       Matrix4 projection=new Matrix4(batch.getProjectionMatrix()),transform=new Matrix4(batch.getTransformMatrix());
@@ -216,16 +165,16 @@ public final class MoveEffectPresentation {
          snapshot.begin();Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
          batch.setProjectionMatrix(new Matrix4().setToOrtho2D(left(),bottom(),width(),height()));
          batch.setTransformMatrix(new Matrix4());batch.setShader(null);batch.setColor(Color.WHITE);
-         game.johtoBattleRenderer.drawBackground(game);
-         if(game.battle.oppPokemon!=null&&DrawBattle.shouldDrawOppPokemon&&!DrawBattle.hideOppPokemon)
+         Gdx.gl.glDepthMask(true);Gdx.gl.glClearColor(0,0,0,0);Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT|GL20.GL_DEPTH_BUFFER_BIT);
+         if(target!=null&&target==game.battle.oppPokemon&&DrawBattle.shouldDrawOppPokemon&&!DrawBattle.hideOppPokemon)
             game.battle.oppPokemon.sprite.draw(batch);
-         if(game.player.currPokemon!=null&&DrawBattle.shouldDrawOwnPokemon&&!DrawBattle.hideOwnPokemon)
+         else if(target!=null&&target==game.player.currPokemon&&DrawBattle.shouldDrawOwnPokemon&&!DrawBattle.hideOwnPokemon)
             game.player.currPokemon.backSprite.draw(batch);
-         batch.flush();captured=true;captureCount++;
+         batch.flush();captureCount++;
       } finally {
          batch.flush();
          batch.setProjectionMatrix(projection);batch.setTransformMatrix(transform);batch.setShader(shader);batch.setColor(color);
-         state.restore();
+         snapshot.end();state.restore();
       }
    }
 
@@ -234,7 +183,7 @@ public final class MoveEffectPresentation {
    private void ensureShader() {
       if(colors!=null)return;
       colors=new ShaderProgram("attribute vec4 a_position; attribute vec4 a_color; attribute vec2 a_texCoord0; uniform mat4 u_projTrans; varying vec4 v_color; varying vec2 v_uv; void main(){v_color=a_color;v_color.a*=255.0/254.0;v_uv=a_texCoord0;gl_Position=u_projTrans*a_position;}",
-         "#ifdef GL_ES\nprecision mediump float;\n#endif\nvarying vec4 v_color; varying vec2 v_uv; uniform sampler2D u_texture; uniform float u_inverse,u_dark,u_light; void main(){vec4 c=texture2D(u_texture,v_uv)*v_color;c.rgb=mix(c.rgb,vec3(1.0)-c.rgb,u_inverse);c.rgb=mix(c.rgb,vec3(0.0),u_dark);c.rgb=mix(c.rgb,vec3(1.0),u_light);gl_FragColor=c;}");
+         "#ifdef GL_ES\nprecision mediump float;\n#endif\nvarying vec4 v_color; varying vec2 v_uv; uniform sampler2D u_texture; uniform float u_tint,u_alpha; void main(){vec4 c=texture2D(u_texture,v_uv)*v_color;c.rgb=mix(c.rgb,vec3(.76,.86,1.0),u_tint);c.a*=u_alpha;gl_FragColor=c;}");
       if(!colors.isCompiled())throw new IllegalStateException("Move effect color shader: "+colors.getLog());
    }
 
@@ -260,6 +209,7 @@ public final class MoveEffectPresentation {
    }
    private static final class GlState {
       final int framebuffer=ints(GL20.GL_FRAMEBUFFER_BINDING,1)[0];
+      final java.nio.FloatBuffer clear=BufferUtils.newFloatBuffer(4);
       final int[] viewport=ints(GL20.GL_VIEWPORT,4),scissor=ints(GL20.GL_SCISSOR_BOX,4);
       final boolean depth=Gdx.gl.glIsEnabled(GL20.GL_DEPTH_TEST),clip=Gdx.gl.glIsEnabled(GL20.GL_SCISSOR_TEST),blend=Gdx.gl.glIsEnabled(GL20.GL_BLEND);
       final boolean depthMask=ints(GL20.GL_DEPTH_WRITEMASK,1)[0]!=0;
@@ -267,8 +217,9 @@ public final class MoveEffectPresentation {
       final int sourceAlpha=ints(GL20.GL_BLEND_SRC_ALPHA,1)[0],destinationAlpha=ints(GL20.GL_BLEND_DST_ALPHA,1)[0];
       final int active=ints(GL20.GL_ACTIVE_TEXTURE,1)[0],binding=ints(GL20.GL_TEXTURE_BINDING_2D,1)[0];
       final int texture0;
-      GlState(){Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);texture0=ints(GL20.GL_TEXTURE_BINDING_2D,1)[0];Gdx.gl.glActiveTexture(active);}
+      GlState(){Gdx.gl.glGetFloatv(GL20.GL_COLOR_CLEAR_VALUE,clear);Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);texture0=ints(GL20.GL_TEXTURE_BINDING_2D,1)[0];Gdx.gl.glActiveTexture(active);}
       void restore() {
+         Gdx.gl.glClearColor(clear.get(0),clear.get(1),clear.get(2),clear.get(3));
          Gdx.gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER,framebuffer);
          Gdx.gl.glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
          Gdx.gl.glScissor(scissor[0],scissor[1],scissor[2],scissor[3]);
@@ -289,5 +240,14 @@ public final class MoveEffectPresentation {
    public int getLocalFrames(){return localFrames;}
    public int getColorFrames(){return colorFrames;}
    public int getShrinkFrames(){return shrinkFrames;}
-   public void dispose(){if(snapshot!=null){snapshot.dispose();snapshot=null;}if(colors!=null){colors.dispose();colors=null;}captured=false;}
+   public int getModernFrames(){return modernFrames;}
+   public void dispose(){
+      // LibGDX ShaderProgram.dispose unbinds every current program, including a
+      // caller's SpriteBatch shader. Completion may happen inside that batch.
+      int caller=ints(GL20.GL_CURRENT_PROGRAM,1)[0];
+      if(colors!=null&&caller==colors.getHandle()||caller==modern.shaderHandle())caller=0;
+      if(snapshot!=null){snapshot.dispose();snapshot=null;}
+      if(colors!=null){colors.dispose();colors=null;}
+      modern.dispose();Gdx.gl.glUseProgram(caller);
+   }
 }

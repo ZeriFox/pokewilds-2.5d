@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "sourceCommit": "bc92d3b6029ef1abe9e7ad424c400b338f3c11fe",
+  "source": "https://raw.githubusercontent.com/PokeAPI/pokeapi/bc92d3b6029ef1abe9e7ad424c400b338f3c11fe/data/v2/csv/pokemon_species_flavor_text.csv",
+  "sourceSha256": "c341e602ab623084fef4c44ca4a174938e617802cfcf2deec830d824f688dc69",
+  "languageId": 9,
+  "ruleGroups": [
+    {
+      "species": [
+        "snover",
+        "abomasnow",
+        "snom",
+        "frosmoth",
+        "bergmite",
+        "avalugg",
+        "cubchoo",
+        "beartic",
+        "cryogonal"
+      ],
+      "evidenceVersions": [
+        "diamond",
+        "sword",
+        "shield",
+        "white",
+        "y",
+        "legends-arceus"
+      ],
+      "reason": "Snow and cold highland populations. Evolution relatives follow the same regional population."
+    },
+    {
+      "species": [
+        "finneon",
+        "lumineon",
+        "frillish",
+        "jellicent",
+        "skrelp",
+        "dragalge",
+        "clauncher",
+        "clawitzer"
+      ],
+      "evidenceVersions": [
+        "diamond",
+        "black",
+        "white",
+        "sword",
+        "shield"
+      ],
+      "reason": "Marine habitat, sea floor or seawater. Evolved forms remain in marine populations."
+    },
+    {
+      "species": [
+        "barboach",
+        "whiscash",
+        "basculin",
+        "basculegion"
+      ],
+      "evidenceVersions": [
+        "firered",
+        "ruby",
+        "ultra-moon",
+        "sword"
+      ],
+      "reason": "Riverbeds, swamps and lakes. Evolution relatives stay in these freshwater populations."
+    },
+    {
+      "species": [
+        "salandit",
+        "salazzle"
+      ],
+      "evidenceVersions": [
+        "moon",
+        "ultra-sun"
+      ],
+      "reason": "Volcanoes, dry rocky areas and caves."
+    },
+    {
+      "species": [
+        "morelull",
+        "shiinotic"
+      ],
+      "evidenceVersions": [
+        "moon",
+        "ultra-moon",
+        "shield",
+        "sun"
+      ],
+      "reason": "Woodland roots and dark forest; day encounters require sheltered deep woodland."
+    },
+    {
+      "species": [
+        "sandygast",
+        "palossand"
+      ],
+      "evidenceVersions": [
+        "shield"
+      ],
+      "reason": "Dry beaches; avoid immersion."
+    },
+    {
+      "species": [
+        "maractus"
+      ],
+      "evidenceVersions": [
+        "white",
+        "shield"
+      ],
+      "reason": "Arid desert population."
+    }
+  ],
+  "limits": [
+    "Broad canonical habitat metadata remains primary for other expansion species.",
+    "Species without known metadata or reviewed family rules retain original route defaults, not invented ecology.",
+    "Only expansion registration uses spawnRoutes; original route lists, multiplicity and authored scripted dungeon encounters stay intact.",
+    "No existing saved or owned Pokemon is relocated by these gates.",
+    "minDepth represents four-neighbor enclosure, not measured ocean bathymetry."
+  ]
+}

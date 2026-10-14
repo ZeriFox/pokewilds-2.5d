@@ -1,7 +1,14 @@
 # Modalità Creativa
 
+Alla creazione, scegli **New adventure**, lascia **Play mode: Local** e imposta
+**Game mode: Creative** prima di **Begin adventure**. Il campo si cambia con
+Invio, clic sinistro o A/D; **Adventure** resta la scelta iniziale. La scelta
+vale per il nuovo mondo e non modifica una partita già aperta. **Continue**
+carica la modalità salvata: non propone una nuova scelta.
+
 Durante una partita **Local**, apri il menù con Invio, premi **F1** e scegli
-**Creative sandbox**. L'interruttore **Creative mode** abilita immediatamente:
+**Creative sandbox** per accedere al catalogo o cambiare la modalità anche dopo
+la creazione. La modalità Creativa abilita:
 
 - Un catalogo di tutte le specie installate supportate, incluse quelle del Pokédex aggiuntivo.
 - Ricerca per nome, livello da 1 a 100 e scelta della variante Shiny.
@@ -24,7 +31,8 @@ Salva normalmente dal menù dell'avventura per conservare Pokémon, mondo e moda
 Il piccolo file `creative-mode.json` nella cartella `<mondo>.sav` contiene solo
 l'interruttore e l'identità del giocatore. Va trasferita tutta la cartella del salvataggio.
 Non cambia il formato dei file esistenti; un file assente o malformato lascia la modalità
-Avventura attiva. Le nuove avventure partono sempre in modalità Avventura.
+Avventura attiva. Le nuove avventure usano la modalità scelta alla creazione;
+in assenza di una scelta esplicita usano Avventura.
 
 La modalità è disabilitata nelle sessioni **Host** e **Join**. Nessuna scorta virtuale
 viene inviata in rete o salvata nell'inventario reale. I Pokémon e gli oggetti già creati

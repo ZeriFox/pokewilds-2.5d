@@ -16,9 +16,12 @@ final class TrainerCatalog {
    private final LinkedHashMap<String,Sheet> cache=new LinkedHashMap<>(32,.75f,true);
    private final Set<Texture> owned=Collections.newSetFromMap(new IdentityHashMap<>());
    private static final class Sheet {
-      final Texture texture;final TextureRegion[][] frames=new TextureRegion[4][3];long used;
-      Sheet(Pixmap pixels){texture=new Texture(pixels);texture.setFilter(Texture.TextureFilter.Nearest,Texture.TextureFilter.Nearest);
+      final Texture texture;final Pixmap pixels;final TextureRegion[][] frames=new TextureRegion[4][3];long used;
+      Sheet(Pixmap source){pixels=new Pixmap(source.getWidth(),source.getHeight(),Pixmap.Format.RGBA8888);
+         pixels.setBlending(Pixmap.Blending.None);pixels.drawPixmap(source,0,0);
+         texture=new Texture(pixels);texture.setFilter(Texture.TextureFilter.Nearest,Texture.TextureFilter.Nearest);
          for(int d=0;d<4;d++)for(int f=0;f<3;f++)frames[d][f]=new TextureRegion(texture,f*32,d*32,32,32);}
+      void dispose(){texture.dispose();pixels.dispose();}
    }
    static FileHandle source(String character,String pose) {
       if(character==null||!character.matches("[A-Za-z0-9_-]+"))return null;
@@ -48,7 +51,7 @@ final class TrainerCatalog {
       // Never dispose a texture already submitted by another player/card this frame.
       Iterator<Sheet> it=cache.values().iterator();
       while(cache.size()>=48&&it.hasNext()) {
-         Sheet old=it.next();if(old.used!=frame){owned.remove(old.texture);old.texture.dispose();it.remove();}
+         Sheet old=it.next();if(old.used!=frame){owned.remove(old.texture);old.dispose();it.remove();}
       }
    }
    TextureRegion modernFrame(String id,String direction,float seconds,boolean moving,boolean running) {
@@ -151,5 +154,10 @@ final class TrainerCatalog {
       return Arrays.asList("gold","mark","red","chase","gloria","hilbert","lyra","serena","brendan","summer").contains(id)?0xf83808ff:0x5048f8ff;
    }
    boolean owns(TextureRegion region){return region!=null&&owned.contains(region.getTexture());}
-   void dispose(){for(Sheet s:cache.values())s.texture.dispose();cache.clear();owned.clear();}
+   Pixmap copyPixels(TextureRegion region) {
+      if(region==null)return null;
+      for(Sheet sheet:cache.values())if(sheet.texture==region.getTexture())return MountedTrainerSprites.copyRegion(sheet.pixels,region);
+      return null;
+   }
+   void dispose(){for(Sheet s:cache.values())s.dispose();cache.clear();owned.clear();}
 }

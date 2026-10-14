@@ -33,7 +33,7 @@ public final class BiomeHabitatTest {
                 map = new PkmnMap("habitat-fixture");
                 map.rand = new Random(391);
                 levelScalingEnabled = false;
-                profiles(); habitat(); expansionHabitats(); fishing(); actualEncounters(); oasis(); waterMovement();
+                profiles(); habitat(); expansionHabitats(); reviewedFamilies(); fishing(); actualEncounters(); oasis(); waterMovement();
             } catch (Throwable error) { failure = error; }
             Gdx.app.exit();
         }
@@ -188,6 +188,42 @@ public final class BiomeHabitatTest {
             for (int sample = 0; sample < 1000; sample++)
                 check(WildSpawnRules.chooseFishing(pond, map.tiles, "day", "oasis_pond1", rodPool, filtered)
                     .equals(eligible.get(original.nextInt(eligible.size()))), "Fishing changed the original uniform selection sequence");
+        }
+        private void reviewedFamilies() {
+            map.tiles.clear();
+            WildSpawnRules.Habitat forest = WildSpawnRules.habitat(tile("green1", "forest1"), map.tiles, "day");
+            WildSpawnRules.Habitat snow = WildSpawnRules.habitat(tile("snow1", "snow1"), map.tiles, "day");
+            for (String species : List.of("snover", "abomasnow", "snom", "frosmoth", "bergmite", "avalugg", "cubchoo", "beartic", "cryogonal")) {
+                check(!WildSpawnRules.allows(species, forest), "Cold family enters a warm forest: " + species);
+                check(WildSpawnRules.allows(species, snow), "Snow habitat lost reviewed family: " + species);
+            }
+            WildSpawnRules.Habitat sea = WildSpawnRules.habitat(tile("water2", "ocean1"), map.tiles, "day");
+            WildSpawnRules.Habitat fresh = WildSpawnRules.habitat(tile("water1", "wooded_lake_water1"), map.tiles, "day");
+            for (String species : List.of("finneon", "lumineon", "frillish", "jellicent", "skrelp", "dragalge", "clauncher", "clawitzer")) {
+                check(WildSpawnRules.allows(species, sea), "Marine family rejected at sea: " + species);
+                check(!WildSpawnRules.allows(species, fresh), "Marine family enters freshwater: " + species);
+            }
+            for (String species : List.of("barboach", "whiscash", "basculin", "basculegion")) {
+                check(WildSpawnRules.allows(species, fresh), "Freshwater family rejected: " + species);
+                check(!WildSpawnRules.allows(species, sea), "Freshwater family enters seawater: " + species);
+            }
+            check(WildSpawnRules.chooseFishing(tile("water1", "wooded_lake_water1"), map.tiles, "day", "wooded_lake_water1",
+                List.of("frillish", "barboach"), new Random(17)).equals("barboach"), "Real rod selection uses marine fish in a forest pond");
+            WildSpawnRules.Habitat beach = WildSpawnRules.habitat(tile("sand1", "beach2"), map.tiles, "day");
+            WildSpawnRules.Habitat desert = WildSpawnRules.habitat(tile("desert2", "desert1"), map.tiles, "day");
+            for (String species : List.of("sandygast", "palossand")) {
+                check(WildSpawnRules.allows(species, beach) && !WildSpawnRules.allows(species, desert) && !WildSpawnRules.allows(species, sea),
+                    "Dry-beach habitat lost or confused with desert/water: " + species);
+            }
+            check(WildSpawnRules.allows("maractus", desert) && !WildSpawnRules.allows("maractus", forest), "Arid cactus ignores habitat");
+            WildSpawnRules.Habitat volcano = WildSpawnRules.habitat(tile("volcano1", "volcano1"), map.tiles, "day");
+            check(WildSpawnRules.allows("salandit", volcano) && !WildSpawnRules.allows("salandit", snow), "Volcanic/dry-rock family ignores habitat");
+            check(!WildSpawnRules.allows("morelull", forest), "Daylight forest gets a dark-woodland encounter");
+            check(WildSpawnRules.allows("morelull", WildSpawnRules.habitat(tile("green1", "forest1"), map.tiles, "night")), "Night woodland lost Morelull");
+            check(WildSpawnRules.allows("morelull", WildSpawnRules.habitat(tile("green1", "deep_forest"), map.tiles, "day")), "Sheltered woodland incorrectly forbids daytime Morelull");
+            check(!new Route("forest1", 10).allowedPokemon().contains("bergmite") && new Route("snow1", 10).allowedPokemon().contains("bergmite"), "Reviewed cold expansion population registered in the wrong route");
+            check(!new Route("wooded_lake_water1", 10).allowedPokemon().contains("skrelp") && new Route("ocean1", 10).allowedPokemon().contains("skrelp"), "Reviewed marine expansion population kept its old freshwater default");
+            check(new Route("forest1", 10).allowedPokemon().contains("morelull") && !new Route("snow1", 10).allowedPokemon().contains("morelull"), "Reviewed woodland expansion routing changed");
         }
         private void oasis() {
             Map<Vector2, Tile> tiles = new HashMap<>();

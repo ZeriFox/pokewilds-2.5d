@@ -3,6 +3,7 @@ package com.pkmngen.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
@@ -35,6 +36,7 @@ public final class BwAssets {
    private final Map<String, Float> anchorsX = new HashMap<>();
    private final Map<String, Float> anchorsY = new HashMap<>();
    private final TrainerCatalog trainers = new TrainerCatalog();
+   private final MountedTrainerSprites mounted = new MountedTrainerSprites();
    private final Set<String> customRegions = new HashSet<>();
    private static final SpriteLayout TRAINER_LAYOUT = new SpriteLayout();
    private final Set<String> missing = new HashSet<>();
@@ -146,6 +148,7 @@ public final class BwAssets {
    }
 
    private void disposeTextures() {
+      mounted.dispose();
       trainers.dispose();
       for (Texture texture : textures.values()) texture.dispose();
       textures.clear();
@@ -285,6 +288,25 @@ public final class BwAssets {
    public TextureRegion trainer(Player player,String direction,float seconds,boolean moving) {
       return trainerFrame(player==null?"gold":player.character,direction,seconds,moving,
          running(player,moving),player==null?null:player.color,CharacterAppearance.player(player));
+   }
+   /** Dedicated mounted body, resolved from the idle identity and its current wardrobe. */
+   TextureRegion mountedTrainer(Player player,String move,float seconds) {
+      String id=lower(player==null?"gold":player.character),direction=player==null?"down":player.dirFacing;
+      String dir="up".equals(direction)||"left".equals(direction)||"right".equals(direction)?direction:"down";
+      String pose=MountedTrainerSprites.pose(move);
+      TextureRegion override=trainerOverride(id,pose,dir,1);
+      if(override==null)override=trainerOverride(femaleTrainer(id)?"female":"male",pose,dir,1);
+      if(override!=null)return override;
+      TextureRegion idle=trainer(player,dir,seconds,false);
+      return mounted.frame(idle,move,dir,this::trainerPixels);
+   }
+   private Pixmap trainerPixels(TextureRegion region) {
+      Pixmap copy=trainers.copyPixels(region);if(copy!=null)return copy;
+      for(Map.Entry<String,Texture> entry:textures.entrySet())if(entry.getValue()==region.getTexture()) {
+         Pixmap source=new Pixmap(Gdx.files.internal(entry.getKey()));
+         try{return MountedTrainerSprites.copyRegion(source,region);}finally{source.dispose();}
+      }
+      throw new IllegalArgumentException("Unowned trainer texture cannot be posed");
    }
    public TextureRegion classicTrainer(String character,String direction,float seconds,boolean moving,com.badlogic.gdx.graphics.Color color) { return trainers.frame(character,direction,seconds,moving,color); }
    public TextureRegion trainer(String character, String direction, float seconds, boolean moving) {

@@ -177,6 +177,7 @@ public final class NatureAnimationTest {
          world("volcano1","volcano",false);
          for(int y=-256;y<=256;y+=16)for(int x=-256;x<=256;x+=16)if(x<-16||x>16)put("lava1","",x,y,"volcano");
          put("volcano1","tree1",64,64,"volcano");compare("08-lava-flow",true,true);
+         lavaMaterial();
          world("desert6","desert",false);put("desert6","cactus1",-32,32,"desert");
          put("desert6","rock1",48,32,"desert");compare("09-rigid-desert",false,true);
          world("house5_floor1","interior",true);put("house5_floor1","house_couch1",48,32,"interior");
@@ -205,6 +206,20 @@ public final class NatureAnimationTest {
          }
          require(water>100,"Open-ocean probe did not render actual fluid geometry");
          System.out.println("NATURE ocean: same-atlas-frame changedPixels="+total+", activeRegions="+active+", luminanceDeviation="+variance+", all shoreDistances=16");
+      }
+      void lavaMaterial()throws Exception {
+         byte[] pixels=draw(null,3.2f,false);int molten=0,crust=0;
+         for(int y=80;y<560;y++)for(int x=24;x<300;x++) {
+            int i=(y*WIDTH+x)*4,r=pixels[i]&255,g=pixels[i+1]&255,b=pixels[i+2]&255;
+            if(r>180&&r>b*2&&g>50)molten++;
+            if(r<115&&g<100&&b<115)crust++;
+         }
+         require(molten>15000&&crust>15000,"Lava lacks visibly distinct magma and dark crust: "+molten+"/"+crust);
+         List<float[]> vertices=meshVertices("geometry",3.125f);
+         require(vertices.size()>100,"Dedicated molten material is not used by actual lava geometry");
+         for(float[] v:vertices) {
+            require(Math.abs(v[4]-v[0]/64)<.001f&&Math.abs(v[5]-v[2]/64)<.001f,"Lava material restarts at a tile boundary");
+         }
       }
       void crownScenes()throws Exception {
          world("green1","forest",false);put("green1","tree1",-32,32,"forest");
@@ -362,6 +377,8 @@ public final class NatureAnimationTest {
             for(int i=0;i<vertices.size;i+=8) {
                float style=vertices.get(i+6);if(style>=-.5f)continue;
                if(style< -1.5f)sand++;else water++;
+               if(style> -1.5f)require(Math.abs(vertices.get(i+4)-vertices.get(i)/80)<.001f
+                  &&Math.abs(vertices.get(i+5)-vertices.get(i+2)/80)<.001f,"Water wave texture restarts at a tile edge");
                float distance=vertices.get(i+7);
                require(Float.isFinite(distance)&&distance>=0&&distance<=WorldNatureMotion.MAX_SHORE_DISTANCE,"Invalid GPU shore distance");
                String coordinate=vertices.get(i)+":"+vertices.get(i+2);

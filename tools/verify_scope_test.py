@@ -19,7 +19,7 @@ def main() -> int:
             raise RuntimeError("Test copy escaped the intended temporary directory")
         shutil.copytree(verifier.ROOT / "src", root / "src")
         shutil.copytree(verifier.ROOT / verifier.CLASSIC_SOURCES, root / verifier.CLASSIC_SOURCES)
-        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE, *verifier.TERRAIN_ARCHIVE, *verifier.LIVING_WORLD_ARCHIVE, *verifier.CINEMATIC_NATURE_ARCHIVE, *verifier.TRAINER_REDRAW_ARCHIVE, *verifier.CINEMATIC_CUSTOMIZATION_ARCHIVE, *verifier.PLAYTEST_ARCHIVE, *verifier.RELIEF_ARCHIVE]:
+        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE, *verifier.TERRAIN_ARCHIVE, *verifier.LIVING_WORLD_ARCHIVE, *verifier.CINEMATIC_NATURE_ARCHIVE, *verifier.TRAINER_REDRAW_ARCHIVE, *verifier.CINEMATIC_CUSTOMIZATION_ARCHIVE, *verifier.PLAYTEST_ARCHIVE, *verifier.RELIEF_ARCHIVE, *verifier.NATURAL_WORLD_ARCHIVE]:
             target = root / source
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / source, target)
@@ -92,7 +92,7 @@ def main() -> int:
         reject_inventory("Creative sidecar removed",verifier.PREFIX+"PkmnMap.java",
             "         CreativeMode.save(game);\n","")
         reject_inventory("Creative reset on load",verifier.PREFIX+"DrawSetupMenu.java",
-            "if (this.newLoadIndex == 0) CreativeMode.newWorld(game);","if (this.newLoadIndex == 1) CreativeMode.newWorld(game);")
+            "if (this.newLoadIndex == 0) CreativeMode.newWorld(game, this);","if (this.newLoadIndex == 1) CreativeMode.newWorld(game, this);")
         reject_inventory("Safari capture identity",verifier.PREFIX+"DrawBattleMenuSafariZone.java",
             'CaptureBallVisual.select(game, "safari ball");','CaptureBallVisual.select(game, "master ball");')
         reject("input changed after freeze", verifier.PREFIX + "InputProcessor.java", append)
@@ -143,6 +143,10 @@ def main() -> int:
             reject("pre-relief checkpoint changed "+name,name,append)
         reject("relief texture loader changed after freeze",verifier.PREFIX+"TerrainReliefAssets.java",append)
         reject("relief renderer changed after freeze",verifier.PREFIX+"JohtoRenderer.java",append)
+        for name in verifier.NATURAL_WORLD_ARCHIVE:
+            reject("pre-natural-world checkpoint changed "+name,name,append)
+        for name in ("MountedTrainerSprites.java","ModernMoveEffects.java"):
+            reject("natural-world helper changed after freeze "+name,verifier.PREFIX+name,append)
         verifier.audit(root)
     report = destination / "results.txt"
     report.write_text("\n".join(results) + f"\nSCOPE NEGATIVE PASS: {len(results)} mutations rejected\n", encoding="utf-8", newline="\n")
