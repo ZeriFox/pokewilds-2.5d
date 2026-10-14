@@ -234,7 +234,9 @@ public final class TerrainReadabilityTest {
          require(!e.isSloped(flatRamp),"Flat stairs fixture accidentally gained elevation");
          require(e.isSloped(slopeRamp),"Terrace entrance is flat");
          require(e.height(8,100)-e.height(8,24)>6,"Terrace lacks an upper walking surface");
-         TextureRegion steps=BwAssets.get().named(BiomeProfiles.visualForTile(flatRamp).cliff("ramp"));
+         BiomeProfiles.Profile profile=BiomeProfiles.visualForTile(flatRamp);
+         TextureRegion steps=TerrainReliefAssets.get().stair(flatRamp,profile);
+         if(steps==null)steps=BwAssets.get().named(profile.cliff("ramp"));
          int texturedVertices=0;
          WorldMeshBatch batch=(WorldMeshBatch)field(JohtoRenderer.class,"geometry").get(r);
          Map<?,?> groups=(Map<?,?>)field(WorldMeshBatch.class,"groups").get(batch);
