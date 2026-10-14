@@ -20,3 +20,12 @@ I prompt esatti e gli originali sono conservati in `sources/`, con hash in
 l'importatore applica solo campionamento nearest deterministico a 128 pixel
 e codifica PNG lossless riproducibile. Verifica: `python
 tools/prepare_terrain_relief.py --check`.
+
+## Materiali v2 per colline e montagne
+
+Il renderer usa `rock-face-v2.png` (massi irregolari), `earth-face-v2.png`
+(zolle di terra con pietre) e `hill-surface-v2.png` (sommità minerale chiara).
+Sostituiscono le fasce orizzontali fitte nei rilievi; i PNG precedenti restano
+conservati per confronti. Sono tre nuove generazioni originali con il tool
+integrato image_gen, ciascuna con prompt completo e sorgente in `sources/`.
+Il medesimo importatore e PROVENANCE coprono anche questi file.

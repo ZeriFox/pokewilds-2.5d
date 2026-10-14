@@ -206,6 +206,23 @@ public final class NatureAnimationTest {
          }
          require(water>100,"Open-ocean probe did not render actual fluid geometry");
          System.out.println("NATURE ocean: same-atlas-frame changedPixels="+total+", activeRegions="+active+", luminanceDeviation="+variance+", all shoreDistances=16");
+         // A one-byte tint change technically animated the old material, but
+         // its painted wave ridges still looked attached to the map. Require
+         // a clearly readable quarter-second change across independent water
+         // areas, at a fixed camera and outside every actor/shore footprint.
+         byte[] quarter=draw(null,3.45f,false);double sum=0;int visibleRegions=0;
+         for(int row=0;row<3;row++)for(int col=0;col<3;col++) {
+            if(row==1&&col==1)continue;
+            double movement=regionDelta(a,quarter,80+col*280,60+row*190,240,150);
+            int perceptible=changedAbove(a,quarter,80+col*280,60+row*190,240,150,36);
+            System.out.println("NATURE water-motion region="+row+","+col+", quarterSecondMeanDelta="+movement+", perceptiblePixels="+perceptible);
+            // At least 10% of every region must move by an average of twelve
+            // RGB levels. This rejects tiny lighting/rounding-only changes.
+            require(movement>4.5&&perceptible>=3600,"Water texture looks stationary within a quarter second: "+row+","+col);
+            visibleRegions++;sum+=movement;
+         }
+         require(visibleRegions==8,"Water motion is missing from an independent ocean region");
+         System.out.println("NATURE water-motion: mean quarter-second delta="+(sum/8));
       }
       void lavaMaterial()throws Exception {
          byte[] pixels=draw(null,3.2f,false);int molten=0,crust=0;
@@ -288,6 +305,19 @@ public final class NatureAnimationTest {
          int count=0;for(int y=bottom;y<bottom+height;y++)for(int x=left;x<left+width;x++) {
             int i=(y*WIDTH+x)*4;if(a[i]!=b[i]||a[i+1]!=b[i+1]||a[i+2]!=b[i+2])count++;
          }return count;
+      }
+      int changedAbove(byte[] a,byte[] b,int left,int bottom,int width,int height,int threshold) {
+         int count=0;for(int y=bottom;y<bottom+height;y++)for(int x=left;x<left+width;x++) {
+            int i=(y*WIDTH+x)*4,difference=0;
+            for(int c=0;c<3;c++)difference+=Math.abs((a[i+c]&255)-(b[i+c]&255));
+            if(difference>=threshold)count++;
+         }return count;
+      }
+      double regionDelta(byte[] a,byte[] b,int left,int bottom,int width,int height) {
+         long sum=0;for(int y=bottom;y<bottom+height;y++)for(int x=left;x<left+width;x++) {
+            int i=(y*WIDTH+x)*4;
+            for(int c=0;c<3;c++)sum+=Math.abs((a[i+c]&255)-(b[i+c]&255));
+         }return sum/(double)(width*height*3);
       }
       double meanLuminance(byte[] pixels) {
          double sum=0;for(int i=0;i<pixels.length;i+=4)sum+=luma(pixels,i);return sum/(WIDTH*HEIGHT);

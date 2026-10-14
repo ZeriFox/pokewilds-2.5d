@@ -222,7 +222,16 @@ public final class JohtoRenderer {
          + "c.rgb=mix(c.rgb,vec3(.22,.53,.59),.23);c.a*=mask*(.84+.10*wave);"
          + "materialNormal=normalize(vec3(-.12*cos(p.x*.24-u_time),1.0,.10*sin(p.y*.27+u_time)));wetness=.72;"
          + "}else if(v_style<-.5){vec2 p=vec2(v_world.x,-v_world.y);"
-         + "if(v_style> -1.5)c=texture2D(u_texture,v_texCoords+vec2(u_time*.003,-u_time*.002))*v_color;"
+         // Move the painted water as well as its lighting: a slow single UV drift
+         // looked frozen beside the much larger stationary texture crests.
+         // Both currents are world-continuous and the refraction stays below
+         // one world pixel, so banks, tiles and sprite silhouettes never swim.
+         + "if(v_style> -1.5){vec2 refract=vec2(sin(dot(p,vec2(.09,.06))-u_time*1.30),"
+         + "cos(dot(p,vec2(-.07,.11))+u_time*.90))*.0075;"
+         + "vec2 current=vec2(u_time*.021,-u_time*.012);"
+         + "vec4 flowing=texture2D(u_texture,v_texCoords+current+refract);"
+         + "vec4 crossing=texture2D(u_texture,v_texCoords+vec2(-u_time*.009,u_time*.016)-refract.yx*.65);"
+         + "c=mix(flowing,crossing,.16)*v_color;}"
          + "float bend=.92*sin(dot(p,vec2(.032,.021)))+.38*sin(p.y*.043-p.x*.013-u_time*.11);"
          + "float swell=sin(dot(p,vec2(.13,.085))+bend-u_time*1.35);"
          + "float small=sin(dot(p,vec2(-.067,.19))+.35*sin(p.x*.043)+u_time*.75);"
@@ -541,7 +550,9 @@ public final class JohtoRenderer {
    /** Natural exposed soil, turf lip and shadow at the actual high surface.
     * Height is conveyed by terrain; no directional glyphs are painted on it. */
    private void jumpLedgeCue(Tile tile) {
-      if(tile.ledgeDir==null||tile.isWaterfall)return;
+      // Large geological contours have their own rock shoulder. The short soil
+      // shelf belongs only to an actual jumpable hill, never a mountain face.
+      if(!WorldReadability.smallJumpLedge(tile))return;
       float dx="left".equals(tile.ledgeDir)?-1:"right".equals(tile.ledgeDir)?1:0;
       float dy=dx!=0?0:"up".equals(tile.ledgeDir)?1:-1,tx=-dy,ty=dx;
       float cx=tile.position.x+8,cy=tile.position.y+8,previous=surfaceLift;surfaceLift=0;
@@ -838,7 +849,7 @@ public final class JohtoRenderer {
    /** A terrain cell is its upper surface, not a flat floor with a wall prop. */
    private void terrainSurface(Game game,Tile tile,TextureRegion ground) {
       float x=tile.position.x,y=tile.position.y,previous=surfaceLift;surfaceLift=0;
-      TextureRegion art=ground;
+      TextureRegion art=terrainArt(tile,ground);
       float a=terrainHeight(tile,x+.01f,y+.01f),b=terrainHeight(tile,x+15.99f,y+.01f);
       float c=terrainHeight(tile,x+15.99f,y+15.99f),d=terrainHeight(tile,x+.01f,y+15.99f);
       // Directional light makes the incline legible even when it shares the
@@ -858,8 +869,26 @@ public final class JohtoRenderer {
       } else if(tile.isLava||WorldNatureMotion.water(tile))surfacePatch(tile,art,x,y,x+16,y+16,0,
          WHITE,WHITE,WHITE,WHITE,geometry,style);
       else if(hasCliffBevel(tile)) plateauSurface(tile,art,light,style);
-      else quad(geometry.buffer(art.getTexture()),x,a,-y,x+16,b,-y,x+16,c,-y-16,x,d,-y-16,art,color(light,light,light),style);
+      else if(art==TerrainReliefAssets.get().cap()) {
+         Buffer top=geometry.buffer(art.getTexture());float tint=color(light,light,light);
+         plateauVertex(top,art,x,y,a,0,0,tint,style);plateauVertex(top,art,x,y,b,16,0,tint,style);
+         plateauVertex(top,art,x,y,c,16,16,tint,style);plateauVertex(top,art,x,y,c,16,16,tint,style);
+         plateauVertex(top,art,x,y,d,0,16,tint,style);plateauVertex(top,art,x,y,a,0,0,tint,style);
+      } else quad(geometry.buffer(art.getTexture()),x,a,-y,x+16,b,-y,x+16,c,-y-16,x,d,-y-16,art,color(light,light,light),style);
       surfaceLift=previous;
+   }
+
+   /** All top-facing fragments, including a rounded lower wedge, share the same
+    * material resolution. A saved interior floor always takes precedence. */
+   private TextureRegion terrainArt(Tile tile,TextureRegion ground) {
+      String base=tile.name==null?"":tile.name;
+      if(!tile.isWater&&!tile.isLava&&!ModernWorldGenerator.isRamp(tile)
+         &&!WorldReadability.plainFloor(tile.nameUpper)&&elevation.tileHeight(tile)>3
+         &&(base.startsWith("mountain")||base.startsWith("rock"))) {
+         TextureRegion rockCap=TerrainReliefAssets.get().cap();
+         if(rockCap!=null)return rockCap;
+      }
+      return ground;
    }
 
    /** Rounded convex rock corners stay inside the old cell footprint. Slopes,
@@ -880,7 +909,7 @@ public final class JohtoRenderer {
    private boolean hasCliffBevel(Tile tile) {
       return cliffBevel(tile,0)||cliffBevel(tile,1)||cliffBevel(tile,2)||cliffBevel(tile,3);
    }
-   private float cliffRadius(Tile tile) { return WorldReadability.smallJumpLedge(tile)?2.7f:4.2f; }
+   private float cliffRadius(Tile tile) { return WorldReadability.smallJumpLedge(tile)?3.5f:5.8f; }
    private float cornerX(int corner,float radius,float f) {
       float center=corner==0||corner==3?radius:16-radius;
       return center+MathUtils.cos(MathUtils.PI+corner*MathUtils.PI*.5f+f*MathUtils.PI*.5f)*radius;
@@ -910,8 +939,10 @@ public final class JohtoRenderer {
       }
    }
    private void plateauVertex(Buffer mesh,TextureRegion art,float x,float y,float h,float px,float py,float tint,float style) {
-      vertex(mesh,x+px,h,-y-py,tint,MathUtils.lerp(art.getU(),art.getU2(),px/16),
-         MathUtils.lerp(art.getV2(),art.getV(),py/16),style);
+      boolean geological=art==TerrainReliefAssets.get().cap();
+      float u=geological?(x+px)/32f:px/16,v=geological?(y+py)/32f:py/16;
+      vertex(mesh,x+px,h,-y-py,tint,MathUtils.lerp(art.getU(),art.getU2(),u),
+         MathUtils.lerp(art.getV2(),art.getV(),v),style);
    }
 
    private float terrainHeight(Tile tile,float x,float y) {
@@ -962,15 +993,17 @@ public final class JohtoRenderer {
          if(cliffBevel(tile,cornerA)){if(side<2)x0+=radius;else y0+=radius;}
          if(cliffBevel(tile,cornerB)){if(side<2)x1-=radius;else y1-=radius;}
          cliffFace(tile,profile,face,authored,side,x0,y0,x1,y1,lowA,lowB,a,b,shade);
-         // A fine edge on the plateau and a contact shadow at the foot give
-         // complementary cues for going up and down, without a thick wall cap.
+         // An irregular weathered shoulder belongs to the actual upper ground,
+         // with a contact shadow below. It is neither a rail nor a flat sand lid.
          if(Math.max(a-lowA,b-lowB)>3) {
-            float ix=-dx*1.1f,iy=-dy*1.1f;
-            float ha=terrainHeight(tile,MathUtils.clamp(x0+ix,x+.01f,x+15.99f),MathUtils.clamp(y0+iy,y+.01f,y+15.99f));
-            float hb=terrainHeight(tile,MathUtils.clamp(x1+ix,x+.01f,x+15.99f),MathUtils.clamp(y1+iy,y+.01f,y+15.99f));
-            quad(translucent.buffer(whiteTexture),x0,a+.065f,-y0,x1,b+.065f,-y1,
-               x1+ix,hb+.065f,-y1-iy,x0+ix,ha+.065f,-y0-iy,white,Color.toFloatBits(.82f,.88f,.70f,.08f));
-            float ox=dx*2.7f,oy=dy*2.7f;
+            for(int segment=0;segment<8;segment++) {
+               float f0=segment/8f,f1=(segment+1)/8f;
+               terrainShoulder(tile,profile,MathUtils.lerp(x0,x1,f0),MathUtils.lerp(y0,y1,f0),
+                  MathUtils.lerp(x0,x1,f1),MathUtils.lerp(y0,y1,f1),
+                  MathUtils.lerp(a,b,f0),MathUtils.lerp(a,b,f1),dx,dy,dx,dy);
+            }
+            float footWidth=MathUtils.clamp(Math.max(a-lowA,b-lowB)*.34f,2.7f,5.2f);
+            float ox=dx*footWidth,oy=dy*footWidth;
             float la=terrainHeight(next,MathUtils.clamp(x0+ox,next.position.x+.01f,next.position.x+15.99f),
                MathUtils.clamp(y0+oy,next.position.y+.01f,next.position.y+15.99f));
             float lb=terrainHeight(next,MathUtils.clamp(x1+ox,next.position.x+.01f,next.position.x+15.99f),
@@ -993,6 +1026,7 @@ public final class JohtoRenderer {
          TextureRegion floor=assets.terrain(low,natureSeconds);
          if(floor==null)floor=assets.cell(WorldMaterials.terrainName(low),low.position.x,low.position.y,natureSeconds);
          if(floor==null)floor=white;
+         floor=terrainArt(low,floor);
          // Both the top and face use the same smooth quarter-circle. Fill
          // the small removed wedge at the real lower height, sealing the contour.
          for(int segment=0;segment<CLIFF_CORNER_SEGMENTS;segment++) {
@@ -1008,16 +1042,52 @@ public final class JohtoRenderer {
             plateauVertex(groundMesh,floor,x,y,bottom,cx-x,cy-y,WHITE,0);
             plateauVertex(groundMesh,floor,x,y,bottom,ax-x,ay-y,WHITE,0);
             plateauVertex(groundMesh,floor,x,y,bottom,bx-x,by-y,WHITE,0);
-            // The rim rounds with the terrain instead of stopping at a diagonal.
             float nx0=MathUtils.cos(angle0),ny0=MathUtils.sin(angle0);
             float nx1=MathUtils.cos(angle1),ny1=MathUtils.sin(angle1);
-            quad(translucent.buffer(whiteTexture),ax,top+.065f,-ay,bx,top+.065f,-by,
-               bx-nx1*1.1f,top+.065f,-by+ny1*1.1f,ax-nx0*1.1f,top+.065f,-ay+ny0*1.1f,
-               white,Color.toFloatBits(.82f,.88f,.70f,.08f));
+            terrainShoulder(tile,profile,ax,ay,bx,by,top,top,nx0,ny0,nx1,ny1);
          }
          roundedCornerFrames++;
       }
       surfaceLift=previous;
+   }
+
+   /** The broken stone/soil edge fades inward, following the same height plane
+    * as the ground. World-space width and UVs remain continuous between cells. */
+   private void terrainShoulder(Tile tile,BiomeProfiles.Profile profile,float ax,float ay,float bx,float by,
+         float topA,float topB,float nx0,float ny0,float nx1,float ny1) {
+      if(tile.isWater||tile.isLava||ModernWorldGenerator.isRamp(tile))return;
+      TextureRegion art=TerrainReliefAssets.get().cap();if(art==null)return;
+      float width=WorldReadability.smallJumpLedge(tile)?2.8f:5.0f;
+      float wa=width+.48f*MathUtils.sin(ax*.29f+ay*.23f)+.25f*MathUtils.sin(ax*.79f-ay*.37f);
+      float wb=width+.48f*MathUtils.sin(bx*.29f+by*.23f)+.25f*MathUtils.sin(bx*.79f-by*.37f);
+      float ix0=ax-nx0*wa,iy0=ay-ny0*wa,ix1=bx-nx1*wb,iy1=by-ny1*wb;
+      float x=tile.position.x,y=tile.position.y;
+      float innerA=terrainHeight(tile,MathUtils.clamp(ix0,x+.01f,x+15.99f),MathUtils.clamp(iy0,y+.01f,y+15.99f));
+      float innerB=terrainHeight(tile,MathUtils.clamp(ix1,x+.01f,x+15.99f),MathUtils.clamp(iy1,y+.01f,y+15.99f));
+      float red=.68f,green=.66f,blue=.56f;
+      if(profile.id.equals("snow")){red=.73f;green=.80f;blue=.88f;}
+      else if(profile.id.equals("volcano")){red=.43f;green=.42f;blue=.52f;}
+      else if(TerrainReliefAssets.earth(tile,profile)){red=.61f;green=.69f;blue=.46f;}
+      else if(profile.id.equals("desert")||profile.id.equals("beach")||profile.id.equals("oasis")){red=.79f;green=.68f;blue=.48f;}
+      float outer=Color.toFloatBits(red*.94f,green*.94f,blue*.94f,.98f);
+      float middle=Color.toFloatBits(red,green,blue,.80f),inner=Color.toFloatBits(red,green,blue,0);
+      float mx0=MathUtils.lerp(ax,ix0,.46f),my0=MathUtils.lerp(ay,iy0,.46f);
+      float mx1=MathUtils.lerp(bx,ix1,.46f),my1=MathUtils.lerp(by,iy1,.46f);
+      float middleA=terrainHeight(tile,MathUtils.clamp(mx0,x+.01f,x+15.99f),MathUtils.clamp(my0,y+.01f,y+15.99f));
+      float middleB=terrainHeight(tile,MathUtils.clamp(mx1,x+.01f,x+15.99f),MathUtils.clamp(my1,y+.01f,y+15.99f));
+      Buffer cap=translucent.buffer(art.getTexture());
+      plateauVertex(cap,art,x,y,topA+.09f,ax-x,ay-y,outer,0);
+      plateauVertex(cap,art,x,y,topB+.09f,bx-x,by-y,outer,0);
+      plateauVertex(cap,art,x,y,middleB+.09f,mx1-x,my1-y,middle,0);
+      plateauVertex(cap,art,x,y,middleB+.09f,mx1-x,my1-y,middle,0);
+      plateauVertex(cap,art,x,y,middleA+.09f,mx0-x,my0-y,middle,0);
+      plateauVertex(cap,art,x,y,topA+.09f,ax-x,ay-y,outer,0);
+      plateauVertex(cap,art,x,y,middleA+.09f,mx0-x,my0-y,middle,0);
+      plateauVertex(cap,art,x,y,middleB+.09f,mx1-x,my1-y,middle,0);
+      plateauVertex(cap,art,x,y,innerB+.09f,ix1-x,iy1-y,inner,0);
+      plateauVertex(cap,art,x,y,innerB+.09f,ix1-x,iy1-y,inner,0);
+      plateauVertex(cap,art,x,y,innerA+.09f,ix0-x,iy0-y,inner,0);
+      plateauVertex(cap,art,x,y,middleA+.09f,mx0-x,my0-y,middle,0);
    }
 
    private void cliffFace(Tile tile,BiomeProfiles.Profile profile,TextureRegion art,boolean authored,int side,float x0,float y0,float x1,float y1,
@@ -1025,41 +1095,56 @@ public final class JohtoRenderer {
       float start=cliffCornerLight(tile,side,x0,y0,shade),end=cliffCornerLight(tile,side,x1,y1,shade);
       cliffSegment(tile,profile,art,authored,x0,y0,x1,y1,lowA,lowB,highA,highB,start,end);
    }
-   /** Lit strata bridge straight and curved faces without a black seam. */
+   /** Eroded facets stay inside the high cell and meet the exact upper/lower
+    * surface. Broad vertical rock shapes replace the old horizontal wafer. */
    private void cliffSegment(Tile tile,BiomeProfiles.Profile profile,TextureRegion art,boolean authored,float x0,float y0,float x1,float y1,
          float lowA,float lowB,float highA,float highB,float start,float end) {
       Buffer mesh=geometry.buffer(art.getTexture());
-      for(int col=0;col<4;col++) {
-         float f0=col==0?0:col==1?.12f:col==2?.50f:.88f;
-         float f1=col==0?.12f:col==1?.50f:col==2?.88f:1;
+      float edgeX=x1-x0,edgeY=y1-y0,length=(float)Math.sqrt(edgeX*edgeX+edgeY*edgeY);
+      float outwardX=length>.01f?edgeY/length:0,outwardY=length>.01f?-edgeX/length:0;
+      if(outwardX*((x0+x1)*.5f-tile.position.x-8)+outwardY*((y0+y1)*.5f-tile.position.y-8)<0) {
+         outwardX=-outwardX;outwardY=-outwardY;
+      }
+      for(int col=0;col<6;col++) {
+         float f0=col/6f,f1=(col+1)/6f;
          float a=MathUtils.lerp(start,end,f0),b=MathUtils.lerp(start,end,f1);
          float ax=MathUtils.lerp(x0,x1,f0),ay=MathUtils.lerp(y0,y1,f0);
          float bx=MathUtils.lerp(x0,x1,f1),by=MathUtils.lerp(y0,y1,f1);
          float bottomA=MathUtils.lerp(lowA,lowB,f0),bottomB=MathUtils.lerp(lowA,lowB,f1);
          float topA=MathUtils.lerp(highA,highB,f0),topB=MathUtils.lerp(highA,highB,f1);
-         for(int row=0;row<3;row++) {
-            float t0=row==0?0:row==1?.28f:.86f,t1=row==0?.28f:row==1?.86f:1;
-            float shade0=row==0?.78f:row==1?.96f:1.05f,shade1=row==0?.96f:row==1?1.05f:1.10f;
+         float nx0=cliffOutward(tile,ax,ay,true,outwardX),ny0=cliffOutward(tile,ax,ay,false,outwardY);
+         float nx1=cliffOutward(tile,bx,by,true,outwardX),ny1=cliffOutward(tile,bx,by,false,outwardY);
+         float erosionA=authored?Math.min(1.15f,(topA-bottomA)*.095f)*cliffErosion(ax,ay):0;
+         float erosionB=authored?Math.min(1.15f,(topB-bottomB)*.095f)*cliffErosion(bx,by):0;
+         for(int row=0;row<5;row++) {
+            float t0=cliffRow(row),t1=cliffRow(row+1);
+            float shade0=.82f+.21f*t0,shade1=.82f+.21f*t1;
             float ha0=MathUtils.lerp(bottomA,topA,t0),ha1=MathUtils.lerp(bottomA,topA,t1);
             float hb0=MathUtils.lerp(bottomB,topB,t0),hb1=MathUtils.lerp(bottomB,topB,t1);
+            float insetA0=erosionA*cliffInset(row),insetA1=erosionA*cliffInset(row+1);
+            float insetB0=erosionB*cliffInset(row),insetB1=erosionB*cliffInset(row+1);
             float u0=MathUtils.lerp(art.getU(),art.getU2(),f0),u1=MathUtils.lerp(art.getU(),art.getU2(),f1);
             float v0=MathUtils.lerp(art.getV2(),art.getV(),t0),v1=MathUtils.lerp(art.getV2(),art.getV(),t1);
             float vb0=v0,vb1=v1;
             if(authored) {
                // Exact shared world vertices carry identical UVs even where a
                // curved segment changes direction, avoiding a visible arc seam.
-               u0=art.getU()+(art.getU2()-art.getU())*(ax+ay)/32f;
-               u1=art.getU()+(art.getU2()-art.getU())*(bx+by)/32f;
-               v0=art.getV2()+(art.getV()-art.getV2())*ha0/24f;
-               v1=art.getV2()+(art.getV()-art.getV2())*ha1/24f;
-               vb0=art.getV2()+(art.getV()-art.getV2())*hb0/24f;
-               vb1=art.getV2()+(art.getV()-art.getV2())*hb1/24f;
+               u0=art.getU()+(art.getU2()-art.getU())*(ax+ay)/48f;
+               u1=art.getU()+(art.getU2()-art.getU())*(bx+by)/48f;
+               v0=art.getV2()+(art.getV()-art.getV2())*ha0/32f;
+               v1=art.getV2()+(art.getV()-art.getV2())*ha1/32f;
+               vb0=art.getV2()+(art.getV()-art.getV2())*hb0/32f;
+               vb1=art.getV2()+(art.getV()-art.getV2())*hb1/32f;
             }
             boolean soil=WorldReadability.smallJumpLedge(tile);
             float c00=rockLight(a*shade0,profile,soil),c10=rockLight(b*shade0,profile,soil);
             float c11=rockLight(b*shade1,profile,soil),c01=rockLight(a*shade1,profile,soil);
-            vertex(mesh,ax,ha0,-ay,c00,u0,v0,0);vertex(mesh,bx,hb0,-by,c10,u1,vb0,0);vertex(mesh,bx,hb1,-by,c11,u1,vb1,0);
-            vertex(mesh,bx,hb1,-by,c11,u1,vb1,0);vertex(mesh,ax,ha1,-ay,c01,u0,v1,0);vertex(mesh,ax,ha0,-ay,c00,u0,v0,0);
+            vertex(mesh,ax-nx0*insetA0,ha0,-ay+ny0*insetA0,c00,u0,v0,0);
+            vertex(mesh,bx-nx1*insetB0,hb0,-by+ny1*insetB0,c10,u1,vb0,0);
+            vertex(mesh,bx-nx1*insetB1,hb1,-by+ny1*insetB1,c11,u1,vb1,0);
+            vertex(mesh,bx-nx1*insetB1,hb1,-by+ny1*insetB1,c11,u1,vb1,0);
+            vertex(mesh,ax-nx0*insetA1,ha1,-ay+ny0*insetA1,c01,u0,v1,0);
+            vertex(mesh,ax-nx0*insetA0,ha0,-ay+ny0*insetA0,c00,u0,v0,0);
          }
       }
       // The plateau's own vegetation hangs over the upper soil edge. This real
@@ -1075,6 +1160,42 @@ public final class JohtoRenderer {
                bx,highB+.015f,-by,ax,highA+.015f,-ay,turf,rockLight(.92f,profile),1);
          }
       }
+   }
+   private static float cliffRow(int row) {
+      return row==0?0:row==1?.14f:row==2?.26f:row==3?.78f:row==4?.92f:1;
+   }
+   private static float cliffInset(int row) { return row==0||row==5?0:row==1?.65f:row==4?.50f:1; }
+   private static float cliffErosion(float x,float y) {
+      return .64f+.20f*MathUtils.sin(x*.29f+y*.23f)+.14f*MathUtils.sin(x*.71f-y*.27f);
+   }
+   private float cliffOutward(Tile tile,float px,float py,boolean horizontal,float fallback) {
+      float x=px-tile.position.x,y=py-tile.position.y,radius=cliffRadius(tile);
+      for(int corner=0;corner<4;corner++) {
+         boolean left=corner==0||corner==3,top=corner<2;
+         if((left?x<=radius+.01f:x>=16-radius-.01f)&&(top?y<=radius+.01f:y>=16-radius-.01f)&&cliffBevel(tile,corner)) {
+            float dx=x-(left?radius:16-radius),dy=y-(top?radius:16-radius);
+            float length=(float)Math.sqrt(dx*dx+dy*dy);
+            if(length>.01f)return (horizontal?dx:dy)/length;
+         }
+      }
+      // Raw convex, concave and stair-side junctions use the same world vertex.
+      // Summing its low quadrants gives both incident high owners one normal;
+      // considering only a tile's two side neighbours misses a concave notch.
+      int sx=x<.01f?-1:x>15.99f?1:0,sy=y<.01f?-1:y>15.99f?1:0;
+      if(sx!=0&&sy!=0) {
+         float height=terrainHeight(tile,MathUtils.clamp(px,tile.position.x+.01f,tile.position.x+15.99f),
+            MathUtils.clamp(py,tile.position.y+.01f,tile.position.y+15.99f));
+         float vx=Math.round(px/16)*16,vy=Math.round(py/16)*16,nx=0,ny=0;
+         for(int qy=-1;qy<=0;qy++)for(int qx=-1;qx<=0;qx++) {
+            Tile candidate=natureTiles.get(lookup.set(vx+qx*16,vy+qy*16));if(candidate==null)continue;
+            float next=terrainHeight(candidate,MathUtils.clamp(vx,candidate.position.x+.01f,candidate.position.x+15.99f),
+               MathUtils.clamp(vy,candidate.position.y+.01f,candidate.position.y+15.99f));
+            if(height-next>.1f){nx+=qx<0?-1:1;ny+=qy<0?-1:1;}
+         }
+         float length=(float)Math.sqrt(nx*nx+ny*ny);
+         if(length>.01f)return(horizontal?nx:ny)/length;
+      }
+      return fallback;
    }
    private static float rockLight(float light,BiomeProfiles.Profile profile) { return rockLight(light,profile,false); }
    private static float rockLight(float light,BiomeProfiles.Profile profile,boolean soil) {

@@ -117,6 +117,66 @@
         "horizontalNeighborMeanRgbDifference": 11.4249,
         "verticalNeighborMeanRgbDifference": 21.7494
       }
+    },
+    {
+      "file": "rock-face-v2.png",
+      "source": "sources/rock-face-v2-source.png",
+      "sourceSha256": "fdd2309b7545a02f5f42468d24ff1b34c984686e6ba99fceb1676661995b723d",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "sources/rock-face-v2-prompt.txt",
+      "promptSha256": "d0dc81a069ff118438528558c99f59efa2ae1efc698e7bcf4bb6f979451dbb1f",
+      "generatedOutputName": "exec-36b88e91-676e-4377-91dc-5889c76fe7ce.png",
+      "suggestedWrapMode": "Repeat",
+      "sha256": "17308906f1775ff8db4d160cdbaa630c487756af4921439d128b09859afdb29d",
+      "edgeMetrics": {
+        "leftRightMeanRgbDifference": 7.8542,
+        "topBottomMeanRgbDifference": 7.8776,
+        "horizontalNeighborMeanRgbDifference": 13.4027,
+        "verticalNeighborMeanRgbDifference": 11.9581
+      }
+    },
+    {
+      "file": "earth-face-v2.png",
+      "source": "sources/earth-face-v2-source.png",
+      "sourceSha256": "f8065a49195fe8966141c2440af4aa294644525b1ed906a343ac39e174fdff36",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "sources/earth-face-v2-prompt.txt",
+      "promptSha256": "a1284e6ba9a3f57f39bd2e5312d907e6ddc324babfa738c82252423803d8e46c",
+      "generatedOutputName": "exec-cc7486a4-c87a-4641-9650-f1b03e200ab0.png",
+      "suggestedWrapMode": "Repeat",
+      "sha256": "b33b125bad67e0190b5f5fad0832a7914d7130004ab279aad49d83caf337ff5b",
+      "edgeMetrics": {
+        "leftRightMeanRgbDifference": 3.9661,
+        "topBottomMeanRgbDifference": 5.1484,
+        "horizontalNeighborMeanRgbDifference": 10.6593,
+        "verticalNeighborMeanRgbDifference": 10.9662
+      }
+    },
+    {
+      "file": "hill-surface-v2.png",
+      "source": "sources/hill-surface-v2-source.png",
+      "sourceSha256": "b7762ed53e00ec5e966130d26e424651905b422e2f8efacaa4a4928213b56333",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "sources/hill-surface-v2-prompt.txt",
+      "promptSha256": "6b4eea9572bb5d3f7b67db6c438bdc4dad87a75a23606728e567c6db9f876e1e",
+      "generatedOutputName": "exec-c42aa420-e90c-4582-9bb0-8a5eeb22cd00.png",
+      "suggestedWrapMode": "Repeat",
+      "sha256": "a6d2eded95a5c01cd4eedaa8c87bc0ef53e4e848d56cdb64c92a355b2260f379",
+      "edgeMetrics": {
+        "leftRightMeanRgbDifference": 8.375,
+        "topBottomMeanRgbDifference": 10.026,
+        "horizontalNeighborMeanRgbDifference": 8.8074,
+        "verticalNeighborMeanRgbDifference": 9.5324
+      }
     }
   ]
 }

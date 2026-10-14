@@ -66,7 +66,7 @@ public final class ReliefPresentationTest {
                super.render();if(frames==20){boot();ready=true;}
                return;
             }
-            if(scenes==8){if(!BEFORE)verifyAssetLifecycle();complete=true;Gdx.app.exit();return;}
+            if(scenes==8){if(!BEFORE){verifyAssetLifecycle();verifyLayeredFloorMaterial();}complete=true;Gdx.app.exit();return;}
             configure(scenes);JohtoRenderer renderer=renderer();
             long seed=929831L+scenes;Game.rand.setSeed(seed);map.rand.setSeed(seed+1);
             require(renderer.render(this),"World composition rejected relief scene "+scenes);
@@ -201,6 +201,24 @@ public final class ReliefPresentationTest {
             require(Math.abs(top-expected)<.5f,"Concave rounding moved the actual high/low contour");
          }
          require(max-min>6,"Concave join fixture does not straddle two actual elevations");
+         float vx=24,vy=24;
+         for(int turn=0;turn<direction;turn++){float previous=vx;vx=-vy;vy=previous;}
+         vx+=8;vy+=8;
+         int[] lowDirection=rotate(1,1,direction);
+         // Two rays straddle the joint: an exact triangle-edge ray can be
+         // rejected by floating-point barycentric tests in one orientation.
+         // The old diverging end points leave both of these rays uncovered.
+         for(float fraction:new float[]{.35f,.50f,.70f})for(float offset:new float[]{-.12f,.12f}) {
+            float height=MathUtils.lerp(min,max,fraction),nearest=Float.MAX_VALUE;
+            Ray ray=new Ray(new Vector3(vx+lowDirection[0]*6-lowDirection[1]*offset,height,
+                  -vy-lowDirection[1]*6-lowDirection[0]*offset),
+               new Vector3(-lowDirection[0],0,lowDirection[1]).nor());
+            for(float[] t:triangles) {
+               a.set(t[0],t[1],t[2]);b.set(t[3],t[4],t[5]);c.set(t[6],t[7],t[8]);
+               if(Intersector.intersectRayTriangle(ray,a,b,c,hit))nearest=Math.min(nearest,hit.dst(ray.origin));
+            }
+            require(nearest<12,"Concave vertical face has a lateral slit at "+fraction+", offset="+offset+", nearest="+nearest+", direction="+direction);
+         }
       }
       void rockPixels(JohtoRenderer renderer,WorldElevation elevation)throws Exception {
          PerspectiveCamera camera=(PerspectiveCamera)field(JohtoRenderer.class,"camera").get(renderer);
@@ -291,7 +309,10 @@ public final class ReliefPresentationTest {
          require(rock!=earth&&earth!=steps&&lava!=rock,"Earth, mountain and lava materials lost their distinct identity");
          require(lava.getTexture().getUWrap()==Texture.TextureWrap.Repeat,"Lava cannot flow continuously across tiles");
          require(water!=lava&&water.getTexture().getUWrap()==Texture.TextureWrap.Repeat,"Water lacks its own continuous wave material");
-         require(textures.size()==5,"Terrain cache grew beyond the five shared materials");
+         TextureRegion cap=(TextureRegion)type.getMethod("cap").invoke(assets);
+         require(cap!=rock&&cap!=earth&&cap!=water&&cap!=lava&&cap!=steps,"Weathered rock cap lacks its dedicated material");
+         require(cap.getTexture().getUWrap()==Texture.TextureWrap.Repeat,"Rock shoulders cannot continue across adjacent tiles");
+         require(textures.size()==6,"Terrain cache grew beyond the six shared materials");
          for(String fluid:new String[]{"water1","lava1"}) {
             Tile tile=new Tile(fluid,"",new Vector2(0,0),true);tile.biome="mountain";
             require(face.invoke(assets,tile,profile)==null,"Dry rock replacement leaked onto a fluid bank");
@@ -305,7 +326,36 @@ public final class ReliefPresentationTest {
          require(renderer().render(this),"World composition failed after relief material recreation");
          require(fingerprint==ModernWorldGenerator.fingerprint(map.tiles),"Material recreation mutated saved terrain");
          require(Gdx.gl.glGetError()==GL20.GL_NO_ERROR,"Relief material recreation left a GL error");
-         System.out.println("RELIEF materials: five cached shared textures, distinct earth/rock/lava/water/stairs, dry-only face, Repeat+Nearest, disposal/recreation PASS");
+         System.out.println("RELIEF materials: six cached shared textures, distinct earth/rock/cap/lava/water/stairs, dry-only face, Repeat+Nearest, disposal/recreation PASS");
+      }
+      void verifyLayeredFloorMaterial()throws Exception {
+         JohtoRenderer renderer=renderer();
+         WorldMeshBatch batch=(WorldMeshBatch)field(JohtoRenderer.class,"geometry").get(renderer);
+         Map<?,?> groups=(Map<?,?>)field(WorldMeshBatch.class,"groups").get(batch);
+         java.lang.reflect.Method surface=JohtoRenderer.class.getDeclaredMethod("terrainSurface",Game.class,Tile.class,TextureRegion.class);
+         surface.setAccessible(true);
+         TextureRegion cap=TerrainReliefAssets.get().cap();
+         // The real fixture has a raised interior at this coordinate; an exterior
+         // sample would miss the cap override entirely and provide a false pass.
+         Tile equivalent=new Tile("green1","house5_floor1",new Vector2(0,0),true);equivalent.biome="mountain";
+         TextureRegion expected=BwAssets.get().terrain(equivalent,0);
+         require(expected!=null&&expected.getTexture()!=cap.getTexture(),"Layered floor reference lacks its own texture");
+         for(String base:new String[]{"mountain3","rock1"}) {
+            Tile tile=new Tile(base,"house5_floor1",new Vector2(0,0),true);tile.biome="mountain";
+            require(renderer.getElevation().tileHeight(tile)>3,"Layered floor regression is not on raised terrain");
+            TextureRegion floor=BwAssets.get().terrain(tile,0);
+            require(floor!=null&&floor.getTexture()==expected.getTexture(),"Floor resolution differs from equivalent green base");
+            int floorBefore=bufferSize(groups,expected.getTexture()),capBefore=bufferSize(groups,cap.getTexture());
+            surface.invoke(renderer,this,tile,floor);
+            require(bufferSize(groups,expected.getTexture())==floorBefore+48,"Raised "+base+" floor did not submit its actual six surface vertices");
+            require(bufferSize(groups,cap.getTexture())==capBefore,"Raised "+base+" floor was covered with geological cap");
+         }
+         require(fingerprint==ModernWorldGenerator.fingerprint(map.tiles),"Layered floor probe mutated the fixture map");
+         System.out.println("RELIEF layered floors: raised mountain3/rock1 + house5_floor1 keep original wood-floor mesh texture, PASS");
+      }
+      int bufferSize(Map<?,?> groups,Texture texture)throws Exception {
+         Object buffer=groups.get(texture);
+         return buffer==null?0:((FloatArray)field(buffer.getClass(),"vertices").get(buffer)).size;
       }
       void capture(String name) {
          Pixmap pixels=com.badlogic.gdx.utils.ScreenUtils.getFrameBufferPixmap(0,0,960,720);PixmapIO.PNG png=new PixmapIO.PNG();png.setFlipY(true);

@@ -32,6 +32,8 @@ REQUIRED_JAR = (*NATIVES, "com/pkmngen/game/desktop/DesktopLauncher.class",
                 "visual/stardew/PROVENANCE.json", "visual/biomes/profiles.json",
                 "visual/terrain-relief/rock-face.png", "visual/terrain-relief/stair-stone.png",
                 "visual/terrain-relief/earth-face.png", "visual/terrain-relief/lava-surface.png",
+                "visual/terrain-relief/rock-face-v2.png", "visual/terrain-relief/earth-face-v2.png",
+                "visual/terrain-relief/hill-surface-v2.png",
                 "visual/terrain-relief/water-surface.png", "visual/mounted-trainers/bodies.png",
                 "visual/mounted-trainers/PROVENANCE.json", "visual/biomes/HABITAT-SOURCES.json",
                 "visual/terrain-relief/PROVENANCE.json", "visual/supplied/PROVENANCE.json",
@@ -124,7 +126,8 @@ def make_package(version: str, destination: Path, receipts: list[Path]) -> Path:
     for name in ("REWORK-STATUS.md", "ASSET-COVERAGE.md", "REWORK-TESTS.md", "PACKAGING.md", "VERTICAL-SLICE.md", "JAVA-REFACTOR-STEP3.md",
                  "CINEMATIC-CUSTOMIZATION.md", "TRAINERS-BW.md", "LIVING-WORLD.md", "CINEMATIC-NATURE.md",
                  "CREATIVE-MODE.md", "PLAYTEST-2026-10-14.md", "RELIEF-REFINEMENT.md",
-                 "NATURAL-WORLD-2026-10-14.md", "HABITAT-REFINEMENT.md", "MAP-FIX-2026-10-14.md"):
+                 "NATURAL-WORLD-2026-10-14.md", "HABITAT-REFINEMENT.md", "MAP-FIX-2026-10-14.md",
+                 "RELIEF-WATER-2026-10-14.md"):
         path = ROOT / "docs" / name
         if path.is_file():
             add(path, "documentazione/" + name)

@@ -1,11 +1,11 @@
 {
-  "schema": 10,
+  "schema": 11,
   "status": "frozen",
-  "purpose": "Explicit MAP bug fix: display the existing island minimap on the modern UI canvas instead of suppressing it beneath the perspective renderer. Preserve all accepted natural-world features and original map input/teleport/save behavior.",
+  "purpose": "Explicit user revision to make hills and mountains readable with new geological materials and rounded shoulders, and make the existing blue water visibly move. Preserve existing map fix, mechanics, terrain constraints and saved-world data.",
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "0be78bd8cdd8e5158063e384fbda47d658372f2f3fd4dd4a47d4b77ae06c68a3",
+  "reviewed_patch_sha256": "4fe1f52819197ee41337e06a358628129500e10cbfeaa70ac69ec9d248eac266",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/CheckEndOfBattle.java",
@@ -351,8 +351,8 @@
       "scope": "Continuous whole-arena orbit across command and action phases, fixed top HUD, actor depth clearing and projected legacy effect anchors, identity-concealing encounter transition and full viewport coverage; reduced motion and exact original action timing retained."
     },
     "src/com/pkmngen/game/JohtoRenderer.java": {
-      "reviewed_sha256": "e51f0a90d3084c45890c0c6169fbdd4cbdeed9e93fe58ef9c167342516ff21f8",
-      "scope": "Exclusive perspective world presentation with rounded natural relief, distinct earth/rock/lava/water materials and continuous fluid UVs, grass-capped cliffs without directional glyphs, stronger waves/shore foam and dedicated complete mounted trainer poses. Preserves saved terrain/elevation/collision, player/Pokemon positions, gameplay RNG/action clocks and interior foreground visibility."
+      "reviewed_sha256": "773c33131ef4711de6d2e535d9df0ccf43149b90cd8375d7f6a2f3f987dbcfdb",
+      "scope": "Exclusive perspective world presentation with irregular rock/soil relief and weathered shoulders, rounded eroded faces sealed to existing upper/lower surfaces, resolved biome floors and continuous geological UVs; perceptible two-current water texture advection with bounded refraction and reduced-motion freeze. Preserves all accepted mounted poses and world effects, derived elevation/collision, player/Pokemon positions, gameplay RNG/action clocks and layered interior visibility."
     },
     "src/com/pkmngen/game/MenuMotion.java": {
       "reviewed_sha256": "eefc7eaed302305ed08d151d86decd2eded9ee6a85a7d3870a0f9a5af93e9a18",
@@ -463,8 +463,8 @@
       "reviewed_sha256": "bc28fcded8554e52bbe1e598505f97b3f2612abd193123ba432dd9c28a0bb62b"
     },
     "src/com/pkmngen/game/TerrainReliefAssets.java": {
-      "scope": "Read-only shared earth, rock, stair, lava and water material loader with nearest filtering, repeating world fluids/strata, dry-only face fallback and bounded dispose/reload. Required fluids fail clearly rather than scrolling atlas UVs. No tile, height, collision, gameplay RNG or save writes.",
-      "reviewed_sha256": "cda7adea02bcb9bd286fd4847a7ac64c48d292a97f1acad36de9d97e34c57edd"
+      "scope": "Read-only shared v2 earth, rock and mineral cap plus original stair, lava and water material loader with nearest filtering, repeating world materials, dry-only face fallback and bounded dispose/reload. Required fluids fail clearly. No tile, height, collision, gameplay RNG or save writes.",
+      "reviewed_sha256": "f4dd37cb2c02ec90b340795bf1ef9a409f5b5c54fc5dba86a02ed46b9192ea35"
     },
     "src/com/pkmngen/game/MountedTrainerSprites.java": {
       "scope": "Presentation-only seated Ride, Surf and Fly body composition, preserving resolved idle identity/head/wardrobe materials and explicit mounted mod priority. Bounded texture cache, read-only retained CPU pixels and deterministic pose sway; no player, move, collision, clock, save or RNG writes.",
@@ -521,7 +521,8 @@
     "2026-10-14 natural world, explicit user scope after published johto.5: reviewed complete coordinated diff for natural relief/fluid shader and materials, full seated trainer bodies and mount envelopes, local creation-mode draft hook, sourced habitat route overrides, rigid cylindrical panorama and actor-only metadata plus move particles. Pre-change schema 8 manifest/verifier/negative tests/VERIFICA archived unchanged. Independent terrain review fixed missing-fluid fallback to fail clearly. Classic combat/save sources and exact nonpresentation boundaries remain protected. Native acceptance is separate.",
     "Final native regression at 7e49a8ac caught TrainerCatalog uploading from retained CPU pixels, unintentionally enabling alpha trimming of normalized battle-entry wardrobe frames. Reviewed minimal ownership fix uploads from the caller source as before, retains only a separate CPU copy for mounted composition, and preserves the existing full-frame PMD oracle. No oracle weakened or other production helper changed; all 41 final suites must be rerun on the rebuilt JAR.",
     "2026-10-14 natural world, explicit user scope after published johto.5: reviewed complete coordinated diff for natural relief/fluid shader and materials, full seated trainer bodies and mount envelopes, local creation-mode draft hook, sourced habitat route overrides, rigid cylindrical panorama and actor-only metadata plus move particles. Pre-change schema 8 manifest/verifier/negative tests/VERIFICA archived unchanged. Independent terrain review fixed missing-fluid fallback to fail clearly. Classic combat/save sources and exact nonpresentation boundaries remain protected. Native acceptance is separate.",
-    "MAP fix reviewed after accepted 7e7920dc: only ModernUi.mapFrame routes the existing DrawMiniMap to the new read-only ModernMapUi canvas presenter. Existing map action, input, teleport, world and save sources remain unchanged. Native negative reproduction on JAR0512 showed zero visible overview palette pixels; source diagnostic passed1824checks,10captures,290frames through actual menu/drag/pan/reopen/resize/warp cancellation, with untouched terrain/minimap/player/RNG. Map viewport restores scissor and borrows original action-owned textures; no image assets added. Full final JAR acceptance separate."
+    "MAP fix reviewed after accepted 7e7920dc: only ModernUi.mapFrame routes the existing DrawMiniMap to the new read-only ModernMapUi canvas presenter. Existing map action, input, teleport, world and save sources remain unchanged. Native negative reproduction on JAR0512 showed zero visible overview palette pixels; source diagnostic passed1824checks,10captures,290frames through actual menu/drag/pan/reopen/resize/warp cancellation, with untouched terrain/minimap/player/RNG. Map viewport restores scissor and borrows original action-owned textures; no image assets added. Full final JAR acceptance separate.",
+    "2026-10-14 relief/water revision after d8f4d014: complete diff reviewed for exactly JohtoRenderer and TerrainReliefAssets. Irregular rock/earth/cap replace striped relief, shoulders distinguish upper ground, and bounded UV advection moves actual painted waves. Previous schema10 manifest/verifier/negative tests/VERIFICA archived unchanged. Existing terrain constraints, collision, actors, RNG, layered floors, map UI and saves remain protected. Native acceptance separate."
   ],
   "historical_v2": "baseline/modernization-v2/archive.json",
   "historical_v3": "baseline/modernization-v3/",
@@ -529,5 +530,6 @@
   "historical_v5": "baseline/modernization-v5/archive.json",
   "historical_pre_playtest": "baseline/before-playtest-2026-10-14/",
   "historical_pre_natural_world": "baseline/before-natural-world-2026-10-14/",
-  "historical_pre_map_fix": "baseline/before-map-fix-2026-10-14/"
+  "historical_pre_map_fix": "baseline/before-map-fix-2026-10-14/",
+  "historical_pre_relief_water": "baseline/before-relief-water-2026-10-14"
 }

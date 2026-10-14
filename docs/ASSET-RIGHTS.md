@@ -62,3 +62,8 @@ composti a runtime con le teste e i materiali degli allenatori già risolti:
 questa operazione non modifica l'origine o le condizioni degli asset preesistenti.
 I controlli prepare_terrain_relief.py --check e prepare_mounted_trainers.py --check
 riproducono i PNG consumati dal gioco.
+
+La successiva revisione dei rilievi aggiunge tre materiali originali generati
+con lo stesso tool integrato: `rock-face-v2`, `earth-face-v2` e
+`hill-surface-v2`. I PNG, i prompt esatti e gli hash sono conservati in
+`resources/visual/terrain-relief`; non derivano da sprite di altri giochi.

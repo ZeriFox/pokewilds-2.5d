@@ -21,12 +21,14 @@ public final class TerrainReliefAssets {
    public TextureRegion face(Tile tile, BiomeProfiles.Profile profile) {
       // Fluid banks retain their own wet material; this set describes dry relief.
       if (tile != null && (tile.isWater || tile.isLava)) return null;
-      return region(earth(tile,profile) ? "earth-face.png" : "rock-face.png");
+      return region(earth(tile,profile) ? "earth-face-v2.png" : "rock-face-v2.png");
    }
    public TextureRegion stair(Tile tile, BiomeProfiles.Profile profile) {
       return region("stair-stone.png");
    }
-   public TextureRegion earth() { return region("earth-face.png"); }
+   public TextureRegion earth() { return region("earth-face-v2.png"); }
+   /** A neutral, top-down gravel material. It is a shoulder/cap, never grass. */
+   public TextureRegion cap() { return region("hill-surface-v2.png"); }
    public TextureRegion lava() { return required("lava-surface.png"); }
    public TextureRegion water() { return required("water-surface.png"); }
    private TextureRegion required(String name) {

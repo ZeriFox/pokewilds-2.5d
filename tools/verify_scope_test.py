@@ -19,7 +19,7 @@ def main() -> int:
             raise RuntimeError("Test copy escaped the intended temporary directory")
         shutil.copytree(verifier.ROOT / "src", root / "src")
         shutil.copytree(verifier.ROOT / verifier.CLASSIC_SOURCES, root / verifier.CLASSIC_SOURCES)
-        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE, *verifier.TERRAIN_ARCHIVE, *verifier.LIVING_WORLD_ARCHIVE, *verifier.CINEMATIC_NATURE_ARCHIVE, *verifier.TRAINER_REDRAW_ARCHIVE, *verifier.CINEMATIC_CUSTOMIZATION_ARCHIVE, *verifier.PLAYTEST_ARCHIVE, *verifier.RELIEF_ARCHIVE, *verifier.NATURAL_WORLD_ARCHIVE, *verifier.MAP_FIX_ARCHIVE]:
+        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE, *verifier.TERRAIN_ARCHIVE, *verifier.LIVING_WORLD_ARCHIVE, *verifier.CINEMATIC_NATURE_ARCHIVE, *verifier.TRAINER_REDRAW_ARCHIVE, *verifier.CINEMATIC_CUSTOMIZATION_ARCHIVE, *verifier.PLAYTEST_ARCHIVE, *verifier.RELIEF_ARCHIVE, *verifier.NATURAL_WORLD_ARCHIVE, *verifier.MAP_FIX_ARCHIVE, *verifier.RELIEF_WATER_ARCHIVE]:
             target = root / source
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / source, target)
@@ -147,6 +147,8 @@ def main() -> int:
             reject("pre-natural-world checkpoint changed "+name,name,append)
         for name in ("MountedTrainerSprites.java","ModernMoveEffects.java"):
             reject("natural-world helper changed after freeze "+name,verifier.PREFIX+name,append)
+        for name in verifier.RELIEF_WATER_ARCHIVE:
+            reject("pre-relief-water checkpoint changed "+name,name,append)
         for name in verifier.MAP_FIX_ARCHIVE:
             reject("pre-map-fix checkpoint changed "+name,name,append)
         for name in ("ModernMapUi.java","ModernUi.java"):

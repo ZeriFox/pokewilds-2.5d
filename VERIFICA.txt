@@ -1,64 +1,60 @@
-VERIFICA - revisione naturale e correzione MAP locale - 14 ottobre 2026
+VERIFICA - colline, montagne e acqua animata locale - 14 ottobre 2026
 
 BASE E AVVIO
-Base GitHub: 1f916e24033d70998b046252dc6bb4f2805a4b27 (johto.5).
-Questa revisione e locale; non identifica una nuova release pubblicata.
-Avvio: run-johto.cmd. Nessun salvataggio personale usato dalle prove.
-Il checkpoint naturale e conservato in baseline/before-natural-world-2026-10-14/.
-La correzione MAP parte da 7e7920dc; ambito precedente in baseline/before-map-fix-2026-10-14/.
+Base della revisione: d8f4d014 (MAP corretto, successivo ai rilievi naturali locali).
+Avvio: run-johto.cmd o collegamento desktop PokeWilds 2.5D - Prova locale.
+Nessun salvataggio personale aperto dalle prove. Questa revisione e locale.
+Il checkpoint precedente e conservato in baseline/before-relief-water-2026-10-14/.
+Le revisioni gia accettate di MAP, cavalcature, lotte e Creativa sono conservate.
 
 ARTEFATTO COMPILATO
 dist/pokewilds-rebuilt.jar
-SHA-256: 52e7d93cace97fa4626f30f6c5bc162a447481d1940f944b664b123ef5f78c75
-Dimensione: 338507815 byte; 109104 voci ZIP.
+SHA-256: 3ff096c13bfb320ee42d326324de64a6498d4c74ab3d3c34b6a8b29852649d43
+Dimensione: 343192005 byte; 109113 voci ZIP.
 Java 17; 245 sorgenti; 513 classi compilate.
 Modelli GLB esclusi; zero classi di gioco recuperate dal runtime upstream.
-Digest sorgenti: a296f0d74612ecf53f40602e222fb27a4fa91d53850a3b40958d620ed17a43a5
+Digest sorgenti: 681efe3ca4840b0c76e7961b147b411d52bea262bfa5319f5edcd04f4f6ab6f3
 Build report: build/build-report.json (hash di ogni sorgente e risorsa).
 
+MODIFICHE
+- Nuovi materiali originali per pareti di roccia, terra e sommitA minerali:
+  massi e zolle irregolari sostituiscono le fitte strisce orizzontali.
+- Spalle erose piu ampie, angoli convessi arrotondati, ombra di contatto
+  proporzionata al dislivello. Nessuna fascia dorata da saltino sulle montagne.
+- Vertici condivisi anche negli angoli concavi e vicino all'acqua; stesso
+  materiale fra superficie e porzioni di terreno ai piedi degli angoli.
+- Pavimenti sopra basi montagna/roccia mantengono il loro materiale interno.
+- Acqua blu conservata: due correnti muovono anche le onde dipinte nella
+  texture, con rifrazione inferiore a un pixel e UV continui fra le celle.
+  Il movimento ridotto mantiene ferma l'animazione ambientale.
+- Quote derivate, rampe, collisioni, posizione attori, RNG e dati dei mondi
+  salvati non sono modificati da questa revisione.
+
 CONTROLLI
-Build e controlli statici/deterministici completati: build/rework-verification/build.json.
-Scope schema 10: 143 sorgenti originali invariati, 55 con ambito esplicito, 47 aggiunte.
-85 mutazioni non autorizzate respinte, compresi i checkpoint precedenti,
-le regole/tempi di cattura e la serializzazione dell'inventario reale.
+Build e controlli statici/deterministici: build/rework-verification/build.json.
+Scope schema 11: 143 sorgenti originali invariati, 55 con ambito esplicito,
+47 aggiunte. La nuova differenza di produzione comprende soltanto
+JohtoRenderer.java e TerrainReliefAssets.java.
+89 mutazioni non autorizzate respinte; tutti i checkpoint precedenti protetti.
 Le 42 suite native obbligatorie sono elencate in tools/verify_rework.py.
 Esito effettivo, commit, hash del JAR e log per ciascuna suite:
   build/rework-verification/native.json
-La ricevuta nativa identifica questa build soltanto se status=passed,
-jar_sha256 corrisponde all'hash sopra e il commit e quello del checkout.
+La ricevuta identifica questa build soltanto se status=passed, il suo
+jar_sha256 corrisponde all'hash sopra e il commit coincide con il checkout.
 I runner normali verificano il JAR senza classi di produzione sovrapposte;
 --sources identifica soltanto le diagnostiche di sviluppo.
 
-MODIFICHE
-- MAP torna a disegnare la minimappa nel canvas della UI, dopo il mondo
-  prospettico. Marcatori di personaggio/campo/teletrasporto e riquadro ritagliato.
-  Apertura, pan, trascinamento, chiusura/riapertura e teletrasporto originali;
-  nuova regressione nativa da 1824 controlli/290 frame, dieci schermate.
-- Rilievi naturali senza frecce o strisce gialle: terra/roccia differenziate,
-  bordo erboso, ombre alla base, sei segmenti agli angoli e scale raccordate.
-  Quote, collisioni e dati dei mondi salvati sono conservati.
-- Nuove texture autonome per acqua e lava, con UV continui tra tile, onde,
-  schiuma di riva, risacca e canali incandescenti fra croste scure.
-- Pose complete sedute Ride/Surf/Volo per tutti i 19 personaggi, quattro
-  direzioni, identita della testa e colori/guardaroba attuali conservati.
-  Non vengono piu tagliate le gambe dello sprite che cammina.
-- Panorama cilindrico rigido, orbita continua a 360 gradi e schede HP fisse.
-  Le righe/inversioni legacy campionano soltanto il Pokemon bersaglio,
-  senza deformare il fondale. Corretto lo shader invalidato a fine effetto.
-- Particelle moderne in dieci famiglie per 46 mosse con risorse gia presenti;
-  14 mosse reali esercitate nelle prove, con resize e bersagli consecutivi.
-  Formule, RNG, esiti di cattura e durata delle azioni restano protetti.
-- Game mode Adventure/Creative nella creazione di un nuovo mondo Local;
-  caricamenti e multiplayer conservano il comportamento esistente.
-- Regole ecologiche documentate per 28 specie/famiglie, fra acqua marina
-  e dolce, neve, foreste, spiagge e regioni aride/vulcaniche.
-  Non viene spostato alcun Pokemon gia salvato.
+Le regressioni rilievi includono raggi laterali sui raccordi concavi in
+quattro direzioni e pavimenti reali su basi rocciose rialzate. La regressione
+acqua richiede movimento visibile in otto aree a telecamera ferma in 0,25s:
+il vecchio JAR non supera questa nuova verifica percettiva. Le prove usano
+scene isolate e salvataggi generati automaticamente sotto build/.
+Le prove automatiche non equivalgono a una campagna manuale completa.
 
-LIMITI E DOCUMENTAZIONE
-docs/MAP-FIX-2026-10-14.md, docs/NATURAL-WORLD-2026-10-14.md, docs/CREATIVE-MODE.md,
-docs/HABITAT-REFINEMENT.md e docs/ASSET-RIGHTS.md.
-I fondali esistenti sono ripetuti in tre settori del cilindro; non sono
-panorami unici disegnati a 360 gradi. Le pose montate semplificano alcuni
-dettagli degli abiti; i mod possono fornire sprite montati espliciti.
-La copertura ecologica dell'intero catalogo resta parziale.
-Le prove automatiche non sostituiscono una campagna manuale completa.
+MATERIALI E DOCUMENTAZIONE
+docs/RELIEF-WATER-2026-10-14.md; docs/MAP-FIX-2026-10-14.md;
+docs/NATURAL-WORLD-2026-10-14.md; docs/ASSET-RIGHTS.md.
+Tre nuovi materiali creati con il tool integrato image_gen. Originali,
+prompt esatti, hash e trasformazioni deterministiche sono conservati in
+resources/visual/terrain-relief/sources/ e PROVENANCE.json.
+Verifica asset: python tools/prepare_terrain_relief.py --check.
