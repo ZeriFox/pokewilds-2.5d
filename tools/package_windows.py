@@ -21,9 +21,16 @@ NATIVES = ("gdx64.dll", "gdx-freetype64.dll", "gdx-box2d64.dll", "jamepad64.dll"
 REQUIRED_JAR = (*NATIVES, "com/pkmngen/game/desktop/DesktopLauncher.class",
                 "com/pkmngen/game/StartupVerification.class",
                 "com/pkmngen/game/JohtoRenderer.class", "com/pkmngen/game/JohtoBattleRenderer.class",
-                "com/pkmngen/game/PmdBattleSprites.class", "visual/pmd/catalog.json",
+                "com/pkmngen/game/PmdBattleSprites.class",
+                "com/pkmngen/game/CreativeMode.class", "com/pkmngen/game/CreativeModeUi.class",
+                "com/pkmngen/game/TerrainReliefAssets.class", "com/pkmngen/game/WorldReadability.class",
+                "com/pkmngen/game/UserSpriteAssets.class", "com/pkmngen/game/CaptureBallVisual.class",
+                "com/pkmngen/game/ShinyVisuals.class", "visual/pmd/catalog.json",
                 "visual/stardew/world-atlas.png", "visual/stardew/world-atlas.json",
-                "visual/stardew/PROVENANCE.json", "visual/biomes/profiles.json")
+                "visual/stardew/PROVENANCE.json", "visual/biomes/profiles.json",
+                "visual/terrain-relief/rock-face.png", "visual/terrain-relief/stair-stone.png",
+                "visual/terrain-relief/PROVENANCE.json", "visual/supplied/PROVENANCE.json",
+                "visual/supplied/item-regions.json", "visual/supplied/berry-plants.png")
 
 
 def windows_x64(path: Path) -> None:
@@ -56,7 +63,7 @@ def read_receipt(path: Path, report: dict, commit: str) -> dict:
 
 def make_package(version: str, destination: Path, receipts: list[Path]) -> Path:
     if not re.fullmatch(r"v\d+\.\d+\.\d+-[a-z0-9]+\.\d+", version):
-        raise RuntimeError("Use a new version such as v0.8.11-johto.4")
+        raise RuntimeError("Use a new version such as v0.8.11-johto.5")
     if git("status", "--porcelain", "--untracked-files=all"):
         raise RuntimeError("Commit reviewed sources/assets first: packaging requires a clean working tree")
     commit = git("rev-parse", "HEAD")
@@ -110,10 +117,14 @@ def make_package(version: str, destination: Path, receipts: list[Path]) -> Path:
     add(ROOT / "art-source/reference/manifest.json", "documentazione/reference-manifest.json")
     add(ROOT / "docs/ASSET-RIGHTS.md", "documentazione/ASSET-RIGHTS.md")
     for name in ("REWORK-STATUS.md", "ASSET-COVERAGE.md", "REWORK-TESTS.md", "PACKAGING.md", "VERTICAL-SLICE.md", "JAVA-REFACTOR-STEP3.md",
-                 "CINEMATIC-CUSTOMIZATION.md", "TRAINERS-BW.md", "LIVING-WORLD.md", "CINEMATIC-NATURE.md"):
+                 "CINEMATIC-CUSTOMIZATION.md", "TRAINERS-BW.md", "LIVING-WORLD.md", "CINEMATIC-NATURE.md",
+                 "CREATIVE-MODE.md", "PLAYTEST-2026-10-14.md", "RELIEF-REFINEMENT.md"):
         path = ROOT / "docs" / name
         if path.is_file():
             add(path, "documentazione/" + name)
+    relief_readme = ROOT / "resources/visual/terrain-relief/README.md"
+    if relief_readme.is_file():
+        add(relief_readme, "documentazione/TERRAIN-RELIEF-ASSETS.md")
     for index, receipt in enumerate(verification):
         payload[f"documentazione/verification-{index + 1}.json"] = (json.dumps(receipt, indent=2) + "\n").encode()
     payload["LEGGIMI.txt"] = f'''POKEWILDS 2.5D - {version} - WINDOWS X64
@@ -143,6 +154,21 @@ La conferma salta la scena iniziale; premila di nuovo per aprire il menu.
 Puoi disattivare l'apertura o attivare il movimento ridotto nelle impostazioni.
 Dettagli: documentazione/CINEMATIC-CUSTOMIZATION.md.
 Impostazioni interfaccia in interface-settings.json.
+
+NOVITA JOHTO.5
+Arena con rotazione completa a 360 gradi anche durante mosse e catture.
+Nuove icone, piante di bacche animate, Pokeball ed effetti Shiny.
+Angoli arrotondati, pareti rocciose dedicate e scale larghe raccordate.
+
+MODALITA CREATIVA
+Durante una partita Local: Invio > F1 > Creative sandbox.
+Attiva Creative mode, cerca una specie, scegli livello e Shiny e premi
+Add to party. Con la squadra piena libera prima un posto tramite Drop.
+I materiali per crafting, costruzione e semina sono illimitati (INF).
+Disattivando Creativa tornano le quantita realmente possedute.
+Salva normalmente per conservare la modalita e i Pokemon aggiunti.
+Creativa e disponibile nelle partite Local.
+Dettagli: documentazione/CREATIVE-MODE.md e RELIEF-REFINEMENT.md.
 
 SALVATAGGI E AGGIORNAMENTO
 La cartella run-johto viene creata accanto a GIOCA.cmd al primo avvio.

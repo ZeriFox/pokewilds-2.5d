@@ -1,10 +1,10 @@
 # Reproducible Windows package
 
-Current packaging target: **v0.8.11-johto.4**. Its exact source commit, JAR and
+Current packaging target: **v0.8.11-johto.5**. Its exact source commit, JAR and
 verification results are recorded in the generated `BUILD-INFO.json` and
 receipts accompanying the candidate ZIP. The commands below require the complete
 current native suite to pass; results from an earlier release do not approve it.
-See the [release page](https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.4)
+See the [release page](https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.5)
 for the Windows archive and its accompanying evidence.
 
 ## Historical package evidence
@@ -72,8 +72,8 @@ The PMD asset test requires `--bundled` for delivered-JAR checks; the runner add
 Commit the reviewed changes before the final verification, then use a new version:
 
 ```
-python tools/package_windows.py --version v0.8.11-johto.4
-python tools/verify_windows_package.py build/release/pokewilds-2.5d-windows-x64-v0.8.11-johto.4.zip
+python tools/package_windows.py --version v0.8.11-johto.5
+python tools/verify_windows_package.py build/release/pokewilds-2.5d-windows-x64-v0.8.11-johto.5.zip
 ```
 
 The example version is not reserved; inspect existing versions before choosing

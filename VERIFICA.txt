@@ -1,8 +1,8 @@
 VERIFICA - rilievi, roccia e scale - 14 ottobre 2026
 
-BUILD LOCALE
+BUILD JOHTO.5
 Base pubblicata: 037f8c09b24d4bfa8bb601aac23679259466aa3f (johto.4).
-Avvio: run-johto.cmd. Nessun aggiornamento dello ZIP GitHub in questa iterazione.
+Avvio: run-johto.cmd. Destinazione: release v0.8.11-johto.5, con pacchetto Windows x64.
 I salvataggi personali non sono usati dalle prove automatiche.
 La precedente prova locale (26ffcf6f) e archiviata in baseline/before-relief-refinement/.
 

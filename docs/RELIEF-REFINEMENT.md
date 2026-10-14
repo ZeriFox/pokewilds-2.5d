@@ -1,6 +1,6 @@
 # Rilievi, roccia e scale
 
-La prova locale del 14 ottobre prosegue dalla build `26ffcf6f`. Avvia
+La johto.5 del 14 ottobre prosegue dalla build `26ffcf6f`. Avvia
 `run-johto.cmd` per usare il nuovo aspetto anche nei mondi salvati.
 
 Le terrazze hanno angoli convessi arrotondati con più segmenti. Il piano alto,
@@ -46,4 +46,4 @@ caricati da queste prove.
 
 L'hash del JAR locale è in `VERIFICA.txt` e `build/build-report.json`; la
 ricevuta completa delle prove sul JAR è `build/rework-verification/native.json`.
-La release GitHub johto.4 precede questa iterazione locale.
+Questi materiali e rilievi sono inclusi nella release GitHub johto.5.

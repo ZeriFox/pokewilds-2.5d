@@ -4,11 +4,11 @@ Una ricostruzione PC di PokeWilds 0.8.11 in Java/LibGDX, con mondo prospettico, 
 
 La versione aggiunge **552 specie giocabili** alle 410 della base, per **962 specie totali**, una caldera vulcanica e rampe percorribili tra alcune terrazze montane. La mappa resta procedurale: il nuovo passaggio di generazione modifica davvero terreno e collisioni. La presentazione predefinita usa sprite 2D e la build normale esclude i modelli GLB. È una versione Windows PC x64, non un port Nintendo 3DS.
 
-La versione **v0.8.11-johto.4** prosegue dal commit `ac200935`: [arene prospettiche, apertura e guardaroba](docs/CINEMATIC-CUSTOMIZATION.md), [cast giocabile in stile Bianco e Nero](docs/TRAINERS-BW.md), [mare, chiome e scenari di battaglia](docs/CINEMATIC-NATURE.md), [ricevuta della build e verifiche](VERIFICA.txt). I nuovi sprite e gli effetti funzionano anche sui mondi salvati. La precedente [ricostruzione del terreno](docs/LIVING-WORLD.md) richiede invece una nuova avventura/isola per vedere la diversa disposizione strutturale. Il precedente pacchetto **v0.8.11-stardew.1** e le anteprime seguenti sono storici; [REWORK-STATUS.md](docs/REWORK-STATUS.md) ne conserva lo stato e gli hash.
+La versione **v0.8.11-johto.5** comprende gli aggiornamenti di mondo, lotta e modalità Creativa, insieme a [arene prospettiche, apertura e guardaroba](docs/CINEMATIC-CUSTOMIZATION.md), [cast giocabile in stile Bianco e Nero](docs/TRAINERS-BW.md), [mare, chiome e scenari di battaglia](docs/CINEMATIC-NATURE.md), [ricevuta della build e verifiche](VERIFICA.txt). I nuovi sprite e gli effetti funzionano anche sui mondi salvati. La precedente [ricostruzione del terreno](docs/LIVING-WORLD.md) richiede invece una nuova avventura/isola per vedere la diversa disposizione strutturale. Il precedente pacchetto **v0.8.11-stardew.1** e le anteprime seguenti sono storici; [REWORK-STATUS.md](docs/REWORK-STATUS.md) ne conserva lo stato e gli hash.
 
-La successiva **prova locale del 14 ottobre** introduce camera continua a 360 gradi, rialzi leggibili, nuovi strumenti e bacche, effetti Shiny e modalità Creativa. Avvio e controlli sono in [PLAYTEST-2026-10-14.md](docs/PLAYTEST-2026-10-14.md); la release johto.4 sopra resta il pacchetto precedente. Le ricevute correnti sono in `build/build-report.json` e `build/rework-verification/native.json`.
+La **johto.5 del 14 ottobre** introduce camera continua a 360 gradi, rialzi leggibili, nuovi strumenti e bacche, effetti Shiny e modalità Creativa. Avvio e controlli sono in [PLAYTEST-2026-10-14.md](docs/PLAYTEST-2026-10-14.md). Le ricevute correnti sono in `build/build-report.json` e `build/rework-verification/native.json`.
 
-L’ultimo [affinamento dei rilievi](docs/RELIEF-REFINEMENT.md) rende gli angoli più arrotondati, le pareti rocciose leggibili e le scale coerenti con la salita, con materiali dedicati alla build locale.
+L’ultimo [affinamento dei rilievi](docs/RELIEF-REFINEMENT.md) rende gli angoli più arrotondati, le pareti rocciose leggibili e le scale coerenti con la salita, con materiali dedicati alla nuova versione.
 
 ![Mondo procedurale in 2.5D](anteprima-25d.png)
 
@@ -30,8 +30,8 @@ Il ramo **`main`** riunisce le correzioni di johto.3 con **14 profili di bioma**
 
 ## Giocare su Windows
 
-1. Apri la [release v0.8.11-johto.4](https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.4).
-2. Nella sezione **Assets** scarica **`pokewilds-2.5d-windows-x64-v0.8.11-johto.4.zip`**.
+1. Apri la [release v0.8.11-johto.5](https://github.com/ZeriFox/pokewilds-2.5d/releases/tag/v0.8.11-johto.5).
+2. Nella sezione **Assets** scarica **`pokewilds-2.5d-windows-x64-v0.8.11-johto.5.zip`**.
 3. Usa **Estrai tutto** in una cartella scrivibile, poi apri **`PokeWilds-2.5D/GIOCA.cmd`**.
 
 Il pacchetto include **Java 17, gioco compilato e risorse**: non occorrono Python, Git, Java installato o `build.cmd`. Funziona anche offline. Mantieni insieme launcher, `dist/` e `toolchain/`; non avviare il launcher dentro lo ZIP e non spostarlo da solo. Anche **`run-johto.cmd`** avvia la stessa versione.
