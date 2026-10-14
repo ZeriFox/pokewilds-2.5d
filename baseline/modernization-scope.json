@@ -1,11 +1,11 @@
 {
-  "schema": 9,
+  "schema": 10,
   "status": "frozen",
-  "purpose": "User-directed natural terrain and waves/lava, Creative choice at new-world setup, dedicated Ride/Surf/Fly poses, stable cylindrical battle panoramas, additional move effects and sourced species habitat refinements.",
+  "purpose": "Explicit MAP bug fix: display the existing island minimap on the modern UI canvas instead of suppressing it beneath the perspective renderer. Preserve all accepted natural-world features and original map input/teleport/save behavior.",
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "a707fadb0e25dd4341756a2730be8354c7ae43f4d1ec09892641e824475dc58e",
+  "reviewed_patch_sha256": "0be78bd8cdd8e5158063e384fbda47d658372f2f3fd4dd4a47d4b77ae06c68a3",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/CheckEndOfBattle.java",
@@ -379,8 +379,8 @@
       "scope": "Modern startup/options/trainer/wardrobe presentation with an accessible eight-row local-world setup including Adventure/Creative and explanatory hint. Uses controller hitboxes and preserves original launch/load actions."
     },
     "src/com/pkmngen/game/ModernUi.java": {
-      "reviewed_sha256": "a66620f6660e65f802d88fa4156042957c15eaf1f0cf35cb5d0c018787cbbb8f",
-      "scope": "Shared viewport, modern card typography, palettes and bounded easing at fixed hit boxes. Delegates original menu actions; disposes opening artwork, supplied atlas resources and dedicated relief textures. No gameplay rules or inventory writes."
+      "reviewed_sha256": "a91d29f258fbead786a09d66302a621f0bb7c0c5fb470b3f203a45815058686b",
+      "scope": "Central modern UI rendering/viewport and action bridges, including explicit UI-canvas map presentation after perspective world drawing. Original DrawMiniMap action retains opening/input/pan/teleport/close progression and texture ownership; no original gameplay or minimap data modified."
     },
     "src/com/pkmngen/game/ModernWorldGenerator.java": {
       "reviewed_sha256": "a7e6e51da47259ddec48e6fbe2ed6253e46d3cb17428216a35ad4d44d183d0e2",
@@ -473,6 +473,10 @@
     "src/com/pkmngen/game/ModernMoveEffects.java": {
       "scope": "Deterministic family-based particles for reviewed move animation names, projected through the existing rotating arena camera. Retains original frame counts and audio/gameplay actions, bounded shader/texture lifecycle, HUD clipping and reduced-motion behavior; no gameplay RNG or camera resets.",
       "reviewed_sha256": "73f2f1c36c8e87f6496448748261f2f8a660b23b333888776287d6cf0db943f9"
+    },
+    "src/com/pkmngen/game/ModernMapUi.java": {
+      "scope": "Read-only modern world-map presentation from the original DrawMiniMap texture/state on the UI canvas, aspect-preserving island overview, pan translation, player/camp/warp markers and clipped viewport with GL restoration. Borrows action-owned textures; no gameplay input, teleport rules, camera/player/terrain/minimap writes, saves or RNG.",
+      "reviewed_sha256": "7aa9d319bf7eaea98a3018bb445dcb768f53fbb690c79dc1b11d4b3f32018d87"
     }
   },
   "review_notes": [
@@ -516,12 +520,14 @@
     "2026-10-14 natural world, explicit user scope after published johto.5: reviewed complete coordinated diff for natural relief/fluid shader and materials, full seated trainer bodies and mount envelopes, local creation-mode draft hook, sourced habitat route overrides, rigid cylindrical panorama and actor-only metadata plus move particles. Pre-change schema 8 manifest/verifier/negative tests/VERIFICA archived unchanged. Independent terrain review fixed missing-fluid fallback to fail clearly. Classic combat/save sources and exact nonpresentation boundaries remain protected. Native acceptance is separate.",
     "2026-10-14 natural world, explicit user scope after published johto.5: reviewed complete coordinated diff for natural relief/fluid shader and materials, full seated trainer bodies and mount envelopes, local creation-mode draft hook, sourced habitat route overrides, rigid cylindrical panorama and actor-only metadata plus move particles. Pre-change schema 8 manifest/verifier/negative tests/VERIFICA archived unchanged. Independent terrain review fixed missing-fluid fallback to fail clearly. Classic combat/save sources and exact nonpresentation boundaries remain protected. Native acceptance is separate.",
     "Final native regression at 7e49a8ac caught TrainerCatalog uploading from retained CPU pixels, unintentionally enabling alpha trimming of normalized battle-entry wardrobe frames. Reviewed minimal ownership fix uploads from the caller source as before, retains only a separate CPU copy for mounted composition, and preserves the existing full-frame PMD oracle. No oracle weakened or other production helper changed; all 41 final suites must be rerun on the rebuilt JAR.",
-    "2026-10-14 natural world, explicit user scope after published johto.5: reviewed complete coordinated diff for natural relief/fluid shader and materials, full seated trainer bodies and mount envelopes, local creation-mode draft hook, sourced habitat route overrides, rigid cylindrical panorama and actor-only metadata plus move particles. Pre-change schema 8 manifest/verifier/negative tests/VERIFICA archived unchanged. Independent terrain review fixed missing-fluid fallback to fail clearly. Classic combat/save sources and exact nonpresentation boundaries remain protected. Native acceptance is separate."
+    "2026-10-14 natural world, explicit user scope after published johto.5: reviewed complete coordinated diff for natural relief/fluid shader and materials, full seated trainer bodies and mount envelopes, local creation-mode draft hook, sourced habitat route overrides, rigid cylindrical panorama and actor-only metadata plus move particles. Pre-change schema 8 manifest/verifier/negative tests/VERIFICA archived unchanged. Independent terrain review fixed missing-fluid fallback to fail clearly. Classic combat/save sources and exact nonpresentation boundaries remain protected. Native acceptance is separate.",
+    "MAP fix reviewed after accepted 7e7920dc: only ModernUi.mapFrame routes the existing DrawMiniMap to the new read-only ModernMapUi canvas presenter. Existing map action, input, teleport, world and save sources remain unchanged. Native negative reproduction on JAR0512 showed zero visible overview palette pixels; source diagnostic passed1824checks,10captures,290frames through actual menu/drag/pan/reopen/resize/warp cancellation, with untouched terrain/minimap/player/RNG. Map viewport restores scissor and borrows original action-owned textures; no image assets added. Full final JAR acceptance separate."
   ],
   "historical_v2": "baseline/modernization-v2/archive.json",
   "historical_v3": "baseline/modernization-v3/",
   "historical_v4": "baseline/modernization-v4/archive.json",
   "historical_v5": "baseline/modernization-v5/archive.json",
   "historical_pre_playtest": "baseline/before-playtest-2026-10-14/",
-  "historical_pre_natural_world": "baseline/before-natural-world-2026-10-14/"
+  "historical_pre_natural_world": "baseline/before-natural-world-2026-10-14/",
+  "historical_pre_map_fix": "baseline/before-map-fix-2026-10-14/"
 }

@@ -25,6 +25,7 @@ REQUIRED_JAR = (*NATIVES, "com/pkmngen/game/desktop/DesktopLauncher.class",
                 "com/pkmngen/game/CreativeMode.class", "com/pkmngen/game/CreativeModeUi.class",
                 "com/pkmngen/game/TerrainReliefAssets.class", "com/pkmngen/game/WorldReadability.class",
                 "com/pkmngen/game/MountedTrainerSprites.class", "com/pkmngen/game/ModernMoveEffects.class",
+                "com/pkmngen/game/ModernMapUi.class",
                 "com/pkmngen/game/UserSpriteAssets.class", "com/pkmngen/game/CaptureBallVisual.class",
                 "com/pkmngen/game/ShinyVisuals.class", "visual/pmd/catalog.json",
                 "visual/stardew/world-atlas.png", "visual/stardew/world-atlas.json",
@@ -123,7 +124,7 @@ def make_package(version: str, destination: Path, receipts: list[Path]) -> Path:
     for name in ("REWORK-STATUS.md", "ASSET-COVERAGE.md", "REWORK-TESTS.md", "PACKAGING.md", "VERTICAL-SLICE.md", "JAVA-REFACTOR-STEP3.md",
                  "CINEMATIC-CUSTOMIZATION.md", "TRAINERS-BW.md", "LIVING-WORLD.md", "CINEMATIC-NATURE.md",
                  "CREATIVE-MODE.md", "PLAYTEST-2026-10-14.md", "RELIEF-REFINEMENT.md",
-                 "NATURAL-WORLD-2026-10-14.md", "HABITAT-REFINEMENT.md"):
+                 "NATURAL-WORLD-2026-10-14.md", "HABITAT-REFINEMENT.md", "MAP-FIX-2026-10-14.md"):
         path = ROOT / "docs" / name
         if path.is_file():
             add(path, "documentazione/" + name)

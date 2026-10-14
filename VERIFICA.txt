@@ -1,26 +1,27 @@
-VERIFICA - revisione naturale locale dopo johto.5 - 14 ottobre 2026
+VERIFICA - revisione naturale e correzione MAP locale - 14 ottobre 2026
 
 BASE E AVVIO
 Base GitHub: 1f916e24033d70998b046252dc6bb4f2805a4b27 (johto.5).
 Questa revisione e locale; non identifica una nuova release pubblicata.
 Avvio: run-johto.cmd. Nessun salvataggio personale usato dalle prove.
-Il checkpoint precedente e conservato in baseline/before-natural-world-2026-10-14/.
+Il checkpoint naturale e conservato in baseline/before-natural-world-2026-10-14/.
+La correzione MAP parte da 7e7920dc; ambito precedente in baseline/before-map-fix-2026-10-14/.
 
 ARTEFATTO COMPILATO
 dist/pokewilds-rebuilt.jar
-SHA-256: 0512c93f98c75a427e257d9b693c87206e6cd094256869aac864951157fae220
-Dimensione: 338504266 byte; 109103 voci ZIP.
-Java 17; 244 sorgenti; 512 classi compilate.
+SHA-256: 52e7d93cace97fa4626f30f6c5bc162a447481d1940f944b664b123ef5f78c75
+Dimensione: 338507815 byte; 109104 voci ZIP.
+Java 17; 245 sorgenti; 513 classi compilate.
 Modelli GLB esclusi; zero classi di gioco recuperate dal runtime upstream.
-Digest sorgenti: 59e0ca21ac245df08f0e71b2d4f023d22125566cb5d13c8539f15f6cb0412638
+Digest sorgenti: a296f0d74612ecf53f40602e222fb27a4fa91d53850a3b40958d620ed17a43a5
 Build report: build/build-report.json (hash di ogni sorgente e risorsa).
 
 CONTROLLI
 Build e controlli statici/deterministici completati: build/rework-verification/build.json.
-Scope schema 9: 143 sorgenti originali invariati, 55 con ambito esplicito, 46 aggiunte.
-79 mutazioni non autorizzate respinte, compresi i checkpoint precedenti,
+Scope schema 10: 143 sorgenti originali invariati, 55 con ambito esplicito, 47 aggiunte.
+85 mutazioni non autorizzate respinte, compresi i checkpoint precedenti,
 le regole/tempi di cattura e la serializzazione dell'inventario reale.
-Le 41 suite native obbligatorie sono elencate in tools/verify_rework.py.
+Le 42 suite native obbligatorie sono elencate in tools/verify_rework.py.
 Esito effettivo, commit, hash del JAR e log per ciascuna suite:
   build/rework-verification/native.json
 La ricevuta nativa identifica questa build soltanto se status=passed,
@@ -29,6 +30,10 @@ I runner normali verificano il JAR senza classi di produzione sovrapposte;
 --sources identifica soltanto le diagnostiche di sviluppo.
 
 MODIFICHE
+- MAP torna a disegnare la minimappa nel canvas della UI, dopo il mondo
+  prospettico. Marcatori di personaggio/campo/teletrasporto e riquadro ritagliato.
+  Apertura, pan, trascinamento, chiusura/riapertura e teletrasporto originali;
+  nuova regressione nativa da 1824 controlli/290 frame, dieci schermate.
 - Rilievi naturali senza frecce o strisce gialle: terra/roccia differenziate,
   bordo erboso, ombre alla base, sei segmenti agli angoli e scale raccordate.
   Quote, collisioni e dati dei mondi salvati sono conservati.
@@ -50,7 +55,7 @@ MODIFICHE
   Non viene spostato alcun Pokemon gia salvato.
 
 LIMITI E DOCUMENTAZIONE
-docs/NATURAL-WORLD-2026-10-14.md, docs/CREATIVE-MODE.md,
+docs/MAP-FIX-2026-10-14.md, docs/NATURAL-WORLD-2026-10-14.md, docs/CREATIVE-MODE.md,
 docs/HABITAT-REFINEMENT.md e docs/ASSET-RIGHTS.md.
 I fondali esistenti sono ripetuti in tre settori del cilindro; non sono
 panorami unici disegnati a 360 gradi. Le pose montate semplificano alcuni

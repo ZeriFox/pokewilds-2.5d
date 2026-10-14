@@ -20,8 +20,10 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "bacee0c943378321ad78d68a32f872047a68780d9772fa156c2c6607220aa41d"
+FROZEN_MANIFEST_SHA256 = "3e0b0f2ba7a8b2e74adf6553f7928932d382d72b41268240f8977acd0d3d795d"
 PREFIX = "src/com/pkmngen/game/"
+MAP_FIX_ARCHIVE = {'baseline/before-map-fix-2026-10-14/modernization-scope.json': 'bacee0c943378321ad78d68a32f872047a68780d9772fa156c2c6607220aa41d', 'baseline/before-map-fix-2026-10-14/VERIFICA.txt': '7533322544f7c87b26c9a45067212941407af7f071fe22539600057f44160dfb', 'baseline/before-map-fix-2026-10-14/verify_scope_test.py': '0ccc76f41ad62f42b5d747e610712ab19914dd14c1757cc9812a8785c53425a7', 'baseline/before-map-fix-2026-10-14/verify_visual_scope.py': '92be571e2df25556a3141f8291b8abef02788e6aecf3e5177b969958aab03478'}
+
 NATURAL_WORLD_ARCHIVE = {'baseline/before-natural-world-2026-10-14/modernization-scope.json': 'de53c924dc3dcfa4e27c6ae0f7a7999fec7906df1826cfc24e2c497c5063431d', 'baseline/before-natural-world-2026-10-14/VERIFICA.txt': '1a89c2a2a5ca1e1b2ce9b0b3aaa719056cb7dbc9c911838c83596ee250d20a89', 'baseline/before-natural-world-2026-10-14/verify_scope_test.py': 'd84e08cb77da5e6228df62a29d2241137d1f96245a5ae9133edf63d6c8e2a63d', 'baseline/before-natural-world-2026-10-14/verify_visual_scope.py': '69a4ff13404fa237771ba8f4942e5663b2a51ee4fadd41d630216d4d4a631e7c'}
 
 RELIEF_ARCHIVE = {'baseline/before-relief-refinement/modernization-scope.json': '6449bde64b50c3a5cf5c3dd804b824af1c7b355a2e6caa5178adab1060c50dfe', 'baseline/before-relief-refinement/verify_visual_scope.py': '43d6398d747ec99e1ca5496b0d8811c1751e360891a06a28d36ecc0c65f55e0b', 'baseline/before-relief-refinement/verify_scope_test.py': '5a5b4e9b5c55d8c6991af9468a83fcc813abc6fe86dfc3ad1efb50d0eba1aed1', 'baseline/before-relief-refinement/VERIFICA.txt': '7b8dc3ab46ad3535a3d545aef90b42d7807afd86d5a4989b475d6abb6c8a2b49'}
@@ -143,6 +145,7 @@ MODIFIED_SCOPES = {
     "util/SpriteProxy.java": "Presentation: known projected actors first, then full-screen or orbit-anchored effects; gameplay Sprite transforms remain read-only.",
 }
 ADDED_SCOPES = {
+    "ModernMapUi.java": "Read-only modern world-map presentation from the original DrawMiniMap texture/state on the UI canvas, aspect-preserving island overview, pan translation, player/camp/warp markers and clipped viewport with GL restoration. Borrows action-owned textures; no gameplay input, teleport rules, camera/player/terrain/minimap writes, saves or RNG.",
     "ModernMoveEffects.java": "Deterministic family-based particles for reviewed move animation names, projected through the existing rotating arena camera. Retains original frame counts and audio/gameplay actions, bounded shader/texture lifecycle, HUD clipping and reduced-motion behavior; no gameplay RNG or camera resets.",
     "MountedTrainerSprites.java": "Presentation-only seated Ride, Surf and Fly body composition, preserving resolved idle identity/head/wardrobe materials and explicit mounted mod priority. Bounded texture cache, read-only retained CPU pixels and deterministic pose sway; no player, move, collision, clock, save or RNG writes.",
     "TerrainReliefAssets.java": "Read-only shared earth, rock, stair, lava and water material loader with nearest filtering, repeating world fluids/strata, dry-only face fallback and bounded dispose/reload. Required fluids fail clearly rather than scrolling atlas UVs. No tile, height, collision, gameplay RNG or save writes.",
@@ -178,7 +181,7 @@ ADDED_SCOPES = {
     "ModernBatch.java": "Suppress legacy draw submissions while original menu actions advance.",
     "ModernInventoryUi.java": "Modern inventory/item/crafting/guide presentation with supplied identity-mapped icons, five pocket tabs, quantity-safe rows and details. Shows INF/Unlimited only for explicit Creative virtual supplies; original item-use, sorting and crafting actions remain authoritative.",
     "ModernPartyUi.java": "Modern party/storage/nickname UI with shared cards, supplied party-ball/status badges, full animated summary actors and shiny sparkle cues. Existing hitboxes, setup delegation, reduced-motion preferences and action semantics retained.",
-    "ModernUi.java": "Shared viewport, modern card typography, palettes and bounded easing at fixed hit boxes. Delegates original menu actions; disposes opening artwork, supplied atlas resources and dedicated relief textures. No gameplay rules or inventory writes.",
+    "ModernUi.java": "Central modern UI rendering/viewport and action bridges, including explicit UI-canvas map presentation after perspective world drawing. Original DrawMiniMap action retains opening/input/pan/teleport/close progression and texture ownership; no original gameplay or minimap data modified.",
     "ModernWorldGenerator.java": "Authorized deterministic procedural terrain generation, version 3, with biome-authored modules and the existing connected single-depth caldera. Preserves dungeon routes, deep-forest maze walls, graveyards, ruins and special pits during volcanic finishing; shoreline smoothing excludes reserved actors, stored encounters and dungeon water while retaining normal inland smoothing. No save schema change.",
     "MoveEffectPresentation.java": "Modern move raster presentation: legacy row/recolor metadata composites only the transparent target actor buffer; never distorts the battle panorama. Retains authored normal-move PNG projection, shrink stages, original timing, target registration, resize/FBO/GL restoration and fixed HUD.",
     "PmdBattleSprites.java": "Eight-direction projected PMD billboards, stable animation bounds, transparent-aware ground depth sorting across legacy action layers, orbit-aware trainer/send-out fragments, genuine original shiny-art fallback and sparkle overlay. No species leak or combat changes.",
@@ -305,6 +308,9 @@ def sha256(path: Path) -> str:
 
 
 def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
+    for archived, expected in MAP_FIX_ARCHIVE.items():
+        if sha256(root / archived) != expected:
+            raise RuntimeError("Immutable pre-map-fix checkpoint changed: " + archived)
     for archived, expected in NATURAL_WORLD_ARCHIVE.items():
         if sha256(root / archived) != expected:
             raise RuntimeError("Immutable pre-natural-world checkpoint changed: " + archived)
@@ -396,8 +402,8 @@ def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
             "missing_additions": sorted(expected_added - set(added)),
         }))
     manifest = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
-    if manifest.get("schema") != 9 or manifest.get("classic_report_sha256") != CLASSIC_REPORT_SHA256:
-        raise RuntimeError("Expected schema 9 manifest bound to classic source baseline")
+    if manifest.get("schema") != 10 or manifest.get("classic_report_sha256") != CLASSIC_REPORT_SHA256:
+        raise RuntimeError("Expected schema 10 manifest bound to classic source baseline")
     if set(manifest.get("modified_original_sources", {})) != expected_changed:
         raise RuntimeError("Manifest changes differ from explicit source allowlist")
     if set(manifest.get("added_sources", {})) != expected_added:
@@ -436,7 +442,7 @@ def audit(root: Path = ROOT, inventory: bool = False) -> tuple[dict, str]:
         raise RuntimeError("Complete source diff differs from reviewed patch digest")
     result = {
         "status": "inventory_not_approved" if inventory else "success",
-        "manifest_schema": 9, "baseline_source_count": len(original), "current_source_count": len(current),
+        "manifest_schema": 10, "baseline_source_count": len(original), "current_source_count": len(current),
         "unchanged_original_sources": len(original) - len(changed),
         "modified_original_sources": changed, "added_sources": added,
         "modified_source_scopes": {PREFIX + key: value for key, value in MODIFIED_SCOPES.items()},

@@ -1,0 +1,59 @@
+VERIFICA - revisione naturale locale dopo johto.5 - 14 ottobre 2026
+
+BASE E AVVIO
+Base GitHub: 1f916e24033d70998b046252dc6bb4f2805a4b27 (johto.5).
+Questa revisione e locale; non identifica una nuova release pubblicata.
+Avvio: run-johto.cmd. Nessun salvataggio personale usato dalle prove.
+Il checkpoint precedente e conservato in baseline/before-natural-world-2026-10-14/.
+
+ARTEFATTO COMPILATO
+dist/pokewilds-rebuilt.jar
+SHA-256: 0512c93f98c75a427e257d9b693c87206e6cd094256869aac864951157fae220
+Dimensione: 338504266 byte; 109103 voci ZIP.
+Java 17; 244 sorgenti; 512 classi compilate.
+Modelli GLB esclusi; zero classi di gioco recuperate dal runtime upstream.
+Digest sorgenti: 59e0ca21ac245df08f0e71b2d4f023d22125566cb5d13c8539f15f6cb0412638
+Build report: build/build-report.json (hash di ogni sorgente e risorsa).
+
+CONTROLLI
+Build e controlli statici/deterministici completati: build/rework-verification/build.json.
+Scope schema 9: 143 sorgenti originali invariati, 55 con ambito esplicito, 46 aggiunte.
+79 mutazioni non autorizzate respinte, compresi i checkpoint precedenti,
+le regole/tempi di cattura e la serializzazione dell'inventario reale.
+Le 41 suite native obbligatorie sono elencate in tools/verify_rework.py.
+Esito effettivo, commit, hash del JAR e log per ciascuna suite:
+  build/rework-verification/native.json
+La ricevuta nativa identifica questa build soltanto se status=passed,
+jar_sha256 corrisponde all'hash sopra e il commit e quello del checkout.
+I runner normali verificano il JAR senza classi di produzione sovrapposte;
+--sources identifica soltanto le diagnostiche di sviluppo.
+
+MODIFICHE
+- Rilievi naturali senza frecce o strisce gialle: terra/roccia differenziate,
+  bordo erboso, ombre alla base, sei segmenti agli angoli e scale raccordate.
+  Quote, collisioni e dati dei mondi salvati sono conservati.
+- Nuove texture autonome per acqua e lava, con UV continui tra tile, onde,
+  schiuma di riva, risacca e canali incandescenti fra croste scure.
+- Pose complete sedute Ride/Surf/Volo per tutti i 19 personaggi, quattro
+  direzioni, identita della testa e colori/guardaroba attuali conservati.
+  Non vengono piu tagliate le gambe dello sprite che cammina.
+- Panorama cilindrico rigido, orbita continua a 360 gradi e schede HP fisse.
+  Le righe/inversioni legacy campionano soltanto il Pokemon bersaglio,
+  senza deformare il fondale. Corretto lo shader invalidato a fine effetto.
+- Particelle moderne in dieci famiglie per 46 mosse con risorse gia presenti;
+  14 mosse reali esercitate nelle prove, con resize e bersagli consecutivi.
+  Formule, RNG, esiti di cattura e durata delle azioni restano protetti.
+- Game mode Adventure/Creative nella creazione di un nuovo mondo Local;
+  caricamenti e multiplayer conservano il comportamento esistente.
+- Regole ecologiche documentate per 28 specie/famiglie, fra acqua marina
+  e dolce, neve, foreste, spiagge e regioni aride/vulcaniche.
+  Non viene spostato alcun Pokemon gia salvato.
+
+LIMITI E DOCUMENTAZIONE
+docs/NATURAL-WORLD-2026-10-14.md, docs/CREATIVE-MODE.md,
+docs/HABITAT-REFINEMENT.md e docs/ASSET-RIGHTS.md.
+I fondali esistenti sono ripetuti in tre settori del cilindro; non sono
+panorami unici disegnati a 360 gradi. Le pose montate semplificano alcuni
+dettagli degli abiti; i mod possono fornire sprite montati espliciti.
+La copertura ecologica dell'intero catalogo resta parziale.
+Le prove automatiche non sostituiscono una campagna manuale completa.

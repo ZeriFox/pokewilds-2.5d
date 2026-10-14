@@ -59,6 +59,7 @@ NATIVE = [
     ["tools/relief_presentation_test.py"],
     ["tools/relief_visual_test.py"],
     ["tools/mounted_pose_test.py"],
+    ["tools/map_presentation_test.py"],
 ]
 
 

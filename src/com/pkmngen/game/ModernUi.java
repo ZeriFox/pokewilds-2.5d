@@ -25,6 +25,7 @@ public final class ModernUi {
    private final ModernStartupUi startup = new ModernStartupUi();
    private final ModernPartyUi party = new ModernPartyUi();
    private final ModernInventoryUi inventory = new ModernInventoryUi();
+   private final ModernMapUi worldMap = new ModernMapUi();
    private final MenuMotion motion = new MenuMotion();
    private final Map<String,Long> counts = new LinkedHashMap<>();
    private final Map<String,Character> letters = new HashMap<>();
@@ -154,9 +155,9 @@ public final class ModernUi {
    }
    public void mapFrame(Game game) {
       for(Action a:game.actionStack) if(a instanceof DrawMiniMap) {
-         header(game,"WORLD MAP","Procedural island");
-         footer(game,DesktopControls.movement()+"  Pan     "+confirmKey()+"  Select     "+backKey()+"  Back"); mark(a); break;
+         worldMap.render(this,game,(DrawMiniMap)a);return;
       }
+      worldMap.clear();
    }
    public void rect(Game game,float x,float y,float w,float h,Color color) {
       float saved=game.uiBatch.getPackedColor(); game.uiBatch.setColor(color);
