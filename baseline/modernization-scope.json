@@ -1,11 +1,11 @@
 {
-  "schema": 7,
+  "schema": 8,
   "status": "frozen",
-  "purpose": "Explicit 2026-10-14 playtest request: whole-arena orbit, readable terrain/interiors and CUT tiers, animated field companions, supplied inventory/berry/ball assets, concealed encounter identity, shiny cues and opt-in local Creative mode. Combat rules and legacy serialized formats remain protected; exact Creative and capture bridges are independently checked before any hash freeze.",
+  "purpose": "Explicit refinement requested by the user: more evident rounded relief corners, dedicated readable mountain rock strata, coherent stone stairs and improved environmental transitions; prior playtest features retained.",
   "classic_report_sha256": "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e",
   "classic_source_snapshot": "baseline/johto-v1/classic-sources",
   "historical_v1": "baseline/johto-v1/archive.json",
-  "reviewed_patch_sha256": "f77e08873cb31c34e591e43870e0288092c23be72674f18ff55c7999d59af0e3",
+  "reviewed_patch_sha256": "5461664ef64b9feb0d2c4df99630b49a4bf3ca3f9b5df00badb6f522d2b8f1b5",
   "protected_original_sources": [
     "src/com/pkmngen/game/Attack.java",
     "src/com/pkmngen/game/CheckEndOfBattle.java",
@@ -351,8 +351,8 @@
       "scope": "Continuous whole-arena orbit across command and action phases, fixed top HUD, actor depth clearing and projected legacy effect anchors, identity-concealing encounter transition and full viewport coverage; reduced motion and exact original action timing retained."
     },
     "src/com/pkmngen/game/JohtoRenderer.java": {
-      "reviewed_sha256": "0690551a022615e232e233050f25dc02210b2335450b556cd52eff9d1a0c6302",
-      "scope": "Exclusive perspective world presentation with continuous shore wash, tidal films, reflected lighting and blended cliff contacts. Visible jump-ledge lips/drop cues, root-footprint skirts, textured interiors, CUT-tier tree silhouettes, mapped berry plants and ball pickups, action-aware companion offsets and shiny sparkles. Preserves saved tiles, hitboxes, player/Pokemon positions, field-action clocks and encounter identity; reduced-motion freeze and resource disposal retained."
+      "reviewed_sha256": "1408435659a4705e441924b45bf93ea7ec0d250ece865650724281f6d38aa57f",
+      "scope": "Exclusive perspective world presentation with rounded multi-segment convex relief edges, matching upper/rock/lower contours, geological cliff textures with continuous strata and biome shading, visible tread noses and coherent stair transitions. Retains shore wash, fields, actors and all previous visual systems; preserves saved tiles, elevations, hitboxes, player/Pokemon positions, action clocks, encounter identity and interior foreground visibility."
     },
     "src/com/pkmngen/game/MenuMotion.java": {
       "reviewed_sha256": "eefc7eaed302305ed08d151d86decd2eded9ee6a85a7d3870a0f9a5af93e9a18",
@@ -379,8 +379,8 @@
       "scope": "Modern title/setup/options, nineteen-trainer picker and wardrobe preview with matching pointer hit boxes. Delegates explicit Creative submenu presentation from the settings list; no gameplay RNG or serialized format changes."
     },
     "src/com/pkmngen/game/ModernUi.java": {
-      "reviewed_sha256": "2bc26b62237f7cd3744f0d7816a2e3274103252c274d7a8fd23da61e8a1727e4",
-      "scope": "Shared viewport, modern card typography, palettes and bounded easing at fixed hit boxes. Delegates original menu actions; disposes opening artwork and supplied atlas resources. No gameplay rules or inventory writes."
+      "reviewed_sha256": "a66620f6660e65f802d88fa4156042957c15eaf1f0cf35cb5d0c018787cbbb8f",
+      "scope": "Shared viewport, modern card typography, palettes and bounded easing at fixed hit boxes. Delegates original menu actions; disposes opening artwork, supplied atlas resources and dedicated relief textures. No gameplay rules or inventory writes."
     },
     "src/com/pkmngen/game/ModernWorldGenerator.java": {
       "reviewed_sha256": "a7e6e51da47259ddec48e6fbe2ed6253e46d3cb17428216a35ad4d44d183d0e2",
@@ -461,6 +461,10 @@
     "src/com/pkmngen/game/WorldReadability.java": {
       "scope": "Read-only semantic helpers for jumpable ledges, exact CUT requirement tree tiers, interior material classification and action-aware companion presentation. Saved tiles, hitboxes, interactions and field-action clocks remain authoritative.",
       "reviewed_sha256": "bc28fcded8554e52bbe1e598505f97b3f2612abd193123ba432dd9c28a0bb62b"
+    },
+    "src/com/pkmngen/game/TerrainReliefAssets.java": {
+      "scope": "Read-only dedicated geological face and stair texture loader, nearest sampling, repeatable rock strata UVs, fluid-bank fallback, bounded shared texture ownership and dispose/reload. No tiles, elevations, collision, gameplay RNG or save writes.",
+      "reviewed_sha256": "8452b0a8087ed987ff31507a67b4b388cee287984f22a7b71de30f3c36173c7b"
     }
   },
   "review_notes": [
@@ -499,7 +503,8 @@
     "2026-10-12 trainer redraw: reviewed four presentation/menu helpers for nineteen identity-specific B/W-style trainers, clothing accents, native idle/run frames, custom-art priority and complete mod validation. Seventeen AI-assisted sheets preserve source prompts/provenance; two original B/W heroes retained. Combat, Player, saves, terrain and cinematic nature remain unchanged from 5df68264. Prior review archived in before-trainer-redraw.",
     "2026-10-12 cinematic customization: explicit review against ac200935 of arena camera/scenery, shaped shores, convex visual bevels and lighting, concealed spirit, opening/menu animation and local modular wardrobe profiles. All original sources including Player, combat formulas, network and save serialization remain unchanged from this checkpoint. Prior review archived in before-cinematic-customization.",
     "2026-10-14: explicit user ten-point scope authorizes opt-in Local Creative resources/species grants as well as presentation changes. Previous schema 6 checkpoint and Safari source are archived unchanged under before-playtest-2026-10-14. Exact normalization protects Player, Network, PkmnMap, DrawSetupMenu, Battle outer rules and all capture action timing/outcomes even in inventory mode. Final coordinated source review completed after all production agents froze their edits. Native acceptance is separate.",
-    "2026-10-14 native follow-up: restored the existing 0.12 foreground-wall occlusion alpha after the original vertical regression found an obstruction at 0.42. Interior texture fixes remain. Independent active-resize oracle now projects actual PNG texels into the full-orbit camera, checks strict alpha coverage, exact opaque pixels and fixed HUD; no move production logic changed. Only JohtoRenderer source hash changed after the coordinated freeze; pre-playtest archive remains immutable."
+    "2026-10-14 native follow-up: restored the existing 0.12 foreground-wall occlusion alpha after the original vertical regression found an obstruction at 0.42. Interior texture fixes remain. Independent active-resize oracle now projects actual PNG texels into the full-orbit camera, checks strict alpha coverage, exact opaque pixels and fixed HUD; no move production logic changed. Only JohtoRenderer source hash changed after the coordinated freeze; pre-playtest archive remains immutable.",
+    "Relief refinement preserves WorldElevation, procedural tile state, collision, normal saves and combat rules; rendered contour and material changes are tested on isolated native scenes."
   ],
   "historical_v2": "baseline/modernization-v2/archive.json",
   "historical_v3": "baseline/modernization-v3/",

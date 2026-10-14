@@ -311,5 +311,5 @@ public final class ModernUi {
       for(Field f:object.getClass().getDeclaredFields()) if(f.isSynthetic() && f.getName().startsWith("this$")) try {f.setAccessible(true);return f.get(object);} catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
       return null;
    }
-   public void dispose() { desktop.dispose();StartupCinematic.disposeShared();UserSpriteAssets.disposeShared();font.dispose(); pixel.dispose(); }
+   public void dispose() { desktop.dispose();StartupCinematic.disposeShared();UserSpriteAssets.disposeShared();TerrainReliefAssets.disposeShared();font.dispose(); pixel.dispose(); }
 }

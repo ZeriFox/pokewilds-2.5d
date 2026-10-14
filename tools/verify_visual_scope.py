@@ -20,8 +20,10 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "6449bde64b50c3a5cf5c3dd804b824af1c7b355a2e6caa5178adab1060c50dfe"
+FROZEN_MANIFEST_SHA256 = "de53c924dc3dcfa4e27c6ae0f7a7999fec7906df1826cfc24e2c497c5063431d"
 PREFIX = "src/com/pkmngen/game/"
+RELIEF_ARCHIVE = {'baseline/before-relief-refinement/modernization-scope.json': '6449bde64b50c3a5cf5c3dd804b824af1c7b355a2e6caa5178adab1060c50dfe', 'baseline/before-relief-refinement/verify_visual_scope.py': '43d6398d747ec99e1ca5496b0d8811c1751e360891a06a28d36ecc0c65f55e0b', 'baseline/before-relief-refinement/verify_scope_test.py': '5a5b4e9b5c55d8c6991af9468a83fcc813abc6fe86dfc3ad1efb50d0eba1aed1', 'baseline/before-relief-refinement/VERIFICA.txt': '7b8dc3ab46ad3535a3d545aef90b42d7807afd86d5a4989b475d6abb6c8a2b49'}
+
 PLAYTEST_ARCHIVE = {'baseline/before-playtest-2026-10-14/modernization-scope.json': '67a078821afeee2595a1a7274bc8ec775b431333eb100b320cd327729ba1cf3b',
  'baseline/before-playtest-2026-10-14/verify_visual_scope.py': '8a650dd5ce3894a638ee9bf33ee486569196e040b9a05c0704b915def459f584',
  'baseline/before-playtest-2026-10-14/verify_scope_test.py': '6b3c666a4b678dd77e699608f819cbe91e2d317db279b958e971b91424bfe2f6',
@@ -139,6 +141,7 @@ MODIFIED_SCOPES = {
     "util/SpriteProxy.java": "Presentation: known projected actors first, then full-screen or orbit-anchored effects; gameplay Sprite transforms remain read-only.",
 }
 ADDED_SCOPES = {
+    "TerrainReliefAssets.java": "Read-only dedicated geological face and stair texture loader, nearest sampling, repeatable rock strata UVs, fluid-bank fallback, bounded shared texture ownership and dispose/reload. No tiles, elevations, collision, gameplay RNG or save writes.",
     "WorldReadability.java": "Read-only semantic helpers for jumpable ledges, exact CUT requirement tree tiers, interior material classification and action-aware companion presentation. Saved tiles, hitboxes, interactions and field-action clocks remain authoritative.",
     "UserSpriteAssets.java": "Read-only supplied atlas loader with 470 explicit item identities, distinct capture balls, status/party badges and 64 berry identities with growth/animation frames. Alpha-trimmed source regions, validated semantic mappings, bounded cache and disposal/reload; no item or capture mechanics.",
     "ShinyVisuals.java": "Visible four-point sparkle cue for shiny actors, shared battle/party rendering, reduced-motion static cue; hidden ghosts and eggs excluded. No invented palettes or gameplay state changes.",
@@ -168,11 +171,11 @@ ADDED_SCOPES = {
     "StartupVerification.java": "Opt-in packaged-launch probe inside the delivered Game: observe 120 original menu frames, verify nonempty framebuffer, save capture and exit normally; disabled in ordinary play.",
     "ExpansionDex.java": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration.",
     "JohtoBattleRenderer.java": "Continuous whole-arena orbit across command and action phases, fixed top HUD, actor depth clearing and projected legacy effect anchors, identity-concealing encounter transition and full viewport coverage; reduced motion and exact original action timing retained.",
-    "JohtoRenderer.java": "Exclusive perspective world presentation with continuous shore wash, tidal films, reflected lighting and blended cliff contacts. Visible jump-ledge lips/drop cues, root-footprint skirts, textured interiors, CUT-tier tree silhouettes, mapped berry plants and ball pickups, action-aware companion offsets and shiny sparkles. Preserves saved tiles, hitboxes, player/Pokemon positions, field-action clocks and encounter identity; reduced-motion freeze and resource disposal retained.",
+    "JohtoRenderer.java": "Exclusive perspective world presentation with rounded multi-segment convex relief edges, matching upper/rock/lower contours, geological cliff textures with continuous strata and biome shading, visible tread noses and coherent stair transitions. Retains shore wash, fields, actors and all previous visual systems; preserves saved tiles, elevations, hitboxes, player/Pokemon positions, action clocks, encounter identity and interior foreground visibility.",
     "ModernBatch.java": "Suppress legacy draw submissions while original menu actions advance.",
     "ModernInventoryUi.java": "Modern inventory/item/crafting/guide presentation with supplied identity-mapped icons, five pocket tabs, quantity-safe rows and details. Shows INF/Unlimited only for explicit Creative virtual supplies; original item-use, sorting and crafting actions remain authoritative.",
     "ModernPartyUi.java": "Modern party/storage/nickname UI with shared cards, supplied party-ball/status badges, full animated summary actors and shiny sparkle cues. Existing hitboxes, setup delegation, reduced-motion preferences and action semantics retained.",
-    "ModernUi.java": "Shared viewport, modern card typography, palettes and bounded easing at fixed hit boxes. Delegates original menu actions; disposes opening artwork and supplied atlas resources. No gameplay rules or inventory writes.",
+    "ModernUi.java": "Shared viewport, modern card typography, palettes and bounded easing at fixed hit boxes. Delegates original menu actions; disposes opening artwork, supplied atlas resources and dedicated relief textures. No gameplay rules or inventory writes.",
     "ModernWorldGenerator.java": "Authorized deterministic procedural terrain generation, version 3, with biome-authored modules and the existing connected single-depth caldera. Preserves dungeon routes, deep-forest maze walls, graveyards, ruins and special pits during volcanic finishing; shoreline smoothing excludes reserved actors, stored encounters and dungeon water while retaining normal inland smoothing. No save schema change.",
     "MoveEffectPresentation.java": "Semantic local/screen effect classification, continuously refreshed full-viewport snapshots, projected target rows and normal move frames, depth-enabled FBOs and GL restoration. Original action frame clocks and effects metadata retained.",
     "PmdBattleSprites.java": "Eight-direction projected PMD billboards, stable animation bounds, transparent-aware ground depth sorting across legacy action layers, orbit-aware trainer/send-out fragments, genuine original shiny-art fallback and sparkle overlay. No species leak or combat changes.",
@@ -299,6 +302,9 @@ def sha256(path: Path) -> str:
 
 
 def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
+    for archived, expected in RELIEF_ARCHIVE.items():
+        if sha256(root / archived) != expected:
+            raise RuntimeError("Immutable pre-relief checkpoint changed: " + archived)
     for archived, expected in PLAYTEST_ARCHIVE.items():
         if sha256(root / archived) != expected:
             raise RuntimeError("Pre-playtest 2026-10-14 archive changed: " + archived)
@@ -384,8 +390,8 @@ def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
             "missing_additions": sorted(expected_added - set(added)),
         }))
     manifest = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
-    if manifest.get("schema") != 7 or manifest.get("classic_report_sha256") != CLASSIC_REPORT_SHA256:
-        raise RuntimeError("Expected schema 7 manifest bound to classic source baseline")
+    if manifest.get("schema") != 8 or manifest.get("classic_report_sha256") != CLASSIC_REPORT_SHA256:
+        raise RuntimeError("Expected schema 8 manifest bound to classic source baseline")
     if set(manifest.get("modified_original_sources", {})) != expected_changed:
         raise RuntimeError("Manifest changes differ from explicit source allowlist")
     if set(manifest.get("added_sources", {})) != expected_added:
@@ -424,7 +430,7 @@ def audit(root: Path = ROOT, inventory: bool = False) -> tuple[dict, str]:
         raise RuntimeError("Complete source diff differs from reviewed patch digest")
     result = {
         "status": "inventory_not_approved" if inventory else "success",
-        "manifest_schema": 7, "baseline_source_count": len(original), "current_source_count": len(current),
+        "manifest_schema": 8, "baseline_source_count": len(original), "current_source_count": len(current),
         "unchanged_original_sources": len(original) - len(changed),
         "modified_original_sources": changed, "added_sources": added,
         "modified_source_scopes": {PREFIX + key: value for key, value in MODIFIED_SCOPES.items()},

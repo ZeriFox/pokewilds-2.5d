@@ -56,6 +56,8 @@ NATIVE = [
     ["tools/user_sprite_assets_test.py"],
     ["tools/inventory_presentation_test.py"],
     ["tools/battle_capture_orbit_test.py"],
+    ["tools/relief_presentation_test.py"],
+    ["tools/relief_visual_test.py"],
 ]
 
 
@@ -140,7 +142,7 @@ def run_stage(stage: str) -> None:
             report = verify_build()
             receipt.update(jar_sha256=report["output_sha256"], sources_sha256=report["sources_sha256"])
         commands = ([["tools/prepare_stardew_presentation.py"], ["tools/prepare_pmd_compatibility.py"]] if stage == "prepare" else
-                    [[name] for name in PURE] + [["tools/prepare_trainer_assets.py", "--check"], ["tools/prepare_wardrobe_assets.py", "--check"], ["tools/prepare_battle_scenes.py", "--check"], ["build.py"]] if stage == "build" else NATIVE)
+                    [[name] for name in PURE] + [["tools/prepare_trainer_assets.py", "--check"], ["tools/prepare_wardrobe_assets.py", "--check"], ["tools/prepare_battle_scenes.py", "--check"], ["tools/prepare_terrain_relief.py", "--check"], ["build.py"]] if stage == "build" else NATIVE)
         for args in commands:
             if not (ROOT / args[0]).is_file():
                 raise RuntimeError("Required verification is absent: " + args[0])

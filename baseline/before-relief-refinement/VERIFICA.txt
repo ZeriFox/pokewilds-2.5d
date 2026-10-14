@@ -1,0 +1,50 @@
+VERIFICA - prova locale 14 ottobre 2026
+
+BUILD LOCALE
+Base pubblicata: 037f8c09b24d4bfa8bb601aac23679259466aa3f (johto.4).
+Avvio: run-johto.cmd. Nessun aggiornamento dello ZIP GitHub in questa iterazione.
+I salvataggi personali non sono usati dalle prove automatiche.
+La precedente ricevuta e archiviata in baseline/before-playtest-2026-10-14/.
+
+ARTEFATTO COMPILATO
+dist/pokewilds-rebuilt.jar
+SHA-256: 070cf7d68c601920244e97edf3375bd9f222be7d1187e88f124f6f9d6aef5eb6
+Dimensione: 330105834 byte; 109075 voci ZIP.
+Java 17; 241 sorgenti; 507 classi compilate.
+Modelli GLB esclusi; zero classi di gioco recuperate dal runtime upstream.
+Digest sorgenti: 61b4a92c73a9dde3b48e1f925c13259226581864481b55e42282c14178200f6a
+Build report: build/build-report.json (hash di ogni sorgente e risorsa).
+
+CONTROLLI
+Build e controlli statici/deterministici completati: build/rework-verification/build.json.
+Scope: 143 sorgenti originali invariati, 55 modificati con ambito esplicito, 43 aggiunte.
+67 mutazioni non autorizzate respinte, comprese regole/tempi di cattura e
+serializzazione dell'inventario reale in modalita Creativa.
+Le 38 suite native obbligatorie sono elencate in tools/verify_rework.py.
+Esito, commit, hash del JAR e log per ciascuna suite:
+  build/rework-verification/native.json
+La ricevuta nativa identifica questa build solo se status=passed e jar_sha256
+corrisponde all'hash sopra. I singoli runner non caricano classi di produzione
+sovrapposte al JAR; --sources identifica invece le diagnostiche di sviluppo.
+
+MODIFICHE
+- Rotazione continua dell'intera arena a 360 gradi in 48 secondi, anche durante
+  mosse e catture. Panorama, pavimento, attori ed effetti condividono la camera;
+  comandi e schede HP restano fermi per essere leggibili.
+- Rialzi saltabili con quota, bordo terroso e ombra; pavimenti interni e strutture
+  visibili. Radici e basamenti rendono riconoscibili gli ingombri solidi.
+- Sagome diverse per gli alberi secondo i requisiti reali di Taglio; compagno
+  indipendente nella presentazione, con pose attive durante le abilita.
+- Nessuna anticipazione della specie prima dell'ingresso nell'arena.
+- 470 associazioni di strumenti, piante di bacche con fasi/animazioni e Pokeball
+  dai fogli forniti; catture con identita corretta e tempi/esiti originali.
+- Bagliori Shiny nel mondo, in lotta e nel riepilogo. Fantasmi e uova esclusi.
+- Creative sandbox: menu partita > F1 > Creative sandbox. Catalogo Pokemon,
+  livello 1-100, scelta Shiny e materiali illimitati. Inventario reale conservato;
+  preferenza persistente con il salvataggio normale, solo nelle partite locali.
+
+ISTRUZIONI E LIMITI
+Dettagli: docs/PLAYTEST-2026-10-14.md e docs/CREATIVE-MODE.md.
+Panorama illustrato ciclico e sprite in prospettiva: presentazione 2.5D.
+Non e una certificazione di ogni mappa, partita completa o sessione multiplayer.
+Gli originali dei fogli e i loro crediti sono conservati in visual/supplied.

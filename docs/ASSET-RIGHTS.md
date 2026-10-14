@@ -41,3 +41,12 @@ selection and edge-connected background removal adapt them to the local game.
 The named item mapping is checked against the actual art rather than inferred
 from game item order. These are supplied Pokemon game sprites and sprite edits,
 not newly generated artwork; no new artwork licence is asserted here.
+
+## Relief rock and stair materials, 2026-10-14
+
+`resources/visual/terrain-relief` contains two project-specific textures made
+with the built-in ImageGen tool: geological rock strata and worn stone stair
+treads. The selected source PNGs, exact prompts and hashes are preserved there.
+The importer performs deterministic nearest sampling to 128 pixels and canonical
+lossless PNG encoding. Runtime geometry and biome lighting provide the rounded
+contour and elevation; the pictures do not replace map or collision data.

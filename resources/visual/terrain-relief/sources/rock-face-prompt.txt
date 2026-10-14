@@ -1,0 +1,7 @@
+Use case: stylized-concept
+Asset type: seamless exposed mountain-cliff material for a 2.5D pixel-art game.
+Primary request: a SINGLE CONTINUOUS geological rock face with long uneven sedimentary bands, each stratum flowing irregularly across the whole square. The surface is carved naturally by erosion, with softly bulging horizontal shelves and small chipped rounded edges. Add a FEW short vertical cracks, staggered between strata; never divide the surface into individual rectangular blocks or boulders. It must unmistakably read as a natural mountain escarpment, not a built wall.
+Style/medium: modern crisp 16-bit game pixel art, drawn as 128 by 128 logical pixels, nearest-neighbor enlargement. Keep the structure broad and readable; no excessive grain.
+Composition/framing: square material fills the entire canvas, completely opaque, straight-on flat orthographic surface, no scene or horizon or objects. The left and right boundaries must repeat seamlessly; top and bottom must also repeat. Do not put a straight ledge or frame around the boundary.
+Palette/light: medium warm grey and subtle olive-grey rock, muted tan highlights, grey-brown fissures. Mild ambient relief: highlight upper rock lips and shade lower recesses gently. No black patches, no cast shadow.
+Avoid: BRICKS, masonry, stacked blocks, pavers, constructed walls, regular rectangles, separate stones, dungeon wall, photos, 3D rendering, vegetation, labels, text, watermark, perspective. Continuous irregular geological strata only.

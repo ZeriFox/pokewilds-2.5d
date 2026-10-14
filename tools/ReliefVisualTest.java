@@ -239,7 +239,10 @@ public final class ReliefVisualTest {
          for(double luma:samples){boolean next=luma>=threshold;if(next&&!bright)bands++;bright=next;}
          System.out.println("RELIEF pixels "+name+": topLuma="+top+" faceLuma="+face+" treadBands="+bands+" rampRange="+minimum+".."+maximum);
          if(high-low>=8){
-            check(top-face>=10,"Upper surface does not visually separate from cliff face: "+(top-face));
+            // Volcanic ash can be darker than the dedicated exposed rock. Both
+            // directions of contrast identify height; a near-black face cannot.
+            check(Math.abs(top-face)>=10,"Upper surface does not visually separate from cliff face: "+(top-face));
+            check(face>=30,"Daytime cliff face is too dark to reveal its rock texture: "+face);
             check(bands>=3,"Inclined ramp lacks three separately visible crosswise treads: "+bands);
          }
       }

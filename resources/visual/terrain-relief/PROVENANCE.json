@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "origin": "Built-in image_gen.imagegen tool, generated for this project",
+  "generationDate": "2026-10-14",
+  "authoring": "AI-generated original material surfaces; no copied game assets or external images used",
+  "normalization": {
+    "implementation": "tools/prepare_terrain_relief.py",
+    "resolution": [
+      128,
+      128
+    ],
+    "sampling": "integer pixel-centre nearest-neighbour; no painting, palette quantization, blurring, blending or alpha changes",
+    "encoding": {
+      "name": "RGBA8-filter0-stored-deflate",
+      "version": 1,
+      "blockBytes": 65535,
+      "implementation": "tools/deterministic_png.py"
+    }
+  },
+  "assets": [
+    {
+      "file": "rock-face.png",
+      "source": "sources/rock-face-source.png",
+      "sourceSha256": "3ab3a9dafac200f94d4f63b29347dfd439e4967b97394dd72e0ce7378dccc0d6",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "sources/rock-face-prompt.txt",
+      "promptSha256": "5d8d8a666f8a1f7dc65edbf43aad314fef869263b82e9069fb8f0026c9f153ac",
+      "generatedOutputName": "exec-66bc2133-7615-4f15-9c15-5d9d990d3e03.png",
+      "suggestedWrapMode": "Repeat",
+      "sha256": "865fa2ed9412bad141b2271cdc95e6563bddb9f8035d2f766b3710a86080e87c",
+      "edgeMetrics": {
+        "leftRightMeanRgbDifference": 7.2734,
+        "topBottomMeanRgbDifference": 20.3854,
+        "horizontalNeighborMeanRgbDifference": 10.6664,
+        "verticalNeighborMeanRgbDifference": 20.9297
+      }
+    },
+    {
+      "file": "stair-stone.png",
+      "source": "sources/stair-stone-source.png",
+      "sourceSha256": "76b397269f1470d83beb44689b0455c37ad19ee208b600af05bda85868725f3b",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "prompt": "sources/stair-stone-prompt.txt",
+      "promptSha256": "173a5d9443adfc05c5070a34fee8e1756443d43f4de112699b6b10e88ea13602",
+      "generatedOutputName": "exec-5371a710-e600-42cb-ba17-314a9c24a7ec.png",
+      "suggestedWrapMode": "ClampToEdge",
+      "sha256": "cb8b1925175b301ec13d35b2a8a83017a0095015b624e3f90ab25c6b86707a3e",
+      "edgeMetrics": {
+        "leftRightMeanRgbDifference": 7.8776,
+        "topBottomMeanRgbDifference": 46.5651,
+        "horizontalNeighborMeanRgbDifference": 10.8161,
+        "verticalNeighborMeanRgbDifference": 17.3544
+      }
+    }
+  ]
+}

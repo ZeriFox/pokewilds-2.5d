@@ -1,0 +1,7 @@
+Use case: stylized-concept
+Asset type: repeatable worn stone stair-tread material for a 2.5D pixel-art game; not a scene.
+Primary request: create one square seamless flat material texture showing repeated horizontal parallel stone treads with softly rounded, worn front noses. Clearly separate four to six broad tread bands with modest grey-brown joints and softly lit worn upper lips. Natural stone surface should contain sparse small mineral chips and irregular veins.
+Style/medium: crisp contemporary 16-bit pixel art, deliberately drawn on a 128 by 128 logical pixel grid and enlarged with nearest-neighbor pixels. Match a warm mid-grey and subdued olive stone cliff palette, sparse tan highlights, legible at 128 by 128.
+Composition/framing: the texture fills the square edge to edge. Flat orthographic material view: horizontal bands of tread material, no converging perspective or scene geometry, no side walls, no horizon, no objects, no border. Both left-right and top-bottom edges tile seamlessly.
+Lighting/mood: gentle ambient material relief; highlights on softened tread noses and narrow muted recesses; midtones stay readable.
+Constraints: opaque square PNG, no transparency, no black shadow, no bricks, no stairs in a scene, no baked camera perspective, no metal, no foliage, no characters, no labels, no text, no watermark. Single repeatable surface only.

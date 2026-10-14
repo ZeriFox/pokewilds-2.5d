@@ -8,6 +8,8 @@ La versione **v0.8.11-johto.4** prosegue dal commit `ac200935`: [arene prospetti
 
 La successiva **prova locale del 14 ottobre** introduce camera continua a 360 gradi, rialzi leggibili, nuovi strumenti e bacche, effetti Shiny e modalità Creativa. Avvio e controlli sono in [PLAYTEST-2026-10-14.md](docs/PLAYTEST-2026-10-14.md); la release johto.4 sopra resta il pacchetto precedente. Le ricevute correnti sono in `build/build-report.json` e `build/rework-verification/native.json`.
 
+L’ultimo [affinamento dei rilievi](docs/RELIEF-REFINEMENT.md) rende gli angoli più arrotondati, le pareti rocciose leggibili e le scale coerenti con la salita, con materiali dedicati alla build locale.
+
 ![Mondo procedurale in 2.5D](anteprima-25d.png)
 
 ![Interfaccia di lotta](anteprima-lotta.png)

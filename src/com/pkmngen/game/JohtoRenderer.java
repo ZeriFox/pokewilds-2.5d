@@ -39,6 +39,8 @@ public final class JohtoRenderer {
    private static final String[] ACTOR_DIRECTIONS={"down","up","left","right"};
    private static final String[] LOCOMOTION_ANIMATIONS={"Idle","Walk"};
    private static final float[] CROWN_ROWS={0,.225f,.45f,.5875f,.725f,.8625f,1};
+   private static final int CLIFF_CORNER_SEGMENTS=4;
+   private final float[] plateauOutline=new float[4*(CLIFF_CORNER_SEGMENTS+1)*2];
    private final PerspectiveCamera camera = new PerspectiveCamera(35f, 160f, 144f);
    private final Vector2 lookup = new Vector2();
    private final WorldMeshBatch geometry = new WorldMeshBatch();
@@ -90,6 +92,7 @@ public final class JohtoRenderer {
    private Map<Vector2,Tile> companionMap;
    private float companionLastTime;
    private long jumpCueFrames,obstacleFootprintFrames,activeCompanionFrames,shinyFrames;
+   private long roundedCornerFrames,stairTreadFrames;
 
    public JohtoRenderer() {
       camera.near = 1f;
@@ -156,6 +159,8 @@ public final class JohtoRenderer {
    public long getObstacleFootprintFrames() { return obstacleFootprintFrames; }
    public long getActiveCompanionFrames() { return activeCompanionFrames; }
    public long getShinyFrames() { return shinyFrames; }
+   public long getRoundedCornerFrames() { return roundedCornerFrames; }
+   public long getStairTreadFrames() { return stairTreadFrames; }
    public float getFogDensity() { return fogDensity; }
 
    public long getPlayerModelFrames() { return actorModels.getPlayerModelFrames(); }
@@ -535,13 +540,16 @@ public final class JohtoRenderer {
       float dy=dx!=0?0:"up".equals(tile.ledgeDir)?1:-1,tx=-dy,ty=dx;
       float cx=tile.position.x+8,cy=tile.position.y+8,previous=surfaceLift;surfaceLift=0;
       float edgeX=cx+dx*7.7f,edgeY=cy+dy*7.7f;
+      int firstCorner=dy<0?0:dy>0?3:dx<0?0:1,lastCorner=dy<0?1:dy>0?2:dx<0?3:2;
+      float span0=(dx==0?tile.position.x:tile.position.y)+(cliffBevel(tile,firstCorner)?cliffRadius(tile):.05f);
+      float span1=(dx==0?tile.position.x:tile.position.y)+16-(cliffBevel(tile,lastCorner)?cliffRadius(tile):.05f);
       // A 3px exposed soil shelf stays readable when a side face is edge-on to
       // the fixed camera. This is textured terrain at the real high elevation.
       float ix=edgeX-dx*2.7f,iy=edgeY-dy*2.7f;
       TextureRegion soil=assets.named("dirt");
       float soilTint=color(.78f,.68f,.48f);
-      surfacePatch(tile,soil,Math.min(edgeX,ix)-Math.abs(tx)*7.95f,Math.min(edgeY,iy)-Math.abs(ty)*7.95f,
-         Math.max(edgeX,ix)+Math.abs(tx)*7.95f,Math.max(edgeY,iy)+Math.abs(ty)*7.95f,.08f,
+      surfacePatch(tile,soil,dx==0?span0:Math.min(edgeX,ix),dx==0?Math.min(edgeY,iy):span0,
+         dx==0?span1:Math.max(edgeX,ix),dx==0?Math.max(edgeY,iy):span1,.08f,
          soilTint,soilTint,soilTint,soilTint,geometry,0);
       Tile landing=natureTiles.get(lookup.set(tile.position.x+dx*16,tile.position.y+dy*16));
       if(landing!=null&&!landing.isWater&&!landing.isLava) {
@@ -552,8 +560,8 @@ public final class JohtoRenderer {
             dx>0||dy>0?dark:clear,dx<0||dy>0?dark:clear,dx<0||dy<0?dark:clear,dx>0||dy<0?dark:clear,translucent,0);
       }
       float shade=Color.toFloatBits(.96f,.87f,.60f,.66f);
-      surfacePatch(tile,white,Math.min(edgeX,edgeX-dx*.9f)-Math.abs(tx)*7.95f,Math.min(edgeY,edgeY-dy*.9f)-Math.abs(ty)*7.95f,
-         Math.max(edgeX,edgeX-dx*.9f)+Math.abs(tx)*7.95f,Math.max(edgeY,edgeY-dy*.9f)+Math.abs(ty)*7.95f,.13f,
+      surfacePatch(tile,white,dx==0?span0:Math.min(edgeX,edgeX-dx*.9f),dx==0?Math.min(edgeY,edgeY-dy*.9f):span0,
+         dx==0?span1:Math.max(edgeX,edgeX-dx*.9f),dx==0?Math.max(edgeY,edgeY-dy*.9f):span1,.13f,
          shade,shade,shade,shade,translucent,0);
       // A pair of small soil-coloured notches makes the permitted jump direction
       // readable in all four orientations without UI arrows over the whole map.
@@ -617,28 +625,104 @@ public final class JohtoRenderer {
       float x=tile.position.x,y=tile.position.y,previousLift=surfaceLift;surfaceLift=0;
       float a=elevation.height(x+.01f,y+.01f),b=elevation.height(x+15.99f,y+.01f);
       float c=elevation.height(x+15.99f,y+15.99f),d=elevation.height(x+.01f,y+15.99f);
-      // Keep the authored step material visible even when an old save contains a
-      // flat connector. It stays a flat marker, never an invented cliff face.
-      TextureRegion steps=assets.named(profile.cliff("ramp"));
-      if(steps!=null)surfacePatch(tile,steps,x+1,y+.5f,x+15,y+15.5f,.10f,WHITE,WHITE,WHITE,WHITE,geometry,0);
-      // Flat connectors keep planar tread markings too: the inherited steps
-      // material alone is a stone slab. No height is invented by these lines.
-      // Broad highlights and adjacent dark risers retain direction at game zoom.
+      TextureRegion steps=TerrainReliefAssets.get().stair(tile,profile);
+      if(steps==null)steps=assets.named(profile.cliff("ramp"));
       boolean horizontal=Math.abs((b+c)-(a+d))>Math.abs((c+d)-(a+b));
-      for(int step=1;step<5;step++) {
-         float f=step/5f,px=horizontal?x+16*f:x,py=horizontal?y:y+16*f;
-         float ex=px+(horizontal?.85f:16),ey=py+(horizontal?16:.85f);
-         float h0=elevation.height(MathUtils.clamp(px,x+.01f,x+15.99f),MathUtils.clamp(py,y+.01f,y+15.99f));
-         float h1=elevation.height(MathUtils.clamp(ex,x+.01f,x+15.99f),MathUtils.clamp(py,y+.01f,y+15.99f));
-         float h2=elevation.height(MathUtils.clamp(ex,x+.01f,x+15.99f),MathUtils.clamp(ey,y+.01f,y+15.99f));
-         float h3=elevation.height(MathUtils.clamp(px,x+.01f,x+15.99f),MathUtils.clamp(ey,y+.01f,y+15.99f));
-         quad(translucent.buffer(whiteTexture),px,h0+.14f,-py,ex,h1+.14f,-py,ex,h2+.14f,-ey,px,h3+.14f,-ey,
-            white,Color.toFloatBits(.91f,.87f,.72f,.76f));
-         float dark=Color.toFloatBits(.12f,.15f,.13f,.62f);
-         surfacePatch(tile,white,horizontal?ex:px,horizontal?py:ey,
-            horizontal?ex+.55f:ex,horizontal?ey:ey+.55f,.13f,dark,dark,dark,dark,translucent,0);
+      boolean positive=horizontal?b+c>=a+d:c+d>=a+b;
+      int joinedBefore=rampRun(tile,horizontal,-1),joinedAfter=rampRun(tile,horizontal,1);
+      float acrossMin=joinedBefore>0?0:1.05f,acrossMax=joinedAfter>0?16:14.95f;
+      float noseMin=joinedBefore>0?0:1.15f,noseMax=joinedAfter>0?16:14.85f;
+      float flightOrigin=(horizontal?y:x)-joinedBefore*16+1.05f;
+      float flightWidth=(1+joinedBefore+joinedAfter)*16-2.1f;
+      // Six broad stone treads follow the existing continuous walkable slope.
+      // Their small raised lips and recessed seams provide depth without adding
+      // a new staircase to the collision surface or changing actors' foot height.
+      for(int step=0;step<6;step++) {
+         float start=step*16f/6,end=(step+1)*16f/6;
+         float x0=horizontal?x+start:x+acrossMin,y0=horizontal?y+acrossMin:y+start;
+         float x1=horizontal?x+end:x+acrossMax,y1=horizontal?y+acrossMax:y+end;
+         float tint=rockLight(step%2==0?1f:.94f,profile);
+         if(steps!=null)stairPatch(tile,steps,x0,y0,x1,y1,horizontal,flightOrigin,flightWidth,.14f,tint,tint,tint,tint,geometry);
+         float nose=positive?start+.20f:end-.70f;
+         float px=horizontal?x+nose:x+noseMin,py=horizontal?y+noseMin:y+nose;
+         float ex=horizontal?px+.50f:x+noseMax,ey=horizontal?y+noseMax:py+.50f;
+         float bright=Color.toFloatBits(.96f,.94f,.84f,.68f);
+         surfacePatch(tile,white,px,py,ex,ey,.24f,bright,bright,bright,bright,translucent,0);
+         // A fine real vertical lip catches the light at each tread's low edge.
+         float nx=horizontal?(positive?px:ex):px,ny=horizontal?py:(positive?py:ey);
+         float fx=horizontal?nx:ex,fy=horizontal?ey:ny;
+         float h0=terrainHeight(tile,MathUtils.clamp(nx,x+.01f,x+15.99f),MathUtils.clamp(ny,y+.01f,y+15.99f));
+         float h1=terrainHeight(tile,MathUtils.clamp(fx,x+.01f,x+15.99f),MathUtils.clamp(fy,y+.01f,y+15.99f));
+         quad(geometry.buffer(whiteTexture),nx,h0+.045f,-ny,fx,h1+.045f,-fy,
+            fx,h1+.24f,-fy,nx,h0+.24f,-ny,white,rockLight(.70f,profile));
+         float seam=Color.toFloatBits(.20f,.22f,.22f,.48f);
+         float gap=positive?end-.32f:start+.05f;
+         surfacePatch(tile,white,horizontal?x+gap:x+acrossMin,horizontal?y+acrossMin:y+gap,
+            horizontal?x+gap+.25f:x+acrossMax,horizontal?y+acrossMax:y+gap+.25f,.17f,
+            seam,seam,seam,seam,translucent,0);
+         stairTreadFrames++;
+      }
+      // Weathered shoulders taper into the adjoining terrain. Both end landings
+      // remain at precisely the same elevation as the connected ground.
+      float edge=Color.toFloatBits(.77f,.78f,.70f,.50f),clear=Color.toFloatBits(.77f,.78f,.70f,0);
+      if(horizontal) {
+         if(joinedBefore==0)surfacePatch(tile,white,x,y,x+16,y+1.05f,.10f,clear,clear,edge,edge,translucent,0);
+         if(joinedAfter==0)surfacePatch(tile,white,x,y+14.95f,x+16,y+16,.10f,edge,edge,clear,clear,translucent,0);
+      } else {
+         if(joinedBefore==0)surfacePatch(tile,white,x,y,x+1.05f,y+16,.10f,clear,edge,edge,clear,translucent,0);
+         if(joinedAfter==0)surfacePatch(tile,white,x+14.95f,y,x+16,y+16,.10f,edge,clear,clear,edge,translucent,0);
       }
       surfaceLift=previousLift;
+   }
+
+   private void stairPatch(Tile tile,TextureRegion art,float x0,float y0,float x1,float y1,boolean horizontal,
+      float flightOrigin,float flightWidth,float lift,float c0,float c1,float c2,float c3,WorldMeshBatch batch) {
+      float x=tile.position.x,y=tile.position.y;
+      float a=terrainHeight(tile,MathUtils.clamp(x0,x+.01f,x+15.99f),MathUtils.clamp(y0,y+.01f,y+15.99f))+lift;
+      float b=terrainHeight(tile,MathUtils.clamp(x1,x+.01f,x+15.99f),MathUtils.clamp(y0,y+.01f,y+15.99f))+lift;
+      float c=terrainHeight(tile,MathUtils.clamp(x1,x+.01f,x+15.99f),MathUtils.clamp(y1,y+.01f,y+15.99f))+lift;
+      float d=terrainHeight(tile,MathUtils.clamp(x0,x+.01f,x+15.99f),MathUtils.clamp(y1,y+.01f,y+15.99f))+lift;
+      float across0=((horizontal?y0:x0)-flightOrigin)/flightWidth;
+      float across1=((horizontal?y1:x1)-flightOrigin)/flightWidth;
+      float u0=MathUtils.lerp(art.getU(),art.getU2(),across0),u1=MathUtils.lerp(art.getU(),art.getU2(),across1);
+      // The authored six-tread image covers the complete connector exactly once.
+      // Rotating these UV axes with the incline keeps sideways stairs readable.
+      float travel0=horizontal?(x0-x)/16:(y0-y)/16,travel1=horizontal?(x1-x)/16:(y1-y)/16;
+      float v0=MathUtils.lerp(art.getV2(),art.getV(),travel0),v1=MathUtils.lerp(art.getV2(),art.getV(),travel1);
+      Buffer mesh=batch.buffer(art.getTexture());
+      vertex(mesh,x0,a,-y0,c0,u0,v0,0);vertex(mesh,x1,b,-y0,c1,horizontal?u0:u1,horizontal?v1:v0,0);
+      vertex(mesh,x1,c,-y1,c2,u1,v1,0);vertex(mesh,x1,c,-y1,c2,u1,v1,0);
+      vertex(mesh,x0,d,-y1,c3,horizontal?u1:u0,horizontal?v0:v1,0);vertex(mesh,x0,a,-y0,c0,u0,v0,0);
+   }
+
+   /** Parallel compatible connectors share one wide flight, including UVs and
+    * nose lines. Only its two outside shoulders receive a weathered border. */
+   private int rampRun(Tile tile,boolean horizontal,int direction) {
+      Tile previous=tile;int count=0;
+      for(;count<natureTiles.size();count++) {
+         Tile next=natureTiles.get(lookup.set(previous.position.x+(horizontal?0:direction*16),
+            previous.position.y+(horizontal?direction*16:0)));
+         if(!parallelRamp(previous,next,horizontal))break;
+         previous=next;
+      }
+      return count;
+   }
+   private boolean parallelRamp(Tile tile,Tile next,boolean horizontal) {
+      if(next==null||!ModernWorldGenerator.isRamp(next)||!BiomeProfiles.visualForTile(tile).id.equals(BiomeProfiles.visualForTile(next).id))return false;
+      float x=next.position.x,y=next.position.y;
+      float a=elevation.height(x+.01f,y+.01f),b=elevation.height(x+15.99f,y+.01f);
+      float c=elevation.height(x+15.99f,y+15.99f),d=elevation.height(x+.01f,y+15.99f);
+      if(horizontal!=(Math.abs((b+c)-(a+d))>Math.abs((c+d)-(a+b))))return false;
+      float seam=horizontal?Math.max(tile.position.y,next.position.y):Math.max(tile.position.x,next.position.x);
+      for(int sample=0;sample<3;sample++) {
+         float f=sample==0?.01f:sample==1?8:15.99f;
+         float tx=horizontal?tile.position.x+f:seam,ty=horizontal?seam:tile.position.y+f;
+         float h0=terrainHeight(tile,MathUtils.clamp(tx,tile.position.x+.01f,tile.position.x+15.99f),
+            MathUtils.clamp(ty,tile.position.y+.01f,tile.position.y+15.99f));
+         float h1=terrainHeight(next,MathUtils.clamp(tx,x+.01f,x+15.99f),MathUtils.clamp(ty,y+.01f,y+15.99f));
+         if(Math.abs(h0-h1)>.15f)return false;
+      }
+      return true;
    }
 
    /** Shared-corner patches follow the same triangle split as the terrain. */
@@ -770,7 +854,7 @@ public final class JohtoRenderer {
       surfaceLift=previous;
    }
 
-   /** Small convex rock chamfers stay inside the old cell footprint. Slopes,
+   /** Rounded convex rock corners stay inside the old cell footprint. Slopes,
     * shores and concave joins retain their exact shared-corner surface. */
    private boolean cliffBevel(Tile tile,int corner) {
       if(tile==null||tile.isWater||tile.isLava||tile.isWaterfall||ModernWorldGenerator.isRamp(tile))return false;
@@ -780,24 +864,33 @@ public final class JohtoRenderer {
       int dx=corner==0||corner==3?-16:16,dy=corner<2?-16:16;
       Tile sideX=natureTiles.get(lookup.set(x+dx,y)),sideY=natureTiles.get(lookup.set(x,y+dy));
       return sideX!=null&&sideY!=null&&!ModernWorldGenerator.isRamp(sideX)&&!ModernWorldGenerator.isRamp(sideY)
-         &&!sideX.isWaterfall&&!sideY.isWaterfall
+         &&!sideX.isWater&&!sideY.isWater&&!sideX.isLava&&!sideY.isLava
+         &&!sideX.isWaterfall&&!sideY.isWaterfall&&!elevation.isSloped(sideX)&&!elevation.isSloped(sideY)
          &&h-elevation.tileHeight(sideX)>3&&h-elevation.tileHeight(sideY)>3
          &&Math.abs(elevation.tileHeight(sideX)-elevation.tileHeight(sideY))<.1f;
    }
    private boolean hasCliffBevel(Tile tile) {
       return cliffBevel(tile,0)||cliffBevel(tile,1)||cliffBevel(tile,2)||cliffBevel(tile,3);
    }
+   private float cliffRadius(Tile tile) { return WorldReadability.smallJumpLedge(tile)?2.2f:3.6f; }
+   private float cornerX(int corner,float radius,float f) {
+      float center=corner==0||corner==3?radius:16-radius;
+      return center+MathUtils.cos(MathUtils.PI+corner*MathUtils.PI*.5f+f*MathUtils.PI*.5f)*radius;
+   }
+   private float cornerY(int corner,float radius,float f) {
+      float center=corner<2?radius:16-radius;
+      return center+MathUtils.sin(MathUtils.PI+corner*MathUtils.PI*.5f+f*MathUtils.PI*.5f)*radius;
+   }
    private void plateauSurface(Tile tile,TextureRegion art,float light,float style) {
       float x=tile.position.x,y=tile.position.y,h=terrainHeight(tile,x+8,y+8),tint=color(light,light,light);
-      float[] points=new float[16];int count=0;
+      float[] points=plateauOutline;int count=0;float radius=cliffRadius(tile);
       for(int corner=0;corner<4;corner++) {
          float cx=corner==0||corner==3?0:16,cy=corner<2?0:16;
          if(cliffBevel(tile,corner)) {
-            // Counter-clockwise incoming/outgoing points, 1.3 world pixels from the corner.
-            points[count++]=cx+(corner==0?0:corner==1?-1.3f:corner==2?0:1.3f);
-            points[count++]=cy+(corner==0?1.3f:corner==1?0:corner==2?-1.3f:0);
-            points[count++]=cx+(corner==0?1.3f:corner==1?0:corner==2?-1.3f:0);
-            points[count++]=cy+(corner==0?0:corner==1?1.3f:corner==2?0:-1.3f);
+            for(int segment=0;segment<=CLIFF_CORNER_SEGMENTS;segment++) {
+               float f=segment/(float)CLIFF_CORNER_SEGMENTS;
+               points[count++]=cornerX(corner,radius,f);points[count++]=cornerY(corner,radius,f);
+            }
          } else {points[count++]=cx;points[count++]=cy;}
       }
       Buffer mesh=geometry.buffer(art.getTexture());
@@ -829,6 +922,10 @@ public final class JohtoRenderer {
     * extrude a fallback fence when both sides have the same elevation. */
    private void terrainEdges(Game game,Tile tile,BiomeProfiles.Profile profile) {
       float x=tile.position.x,y=tile.position.y,previous=surfaceLift;surfaceLift=0;
+      TextureRegion face=TerrainReliefAssets.get().face(tile,profile);
+      boolean authored=face!=null;
+      if(face==null)face=assets.named(profile.cliff("front"));
+      float radius=cliffRadius(tile);
       for(int side=0;side<4;side++) {
          int dx=side==2?-1:side==3?1:0,dy=side==0?-1:side==1?1:0;
          Tile next=game.map.tiles.get(lookup.set(x+dx*16,y+dy*16));
@@ -848,23 +945,23 @@ public final class JohtoRenderer {
             float xx=MathUtils.lerp(x0,x1,t),yy=MathUtils.lerp(y0,y1,t),hh=MathUtils.lerp(a,b,t);
             if(a<lowA){x0=xx;y0=yy;a=lowA=hh;}else{x1=xx;y1=yy;b=lowB=hh;}
          }
-         // A cliff uses its complete vertical artwork; ground sampling must not
-         // cut alternating horizontal strips out of its face.
-         TextureRegion face=assets.named(profile.cliff("front"));
-         float shade=side==0?.90f:side==1?.66f:side==2?.78f:.64f;
+         // Brighter directional light reveals strata on the whole exposed face.
+         // Dedicated repeating rock remains anchored in world height, so layers
+         // flow continuously between adjoining tiles and rounded corners.
+         float shade=cliffDirectionLight(side);
          int cornerA=side==0?0:side==1?3:side==2?0:1;
          int cornerB=side==0?1:side==1?2:side==2?3:2;
-         if(cliffBevel(tile,cornerA)){if(side<2)x0+=1.3f;else y0+=1.3f;}
-         if(cliffBevel(tile,cornerB)){if(side<2)x1-=1.3f;else y1-=1.3f;}
-         cliffFace(tile,face,side,x0,y0,x1,y1,lowA,lowB,a,b,shade);
+         if(cliffBevel(tile,cornerA)){if(side<2)x0+=radius;else y0+=radius;}
+         if(cliffBevel(tile,cornerB)){if(side<2)x1-=radius;else y1-=radius;}
+         cliffFace(tile,profile,face,authored,side,x0,y0,x1,y1,lowA,lowB,a,b,shade);
          // A fine edge on the plateau and a contact shadow at the foot give
          // complementary cues for going up and down, without a thick wall cap.
          if(Math.max(a-lowA,b-lowB)>3) {
-            float ix=-dx*.9f,iy=-dy*.9f;
+            float ix=-dx*1.1f,iy=-dy*1.1f;
             float ha=terrainHeight(tile,MathUtils.clamp(x0+ix,x+.01f,x+15.99f),MathUtils.clamp(y0+iy,y+.01f,y+15.99f));
             float hb=terrainHeight(tile,MathUtils.clamp(x1+ix,x+.01f,x+15.99f),MathUtils.clamp(y1+iy,y+.01f,y+15.99f));
             quad(translucent.buffer(whiteTexture),x0,a+.065f,-y0,x1,b+.065f,-y1,
-               x1+ix,hb+.065f,-y1-iy,x0+ix,ha+.065f,-y0-iy,white,Color.toFloatBits(.88f,.87f,.79f,.22f));
+               x1+ix,hb+.065f,-y1-iy,x0+ix,ha+.065f,-y0-iy,white,Color.toFloatBits(.94f,.92f,.78f,.29f));
             float ox=dx*2.7f,oy=dy*2.7f;
             float la=terrainHeight(next,MathUtils.clamp(x0+ox,next.position.x+.01f,next.position.x+15.99f),
                MathUtils.clamp(y0+oy,next.position.y+.01f,next.position.y+15.99f));
@@ -885,50 +982,99 @@ public final class JohtoRenderer {
          float sx=corner==0||corner==3?1:-1,sy=corner<2?1:-1;
          Tile low=natureTiles.get(lookup.set(x-sx*16,y));
          float bottom=elevation.tileHeight(low),top=terrainHeight(tile,x+8,y+8);
-         TextureRegion face=assets.named(profile.cliff("front"));
-         float shade=((corner<2?.90f:.66f)+(corner==0||corner==3?.78f:.64f))*.5f;
-         cliffFace(tile,face,corner<2?0:1,cx+sx*1.3f,cy,cx,cy+sy*1.3f,bottom,bottom,top,top,shade);
+         TextureRegion floor=assets.terrain(low,natureSeconds);
+         if(floor==null)floor=assets.cell(WorldMaterials.terrainName(low),low.position.x,low.position.y,natureSeconds);
+         if(floor==null)floor=white;
+         // Both the top and face use the same four-segment quarter-circle. Fill
+         // the small removed wedge at the real lower height, sealing the contour.
+         for(int segment=0;segment<CLIFF_CORNER_SEGMENTS;segment++) {
+            float f0=segment/(float)CLIFF_CORNER_SEGMENTS,f1=(segment+1)/(float)CLIFF_CORNER_SEGMENTS;
+            float ax=x+cornerX(corner,radius,f0),ay=y+cornerY(corner,radius,f0);
+            float bx=x+cornerX(corner,radius,f1),by=y+cornerY(corner,radius,f1);
+            float angle0=MathUtils.PI+corner*MathUtils.PI*.5f+f0*MathUtils.PI*.5f;
+            float angle1=MathUtils.PI+corner*MathUtils.PI*.5f+f1*MathUtils.PI*.5f;
+            float shade0=cliffNormalLight(MathUtils.cos(angle0),MathUtils.sin(angle0));
+            float shade1=cliffNormalLight(MathUtils.cos(angle1),MathUtils.sin(angle1));
+            cliffSegment(tile,profile,face,authored,ax,ay,bx,by,bottom,bottom,top,top,shade0,shade1);
+            Buffer groundMesh=geometry.buffer(floor.getTexture());
+            plateauVertex(groundMesh,floor,x,y,bottom,cx-x,cy-y,WHITE,0);
+            plateauVertex(groundMesh,floor,x,y,bottom,ax-x,ay-y,WHITE,0);
+            plateauVertex(groundMesh,floor,x,y,bottom,bx-x,by-y,WHITE,0);
+            // The rim rounds with the terrain instead of stopping at a diagonal.
+            float nx0=MathUtils.cos(angle0),ny0=MathUtils.sin(angle0);
+            float nx1=MathUtils.cos(angle1),ny1=MathUtils.sin(angle1);
+            quad(translucent.buffer(whiteTexture),ax,top+.065f,-ay,bx,top+.065f,-by,
+               bx-nx1*1.1f,top+.065f,-by+ny1*1.1f,ax-nx0*1.1f,top+.065f,-ay+ny0*1.1f,
+               white,Color.toFloatBits(.94f,.92f,.78f,.29f));
+         }
+         roundedCornerFrames++;
       }
       surfaceLift=previous;
    }
 
-   /** Corner lighting bridges adjacent rock faces instead of drawing a dark seam.
-    * The four face strips preserve the actual high/low contour and source artwork. */
-   private void cliffFace(Tile tile,TextureRegion art,int side,float x0,float y0,float x1,float y1,
+   private void cliffFace(Tile tile,BiomeProfiles.Profile profile,TextureRegion art,boolean authored,int side,float x0,float y0,float x1,float y1,
          float lowA,float lowB,float highA,float highB,float shade) {
       float start=cliffCornerLight(tile,side,x0,y0,shade),end=cliffCornerLight(tile,side,x1,y1,shade);
+      cliffSegment(tile,profile,art,authored,x0,y0,x1,y1,lowA,lowB,highA,highB,start,end);
+   }
+   /** Lit strata bridge straight and curved faces without a black seam. */
+   private void cliffSegment(Tile tile,BiomeProfiles.Profile profile,TextureRegion art,boolean authored,float x0,float y0,float x1,float y1,
+         float lowA,float lowB,float highA,float highB,float start,float end) {
       Buffer mesh=geometry.buffer(art.getTexture());
       for(int col=0;col<4;col++) {
          float f0=col==0?0:col==1?.12f:col==2?.50f:.88f;
          float f1=col==0?.12f:col==1?.50f:col==2?.88f:1;
-         float a=col==0?start:shade,b=col==3?end:shade;
+         float a=MathUtils.lerp(start,end,f0),b=MathUtils.lerp(start,end,f1);
          float ax=MathUtils.lerp(x0,x1,f0),ay=MathUtils.lerp(y0,y1,f0);
          float bx=MathUtils.lerp(x0,x1,f1),by=MathUtils.lerp(y0,y1,f1);
          float bottomA=MathUtils.lerp(lowA,lowB,f0),bottomB=MathUtils.lerp(lowA,lowB,f1);
          float topA=MathUtils.lerp(highA,highB,f0),topB=MathUtils.lerp(highA,highB,f1);
          for(int row=0;row<3;row++) {
             float t0=row==0?0:row==1?.28f:.86f,t1=row==0?.28f:row==1?.86f:1;
-            float shade0=row==0?.69f:row==1?.91f:1.06f,shade1=row==0?.91f:row==1?1.06f:1.12f;
+            float shade0=row==0?.78f:row==1?.96f:1.05f,shade1=row==0?.96f:row==1?1.05f:1.10f;
             float ha0=MathUtils.lerp(bottomA,topA,t0),ha1=MathUtils.lerp(bottomA,topA,t1);
             float hb0=MathUtils.lerp(bottomB,topB,t0),hb1=MathUtils.lerp(bottomB,topB,t1);
             float u0=MathUtils.lerp(art.getU(),art.getU2(),f0),u1=MathUtils.lerp(art.getU(),art.getU2(),f1);
             float v0=MathUtils.lerp(art.getV2(),art.getV(),t0),v1=MathUtils.lerp(art.getV2(),art.getV(),t1);
-            float c00=rockLight(a*shade0),c10=rockLight(b*shade0),c11=rockLight(b*shade1),c01=rockLight(a*shade1);
-            vertex(mesh,ax,ha0,-ay,c00,u0,v0,0);vertex(mesh,bx,hb0,-by,c10,u1,v0,0);vertex(mesh,bx,hb1,-by,c11,u1,v1,0);
-            vertex(mesh,bx,hb1,-by,c11,u1,v1,0);vertex(mesh,ax,ha1,-ay,c01,u0,v1,0);vertex(mesh,ax,ha0,-ay,c00,u0,v0,0);
+            float vb0=v0,vb1=v1;
+            if(authored) {
+               // Exact shared world vertices carry identical UVs even where a
+               // curved segment changes direction, avoiding a visible arc seam.
+               u0=art.getU()+(art.getU2()-art.getU())*(ax+ay)/32f;
+               u1=art.getU()+(art.getU2()-art.getU())*(bx+by)/32f;
+               v0=art.getV2()+(art.getV()-art.getV2())*ha0/24f;
+               v1=art.getV2()+(art.getV()-art.getV2())*ha1/24f;
+               vb0=art.getV2()+(art.getV()-art.getV2())*hb0/24f;
+               vb1=art.getV2()+(art.getV()-art.getV2())*hb1/24f;
+            }
+            boolean soil=WorldReadability.smallJumpLedge(tile);
+            float c00=rockLight(a*shade0,profile,soil),c10=rockLight(b*shade0,profile,soil);
+            float c11=rockLight(b*shade1,profile,soil),c01=rockLight(a*shade1,profile,soil);
+            vertex(mesh,ax,ha0,-ay,c00,u0,v0,0);vertex(mesh,bx,hb0,-by,c10,u1,vb0,0);vertex(mesh,bx,hb1,-by,c11,u1,vb1,0);
+            vertex(mesh,bx,hb1,-by,c11,u1,vb1,0);vertex(mesh,ax,ha1,-ay,c01,u0,v1,0);vertex(mesh,ax,ha0,-ay,c00,u0,v0,0);
          }
       }
    }
-   private static float rockLight(float light) {
-      light=MathUtils.clamp(light,0,1);
-      return color(light,light*.99f,light*.95f);
+   private static float rockLight(float light,BiomeProfiles.Profile profile) { return rockLight(light,profile,false); }
+   private static float rockLight(float light,BiomeProfiles.Profile profile,boolean soil) {
+      light=MathUtils.clamp(light,.64f,1);
+      if(soil)return color(light*.94f,light*.83f,light*.64f);
+      if(profile.id.equals("desert")||profile.id.equals("beach")||profile.id.equals("oasis"))
+         return color(light,light*.91f,light*.73f);
+      if(profile.id.equals("snow"))return color(light*.84f,light*.94f,light);
+      if(profile.id.equals("volcano"))return color(light*.68f,light*.66f,light*.90f);
+      return color(light*.96f,light,light*.94f);
+   }
+   private static float cliffNormalLight(float nx,float ny) { return .92f-.045f*nx-.05f*ny; }
+   private static float cliffDirectionLight(int side) {
+      return cliffNormalLight(side==2?-1:side==3?1:0,side==0?-1:side==1?1:0);
    }
    private float cliffCornerLight(Tile tile,int side,float x,float y,float original) {
       int perpendicular=side<2?(x<tile.position.x+8?2:3):(y<tile.position.y+8?0:1);
       int dx=perpendicular==2?-16:perpendicular==3?16:0,dy=perpendicular==0?-16:perpendicular==1?16:0;
       Tile next=natureTiles==null?null:natureTiles.get(lookup.set(tile.position.x+dx,tile.position.y+dy));
       if(next==null||elevation.tileHeight(tile)-elevation.tileHeight(next)<3)return original;
-      float adjacent=perpendicular==0?.90f:perpendicular==1?.66f:perpendicular==2?.78f:.64f;
+      float adjacent=cliffDirectionLight(perpendicular);
       return (original+adjacent)*.5f;
    }
 

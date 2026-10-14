@@ -13,13 +13,13 @@ def main() -> int:
     destination = verifier.ROOT / "build" / "scope-negative"
     destination.mkdir(parents=True, exist_ok=True)
     results: list[str] = []
-    with tempfile.TemporaryDirectory(prefix="schema7-", dir=destination) as temporary:
+    with tempfile.TemporaryDirectory(prefix="schema8-", dir=destination) as temporary:
         root = Path(temporary).resolve()
         if not root.is_relative_to(destination.resolve()):
             raise RuntimeError("Test copy escaped the intended temporary directory")
         shutil.copytree(verifier.ROOT / "src", root / "src")
         shutil.copytree(verifier.ROOT / verifier.CLASSIC_SOURCES, root / verifier.CLASSIC_SOURCES)
-        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE, *verifier.TERRAIN_ARCHIVE, *verifier.LIVING_WORLD_ARCHIVE, *verifier.CINEMATIC_NATURE_ARCHIVE, *verifier.TRAINER_REDRAW_ARCHIVE, *verifier.CINEMATIC_CUSTOMIZATION_ARCHIVE, *verifier.PLAYTEST_ARCHIVE]:
+        for source in [verifier.MANIFEST, verifier.CLASSIC_REPORT, *verifier.V2_ARCHIVE, *verifier.V3_ARCHIVE, *verifier.V4_ARCHIVE, *verifier.V5_ARCHIVE, *verifier.STEP2_ARCHIVE, *verifier.STEP3_ARCHIVE, *verifier.TERRAIN_ARCHIVE, *verifier.LIVING_WORLD_ARCHIVE, *verifier.CINEMATIC_NATURE_ARCHIVE, *verifier.TRAINER_REDRAW_ARCHIVE, *verifier.CINEMATIC_CUSTOMIZATION_ARCHIVE, *verifier.PLAYTEST_ARCHIVE, *verifier.RELIEF_ARCHIVE]:
             target = root / source
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / source, target)
@@ -139,6 +139,10 @@ def main() -> int:
             reject("pre-playtest checkpoint changed "+name,name,append)
         for name in ("CreativeMode.java","CreativeModeUi.java","CaptureBallVisual.java","UserSpriteAssets.java","ShinyVisuals.java","WorldReadability.java"):
             reject("playtest helper changed after freeze "+name,verifier.PREFIX+name,append)
+        for name in verifier.RELIEF_ARCHIVE:
+            reject("pre-relief checkpoint changed "+name,name,append)
+        reject("relief texture loader changed after freeze",verifier.PREFIX+"TerrainReliefAssets.java",append)
+        reject("relief renderer changed after freeze",verifier.PREFIX+"JohtoRenderer.java",append)
         verifier.audit(root)
     report = destination / "results.txt"
     report.write_text("\n".join(results) + f"\nSCOPE NEGATIVE PASS: {len(results)} mutations rejected\n", encoding="utf-8", newline="\n")
