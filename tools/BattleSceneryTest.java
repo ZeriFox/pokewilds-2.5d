@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -74,6 +75,7 @@ public final class BattleSceneryTest {
             require(Gdx.graphics.getBackBufferWidth()==size[0]&&Gdx.graphics.getBackBufferHeight()==size[1],"Resize not applied");
             for(String biome:biomes)compare(biome);
             largeActors();
+            actorOcclusion();
             sizeIndex++;requested=false;
          }catch(Throwable e){failure=e;Gdx.app.exit();}
       }
@@ -121,6 +123,8 @@ public final class BattleSceneryTest {
          require(cached==field(JohtoBattleRenderer.class,"arena").get(johtoBattleRenderer),"Per-frame arena texture allocation");
          int changed=changed(a,b,0,0,width(),height());require(changed>width()*height()/200,"Static panorama "+label+": "+changed);
          require(changed(a,near,0,0,width(),height())>20,"Shader lacks continuous movement "+label);
+         require(changed(a,b,0,height()*4/5,Math.max(1,width()/8),height()/10)>5,
+            "Surrounding panorama stayed fixed while only arena center rotated "+label);
          require(Arrays.equals(a,draw(3.2f,false,true,null)),"Same clock changed pixels "+label);
          byte[] stillA=draw(3.2f,true,true,sizeIndex==0||biome.equals("forest")?label+"-still":null),stillB=draw(80f,true,true,null);
          require(Arrays.equals(stillA,stillB),"Reduced motion still animates "+label);
@@ -131,20 +135,27 @@ public final class BattleSceneryTest {
       }
       void cameraContract()throws Exception {
          Vector3 neutral=BattleScenery.project(40,48,0,new Vector3());
-         require(neutral.equals(new Vector3(40,48,1)),"Neutral projection changed");
-         for(int t=0;t<400;t++) {
-            float yaw=BattleScenery.orbit(t*.1f);
+         require(neutral.x>30&&neutral.x<60&&neutral.y>48,"Neutral actor placement outside stage");
+         java.util.Set<String> facings=new java.util.HashSet<>();
+         for(int step=0;step<=720;step++) {
+            float yaw=step*MathUtils.PI2/720f;
             Vector3 a=BattleScenery.project(40,48,yaw,new Vector3());
             Vector3 b=BattleScenery.project(124,88,yaw,new Vector3());
-            require(a.y>=41&&a.x>8&&a.x<72&&b.x<150&&b.y>70,"Actor leaves safe stage at "+t+": "+a+" / "+b);
-            Vector3 roundTrip=BattleScenery.project(a.x,a.y,-yaw,new Vector3());
-            require(Math.abs(roundTrip.x-40)<.04f&&Math.abs(roundTrip.y-48)<.04f,"CPU floor projection is not invertible");
+            require(a.y>48&&a.x>8&&a.x<152&&b.x>8&&b.x<152&&b.y>48,"Actor leaves safe stage at "+step+": "+a+" / "+b);
+            Vector3 periodic=BattleScenery.project(40,48,yaw+MathUtils.PI2,new Vector3());
+            require(a.dst(periodic)<.05f,"Orbit seam changes actor ground anchor");
+            Vector3 effect=BattleScenery.projectEffect(40,48,yaw,new Vector3());
+            require(effect.dst(a)<.001f,"Friendly particle ground detached from actor");
+            effect=BattleScenery.projectEffect(124,88,yaw,new Vector3());
+            require(effect.dst(b)<.001f,"Enemy particle ground detached from actor");
+            facings.add(BattleScenery.facing(true,yaw));
          }
-         require(BattleScenery.facing(true,0).equals("up-right")&&BattleScenery.facing(false,0).equals("down-left"),"Default opposing directions");
-         require(BattleScenery.facing(true,BattleScenery.orbit(24)).equals("right")&&BattleScenery.facing(false,BattleScenery.orbit(24)).equals("left"),"Orbit did not change directional frames");
-         require(johtoBattleRenderer.cameraYaw(this)!=0,"Menu orbit disabled");
-         menu.disabled=true;require(johtoBattleRenderer.cameraYaw(this)==0,"Disabled menu still orbits");menu.disabled=false;
-         actionStack.remove(menu);require(johtoBattleRenderer.cameraYaw(this)==0,"Active turn still orbits");actionStack.add(menu);
+         require(facings.size()==8,"Full orbit did not expose all eight sprite directions");
+         require(Math.abs(BattleScenery.orbit(BattleScenery.ORBIT_PERIOD)-MathUtils.PI2)<.0001f,"Orbit does not complete 360 degrees");
+         require(BattleScenery.project(40,48,MathUtils.PI,new Vector3()).x>80,"Half orbit did not swap actor sides");
+         float active=johtoBattleRenderer.cameraYaw(this);require(active!=0,"Menu orbit disabled");
+         menu.disabled=true;require(johtoBattleRenderer.cameraYaw(this)==active,"Disabled menu resets camera");menu.disabled=false;
+         actionStack.remove(menu);require(johtoBattleRenderer.cameraYaw(this)==active,"Active turn resets camera");actionStack.add(menu);
       }
       void largeActors()throws Exception {
          Pokemon savedOwn=own,savedEnemy=enemy;map.currBiome="forest";
@@ -155,6 +166,28 @@ public final class BattleSceneryTest {
          draw(24.8723f,false,true,sizeIndex+"-forest-exeggutor-orbit-min");
          own=savedOwn;enemy=savedEnemy;player.currPokemon=own;battle.oppPokemon=enemy;
          friendlyHealth=new DrawFriendlyHealthGen2(this);friendlyHealth.firstStep(this);enemyHealth=new DrawEnemyHealthGen2(this);
+      }
+      void actorOcclusion()throws Exception {
+         float x=enemy.sprite.getX(),y=enemy.sprite.getY();
+         enemy.sprite.setPosition(14,52);
+         byte[][] orders=new byte[2][];
+         for(int order=0;order<2;order++){
+            draw(0,false,false,null);johtoBattleRenderer.prepareFrame(this,false);
+            field(JohtoBattleRenderer.class,"scenerySeconds").setFloat(johtoBattleRenderer,0);
+            uiBatch.begin();johtoBattleRenderer.drawBackground(this);
+            boolean depth=Gdx.gl.glIsEnabled(GL20.GL_DEPTH_TEST);
+            if(order==0){own.backSprite.draw(uiBatch);enemy.sprite.draw(uiBatch);}
+            else {enemy.sprite.draw(uiBatch);own.backSprite.draw(uiBatch);}
+            require(depth==Gdx.gl.glIsEnabled(GL20.GL_DEPTH_TEST),"Actor depth state leaked to UI");
+            uiBatch.end();johtoBattleRenderer.finishFrame(this);
+            orders[order]=ScreenUtils.getFrameBufferPixels(0,0,width(),height(),false);
+         }
+         // Fractional floor shadows are intentionally blended; opaque sprite bodies
+         // above y=68 must be identical regardless of legacy GUI action order.
+         float scale=Math.min(width()/160f,height()/144f),bottom=(height()-144*scale)/2;
+         int y0=(int)Math.ceil(bottom+68*scale),top=(int)Math.floor(bottom+120*scale);
+         require(changed(orders[0],orders[1],0,y0,width(),top-y0)==0,"Overlapping actors depend on legacy draw order");
+         enemy.sprite.setPosition(x,y);
       }
       void fixedRect(byte[] a,byte[] b,float x,float y,float w,float h,String label){
          float scale=Math.min(width()/160f,height()/144f),left=(width()-160*scale)/2,bottom=(height()-144*scale)/2;
@@ -168,13 +201,11 @@ public final class BattleSceneryTest {
          byte[] previousFrame=draw(24f,false,true,null);
          actionStack.remove(menu);
          byte[] cut=draw(24f,false,true,null);
-         require(changed(previousFrame,cut,0,0,width(),height())==0,"Turn camera cut was not masked by the previous frame");
-         require(field(JohtoBattleRenderer.class,"cameraBlend").getFloat(johtoBattleRenderer)>0,"Camera dissolve did not start");
-         field(JohtoBattleRenderer.class,"cameraBlend").setFloat(johtoBattleRenderer,0);
-         byte[] settled=draw(24f,false,true,null);
-         require(!Arrays.equals(previousFrame,settled),"Turn camera did not return to effect coordinates");
+         require(changed(previousFrame,cut,0,0,width(),height())==0,"Turn changed camera or introduced a dissolve");
+         byte[] moving=draw(25f,false,true,null);
+         require(!Arrays.equals(cut,moving),"Camera stopped while turn executes");
          actionStack.add(menu);draw(24f,true,true,null);
-         require(field(JohtoBattleRenderer.class,"cameraBlend").getFloat(johtoBattleRenderer)==0,"Reduced motion retained camera dissolve");
+         require(johtoBattleRenderer.cameraYaw(this)==0,"Reduced motion retained orbit");
          BattleScenery scenery=(BattleScenery)field(JohtoBattleRenderer.class,"scenery").get(johtoBattleRenderer);
          ShaderProgram before=(ShaderProgram)field(BattleScenery.class,"shader").get(scenery);
          scenery.dispose();scenery.dispose();require(field(BattleScenery.class,"shader").get(scenery)==null,"Disposed shader retained");

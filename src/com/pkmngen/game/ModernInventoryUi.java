@@ -1,6 +1,7 @@
 package com.pkmngen.game;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.*;
 
 /** Bag, guide, crafting and confirmation views; never mutates their actions. */
@@ -27,9 +28,10 @@ final class ModernInventoryUi {
             for(int i=0;i<5 && m.itemsList!=null && m.currIndex+i<m.itemsList.size();i++) {
                ModernUi.Box row=bagRow(i);String name=m.itemsList.get(m.currIndex+i);
                boolean count=game.player!=null&&game.player.hasItem(name);
-               ModernPartyUi.frlgRow(ui,game,(m.isSorting&&m.sortingIndex==m.currIndex+i?"* ":"")+name,
-                  row.x,row.y,row.width,row.height,i==m.cursorPos,count?23:0);
-               if(count)ui.fitText(game,"x"+game.player.getItemAmount(name),row.x+row.width-23,row.y+8.5f,5,21,ModernUi.INK);
+               ModernPartyUi.frlgPanel(ui,game,row.x,row.y,row.width,row.height,i==m.cursorPos,false);
+               itemIcon(ui,game,name,row.x+1,row.y+1,11,11);
+               ui.fitText(game,(m.isSorting&&m.sortingIndex==m.currIndex+i?"* ":"")+name,row.x+14,row.y+9,5.2f,row.width-17-(count?19:0),ModernUi.INK);
+               if(count)ui.fitText(game,quantity(game,name),row.x+row.width-21,row.y+8.5f,4.7f,19,ModernUi.INK);
             }
          } else ui.fitText(game,"Changing pocket...",12,62,5.5f,76,ModernUi.MUTED);
          if(m.itemsList!=null && m.itemsList.size()>5) {
@@ -41,9 +43,9 @@ final class ModernInventoryUi {
          String selected=at(m.itemsList,m.currIndex+m.cursorPos);
          ui.panel(game,98,23,56,80);
          ui.surface(game,101,81,50,19,1,ModernUi.SURFACE);
-         pocketIcon(ui,game,Math.floorMod(m.boxIndex,5),117,84);
+         if(!itemIcon(ui,game,selected,115,81,23,19))pocketIcon(ui,game,Math.floorMod(m.boxIndex,5),117,84);
          ui.wrapped(game,selected,103,79,5.6f,46,2,ModernUi.INK);
-         if(game.player!=null&&game.player.hasItem(selected))ui.fitText(game,"Owned: "+game.player.getItemAmount(selected),103,60,5,46,ModernUi.ACCENT);
+         if(game.player!=null&&game.player.hasItem(selected))ui.fitText(game,CreativeMode.infinite(game.player,selected)?"Unlimited":"Owned: "+game.player.getItemAmount(selected),103,60,5,46,ModernUi.ACCENT);
          String description=DrawItemMenuGen2.itemDescriptions.get(selected.toLowerCase(Locale.ROOT));
          if(description==null)description=selected.equalsIgnoreCase("Cancel")?"Return to your adventure.":"Select this item to view available actions.";
          String identity=m.boxIndex+":"+selected;
@@ -141,6 +143,20 @@ final class ModernInventoryUi {
       if(!line.isEmpty())result.add(line);return result;
    }
    static ModernUi.Box bagRow(int index) {return new ModernUi.Box(9,84-index*14,82,13);}
+   private static String quantity(Game game,String name){return CreativeMode.infinite(game.player,name)?"INF":"x"+game.player.getItemAmount(name);}
+   static boolean itemIcon(ModernUi ui,Game game,String name,float x,float y,float w,float h) {
+      if(name==null||name.equalsIgnoreCase("Cancel"))return false;
+      TextureRegion icon=UserSpriteAssets.get().item(name);
+      if(icon==null) {
+         String key=UserSpriteAssets.normalized(name),material=key.equals("log")?"stump":key.contains("soil")?"dirt":key.equals("grass")?"grass_tuft":key.equals("flowers")?"flowers":key.equals("hard shell")?"fossil":null;
+         if(material!=null)icon=BwAssets.get().named(material);
+      }
+      if(icon==null)return false;
+      float scale=Math.min(w/icon.getRegionWidth(),h/icon.getRegionHeight());
+      Color before=new Color(game.uiBatch.getColor());game.uiBatch.setColor(Color.WHITE);
+      game.uiBatch.draw(icon,x+(w-icon.getRegionWidth()*scale)/2,y+(h-icon.getRegionHeight()*scale)/2,icon.getRegionWidth()*scale,icon.getRegionHeight()*scale);
+      game.uiBatch.setColor(before);return true;
+   }
    private void list(ModernUi ui,Game game,List<String> entries,int offset,int cursor,float top,float rowHeight,boolean counts,boolean sorting,int sortingIndex) {
       if(entries==null) return;
       int visible=rowHeight==14?4:5;
@@ -149,9 +165,11 @@ final class ModernInventoryUi {
          String name=entries.get(i+offset); float y=top-(i+1)*rowHeight;
          boolean hasCount=counts && game.player!=null && game.player.hasItem(name);
          // Allocate two columns before text layout; quantities never paint over item names.
-         ModernPartyUi.frlgRow(ui,game,(sorting && i+offset==sortingIndex?"* ":"")+name,9,y,142,rowHeight-1,i==cursor,hasCount?24:0);
+         ModernPartyUi.frlgPanel(ui,game,9,y,142,rowHeight-1,i==cursor,false);
+         boolean art=itemIcon(ui,game,name,11,y+1,12,rowHeight-3);
+         ui.fitText(game,(sorting&&i+offset==sortingIndex?"* ":"")+name,art?26:13,y+rowHeight-4,5.8f,hasCount?100:120,ModernUi.INK);
          if(hasCount) {
-            ui.fitText(game,"x"+game.player.getItemAmount(name),129,y+rowHeight-4,5.8f,19,ModernUi.INK);
+            ui.fitText(game,quantity(game,name),129,y+rowHeight-4,5.8f,19,ModernUi.INK);
          }
       }
       if(entries.size()>visible) ui.bar(game,153,top-visible*rowHeight,1.5f,visible*rowHeight,(offset+cursor+1f)/entries.size(),ModernUi.ACCENT);

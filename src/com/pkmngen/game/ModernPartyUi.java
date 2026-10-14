@@ -127,6 +127,7 @@ public final class ModernPartyUi {
          boolean leader=i==0,chosen=i==selected;
          float x=leader?6:61,y=leader?45:96-(i-1)*19,w=leader?50:93,h=leader?70:18;
          frlgPanel(ui,game,x,y,w,h,chosen,leader);
+         if(leader)region(game,UserSpriteAssets.get().partyBall(),x+3,y+h-11,8,8);
          if(moving==index)ui.rect(game,x,y,w,1.2f,ModernUi.GOLD);
          float px=leader?x+10:x+2,py=leader?y+37:y+1,pw=leader?30:16,ph=leader?28:16;
          if(!PmdBattleSprites.portrait(game,p,px,py,pw,ph)) {
@@ -144,7 +145,9 @@ public final class ModernPartyUi {
          String level="Lv "+p.level+(p.isShiny?" *":"");
          ui.fitText(game,level,leader?x+4:x+69,leader?y+23:y+13.5f,4.4f,leader?42:21,ModernUi.INK);
          String status=condition(p);
-         if(!status.equals("OK"))ui.fitText(game,status,leader?x+28:x+20,leader?y+23:y+5,3.8f,20,ModernUi.RED);
+         TextureRegion badge=UserSpriteAssets.get().status(p.status);
+         if(badge!=null)region(game,badge,leader?x+28:x+20,leader?y+18:y+1,18,6);
+         else if(!status.equals("OK"))ui.fitText(game,status,leader?x+28:x+20,leader?y+23:y+5,3.8f,20,ModernUi.RED);
          else if(!leader)ui.fitText(game,hp+"/"+max,x+20,y+5,3.8f,25,ModernUi.INK);
          ui.bar(game,leader?x+4:x+48,leader?y+13:y+4,leader?42:41,3.4f,max>0?(float)hp/max:0,healthColor(hp,max));
          if(leader)ui.fitText(game,hp+" / "+max,x+4,y+8,4.4f,42,ModernUi.INK);
@@ -171,6 +174,7 @@ public final class ModernPartyUi {
       ui.fitText(game, "Lv " + p.level, 35, 108, 6.5f, 27, ModernUi.ACCENT);
       if (p.isShiny) ui.text(game, "SHINY", 35, 99, 4.2f, ModernUi.GOLD);
       summaryActor(game, p, 10, 23, 52, 64);
+      if(p.isShiny&&!p.isGhost&&!p.isEgg)ShinyVisuals.draw(game,12,25,48,59,animationSeconds);
       ui.panel(game, 71, 79, 83, 38);
       ui.fitText(game, typeNames(p), 77, 109, 5.7f, 70, ModernUi.INK);
       String gender = p.gender == null ? "" : p.gender.equals("male") ? "Male" : p.gender.equals("female") ? "Female" : "Genderless";

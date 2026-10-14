@@ -26,6 +26,7 @@ final class DesktopMenuController {
    float clock,screenAge;
    String message="";
    CharacterAppearance appearanceDraft;
+   CreativeModeUi creative;
    String wardrobeId="gold",wardrobeName="";
    int wardrobeSlot,wardrobeDirection;
    boolean wardrobeFromOptions;
@@ -44,7 +45,7 @@ final class DesktopMenuController {
 
    DesktopMenuController(){preferences.load();}
    boolean optionsOpen(){return draft!=null;}
-   boolean isTyping(Game game){return text.active()&&setup!=null&&game.actionStack.contains(setup);}
+   boolean isTyping(Game game){return creative!=null&&creative.editing || text.active()&&setup!=null&&game.actionStack.contains(setup);}
    boolean menuActive(Game game) {
       for(Action a:game.actionStack)if(a instanceof Menu || a instanceof DrawSetupMenu || a instanceof DrawControls)return true;
       return false;
@@ -55,6 +56,7 @@ final class DesktopMenuController {
    }
    void sync(Game game) {
       tick();
+      CreativeMode.sync(game);
       if(text.active()&&(setup==null||!game.actionStack.contains(setup))) {text.cancel();InputProcessor.blockHeldInputs();}
       if(optionsOwner!=null&&!game.actionStack.contains(optionsOwner)){closeOptions(false);}
       typingBarrier.removeIf(k->!Gdx.input.isKeyPressed(k));
@@ -62,7 +64,7 @@ final class DesktopMenuController {
       com.badlogic.gdx.InputProcessor installed=Gdx.input.getInputProcessor();
       if(installed!=events){delegate=installed;Gdx.input.setInputProcessor(events);}
    }
-   void blur() {text.cancel();typingBarrier.clear();capture=-1;captureWaiting=false;appearanceDraft=null;if(screen==Screen.WARDROBE)screen=Screen.TRAINERS;clearEvents();rawPrevious=0;}
+   void blur() {text.cancel();typingBarrier.clear();capture=-1;captureWaiting=false;appearanceDraft=null;if(creative!=null)creative.editing=false;if(screen==Screen.WARDROBE)screen=Screen.TRAINERS;clearEvents();rawPrevious=0;}
    private void clearEvents(){enter=back=settingsRequest=tab=editConfirm=editCancel=false;pointerButton=-1;wheel=0;}
    private boolean settingsAllowed(Game game) {
       for(Action a:game.actionStack)if(a instanceof DrawSetupMenu || a instanceof DrawPlayerMenu&&!((DrawPlayerMenu)a).disabled)return true;
@@ -75,6 +77,7 @@ final class DesktopMenuController {
    int filterHeld(Game game,int held) {
       int pressed=held&~rawPrevious;rawPrevious=held;
       if(optionsOpen()&&capture>=0)return 0;
+      if(creative!=null&&creative.editing)return 0;
       if(isTyping(game)) {
          if((pressed&(16|64))!=0)editConfirm=true;
          if((pressed&32)!=0)editCancel=true;
@@ -288,22 +291,26 @@ final class DesktopMenuController {
       preferences.classicCast=TrainerCatalog.hasMod(id);
       try{preferences.save();change(Screen.SETUP);}catch(java.io.IOException e){message="Trainer applied this session; settings could not be saved.";}
    }
-   void openOptions(Action owner){appearanceDraft=null;optionsOwner=owner;draft=preferences.copy();optionIndex=0;capture=-1;message="";InputProcessor.blockHeldInputs();clearEvents();}
+   void openOptions(Action owner){appearanceDraft=null;creative=null;optionsOwner=owner;draft=preferences.copy();optionIndex=0;capture=-1;message="";InputProcessor.blockHeldInputs();clearEvents();}
    void closeOptions(boolean save) {
       if(save&&draft!=null) {
          try{draft.save();preferences.bindings=draft.bindings.clone();preferences.reducedMotion=draft.reducedMotion;
             preferences.openingScene=draft.openingScene;preferences.ambient=draft.ambient;preferences.apply();}
          catch(java.io.IOException e){message="Could not save settings. Your previous settings are intact.";return;}
       }
-      appearanceDraft=null;draft=null;optionsOwner=null;capture=-1;clearEvents();InputProcessor.blockHeldInputs();
+      creative=null;appearanceDraft=null;draft=null;optionsOwner=null;capture=-1;clearEvents();InputProcessor.blockHeldInputs();
    }
    private void updateOptions() {
+      if(creative!=null) {
+         if(creative.update(Game.staticGame,this,enter||InputProcessor.startJustPressed||InputProcessor.aJustPressed&&pointerButton!=Buttons.LEFT,pointerButton==Buttons.LEFT)){creative=null;InputProcessor.blockHeldInputs();}
+         return;
+      }
       if(appearanceDraft!=null&&wardrobeFromOptions){updateWardrobe();return;}
       if(capture>=0){if(back){capture=-1;message="Binding unchanged.";InputProcessor.blockHeldInputs();}return;}
       int delta=InputProcessor.downJustPressed?1:InputProcessor.upJustPressed?-1:0;
-      if(delta!=0)optionIndex=Math.floorMod(optionIndex+delta,16);
+      if(delta!=0)optionIndex=Math.floorMod(optionIndex+delta,17);
       boolean confirm=enter||InputProcessor.startJustPressed||InputProcessor.aJustPressed&&pointerButton!=Buttons.LEFT;
-      if(pointerButton==Buttons.LEFT)for(int i=0;i<16;i++)if(hit(optionBox(i))){optionIndex=i;confirm=true;}
+      if(pointerButton==Buttons.LEFT)for(int i=0;i<17;i++)if(hit(optionBox(i))){optionIndex=i;confirm=true;}
       if(back||InputProcessor.bJustPressed){closeOptions(false);return;}
       if(!confirm&&!InputProcessor.leftJustPressed&&!InputProcessor.rightJustPressed)return;
       if(optionIndex<9){capture=optionIndex;captureWaiting=true;message="Press a key or mouse button. Esc cancels.";InputProcessor.blockHeldInputs();}
@@ -312,6 +319,10 @@ final class DesktopMenuController {
       else if(optionIndex==11)draft.ambient=!draft.ambient;
       else if(optionIndex==12){draft.bindings=DesktopInterfaceSettings.defaults();message="Default controls restored in this draft. Save to apply.";}
       else if(optionIndex==15)openWardrobe(true);
+      else if(optionIndex==16) {
+         if(optionsOwner instanceof DrawSetupMenu||!CreativeMode.local(Game.staticGame))message="Open a Local adventure, then Menu > F1 > Creative sandbox.";
+         else {creative=new CreativeModeUi();InputProcessor.blockHeldInputs();}
+      }
       else closeOptions(optionIndex==13);
    }
    private void captured(int code) {
@@ -359,6 +370,7 @@ final class DesktopMenuController {
       @Override public boolean keyDown(int key) {
          if(!InputProcessor.isWindowFocused())return true;
          Game g=game();if(g==null||g.modernUi==null)return delegate!=null&&delegate.keyDown(key);
+         if(creative!=null&&creative.key(key))return true;
          if(key==Keys.F1&&!text.active()&&settingsAllowed(g)){settingsRequest=true;return true;}
          if(optionsOpen()&&capture>=0){if(key==Keys.ESCAPE)back=true;else captured(key);return true;}
          if(text.active()) {
@@ -378,6 +390,7 @@ final class DesktopMenuController {
       @Override public boolean keyTyped(char c) {
          if(!InputProcessor.isWindowFocused())return true;
          Game g=game();if(g!=null&&g.modernUi!=null) {
+            if(creative!=null&&creative.editing)return creative.typed(c);
             if(text.active()) {
                int code=Keys.valueOf(String.valueOf(c).toUpperCase(Locale.ROOT));
                if(typingBarrier.contains(code))return true;return text.typed(c);

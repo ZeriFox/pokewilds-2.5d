@@ -129,12 +129,13 @@ final class ModernStartupUi {
       if(!c.message.isEmpty()){ui.panel(game,7,111,146,9);ui.fitText(game,c.message,10,117,4.1f,140,ModernUi.RED);}
    }
    void options(ModernUi ui,Game game,DesktopMenuController c) {
+      if(c.creative!=null){c.creative.render(ui,game);return;}
       if(c.appearanceDraft!=null&&c.wardrobeFromOptions){wardrobe(ui,game,c);return;}
       ui.fullScreen(game,"CONTROLS & DISPLAY","Changes are applied only with Save settings; Esc discards them.");
-      for(int i=0;i<16;i++) {
+      for(int i=0;i<17;i++) {
          ModernUi.Box b=DesktopMenuController.optionBox(i);boolean active=i==c.optionIndex;
          ui.rect(game,b.x,b.y,b.width,b.height,active?ModernUi.ACCENT:ModernUi.PAPER);
-         String label=i<9?DesktopInterfaceSettings.ACTIONS[i]:new String[]{"Reduced menu motion","Opening scene","Ambient accents","Reset control draft","Save settings","Discard / back","Customize character"}[i-9];
+         String label=i<9?DesktopInterfaceSettings.ACTIONS[i]:new String[]{"Reduced menu motion","Opening scene","Ambient accents","Reset control draft","Save settings","Discard / back","Customize character","Creative sandbox"}[i-9];
          String val=i<9?DesktopControls.label(c.draft.bindings[i]):i==9?(c.draft.reducedMotion?"ON":"OFF"):i==10?(c.draft.openingScene?"ON":"OFF"):i==11?(c.draft.ambient?"ON":"OFF"):"";
          ui.fitText(game,label,b.x+3,b.y+4.8f,4.8f,99,active?ModernUi.PAPER:ModernUi.INK);
          ui.fitText(game,val,b.x+111,b.y+4.8f,4.8f,30,active?ModernUi.PAPER:ModernUi.ACCENT);

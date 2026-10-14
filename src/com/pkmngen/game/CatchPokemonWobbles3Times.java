@@ -45,18 +45,18 @@ class CatchPokemonWobbles3Times extends Action {
       this.sprites = new ArrayList<>();
       this.sprites.add(null);
       text = TextureCache.get(Gdx.files.internal("pokeball_wiggleSheet1_color.png"));
-      this.sprites.add(new Sprite(text, 0, 0, 12, 12));
-      this.sprites.add(new Sprite(text, 12, 0, 12, 12));
-      this.sprites.add(new Sprite(text, 0, 0, 12, 12));
-      this.sprites.add(new Sprite(text, 24, 0, 12, 12));
-      this.sprites.add(new Sprite(text, 0, 0, 12, 12));
-      this.sprites.add(new Sprite(text, 12, 0, 12, 12));
-      this.sprites.add(new Sprite(text, 0, 0, 12, 12));
-      this.sprites.add(new Sprite(text, 24, 0, 12, 12));
-      this.sprites.add(new Sprite(text, 0, 0, 12, 12));
-      this.sprites.add(new Sprite(text, 12, 0, 12, 12));
-      this.sprites.add(new Sprite(text, 0, 0, 12, 12));
-      this.sprites.add(new Sprite(text, 24, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 0, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 12, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 0, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 24, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 0, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 12, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 0, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 24, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 0, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 12, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 0, 0, 12, 12));
+      this.sprites.add(CaptureBallVisual.create(game, text, 24, 0, 12, 12));
       text = TextureCache.get(Gdx.files.internal("poof_sheet1.png"));
       this.sprites.add(new Sprite(text, 0, 0, 48, 48));
       this.sprites.add(new Sprite(text, 48, 0, 48, 48));
@@ -151,7 +151,7 @@ class CatchPokemonWobbles3Times extends Action {
          this.sprite = this.sprites.get(0);
          if (this.sprite != null) {
             this.sprite.setPosition(this.position.x, this.position.y);
-            this.sprite.draw(game.uiBatch);
+            CaptureBallVisual.draw(game, this.sprite);
          }
 
          if (this.repeats.get(0) > 0) {

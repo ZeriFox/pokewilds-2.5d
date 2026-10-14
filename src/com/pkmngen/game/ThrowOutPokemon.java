@@ -145,7 +145,7 @@ class ThrowOutPokemon extends Action {
                for (int j = 0; j < this.sprite[i].length; j++) {
                   if (this.sprite[i][j] != null) {
                      this.sprite[i][j].setPosition(this.position.x + 8 * i, this.position.y + 8 * j);
-                     this.sprite[i][j].draw(game.uiBatch);
+                     PmdBattleSprites.drawSendOutFragment(game, this.sprite[i][j]);
                   }
                }
             }
@@ -185,7 +185,7 @@ class ThrowOutPokemon extends Action {
 
          if(!PmdBattleSprites.draw(game,game.player.currPokemon,game.player.currPokemon.backSprite,true,"Idle"))for (int i = 0; i < this.sprite.length; i++) {
             for (int j = 0; j < this.sprite[i].length; j++) {
-               this.sprite[i][j].draw(game.uiBatch);
+               PmdBattleSprites.drawSendOutFragment(game, this.sprite[i][j]);
             }
          }
 

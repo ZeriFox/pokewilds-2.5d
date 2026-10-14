@@ -6,6 +6,8 @@ La versione aggiunge **552 specie giocabili** alle 410 della base, per **962 spe
 
 La versione **v0.8.11-johto.4** prosegue dal commit `ac200935`: [arene prospettiche, apertura e guardaroba](docs/CINEMATIC-CUSTOMIZATION.md), [cast giocabile in stile Bianco e Nero](docs/TRAINERS-BW.md), [mare, chiome e scenari di battaglia](docs/CINEMATIC-NATURE.md), [ricevuta della build e verifiche](VERIFICA.txt). I nuovi sprite e gli effetti funzionano anche sui mondi salvati. La precedente [ricostruzione del terreno](docs/LIVING-WORLD.md) richiede invece una nuova avventura/isola per vedere la diversa disposizione strutturale. Il precedente pacchetto **v0.8.11-stardew.1** e le anteprime seguenti sono storici; [REWORK-STATUS.md](docs/REWORK-STATUS.md) ne conserva lo stato e gli hash.
 
+La successiva **prova locale del 14 ottobre** introduce camera continua a 360 gradi, rialzi leggibili, nuovi strumenti e bacche, effetti Shiny e modalità Creativa. Avvio e controlli sono in [PLAYTEST-2026-10-14.md](docs/PLAYTEST-2026-10-14.md); la release johto.4 sopra resta il pacchetto precedente. Le ricevute correnti sono in `build/build-report.json` e `build/rework-verification/native.json`.
+
 ![Mondo procedurale in 2.5D](anteprima-25d.png)
 
 ![Interfaccia di lotta](anteprima-lotta.png)

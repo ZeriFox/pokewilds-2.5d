@@ -450,7 +450,7 @@ public class Network {
             this.currPokemon = new Network.PokemonData(player.currPokemon);
          }
 
-         this.itemsDict = player.getItemsDict();
+         this.itemsDict = player.getStoredItemsDict();
          this.id = player.network.id;
          this.number = player.network.number;
          this.color = player.color;

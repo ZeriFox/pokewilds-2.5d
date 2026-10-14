@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify frozen modernization scope against the original 198 source files.
 
-This phase intentionally changes presentation, procedural generation, roster and desktop bindings.
+This phase intentionally changes presentation, procedural generation, roster, desktop bindings and explicitly requested local Creative mode.
 It does not claim full gameplay equivalence. Neither normal verification nor
 --inventory refreshes approved hashes. Approval requires explicit source review
 and edits to the manifest and this verifier's frozen manifest digest.
@@ -20,8 +20,14 @@ CLASSIC_REPORT = "baseline/classic-build-report.json"
 CLASSIC_REPORT_SHA256 = "ff9ad5b0313ecc39d252d450ccd8f04cd47c467f7ce695b28a0c99e0cfae239e"
 CLASSIC_SOURCES = "baseline/johto-v1/classic-sources"
 # Set only after coordinated final source review. No command auto-updates this.
-FROZEN_MANIFEST_SHA256 = "67a078821afeee2595a1a7274bc8ec775b431333eb100b320cd327729ba1cf3b"
+FROZEN_MANIFEST_SHA256 = "45bccd1398d231c389e7e79bfa50ba6ecb5b580172dab0571b64c2f3bd420f6e"
 PREFIX = "src/com/pkmngen/game/"
+PLAYTEST_ARCHIVE = {'baseline/before-playtest-2026-10-14/modernization-scope.json': '67a078821afeee2595a1a7274bc8ec775b431333eb100b320cd327729ba1cf3b',
+ 'baseline/before-playtest-2026-10-14/verify_visual_scope.py': '8a650dd5ce3894a638ee9bf33ee486569196e040b9a05c0704b915def459f584',
+ 'baseline/before-playtest-2026-10-14/verify_scope_test.py': '6b3c666a4b678dd77e699608f819cbe91e2d317db279b958e971b91424bfe2f6',
+ 'baseline/before-playtest-2026-10-14/VERIFICA.txt': 'c1f25b75d6c7ac0b35f37cc681632fac5f63959d535436baee69d7e803a6b2a7',
+ 'baseline/before-playtest-2026-10-14/DrawBattleMenuSafariZone.java': '01092eceba1e423ddf338b6e8703be7f8ebd8a0872a799b0da649f78cad7b8f2'}
+
 CINEMATIC_CUSTOMIZATION_ARCHIVE = {
     "baseline/before-cinematic-customization/modernization-scope.json": "f2c1f39f4c9abfd42bcb92d1c1580c10ce8fd2bb6c4665e5077b002f7081d574",
     "baseline/before-cinematic-customization/VERIFICA.txt": "da6ac2c8e922fcc913bb9fc9302c6288c30bc8fb75f8cb11d537cc55964dd7f7",
@@ -76,7 +82,21 @@ STEP2_ARCHIVE = {'baseline/java-material-step2/modernization-scope.json': '40009
 
 # Names and review scope are explicit; an edited manifest cannot expand them.
 MODIFIED_SCOPES = {
-    "Battle.java": "R15 presentation only inside LoadAndPlayAnimation: explicitly classified screen-space frames and full-viewport snapshot/row-copy composition; outer combat rules remain byte-identical to the original snapshot.",
+    "ThrowRock.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
+    "ThrowBait.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
+    "ThrowHyperPokeball.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
+    "ThrowFastPokeball.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
+    "ThrowPokeball.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
+    "CatchPokemonWobblesThenCatch.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
+    "CatchPokemonWobbles3Times.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
+    "CatchPokemonWobbles2Times.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
+    "CatchPokemonWobbles1Time.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
+    "CatchPokemonWobbles0Times.java": "Presentation-only CaptureBallVisual constructor/draw substitutions; after reversing those exact hooks the full source must equal classic, including capture outcomes, inventory/party changes, RNG, sound schedules and frame counts.",
+    "DrawSetupMenu.java": "One exact CreativeMode.newWorld hook after new PkmnMap construction when creating a world. Existing setup/load/network dispatch remains classic.",
+    "PkmnMap.java": "Exact Creative sidecar save call after existing map/minimap saves and dedicated IOException reporting. Existing serialized map format, load path and all other map logic remain classic.",
+    "Network.java": "Exact stored-inventory accessor substitution in PlayerData so virtual Creative supply never enters network or save payloads. Every other byte of network/schema logic remains classic.",
+    "Player.java": "Explicit local Creative mode: virtual recipe/material inventory reads and non-consuming writes, with stored inventory accessor and sorting bridge. Exact reviewed methods only; all fields, combat/player behavior and serialized schema remain classic.",
+    "Battle.java": "Presentation only inside LoadAndPlayAnimation and one exact CaptureBallVisual.select hook in the existing item-ball branch. All combat formulas and rules outside those narrow boundaries remain identical to classic sources.",
     "CycleDayNight.java": "Remove three unconditional per-frame countdown prints; encounter triggers, timing, lighting and day/night simulation unchanged.",
     "Tile.java": "Repair original ledge corner, colored ledge and pedestal asset construction; habitat-filter rod-restricted fishing and natural evolutions, preserving empty-pool no-nibble behavior; no serialization changes.",
     "desktop/DesktopLauncher.java": "Desktop input focus callbacks and opt-in packaged-launch verification with a hidden window and nonzero crash exit; normal launcher and save location retained.",
@@ -86,7 +106,7 @@ MODIFIED_SCOPES = {
     "DrawAttacksMenu.java": "Presentation: modern move panel; retain cursor state progression and original input.",
     "DrawBattle.java": "Presentation: arena, actor drawing hooks, masks and night tint.",
     "DrawBattleMenuNormal.java": "Presentation: modern battle commands; retain selection and input logic.",
-    "DrawBattleMenuSafariZone.java": "Presentation: modern safari commands; retain selection and input logic.",
+    "DrawBattleMenuSafariZone.java": "Existing modern safari presentation plus one exact safari-ball art identity hook before original capture calculation. Previous reviewed source otherwise remains identical.",
     "DrawControls.java": "Desktop controls presentation: show configured movement, confirm, back/run and menu bindings.",
     "DrawPokemonMenu.java": "Desktop UI layout: remove stale fixed-key guidance from the party menu while preserving menu selection and actions.",
     "DrawUseTossMenu.java": "Desktop UI layout: show configured action bindings without altering item-use/toss state transitions.",
@@ -113,26 +133,32 @@ MODIFIED_SCOPES = {
     "SpecialBattleMewtwo.java": "Presentation: modern special intro, boss arena, PMD actor, rocks and ripple; preserve original battle action progression, RNG and timing.",
     "SpecialMegaGengar1.java": "Boss resource compatibility: initialize the shipped Mega Gengar boss with a dedicated mgengar identity backed by existing Gengar data; preserve its explicit stats, attacks, display name and battle rules.",
     "Specie.java": "Species initialization: verified additional species and the shipped Mega Gengar boss alias before legacy initialization; support fresh-process boss reload without changing serialization.",
-    "ThrowOutPokemon.java": "Presentation: replace original RED sliced send-out actor with exact PMD actor and bound its legacy 7x7 crop; retain ball/poof sequence, durations, sounds and next actions.",
-    "ThrowOutPokemonCrystal.java": "Presentation: replace sliced actor art in send-out; retain poof and action schedule.",
+    "ThrowOutPokemon.java": "Presentation: exact PMD or original-palette fallback send-out actor and orbit-aware poof fragments, preserving original timings, sounds, positions and next actions.",
+    "ThrowOutPokemonCrystal.java": "Presentation: projected PMD/fallback actor and orbit-aware poofs without double projection; original action schedule and sprite slices unchanged.",
     "TrainerTipsTile.java": "Desktop tutorial presentation: substitute current binding labels in original sign text; preserve sign identity and interaction mechanics.",
-    "util/SpriteProxy.java": "Presentation: intercept known battle actors for PMD rendering; legacy fallback retained.",
+    "util/SpriteProxy.java": "Presentation: known projected actors first, then full-screen or orbit-anchored effects; gameplay Sprite transforms remain read-only.",
 }
 ADDED_SCOPES = {
+    "WorldReadability.java": "Read-only semantic helpers for jumpable ledges, exact CUT requirement tree tiers, interior material classification and action-aware companion presentation. Saved tiles, hitboxes, interactions and field-action clocks remain authoritative.",
+    "UserSpriteAssets.java": "Read-only supplied atlas loader with 470 explicit item identities, distinct capture balls, status/party badges and 64 berry identities with growth/animation frames. Alpha-trimmed source regions, validated semantic mappings, bounded cache and disposal/reload; no item or capture mechanics.",
+    "ShinyVisuals.java": "Visible four-point sparkle cue for shiny actors, shared battle/party rendering, reduced-motion static cue; hidden ghosts and eggs excluded. No invented palettes or gameplay state changes.",
+    "CaptureBallVisual.java": "Supplied named ball sprite selection and camera-projected throw/wobble/poof rendering on unchanged legacy capture action clocks. No catch probability or result changes.",
+    "CreativeModeUi.java": "Creative menu draft/search/level/shiny selectors and explicit local mode toggles routed through CreativeMode; bounded pointer rows and input focus isolation; no autonomous Pokemon or resource grants.",
+    "CreativeMode.java": "User-requested opt-in Local-only Creative mode: validated sidecar persistence with atomic backup, virtual unlimited recipe/material supply, searchable supported species grant with level and genuine shiny choice. Full-party grant refuses replacement; no multiplayer activation, save-schema changes or virtual inventory serialization.",
     "GhostVisualAssets.java": "Shared four-frame transparent concealed spirit artwork with finite-clock selection and explicit texture disposal/reload. Does not inspect or reveal the hidden Pokemon species.",
     "StartupCinematic.java": "Skippable 7.2-second opening using authored coast/forest artwork and selected trainer/companion, bounded parallax, title fade and full viewport bars. Disabled for reduced motion; owns/disposes artwork; no map, RNG, save or action mutations.",
     "MenuMotion.java": "Bounded presentation-only selection and entrance easing, fixed layout and immediate reduced-motion state; no input or gameplay state.",
     "CharacterAppearance.java": "Validated local per-name/trainer cosmetic profiles with atomic file persistence and backup, independent generated outfit/backpack/shoes/headwear/hair variants and colors, face-preserving layered composition and run anticipation. No game-save schema, inventory, network or Pokemon changes.",
-    "BattleScenery.java": "Illustrated biome arenas with a shared CPU/GPU floor projection, bounded camera orbit, directional sprite selection and animated background depth/light/water. Restores shader state; no combat formulas, action timing, map or RNG writes.",
+    "BattleScenery.java": "Full 360-degree 48-second 2.5D orbit with shared actor/effect floor projection and surrounding cylindrical illustrated biome vista. Continuous during commands, turns and captures; deterministic finite geometry, shader restoration, no gameplay mutations.",
     "WorldNatureMotion.java": "Pure coordinate-derived rooted vegetation movement, shore distance and same-height live tidal adjacency masks. No simulation clocks, map mutation, gameplay RNG or saved state.",
     "AuthoredTerrain.java": "Generation-only reconstruction and deterministic 17/9/5-cell authored modules for ten natural biome families. Region-specific footprints, minimum useful pocket area, immutable water/tidal/maze boundaries, protected event and encounter access, biome/route preservation, dry connectivity and no save-load regeneration.",
     'DesktopInterfaceSettings.java': 'Explicit local UI/control preferences, draft validation, reserved menu keys and duplicate rejection, atomic save with backup; no game-save schema or legacy settings-file rewrite.',
-    "DesktopMenuController.java": "Desktop setup/control navigation with nineteen unique trainers and installed mods, skippable opening, wardrobe draft/apply/cancel from trainer picker and existing-game settings, independent parts/colors/preview direction. Retains original game launch/input dispatch and Player schema; cosmetic data saved separately.",
+    "DesktopMenuController.java": "Desktop setup/control navigation, nineteen-trainer picker, skippable opening and independent cosmetic wardrobe. Adds explicit local Creative submenu with keyboard/pointer focus, search isolation and lifecycle synchronization; mode toggles and grants delegated to CreativeMode. Original launch dispatch, Player schema and gamepad semantics retained.",
     'MenuTextSession.java': 'Explicit reversible setup text draft with caret/deletion, length/character constraints and IPv4 validation; selection alone never consumes WASD as text.',
-    "ModernStartupUi.java": "Modern title/setup/options and nineteen-trainer picker, authored opening delegation and wardrobe preview with matching pointer hit boxes and current bindings. No gameplay RNG or save format changes.",
+    "ModernStartupUi.java": "Modern title/setup/options, nineteen-trainer picker and wardrobe preview with matching pointer hit boxes. Delegates explicit Creative submenu presentation from the settings list; no gameplay RNG or serialized format changes.",
     "TrainerCatalog.java": "Nineteen identity-preserving B/W-style trainers with clothing accents, generated modular part composition and run anticipation. Bounded owned texture cache, mod/custom-art priority, direction/frame and complete required-pose validation retained. No Player schema or gameplay changes.",
 
-    "WorldMaterials.java": "Presentation-only semantic terrain/prop resolver, natural dry transitions, regional tree selection and cave floor caps. Upper objects override floor-name heuristics; whole rocks remain props and volcanic cracks remain flat. No asset ownership, Tile mutations or saved-data changes.",
+    "WorldMaterials.java": "Presentation-only semantic terrain/prop resolver with actual upper-layer indoor floors, solid interior walls, visible jump-ledges and distinct tree species for existing CUT requirement tiers. Natural dry transitions, regional trees and cave floor caps retained; no Tile mutations or saved-data changes.",
     "WorldAmbientOverlay.java": "Sparse deterministic world-space mist, embers, fireflies, dust, snow and water glints with count/opacity budgets, protected actor focus, depth testing and separate shader ownership. Respects ambient toggle and freezes environmental motion with reduced motion; no gameplay RNG, indoor/UI overlays or saved-state writes.",
     "WorldMeshBatch.java": "CPU vertex storage, identity-based texture grouping, triangle-aligned mesh upload/reuse and GPU ownership extracted from JohtoRenderer; no camera, scene state, shader uniforms, texture ownership, gameplay or saved data.",
     "ActorModelRenderer.java": "Existing optional 3D helper, disabled by the modern sprite launcher.",
@@ -141,27 +167,131 @@ ADDED_SCOPES = {
     "DesktopControls.java": "Authorized desktop binding parser, exact legacy-preset migration, text-entry detection and truthful dynamic hints. Step 3 treats only an explicitly active setup edit as text focus; highlighting a row is navigation.",
     "StartupVerification.java": "Opt-in packaged-launch probe inside the delivered Game: observe 120 original menu frames, verify nonempty framebuffer, save capture and exit normally; disabled in ordinary play.",
     "ExpansionDex.java": "Authorized additional species data, graphics, cries, supported moves, experience and biome integration.",
-    "JohtoBattleRenderer.java": "Full-viewport painted biome arenas, bounded presentation camera during command selection and neutral original effect anchors during turns; modern encounter transition coverage and HUD. Owns/disposes scenery resources, honors reduced motion, preserves battle dispatch and timing.",
-    "JohtoRenderer.java": "Exclusive perspective world presentation with continuous shore wash, shaped connected tidal films and localized puddles, wet-surface sky/local-light reflections, subtle convex plateau bevels and blended cliff contact/corner lighting. Explicit animated concealed ghost sprite follows original action lifecycle. Preserves grid collisions, elevation ramps, actor depth, saved maps and gameplay clocks; reduced-motion freeze and GPU resource lifecycle retained.",
+    "JohtoBattleRenderer.java": "Continuous whole-arena orbit across command and action phases, fixed top HUD, actor depth clearing and projected legacy effect anchors, identity-concealing encounter transition and full viewport coverage; reduced motion and exact original action timing retained.",
+    "JohtoRenderer.java": "Exclusive perspective world presentation with continuous shore wash, tidal films, reflected lighting and blended cliff contacts. Visible jump-ledge lips/drop cues, root-footprint skirts, textured interiors, CUT-tier tree silhouettes, mapped berry plants and ball pickups, action-aware companion offsets and shiny sparkles. Preserves saved tiles, hitboxes, player/Pokemon positions, field-action clocks and encounter identity; reduced-motion freeze and resource disposal retained.",
     "ModernBatch.java": "Suppress legacy draw submissions while original menu actions advance.",
-    "ModernInventoryUi.java": "Modern inventory/item/crafting/guide presentation with shared palette/cards, five pocket tabs, quantity-safe list, scrollbar and scrollable detail pane; controller hitboxes and item/crafting rules unchanged.",
-    "ModernPartyUi.java": "Modern setup/party/storage/nickname UI with shared modern cards replacing old party-sheet backgrounds, full animated summary actors and reduced-motion support; existing hitboxes, setup delegation, controls and action semantics unchanged.",
-    "ModernUi.java": "Shared viewport, modern UI/card typography and palettes with bounded color/indicator easing at fixed hit boxes and reduced-motion snap. Delegates original menu actions and disposes opening artwork; no game rules or inventory changes.",
+    "ModernInventoryUi.java": "Modern inventory/item/crafting/guide presentation with supplied identity-mapped icons, five pocket tabs, quantity-safe rows and details. Shows INF/Unlimited only for explicit Creative virtual supplies; original item-use, sorting and crafting actions remain authoritative.",
+    "ModernPartyUi.java": "Modern party/storage/nickname UI with shared cards, supplied party-ball/status badges, full animated summary actors and shiny sparkle cues. Existing hitboxes, setup delegation, reduced-motion preferences and action semantics retained.",
+    "ModernUi.java": "Shared viewport, modern card typography, palettes and bounded easing at fixed hit boxes. Delegates original menu actions; disposes opening artwork and supplied atlas resources. No gameplay rules or inventory writes.",
     "ModernWorldGenerator.java": "Authorized deterministic procedural terrain generation, version 3, with biome-authored modules and the existing connected single-depth caldera. Preserves dungeon routes, deep-forest maze walls, graveyards, ruins and special pits during volcanic finishing; shoreline smoothing excludes reserved actors, stored encounters and dungeon water while retaining normal inland smoothing. No save schema change.",
-    "MoveEffectPresentation.java": "R15 semantic local/screen effect classification, viewport-sized arena snapshots and GPU row/color effects, PMD shrink presentation, explicit GL state restoration and disposal; original action clocks and scheduling retained.",
-    "PmdBattleSprites.java": "Exact PMD actors with whole-animation and whole-direction envelope fitting, shared projected actor/shadow ground anchors, explicit concealed spirit sprite and original move/faint/capture transforms. No species revelation or combat changes.",
+    "MoveEffectPresentation.java": "Semantic local/screen effect classification, continuously refreshed full-viewport snapshots, projected target rows and normal move frames, depth-enabled FBOs and GL restoration. Original action frame clocks and effects metadata retained.",
+    "PmdBattleSprites.java": "Eight-direction projected PMD billboards, stable animation bounds, transparent-aware ground depth sorting across legacy action layers, orbit-aware trainer/send-out fragments, genuine original shiny-art fallback and sparkle overlay. No species leak or combat changes.",
     "PmdPokemonSprites.java": "Pinned PMD portrait/animation loading, timing/directions, bounded texture cache and complete animation bounds for uncropped actors.",
     "TrainerModel3D.java": "Existing optional experimental trainer model helper.",
     "VisualGeometry.java": "Pure presentation helpers for diagonal battle-facing poses, uniform sprite fitting, cliff footprint math and building-wall classification; no map or collision writes.",
     "VisualSampling.java": "Validated pixel-region sampling independent of the fixed simulation grid, including deterministic signed world coordinates and exact source-cell boundaries.",
     "WorldBatch.java": "Drop legacy world draw submissions while preserving original action step execution and state changes.",
     "WildSpawnRules.java": "New-wild habitat filtering/rarity, metadata-backed habitat and fishing pools, no out-of-pool species injection, preserved authored dungeons, oasis encounter anchoring and uncaught aquatic movement gating; no saved or owned Pokemon migration.",
-    "WorldElevation.java": "Read-only geometry sidecar derived from saved ledges and ramps; deterministic plateau/boundary constraint resolution, continuous ramp heights, local ambiguity diagnostics and cache invalidation without serialized height fields or gameplay collision edits.",
+    "WorldElevation.java": "Read-only geometry sidecar derived from saved ledges and ramps, with six-unit visible jump-ledge elevation. Deterministic plateau/boundary constraint resolution, continuous ramp heights and cache invalidation without serialized height fields or gameplay collision edits.",
 }
 PROTECTED_NAMES = (
-    "Attack.java", "Player.java", "Network.java", "util/Save.java",
-    "CheckMovesLearned.java", "CheckEndOfBattle.java", "PkmnMap.java", "DrawSetupMenu.java",
+    "Attack.java", "util/Save.java", "CheckMovesLearned.java", "CheckEndOfBattle.java",
 )
+
+CLASSIC_HOOK_REPLACEMENTS = {'Player.java': [('   Map<String, Integer> getItemsDict() {\n'
+                  '      return CreativeMode.inventory(this, this.itemsDict);\n'
+                  '   }\n'
+                  '\n'
+                  '   Map<String, Integer> getStoredItemsDict() { return this.itemsDict; }\n'
+                  '\n'
+                  '   boolean hasItem(String name) {\n'
+                  '      return CreativeMode.infinite(this,name) || '
+                  'this.itemsDict.containsKey(name);\n'
+                  '   }\n'
+                  '\n'
+                  '   Integer getItemAmount(String name) {\n'
+                  '      return CreativeMode.infinite(this,name) ? CreativeMode.SUPPLY : '
+                  'this.itemsDict.get(name);\n'
+                  '   }\n'
+                  '\n'
+                  '   void setItemAmount(String name, int amount) {\n'
+                  '      if (CreativeMode.infinite(this,name)) return;\n'
+                  '      this.itemsDict.put(name, amount);\n'
+                  '   }\n'
+                  '\n'
+                  '   void removeItem(String name) {\n'
+                  '      if (CreativeMode.infinite(this,name)) return;\n'
+                  '      this.itemsDict.remove(name);\n'
+                  '   }\n'
+                  '\n'
+                  '   void setPlayerItems(Map<String, Integer> itemsDict) {\n'
+                  '      this.itemsDict = '
+                  'CreativeMode.storedAfterSort(this,itemsDict,this.itemsDict);\n'
+                  '   }\n'
+                  '\n',
+                  '   Map<String, Integer> getItemsDict() {\n'
+                  '      return this.itemsDict;\n'
+                  '   }\n'
+                  '\n'
+                  '   boolean hasItem(String name) {\n'
+                  '      return this.itemsDict.containsKey(name);\n'
+                  '   }\n'
+                  '\n'
+                  '   Integer getItemAmount(String name) {\n'
+                  '      return this.itemsDict.get(name);\n'
+                  '   }\n'
+                  '\n'
+                  '   void setItemAmount(String name, int amount) {\n'
+                  '      this.itemsDict.put(name, amount);\n'
+                  '   }\n'
+                  '\n'
+                  '   void removeItem(String name) {\n'
+                  '      this.itemsDict.remove(name);\n'
+                  '   }\n'
+                  '\n'
+                  '   void setPlayerItems(Map<String, Integer> itemsDict) {\n'
+                  '      this.itemsDict = itemsDict;\n'
+                  '   }\n'
+                  '\n')],
+ 'Network.java': [('         this.itemsDict = player.getStoredItemsDict();',
+                   '         this.itemsDict = player.getItemsDict();')],
+ 'DrawSetupMenu.java': [('                  game.map = new PkmnMap(mapName);\n'
+                         '                  if (this.newLoadIndex == 0) '
+                         'CreativeMode.newWorld(game);',
+                         '                  game.map = new PkmnMap(mapName);')],
+ 'PkmnMap.java': [('         Save.saveMinimap(this, this.id + ".sav/map" + this.currMapId + '
+                   '".png");\n'
+                   '         CreativeMode.save(game);\n'
+                   '      } catch (Save.SaveFailure e) {\n'
+                   '         Game.saveErrorLogAndNotifyUser("An issue occurred while '
+                   'saving:\\n\\n", e);\n'
+                   '      } catch (IOException e) {\n'
+                   '         Game.saveErrorLogAndNotifyUser("Could not save Creative mode '
+                   'settings:\\n\\n", e);\n'
+                   '      }\n'
+                   '\n',
+                   '         Save.saveMinimap(this, this.id + ".sav/map" + this.currMapId + '
+                   '".png");\n'
+                   '      } catch (Save.SaveFailure e) {\n'
+                   '         Game.saveErrorLogAndNotifyUser("An issue occurred while '
+                   'saving:\\n\\n", e);\n'
+                   '      }\n'
+                   '\n')]}
+CAPTURE_PRESENTATION_SOURCES = ('CatchPokemonWobbles0Times.java', 'CatchPokemonWobbles1Time.java', 'CatchPokemonWobbles2Times.java', 'CatchPokemonWobbles3Times.java', 'CatchPokemonWobblesThenCatch.java', 'ThrowPokeball.java', 'ThrowFastPokeball.java', 'ThrowHyperPokeball.java', 'ThrowBait.java', 'ThrowRock.java')
+
+
+def verify_narrow_hooks(root: Path) -> None:
+    for name, replacements in CLASSIC_HOOK_REPLACEMENTS.items():
+        source=(root / PREFIX / name).read_text(encoding="utf-8")
+        for reviewed, original in replacements:
+            if source.count(reviewed)!=1:
+                raise RuntimeError("Protected Creative bridge changed or moved: "+name)
+            source=source.replace(reviewed,original,1)
+        if source!=(root / CLASSIC_SOURCES / PREFIX / name).read_text(encoding="utf-8"):
+            raise RuntimeError("Protected original logic outside Creative bridges changed: "+name)
+    for name in CAPTURE_PRESENTATION_SOURCES:
+        source=(root / PREFIX / name).read_text(encoding="utf-8")
+        source=source.replace("CaptureBallVisual.create(game, text,", "new Sprite(text,")
+        source=source.replace("CaptureBallVisual.draw(game, this.sprite);", "this.sprite.draw(game.uiBatch);")
+        if source!=(root / CLASSIC_SOURCES / PREFIX / name).read_text(encoding="utf-8"):
+            raise RuntimeError("Protected capture timing/outcome logic changed: "+name)
+    safari=(root / PREFIX / "DrawBattleMenuSafariZone.java").read_text(encoding="utf-8")
+    reviewed='            CaptureBallVisual.select(game, "safari ball");\n            Action catchAction = this.calcIfCaught(game);'
+    if safari.count(reviewed)!=1:
+        raise RuntimeError("Protected safari capture identity hook changed")
+    safari=safari.replace(reviewed,'            Action catchAction = this.calcIfCaught(game);',1)
+    if safari!=(root / "baseline/before-playtest-2026-10-14/DrawBattleMenuSafariZone.java").read_text(encoding="utf-8"):
+        raise RuntimeError("Protected safari rules changed outside capture presentation hook")
 
 
 def sha256(path: Path) -> str:
@@ -169,6 +299,9 @@ def sha256(path: Path) -> str:
 
 
 def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
+    for archived, expected in PLAYTEST_ARCHIVE.items():
+        if sha256(root / archived) != expected:
+            raise RuntimeError("Pre-playtest 2026-10-14 archive changed: " + archived)
     for archived, expected in CINEMATIC_CUSTOMIZATION_ARCHIVE.items():
         if sha256(root / archived) != expected:
             raise RuntimeError("Pre-cinematic customization archive changed: " + archived)
@@ -221,6 +354,7 @@ def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
         snapshot = root / CLASSIC_SOURCES / path
         if not snapshot.is_file() or sha256(snapshot) != expected:
             raise RuntimeError("Archived original source differs from classic digest: " + path)
+    verify_narrow_hooks(root)
     # R15 needs the real move renderer. Keep combat logic outside that one
     # presentation action immutable instead of allowing the whole Battle class.
     battle_path = PREFIX + "Battle.java"
@@ -230,6 +364,11 @@ def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
         _, end, after = tail.partition("   class Network {")
         if not start or not end:
             raise RuntimeError("Battle presentation boundary missing")
+        capture='            if (itemName.contains("ball")) {\n               CaptureBallVisual.select(game, itemName);'
+        if path == root / battle_path:
+            if before.count(capture)!=1:
+                raise RuntimeError("Protected combat capture identity hook changed")
+            before=before.replace(capture,'            if (itemName.contains("ball")) {',1)
         return before, end + after
     if battle_rules(root / battle_path) != battle_rules(root / CLASSIC_SOURCES / battle_path):
         raise RuntimeError("Protected combat rules outside LoadAndPlayAnimation changed")
@@ -245,8 +384,8 @@ def _scope(root: Path) -> tuple[dict, dict, dict, list[str], list[str], dict]:
             "missing_additions": sorted(expected_added - set(added)),
         }))
     manifest = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
-    if manifest.get("schema") != 6 or manifest.get("classic_report_sha256") != CLASSIC_REPORT_SHA256:
-        raise RuntimeError("Expected schema 6 manifest bound to classic source baseline")
+    if manifest.get("schema") != 7 or manifest.get("classic_report_sha256") != CLASSIC_REPORT_SHA256:
+        raise RuntimeError("Expected schema 7 manifest bound to classic source baseline")
     if set(manifest.get("modified_original_sources", {})) != expected_changed:
         raise RuntimeError("Manifest changes differ from explicit source allowlist")
     if set(manifest.get("added_sources", {})) != expected_added:
@@ -285,7 +424,7 @@ def audit(root: Path = ROOT, inventory: bool = False) -> tuple[dict, str]:
         raise RuntimeError("Complete source diff differs from reviewed patch digest")
     result = {
         "status": "inventory_not_approved" if inventory else "success",
-        "manifest_schema": 6, "baseline_source_count": len(original), "current_source_count": len(current),
+        "manifest_schema": 7, "baseline_source_count": len(original), "current_source_count": len(current),
         "unchanged_original_sources": len(original) - len(changed),
         "modified_original_sources": changed, "added_sources": added,
         "modified_source_scopes": {PREFIX + key: value for key, value in MODIFIED_SCOPES.items()},
@@ -293,8 +432,8 @@ def audit(root: Path = ROOT, inventory: bool = False) -> tuple[dict, str]:
         "protected_rule_save_sources_sha256": protected,
         "current_source_files_sha256": current, "complete_patch_sha256": diff_digest,
         "frozen_manifest_sha256": FROZEN_MANIFEST_SHA256,
-        "scope": "Authorized update includes exclusive modern presentation, coherent biome profiles, derived terrain geometry, habitat-aware wild encounters/movement, desktop bindings, procedural generation and additional Pokemon data. All other original sources remain byte-identical. Success binds every changed and added source to a reviewed manifest and complete diff.",
-        "limits": "Source-scope verification is NOT proof of total gameplay equivalence. Generator, wild habitats, uncaught aquatic movement, roster and desktop input intentionally change. Combat formulas, Player, map serialization and save sources remain immutable here; behavior, visuals, performance, data assets and save round-trips require separate native tests.",
+        "scope": "Authorized update includes exclusive modern presentation, coherent biome profiles, derived terrain geometry, habitat-aware wild encounters/movement, desktop bindings, procedural generation, additional Pokemon data and opt-in local Creative mode. All other original sources remain byte-identical. Success binds every changed and added source to a reviewed manifest and complete diff.",
+        "limits": "Source-scope verification is NOT proof of total gameplay equivalence. Generator, wild habitats, uncaught aquatic movement, roster and desktop input intentionally change. Combat formulas and serialized formats remain protected. Exact Creative inventory/persistence bridges and capture presentation hooks are explicitly normalized against classic or the prior frozen checkpoint. Creative mode intentionally changes local resource availability and roster grants; native tests remain required.",
     }
     return result, combined_patch
 
@@ -313,7 +452,7 @@ def main() -> int:
     label = "INVENTORY ONLY (not approved)" if args.inventory else "PASS"
     print(f"{label}: {report['unchanged_original_sources']} originals unchanged; "
           f"{len(report['modified_original_sources'])} explicitly scoped originals; {len(report['added_sources'])} added sources.")
-    print("Scope includes intentional generator/roster/input changes; this is not total gameplay equivalence.")
+    print("Scope includes intentional generator/roster/input/Creative changes; this is not total gameplay equivalence.")
     print(f"Report: {destination}")
     return 0
 

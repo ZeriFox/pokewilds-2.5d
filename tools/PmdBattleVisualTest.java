@@ -58,6 +58,7 @@ public final class PmdBattleVisualTest {
          verifyTrainerTrimming();
          verifyCustomizedTrainer();
          verifyBattleDirections();
+         verifyMissingShiny();
       }
 
       void verifyTrainerTrimming() {
@@ -97,7 +98,7 @@ public final class PmdBattleVisualTest {
             appearance.colors[0]=2;appearance.colors[1]=5;appearance.colors[3]=6;
             CharacterAppearance.save("Battle canary","gold",appearance);
             player.name="Battle canary";player.character="gold";
-            TextureRegion expected=BwAssets.get().trainer(player,"up",0,false);
+            TextureRegion expected=BwAssets.get().trainer(player,johtoBattleRenderer.actorFacing(this,true),0,false);
             java.lang.reflect.Method trim=PmdBattleSprites.class.getDeclaredMethod("trimTrainer",TextureRegion.class);trim.setAccessible(true);
             require(trim.invoke(null,expected)==expected,"Composed trainer did not preserve the complete normalized frame");
             uiBatch=capture;capture.reset();capture.begin();player.battleSprite.setBounds(16,48,48,48);
@@ -145,9 +146,10 @@ public final class PmdBattleVisualTest {
                      PmdPokemonSprites.AnimationBounds idle=PmdPokemonSprites.get().bounds(pokemon,direction,"Idle");
                      float contactLift=-Math.min(0,idle.minY)*scale;
                      float actualOrigin=capture.vertices[1]+expected.anchorY*scale;
-                     require(Math.abs(capture.vertices[0]+expected.anchorX*scale-(proxy.getX()+sourceSize/2))<.001f
-                        &&Math.abs(actualOrigin-proxy.getY()-contactLift)<.001f,"PMD contact origin moved across poses");
-                     require(Math.abs(actualOrigin+Math.min(0,idle.minY)*scale-proxy.getY())<.001f,
+                     com.badlogic.gdx.math.Vector3 anchor=johtoBattleRenderer.projectActor(this,proxy.getX()+sourceSize/2,proxy.getY(),new com.badlogic.gdx.math.Vector3());
+                     require(Math.abs(capture.vertices[0]+expected.anchorX*scale-anchor.x)<.001f
+                        &&Math.abs(actualOrigin-anchor.y-contactLift)<.001f,"PMD contact origin moved across poses");
+                     require(Math.abs(actualOrigin+Math.min(0,idle.minY)*scale-anchor.y)<.001f,
                         "Opaque idle contact missed the ground plane");
                      facingChecks++;
                   }
@@ -161,6 +163,27 @@ public final class PmdBattleVisualTest {
             System.out.println("PMD DIAGONAL PASS: "+facingChecks+" actual texture/UV draws; NE/SW animation envelopes, stable uniform scale, ground anchors and send-out");
          }catch(ReflectiveOperationException ex){throw new IllegalStateException(ex);}
          finally{player.currPokemon=originalOwn;uiBatch=original;capture.dispose();}
+      }
+
+      @SuppressWarnings("unchecked")
+      void verifyMissingShiny(){
+         ProxyBatch previous=uiBatch;CaptureBatch capture=new CaptureBatch();uiBatch=capture;
+         java.util.Map<String,Object> entries=null;Object removed=null;
+         try {
+            Field catalog=PmdPokemonSprites.class.getDeclaredField("entries");catalog.setAccessible(true);
+            entries=(java.util.Map<String,Object>)catalog.get(PmdPokemonSprites.get());removed=entries.remove("pikachu#shiny");
+            Pokemon shiny=new Pokemon("pikachu",20);shiny.isShiny=true;
+            Sprite source=new Sprite(shiny.specie.spriteShiny);source.setPosition(96,88);
+            float[] original=source.getVertices().clone();
+            require(PmdPokemonSprites.get().frame(shiny,"down-left","Idle",0)==null,"Absent exact shiny fixture still resolved PMD art");
+            capture.reset();capture.begin();require(PmdBattleSprites.draw(this,shiny,source,false,"Idle"),"Missing PMD shiny escaped the orbit renderer");capture.end();
+            require(capture.texture==source.getTexture(),"Missing PMD shiny borrowed an unrelated palette");
+            require(Arrays.equals(original,source.getVertices()),"Fallback shiny mutated the gameplay sprite");
+            com.badlogic.gdx.math.Vector3 anchor=johtoBattleRenderer.projectActor(this,source.getX()+source.getWidth()*.5f,88,new com.badlogic.gdx.math.Vector3());
+            require(Math.abs((capture.vertices[0]+capture.vertices[10])*.5f-anchor.x)<.001f,"Shiny fallback detached from orbit");
+            System.out.println("PMD SHINY FALLBACK PASS: absent exact sheet retains original art, projected anchor, sparkle draw route and immutable sprite");
+         }catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
+         finally{if(entries!=null&&removed!=null)entries.put("pikachu#shiny",removed);uiBatch=previous;capture.dispose();}
       }
 
       void assertFrame(CaptureBatch capture,TextureRegion expected,String label) {

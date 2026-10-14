@@ -1,0 +1,41 @@
+{
+  "source": "User attachments, 2026-10-14",
+  "processing": "Original sheets preserved byte-for-byte. Runtime regions remove border background only; original credits retained.",
+  "files": {
+    "items-bw.png": {
+      "attachment": "codex-clipboard-3d7ed1ec-e62c-4a96-a394-d5f9ee839503.png",
+      "sha256": "9abfe57c0127d54a486cf1ef429059e8282df4c7661ef71fd3b5efd62a571c61"
+    },
+    "items-sm.png": {
+      "attachment": "codex-clipboard-03633139-67f9-4da9-b6d2-01d8c2c11604.png",
+      "sha256": "050d78f9aaecf772ca94c3e4c15e491566f5844d988ceddd9b239183de90b123"
+    },
+    "items-platinum.png": {
+      "attachment": "codex-clipboard-58a4f8ea-f898-4e15-8e19-abebcf48f31e.png",
+      "sha256": "689ccc67c7221e2db23847d003b8c351989809e8dfa1b6ff9b6c7fd25c00ca6b"
+    },
+    "balls-battle.png": {
+      "attachment": "codex-clipboard-c3636af1-934e-41f3-a8de-ea9de3ef0207.png",
+      "sha256": "634a134f8f1821e87bf25116d2432dc5b911fe628603441e7eea3145744c81fe"
+    },
+    "balls-field.png": {
+      "attachment": "codex-clipboard-da8caaa7-fc05-4e59-9c33-7d11acdb6126.png",
+      "sha256": "dbd0b5a6b79c1a3476d48864985e399827d91572d832ab833e0907c9ed69fb07"
+    },
+    "party-panels.png": {
+      "attachment": "codex-clipboard-e6ed1e47-1a02-41b2-b5de-38d6adb362db.png",
+      "sha256": "665ffca971aa7efba7ca0d14351134ffede4678f0a6ca68b328c5392c48322a9"
+    },
+    "berry-plants.png": {
+      "attachment": "codex-clipboard-f1e9c184-45f1-4a46-8b8d-245758447b75.png",
+      "sha256": "b9055aaa9cfcdd0185be85ae2985f16d5e7d0377ea831560924956b23040a728"
+    }
+  },
+  "item_region_audit": {
+    "file": "item-region-audit.json",
+    "verified_named_regions": 470,
+    "reference_repository": "https://github.com/PokeAPI/sprites",
+    "reference_commit": "0dc105d5b12416932f29b594078282ab4be045f5",
+    "note": "Reference pictures are not bundled or rendered. Only original user attachments supply game pixels; numeric item IDs are not atlas indices."
+  }
+}

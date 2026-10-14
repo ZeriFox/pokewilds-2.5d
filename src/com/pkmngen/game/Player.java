@@ -101,27 +101,31 @@ public class Player {
    public static ArrayList<Player.Craft> kilnCrafts = new ArrayList<>();
 
    Map<String, Integer> getItemsDict() {
-      return this.itemsDict;
+      return CreativeMode.inventory(this, this.itemsDict);
    }
 
+   Map<String, Integer> getStoredItemsDict() { return this.itemsDict; }
+
    boolean hasItem(String name) {
-      return this.itemsDict.containsKey(name);
+      return CreativeMode.infinite(this,name) || this.itemsDict.containsKey(name);
    }
 
    Integer getItemAmount(String name) {
-      return this.itemsDict.get(name);
+      return CreativeMode.infinite(this,name) ? CreativeMode.SUPPLY : this.itemsDict.get(name);
    }
 
    void setItemAmount(String name, int amount) {
+      if (CreativeMode.infinite(this,name)) return;
       this.itemsDict.put(name, amount);
    }
 
    void removeItem(String name) {
+      if (CreativeMode.infinite(this,name)) return;
       this.itemsDict.remove(name);
    }
 
    void setPlayerItems(Map<String, Integer> itemsDict) {
-      this.itemsDict = itemsDict;
+      this.itemsDict = CreativeMode.storedAfterSort(this,itemsDict,this.itemsDict);
    }
 
    public Player() {

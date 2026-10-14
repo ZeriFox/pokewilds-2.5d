@@ -31,3 +31,13 @@ come riferimento di composizione e stile; lo spettro richiama il fantasma
 misterioso di Lavandonia. Questi adattamenti non trasferiscono diritti sui
 personaggi, sui marchi Pokémon o sui riferimenti preesistenti e non sono rip
 ufficiali di Nintendo.
+
+## User-supplied item, berry and ball sheets, 2026-10-14
+
+Seven original sheets supplied by the user are retained byte-for-byte in
+`resources/visual/supplied`, including the credits printed on them.
+`PROVENANCE.json` records attachment names and SHA-256 hashes. Runtime region
+selection and edge-connected background removal adapt them to the local game.
+The named item mapping is checked against the actual art rather than inferred
+from game item order. These are supplied Pokemon game sprites and sprite edits,
+not newly generated artwork; no new artwork licence is asserted here.

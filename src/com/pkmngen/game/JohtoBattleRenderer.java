@@ -21,9 +21,6 @@ public final class JohtoBattleRenderer {
    private final Color oldColor = new Color();
    private Texture worldSnapshot;
    private Texture rippleSnapshot;
-   private Texture cameraSnapshot;
-   private float cameraBlend;
-   private boolean previousSelection,hasCameraSnapshot;
    private Texture arena;
    private String arenaBiome;
    private final BattleScenery scenery=new BattleScenery();
@@ -65,10 +62,6 @@ public final class JohtoBattleRenderer {
       ModernUi modernUi=ModernUi.get(game);
       if(battleCanvas&&(modernUi==null||!modernUi.reducedMotion()))
          scenerySeconds+=Math.min(.05f,Math.max(0,Gdx.graphics.getDeltaTime()));
-      boolean selection=selectionCamera(game);
-      if(!battleCanvas||!phase.equals("none")||modernUi==null||modernUi.reducedMotion())cameraBlend=0;
-      else if(selection!=previousSelection&&hasCameraSnapshot)cameraBlend=.14f;
-      previousSelection=selection;
       if (worldRendered) captureWorld();
       // A cleanup can remove DrawBattle before the next world pass. Always
       // supply an opaque modern frame in that gap, even with no fade action.
@@ -86,31 +79,8 @@ public final class JohtoBattleRenderer {
       transitionLengths.keySet().removeIf(action -> !game.actionStack.contains(action));
    }
 
-   /** A short dissolve hides the camera cut when a turn begins or the menu returns.
-    * Actions and particles retain their original coordinates and timing. */
+   /** Restore only the UI projection: selection and attacks share one uninterrupted clock. */
    public void finishFrame(Game game) {
-      if(battleCanvas&&phase.equals("none")&&ModernUi.get(game)!=null&&!ModernUi.get(game).reducedMotion()) {
-         int w=Gdx.graphics.getBackBufferWidth(),h=Gdx.graphics.getBackBufferHeight();
-         if(cameraSnapshot==null||cameraSnapshot.getWidth()!=w||cameraSnapshot.getHeight()!=h) {
-            if(cameraSnapshot!=null)cameraSnapshot.dispose();
-            // The framebuffer already contains composed UI. Its destination
-            // alpha must not make that captured UI translucent a second time.
-            cameraSnapshot=new Texture(w,h,Pixmap.Format.RGB888);
-            cameraSnapshot.setFilter(Texture.TextureFilter.Nearest,Texture.TextureFilter.Nearest);
-            hasCameraSnapshot=false;cameraBlend=0;
-         }
-         if(cameraBlend>0&&hasCameraSnapshot) {
-            if(snapshotBatch==null)snapshotBatch=new SpriteBatch();
-            snapshotBatch.setProjectionMatrix(new Matrix4().setToOrtho2D(0,0,w,h));
-            snapshotBatch.setColor(1,1,1,MathUtils.clamp(cameraBlend/.14f,0,1));
-            snapshotBatch.begin();snapshotBatch.draw(cameraSnapshot,0,0,w,h,0,0,w,h,false,true);snapshotBatch.end();
-            snapshotBatch.setColor(Color.WHITE);
-            cameraBlend=Math.max(0,cameraBlend-Math.min(.05f,Math.max(0,Gdx.graphics.getDeltaTime())));
-         } else {
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);cameraSnapshot.bind();
-            Gdx.gl.glCopyTexSubImage2D(GL20.GL_TEXTURE_2D,0,0,0,0,0,w,h);hasCameraSnapshot=true;
-         }
-      } else {hasCameraSnapshot=false;cameraBlend=0;}
       if(projectionSaved) {
          game.uiBatch.setProjectionMatrix(previousUiProjection);
          projectionSaved=false;
@@ -228,6 +198,7 @@ public final class JohtoBattleRenderer {
       game.uiBatch.setColor(Color.WHITE);
       float aspect=Gdx.graphics.getBackBufferWidth()/(float)Math.max(1,Gdx.graphics.getBackBufferHeight());
       float w=Math.max(160,144*aspect),h=Math.max(144,160/aspect);
+      clearActorDepth(game);
       scenery.draw(game.uiBatch,arena,biome,ui.reducedMotion()?0:scenerySeconds,cameraYaw(game),(160-w)*.5f,(144-h)*.5f,w,h);
       game.uiBatch.setColor(oldColor);
       if (lastBattleFrame != frame) { battleFrames++; lastBattleFrame = frame; }
@@ -236,7 +207,9 @@ public final class JohtoBattleRenderer {
    public void drawBossRock(Game game,com.badlogic.gdx.graphics.g2d.Sprite source) {
       TextureRegion art=BwAssets.get().named("rock");
       com.badlogic.gdx.graphics.g2d.Sprite rock=new com.badlogic.gdx.graphics.g2d.Sprite(art);
-      rock.setBounds(source.getX()+7,source.getY()+7,18,18f*art.getRegionHeight()/art.getRegionWidth());
+      com.badlogic.gdx.math.Vector3 point=projectScenePoint(game,source.getX()+16,source.getY()+16,new com.badlogic.gdx.math.Vector3());
+      float size=18*point.z*.68f;
+      rock.setBounds(point.x-size*.5f,point.y-size*.5f,size,size*art.getRegionHeight()/art.getRegionWidth());
       rock.setOriginCenter();rock.setRotation(source.getRotation());rock.setColor(source.getColor());rock.draw(game.uiBatch);
    }
 
@@ -246,7 +219,9 @@ public final class JohtoBattleRenderer {
       Color color=tint.set(.93f,.77f,.43f,MathUtils.clamp(1-(float)(clock/(Math.PI*8)),0,1)*.6f);
       for(int i=0;i<64;i++){
          float angle=i*MathUtils.PI2/64;
-         ModernUi.get(game).rect(game,124+MathUtils.cos(angle)*radius,88+MathUtils.sin(angle)*radius*.22f,2.1f,.65f,color);
+         com.badlogic.gdx.math.Vector3 point=projectActor(game,124+MathUtils.cos(angle)*radius,
+            88+MathUtils.sin(angle)*radius*.22f,new com.badlogic.gdx.math.Vector3());
+         ModernUi.get(game).rect(game,point.x,point.y,2.1f*point.z,.65f*point.z,color);
       }
    }
 
@@ -285,31 +260,28 @@ public final class JohtoBattleRenderer {
    public void drawFriendlyHealth(Game game, DrawFriendlyHealthGen2 health) {
       ModernUi ui = ModernUi.get(game);
       Pokemon pokemon = game.player.currPokemon;
-      ui.panel(game, 82, 44, 75, 28);
-      ui.fitText(game, pokemon.nickname, 87, 69, 5.7f, 47, ModernUi.INK);
-      ui.text(game, "Lv " + pokemon.level, 135, 68, 3.3f, ModernUi.MUTED);
-      String status = status(pokemon);
-      ui.text(game, status.isEmpty() ? gender(pokemon) : status, 88, 62, 3.4f, status.isEmpty() ? ModernUi.MUTED : ModernUi.RED);
-      ui.text(game, "HP", 87, 57.5f, 3.2f, ModernUi.MUTED);
-      ui.bar(game, 99, 54.5f, 51, 3f, health.currHealth / 48f, healthColor(health.currHealth));
-      ui.text(game, health.currHealthRemaining + " / " + pokemon.maxStats.get("hp"), 115, 51.5f, 3.8f, ModernUi.INK);
-      ui.text(game, "EXP", 87, 48f, 2.6f, ModernUi.MUTED);
-      ui.bar(game, 100, 45.5f, 50, 1.5f, DrawFriendlyHealthGen2.xpBarIndex / 68f, ModernUi.GOLD);
+      ui.panel(game,83,122,74,19);
+      ui.fitText(game,pokemon.nickname,87,138,4.5f,47,ModernUi.INK);
+      ui.text(game,"Lv "+pokemon.level,136,138,2.8f,ModernUi.MUTED);
+      String status=status(pokemon);
+      ui.text(game,status.isEmpty()?gender(pokemon):status,87,132,2.7f,status.isEmpty()?ModernUi.MUTED:ModernUi.RED);
+      ui.bar(game,98,129,54,2.5f,health.currHealth/48f,healthColor(health.currHealth));
+      ui.text(game,health.currHealthRemaining+" / "+pokemon.maxStats.get("hp"),115,127.5f,2.8f,ModernUi.INK);
+      ui.text(game,"EXP",87,125,2.2f,ModernUi.MUTED);
+      ui.bar(game,98,123.4f,54,1.0f,DrawFriendlyHealthGen2.xpBarIndex/68f,ModernUi.GOLD);
    }
 
    public void drawEnemyHealth(Game game, DrawEnemyHealthGen2 health) {
-      ModernUi ui = ModernUi.get(game);
-      Pokemon pokemon = game.battle.oppPokemon;
-      float x = health.translateAmt.x;
-      float y = health.translateAmt.y;
-      ui.panel(game, 4 + x, 113 + y, 82, 26);
-      ui.fitText(game, pokemon.nickname, 9 + x, 135 + y, 6f, 53, ModernUi.INK);
-      ui.text(game, "Lv " + pokemon.level, 65 + x, 134 + y, 3.6f, ModernUi.MUTED);
-      ui.text(game, "HP", 9 + x, 124 + y, 3.2f, ModernUi.MUTED);
-      ui.bar(game, 21 + x, 120 + y, 57, 3.4f, health.currHealth / 48f, healthColor(health.currHealth));
-      String status = status(pokemon);
-      if (!pokemon.isGhost) ui.text(game, status.isEmpty() ? gender(pokemon) : status, 64 + x, 118 + y, 3.2f,
-         status.isEmpty() ? ModernUi.MUTED : ModernUi.RED);
+      ModernUi ui=ModernUi.get(game);Pokemon pokemon=game.battle.oppPokemon;
+      float x=health.translateAmt.x,y=health.translateAmt.y;
+      ui.panel(game,3+x,122+y,74,19);
+      ui.fitText(game,pokemon.nickname,7+x,138+y,4.5f,47,ModernUi.INK);
+      ui.text(game,"Lv "+pokemon.level,56+x,138+y,2.8f,ModernUi.MUTED);
+      ui.text(game,"HP",7+x,132+y,2.7f,ModernUi.MUTED);
+      ui.bar(game,18+x,129+y,54,2.5f,health.currHealth/48f,healthColor(health.currHealth));
+      String status=status(pokemon);
+      if(!pokemon.isGhost)ui.text(game,status.isEmpty()?gender(pokemon):status,7+x,126+y,2.7f,
+         status.isEmpty()?ModernUi.MUTED:ModernUi.RED);
    }
 
    private static Color healthColor(int health) {
@@ -417,11 +389,7 @@ public final class JohtoBattleRenderer {
       if(entrance>.99f) {
          ui.rect(game,14,61,1.5f,22,ModernUi.GOLD);
          ui.text(game,"WILD ENCOUNTER",22,83,4,ModernUi.LINE);
-         Pokemon opponent=game.battle.oppPokemon;
-         String name=opponent==null?"A new challenge":opponent.isGhost?"Unknown presence":opponent.nickname;
-         ui.fitText(game,name,22,74,8,89,ModernUi.PAPER);
-         if(opponent!=null&&!opponent.isGhost&&!opponent.isEgg)
-            PmdBattleSprites.event(game,opponent,opponent.specie.name,116,57,27,29);
+         ui.fitText(game,"Something is approaching...",22,74,6.4f,116,ModernUi.PAPER);
          ui.rect(game,22,59,116,.6f,ModernUi.MUTED);
          if(!still)ui.rect(game,22,59,116*MathUtils.clamp(p/.77f,0,1),.6f,ModernUi.GOLD);
       }
@@ -509,25 +477,42 @@ public final class JohtoBattleRenderer {
       arenaBiome=key;arenaWidth=arena.getWidth();arenaHeight=arena.getHeight();
    }
 
-   /** Effects retain their exact legacy targets while a turn executes.
-    * The orbit belongs to the command/attack selection phase only. */
+   /** One clock for intros, selection, turns and captures; only reduced motion stops it. */
    float cameraYaw(Game game) {
-      return selectionCamera(game)?BattleScenery.orbit(scenerySeconds):0;
-   }
-   private boolean selectionCamera(Game game) {
       ModernUi ui=ModernUi.get(game);
-      if(!battleCanvas||ui==null||ui.reducedMotion()||!phase.equals("none"))return false;
-      for(Action action:game.actionStack)
-         if(action instanceof DrawBattleMenuNormal&&!((DrawBattleMenuNormal)action).disabled
-            ||action instanceof DrawBattleMenuSafariZone
-            ||action instanceof DrawAttacksMenu&&((DrawAttacksMenu)action).attackLearning==null)
-            return true;
-      return false;
+      return battleCanvas&&ui!=null&&!ui.reducedMotion()?BattleScenery.orbit(scenerySeconds):0;
    }
    com.badlogic.gdx.math.Vector3 projectActor(Game game,float x,float y,com.badlogic.gdx.math.Vector3 out) {
       return BattleScenery.project(x,y,cameraYaw(game),out);
    }
+   public com.badlogic.gdx.math.Vector3 projectScenePoint(Game game,float x,float y,com.badlogic.gdx.math.Vector3 out) {
+      return BattleScenery.projectEffect(x,y,cameraYaw(game),out);
+   }
    String actorFacing(Game game,boolean friendly){return BattleScenery.facing(friendly,cameraYaw(game));}
+
+   private void clearActorDepth(Game game) {
+      game.uiBatch.flush();
+      java.nio.IntBuffer state=BufferUtils.newIntBuffer(1);
+      Gdx.gl.glGetIntegerv(GL20.GL_DEPTH_WRITEMASK,state);
+      Gdx.gl.glDepthMask(true);Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
+      Gdx.gl.glDepthMask(state.get(0)!=0);
+   }
+
+   /** A particle sprite stays upright while its ground anchor follows the camera. */
+   public boolean drawSceneEffect(com.badlogic.gdx.graphics.g2d.Sprite source,com.badlogic.gdx.graphics.g2d.Batch batch) {
+      Game game=Game.staticGame;
+      if(!battleCanvas||game==null||batch!=game.uiBatch||source==null)return false;
+      if(batch instanceof ModernBatch&&((ModernBatch)batch).suppressed)return true;
+      com.badlogic.gdx.math.Vector3 anchor=projectScenePoint(game,source.getX()+source.getWidth()*.5f,
+         source.getY()+source.getHeight()*.5f,new com.badlogic.gdx.math.Vector3());
+      System.arraycopy(source.getVertices(),0,fullScreenVertices,0,20);
+      float cx=source.getX()+source.getWidth()*.5f,cy=source.getY()+source.getHeight()*.5f;
+      for(int i=0;i<20;i+=5){
+         fullScreenVertices[i]=anchor.x+(fullScreenVertices[i]-cx)*anchor.z*.68f;
+         fullScreenVertices[i+1]=anchor.y+(fullScreenVertices[i+1]-cy)*anchor.z*.68f;
+      }
+      batch.draw(source.getTexture(),fullScreenVertices,0,20);return true;
+   }
 
    public long getBattleFrames() { return battleFrames; }
    public long getTransitionFrames() { return transitionFrames; }
@@ -536,7 +521,6 @@ public final class JohtoBattleRenderer {
    public void dispose() {
       if (worldSnapshot != null) worldSnapshot.dispose();
       if (rippleSnapshot != null) rippleSnapshot.dispose();
-      if (cameraSnapshot != null) cameraSnapshot.dispose();
       if (arena != null) arena.dispose();
       scenery.dispose();
       if (snapshotBatch != null) snapshotBatch.dispose();

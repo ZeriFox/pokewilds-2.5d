@@ -156,7 +156,7 @@ class ThrowOutPokemonCrystal extends Action {
             for (int k = 0; k < this.sprite.length; k++) {
                for (int i = 0; i < this.sprite[k].length; i++) {
                   for (int j = 0; j < this.sprite[k][i].length; j++) {
-                     this.sprite[k][i][j].draw(game.uiBatch);
+                     PmdBattleSprites.drawSendOutFragment(game, this.sprite[k][i][j]);
                   }
                }
             }
@@ -175,7 +175,7 @@ class ThrowOutPokemonCrystal extends Action {
                      for (int j = 0; j < this.sprite[k][i].length; j++) {
                         if (this.sprite[k][i][j] != null) {
                            this.sprite[k][i][j].setPosition(this.position.x + 8 * i - 4 * k, this.position.y + 8 * j - 8 * k);
-                           this.sprite[k][i][j].draw(game.uiBatch);
+                           PmdBattleSprites.drawSendOutFragment(game, this.sprite[k][i][j]);
                         }
                      }
                   }

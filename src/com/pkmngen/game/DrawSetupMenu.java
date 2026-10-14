@@ -614,6 +614,7 @@ class DrawSetupMenu extends Action {
                   final Action hostActionFinal = hostAction;
                   final Action drawControls = new DrawControls();
                   game.map = new PkmnMap(mapName);
+                  if (this.newLoadIndex == 0) CreativeMode.newWorld(game);
                   if (this.newLoadIndex != 0) {
                      game.actionStack.remove(this);
                      game.start();

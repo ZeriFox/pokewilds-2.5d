@@ -145,7 +145,7 @@ public class SpriteProxy extends Sprite {
 
       com.pkmngen.game.Game game=com.pkmngen.game.Game.staticGame;
       if(game!=null&&game.modernUi!=null&&game.johtoBattleRenderer!=null
-         &&game.johtoBattleRenderer.drawScreenEffect(this,batch))return;
+         &&(game.johtoBattleRenderer.drawScreenEffect(this,batch)||game.johtoBattleRenderer.drawSceneEffect(this,batch)))return;
       super.draw(batch);
    }
 

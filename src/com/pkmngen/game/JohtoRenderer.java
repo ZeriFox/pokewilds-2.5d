@@ -85,6 +85,11 @@ public final class JohtoRenderer {
    private final java.util.Set<Vector2> growingPlants = new java.util.HashSet<>();
    private final Map<Action, Boolean> diagnosedGhosts = new WeakHashMap<>();
    private final TextureRegion cutLeft = new TextureRegion(), cutRight = new TextureRegion();
+   private final Vector2 companionPosition=new Vector2(),companionGoal=new Vector2();
+   private Pokemon presentedCompanion;
+   private Map<Vector2,Tile> companionMap;
+   private float companionLastTime;
+   private long jumpCueFrames,obstacleFootprintFrames,activeCompanionFrames,shinyFrames;
 
    public JohtoRenderer() {
       camera.near = 1f;
@@ -147,6 +152,10 @@ public final class JohtoRenderer {
    public long getGhostFrames() { return ghostFrames; }
    public long getWaterfallFrames() { return waterfallFrames; }
    public long getFieldEffectFrames() { return fieldEffectFrames; }
+   public long getJumpCueFrames() { return jumpCueFrames; }
+   public long getObstacleFootprintFrames() { return obstacleFootprintFrames; }
+   public long getActiveCompanionFrames() { return activeCompanionFrames; }
+   public long getShinyFrames() { return shinyFrames; }
    public float getFogDensity() { return fogDensity; }
 
    public long getPlayerModelFrames() { return actorModels.getPlayerModelFrames(); }
@@ -451,14 +460,23 @@ public final class JohtoRenderer {
       // The growing action owns its one animated sprout, not a second static prop.
       if (growingPlants.contains(tile.position)) return;
       if (tile.isLedge && (tile.ledgeDir != null || upper.startsWith("ledges3"))) {
+         if(!names.contains("fence")) {jumpLedgeCue(tile);return;}
+         // A jumpable fence still needs its fence art; it is not a terrain cliff.
+      }
+      if(tile.isSolid)obstacleFootprint(game,tile,kind,profile);
+      if (kind == WorldMaterials.Kind.HIDDEN) {
+         // Indoor opaque collision fillers previously looked like walkable empty floor.
+         // Tree extensions have roots above; scripted hidden actors remain invisible.
+         if(identity==null&&"solid".equals(upper.isEmpty()?lower:upper)&&game.map.tiles!=game.map.overworldTiles)
+            prism(x+.35f,y+.35f,0,15.3f,15.3f,3.2f,assets.named("wall_cap"),WHITE);
          return;
       }
-      if (kind == WorldMaterials.Kind.HIDDEN) return;
       if (kind == WorldMaterials.Kind.TREE) { tree(tile, x + 8f, y + 8f, names); return; }
       if (staticPokemon(tile, x+8, y+7)) return;
       if (names.contains("pokeball") || names.contains("ultraball")) { ball(x+8,y+7,names.contains("ultraball")); return; }
       if (building(game, tile, x, y, names)) return;
-      TextureRegion object = identity == null ? null : assets.namedAnimated(identity, natureSeconds);
+      TextureRegion berry=UserSpriteAssets.get().berry(tile,natureSeconds);
+      TextureRegion object = berry!=null?berry:identity == null ? null : assets.namedAnimated(identity, natureSeconds);
       if(object==null && BwAssets.objectName(tile)!=null)
          assets.reportMissing(BwAssets.objectName(tile),tile,game.map.timeOfDay);
       if (object != null) {
@@ -467,8 +485,8 @@ public final class JohtoRenderer {
          }
          boolean seedling="seedling".equals(identity)||"plant_growing".equals(identity);
          boolean plant = names.contains("grass") || names.contains("flower") || seedling;
-         float maxWidth = seedling ? Math.min(9f,object.getRegionWidth()) : kind == WorldMaterials.Kind.ROCK ? 17f : plant ? 16f : 18f;
-         float scale = VisualGeometry.fitScale(object.getRegionWidth(), object.getRegionHeight(), maxWidth, 25f);
+         float maxWidth = berry!=null?14f:seedling ? Math.min(9f,object.getRegionWidth()) : kind == WorldMaterials.Kind.ROCK ? 17f : plant ? 16f : 18f;
+         float scale = VisualGeometry.fitScale(object.getRegionWidth(), object.getRegionHeight(), maxWidth, berry!=null?22f:25f);
          float width = assets.worldWidth(object, object.getRegionWidth() * scale);
          float height = assets.worldHeight(object, object.getRegionHeight() * scale);
          if (!plant) assetShadow(object, x + 8, y + 7, width * .3f, 2.4f);
@@ -505,12 +523,82 @@ public final class JohtoRenderer {
 
    private void ball(float x,float y,boolean ultra) {
       shadow(x,y,3.8f,2f);
-      float dark=color(.09f,.13f,.18f);
-      disc(x,y,.25f,4f,dark,dark);
-      disc(x,y-.02f,.25f,3.2f,ultra?color(.94f,.74f,.18f):color(.88f,.21f,.26f),color(.91f,.94f,.95f));
-      upright(white,x-3.7f,y-3.05f,.25f+2.1f,7.4f,1f,dark);
-      disc(x,y-.04f,.25f+1.7f,1.5f,dark,dark);
-      disc(x,y-.06f,.25f+2.1f,1.1f,WHITE,WHITE);
+      TextureRegion art=UserSpriteAssets.get().ball(ultra?"ultra ball":"poke ball",0);
+      upright(art,x-4.5f,y,.25f,9,9,WHITE);
+   }
+
+   /** Bright rim and a short downward chevron on the actual high surface.
+    * The rocky face itself comes from WorldElevation, including old jump ledges. */
+   private void jumpLedgeCue(Tile tile) {
+      if(tile.ledgeDir==null||tile.isWaterfall)return;
+      float dx="left".equals(tile.ledgeDir)?-1:"right".equals(tile.ledgeDir)?1:0;
+      float dy=dx!=0?0:"up".equals(tile.ledgeDir)?1:-1,tx=-dy,ty=dx;
+      float cx=tile.position.x+8,cy=tile.position.y+8,previous=surfaceLift;surfaceLift=0;
+      float edgeX=cx+dx*7.7f,edgeY=cy+dy*7.7f;
+      // A 3px exposed soil shelf stays readable when a side face is edge-on to
+      // the fixed camera. This is textured terrain at the real high elevation.
+      float ix=edgeX-dx*2.7f,iy=edgeY-dy*2.7f;
+      TextureRegion soil=assets.named("dirt");
+      float soilTint=color(.78f,.68f,.48f);
+      surfacePatch(tile,soil,Math.min(edgeX,ix)-Math.abs(tx)*7.95f,Math.min(edgeY,iy)-Math.abs(ty)*7.95f,
+         Math.max(edgeX,ix)+Math.abs(tx)*7.95f,Math.max(edgeY,iy)+Math.abs(ty)*7.95f,.08f,
+         soilTint,soilTint,soilTint,soilTint,geometry,0);
+      Tile landing=natureTiles.get(lookup.set(tile.position.x+dx*16,tile.position.y+dy*16));
+      if(landing!=null&&!landing.isWater&&!landing.isLava) {
+         float lx=cx+dx*8.3f,ly=cy+dy*8.3f,ox=lx+dx*4.4f,oy=ly+dy*4.4f;
+         float dark=Color.toFloatBits(.17f,.12f,.07f,.54f),clear=Color.toFloatBits(.30f,.24f,.13f,.08f);
+         surfacePatch(landing,white,Math.min(lx,ox)-Math.abs(tx)*7.95f,Math.min(ly,oy)-Math.abs(ty)*7.95f,
+            Math.max(lx,ox)+Math.abs(tx)*7.95f,Math.max(ly,oy)+Math.abs(ty)*7.95f,.11f,
+            dx>0||dy>0?dark:clear,dx<0||dy>0?dark:clear,dx<0||dy<0?dark:clear,dx>0||dy<0?dark:clear,translucent,0);
+      }
+      float shade=Color.toFloatBits(.96f,.87f,.60f,.66f);
+      surfacePatch(tile,white,Math.min(edgeX,edgeX-dx*.9f)-Math.abs(tx)*7.95f,Math.min(edgeY,edgeY-dy*.9f)-Math.abs(ty)*7.95f,
+         Math.max(edgeX,edgeX-dx*.9f)+Math.abs(tx)*7.95f,Math.max(edgeY,edgeY-dy*.9f)+Math.abs(ty)*7.95f,.13f,
+         shade,shade,shade,shade,translucent,0);
+      // A pair of small soil-coloured notches makes the permitted jump direction
+      // readable in all four orientations without UI arrows over the whole map.
+      for(int i=-1;i<=1;i+=2) {
+         float ax=cx-dx*1.5f+tx*i*3,ay=cy-dy*1.5f+ty*i*3;
+         float bx=cx+dx*2.4f,by=cy+dy*2.4f;
+         float ha=terrainHeight(tile,ax,ay)+.10f,hb=terrainHeight(tile,bx,by)+.10f;
+         quad(translucent.buffer(whiteTexture),ax-tx*.45f,ha,-ay+ty*.45f,ax+tx*.45f,ha,-ay-ty*.45f,
+            bx+tx*.45f,hb,-by-ty*.45f,bx-tx*.45f,hb,-by+ty*.45f,white,Color.toFloatBits(.30f,.24f,.15f,.55f));
+      }
+      surfaceLift=previous;jumpCueFrames++;
+   }
+
+   /** The collision cell is a whole 16px tile even when the trunk is slender.
+    * Natural roots/soil and furniture plinths show that occupied footprint. */
+   private void obstacleFootprint(Game game,Tile tile,WorldMaterials.Kind kind,BiomeProfiles.Profile profile) {
+      boolean woody=kind==WorldMaterials.Kind.TREE||WorldReadability.hiddenTreeFootprint(tile);
+      boolean shrub=kind==WorldMaterials.Kind.VEGETATION;
+      if(!woody&&!shrub&&kind!=WorldMaterials.Kind.ROCK&&kind!=WorldMaterials.Kind.FURNITURE&&kind!=WorldMaterials.Kind.PROP)return;
+      float x=tile.position.x,y=tile.position.y;
+      if(kind==WorldMaterials.Kind.FURNITURE) {
+         floor(assets.named("wood_floor"),x+.5f,y+.5f,15,15,.12f,Color.toFloatBits(.62f,.57f,.48f,1),geometry);
+      } else {
+         // A low, irregular soil skirt occupies the blocked cell. No debug-like
+         // square outlines: roots and earth show the obstruction naturally.
+         float tint=Color.toFloatBits(.30f,.24f,.13f,woody?.33f:.23f);
+         Buffer soil=translucent.buffer(whiteTexture);
+         for(int segment=0;segment<12;segment++) {
+            float a=segment*MathUtils.PI2/12,b=(segment+1)*MathUtils.PI2/12;
+            float r0=segment%3==0?7.8f:7.1f,r1=(segment+1)%3==0?7.8f:7.1f;
+            triangle(soil,x+8,.11f,-y-8,x+8+MathUtils.cos(a)*r0,.11f,-y-8+MathUtils.sin(a)*r0,
+               x+8+MathUtils.cos(b)*r1,.11f,-y-8+MathUtils.sin(b)*r1,tint);
+         }
+         if(woody&&!WorldReadability.hiddenTreeFootprint(tile)) {
+            float centerX=x+(WorldReadability.largeTree(tile)?16:8),centerY=y+(WorldReadability.largeTree(tile)?16:8);
+            float length=WorldReadability.largeTree(tile)?14.8f:7.4f;
+            for(int root=0;root<5;root++) {
+               float angle=.35f+root*MathUtils.PI2/5,dx=MathUtils.cos(angle),dy=MathUtils.sin(angle);
+               float tx=-dy,ty=dx;
+               triangle(geometry.buffer(whiteTexture),centerX-tx,.5f,-centerY+ty,centerX+tx,.5f,-centerY-ty,
+                  centerX+dx*length,.14f,-centerY+dy*length,color(.37f,.27f,.13f));
+            }
+         }
+      }
+      obstacleFootprintFrames++;
    }
 
    private void disc(float x,float y,float base,float radius,float top,float bottom) {
@@ -887,7 +975,7 @@ public final class JohtoRenderer {
          // The cap can cover the actor even when the visible front face is far
          // below them on screen. Fade the complete intervening wall segment;
          // retain its geometry and neighbour culling, so corners never gain holes.
-         float alpha=interiorWallOccludesPlayer(game,x,y,height)?.12f:1f;
+         float alpha=interiorWallOccludesPlayer(game,x,y,height)?.42f:1f;
          WorldMeshBatch groups=alpha<1f?translucent:geometry;
          float wallTint=Color.toFloatBits(1,1,1,alpha);
          Buffer mesh=groups.buffer(face.getTexture());
@@ -976,6 +1064,7 @@ public final class JohtoRenderer {
          anchored(region, pokemon.position.x + 8, pokemon.position.y + 7,
             .15f-(pokemon.inWater?0:bottom*scale*MathUtils.cosDeg(50)),
             frame.anchorX, anchorY, scale);
+         shinySparkles(pokemon,pokemon.position.x+8,pokemon.position.y+7,24);
          return;
       }
       Sprite source = pokemon.currOwSprite;
@@ -990,6 +1079,7 @@ public final class JohtoRenderer {
       } else {
          actor(source, pokemon.position.x, pokemon.position.y, 0f);
       }
+      shinySparkles(pokemon,pokemon.position.x+8,pokemon.position.y+7,24);
    }
 
    private void actor(Sprite sprite, float x, float y, float lift) {
@@ -1039,16 +1129,9 @@ public final class JohtoRenderer {
          return;
       }
       if (companion != null && move != null && !move.isEmpty()) {
-         float side = "left".equals(player.dirFacing) ? 14f : -14f;
-         Tile beside=game.map.tiles.get(lookup.set(MathUtils.floor((x+side)/16)*16,MathUtils.floor(y/16)*16));
-         if(beside==null || beside.isSolid || beside.isWater || beside.isLava) side=-side;
-         fieldPokemon(companion,player.dirFacing,x+side,y+5,.2f,walking ? "Walk" : "Idle");
-         if ("POWER".equals(move) || "FLASH".equals(move)) {
-            float pulse = .45f + .12f*MathUtils.sin(seconds*4);
-            ring(x+side,y+5,7.5f,.65f,.13f,Color.toFloatBits(1f,.83f,.38f,pulse));
-         }
+         abilityCompanion(game,companion,move,x,y,walking);
          surfaceLift=elevation.height(x,y);
-      }
+      } else {presentedCompanion=null;companionMap=null;}
       if (player.isSleeping) {
          if (player.sleepingDir != null) {
             // The saved bed target differs from the walkable cell beside it.
@@ -1109,16 +1192,86 @@ public final class JohtoRenderer {
       PmdPokemonSprites.Frame frame=sprites.frame(pokemon,direction,animation,seconds);
       if(frame==null) {
          if(pokemon.currOwSprite!=null) actor(pokemon.currOwSprite,x-8,y-7,lift);
+         shinySparkles(pokemon,x,y,24);
          return 24f;
       }
       PmdPokemonSprites.AnimationBounds bounds=sprites.bounds(pokemon,direction,animation);
       float h=bounds==null?frame.height:bounds.height;
       float w=bounds==null?frame.width:bounds.width;
-      float scale=Math.min(.85f,32f/Math.max(1f,Math.max(w,h)));
+      float extent=Math.max(w,h);
+      for(String facing:ACTOR_DIRECTIONS)for(String pose:new String[]{"Idle","Walk","Attack"}) {
+         PmdPokemonSprites.AnimationBounds envelope=sprites.bounds(pokemon,facing,pose);
+         if(envelope!=null)extent=Math.max(extent,Math.max(envelope.width,envelope.height));
+      }
+      float scale=Math.min(.85f,32f/Math.max(1f,extent));
       float bottom=bounds==null?-frame.anchorY:bounds.minY;
       shadow(x,y,Math.min(8,w*scale*.28f),2.7f);
       anchored(frame.region,x,y,lift-Math.min(0,bottom)*scale*MathUtils.cosDeg(50),frame.anchorX,frame.anchorY,scale);
+      shinySparkles(pokemon,x,y,h*scale);
       return h*scale;
+   }
+
+   /** The companion has its own visible movement and action pose. Gameplay keeps
+    * the original Follow action, timers, positions and network protocol. */
+   private void abilityCompanion(Game game,Pokemon pokemon,String move,float x,float y,boolean walking) {
+      if(!WorldReadability.companionTarget(game.map.tiles,x,y,game.player.dirFacing,companionGoal,lookup)) {
+         // A completely enclosed player has no honest floor location for a
+         // second actor. Do not stack it inside the trainer or through a wall.
+         presentedCompanion=null;return;
+      }
+      boolean reset=presentedCompanion!=pokemon||companionMap!=game.map.tiles||companionPosition.dst2(companionGoal)>96*96;
+      float dt=MathUtils.clamp(seconds-companionLastTime,0,.1f);companionLastTime=seconds;
+      if(reset)companionPosition.set(companionGoal);
+      float previousX=companionPosition.x,previousY=companionPosition.y;
+      float follow=Math.min(1,dt*7.5f);
+      float nx=MathUtils.lerp(previousX,companionGoal.x,follow),ny=MathUtils.lerp(previousY,companionGoal.y,follow);
+      if(WorldReadability.open(game.map.tiles,nx,ny,lookup)&&WorldReadability.open(game.map.tiles,nx-4,ny,lookup)
+         &&WorldReadability.open(game.map.tiles,nx+4,ny,lookup)&&WorldReadability.open(game.map.tiles,nx,ny-3,lookup)
+         &&WorldReadability.open(game.map.tiles,nx,ny+3,lookup)&&Vector2.dst2(nx,ny,x,y)>14*14)
+         companionPosition.set(nx,ny);
+      else companionPosition.set(companionGoal);
+      presentedCompanion=pokemon;companionMap=game.map.tiles;
+      boolean moving=walking||companionPosition.dst2(previousX,previousY)>.003f;
+      boolean working=false;
+      for(Action action:game.actionStackCopy) {
+         if(!game.actionStack.contains(action))continue;
+         if(action instanceof CutTreeAnim&&((CutTreeAnim)action).timer<24
+            ||action instanceof HeadbuttTreeAnim&&((HeadbuttTreeAnim)action).index<48
+            ||action instanceof PlantTree) {working=true;break;}
+      }
+      boolean charged="POWER".equals(move)||"FLASH".equals(move);
+      if(charged&&!moving)working=seconds%3.2f<.75f;
+      if(game.player.isCrafting)working=true;
+      String direction=working?game.player.dirFacing:moving
+         ?WorldReadability.facing(companionPosition.x-previousX,companionPosition.y-previousY,game.player.dirFacing)
+         :game.player.dirFacing;
+      float bob=reducedMotion?0:.28f+.22f*MathUtils.sin(seconds*3.8f);
+      fieldPokemon(pokemon,direction,companionPosition.x,companionPosition.y,.2f+bob,working?"Attack":moving?"Walk":"Idle");
+      if(charged) {
+         float pulse=.40f+(reducedMotion?0:.14f*MathUtils.sin(seconds*4));
+         ring(companionPosition.x,companionPosition.y,7.5f,.65f,.13f,Color.toFloatBits(1,.83f,.38f,pulse));
+      }
+      if(working)activeCompanionFrames++;
+   }
+
+   private void shinySparkles(Pokemon pokemon,float x,float y,float height) {
+      if(pokemon==null||!pokemon.isShiny||pokemon.isEgg||pokemon.isGhost)return;
+      // Sparse four-point gleams remain attached to the actor in world space.
+      // Reduced motion keeps one quiet sparkle instead of flashing/rotating.
+      float clock=reducedMotion?.45f:seconds%2.8f;
+      if(clock>1.1f)return;
+      float pulse=reducedMotion?.65f:MathUtils.sin(clock/1.1f*MathUtils.PI);
+      for(int i=0;i<(reducedMotion?1:4);i++) {
+         float angle=i*MathUtils.PI2/4+(reducedMotion?0:clock*.45f);
+         float px=x+MathUtils.cos(angle)*10,py=y-1;
+         float lift=4+height*.3f+(MathUtils.sin(angle)+1)*height*.22f;
+         float radius=(1.1f+.55f*(i%2))*pulse;
+         float tint=i%2==0?color(1,.87f,.38f):WHITE;
+         actorPlaneZ=-py;
+         uprightRaw(white,px-radius,py,lift,2*radius,.65f,tint,4);
+         uprightRaw(white,px-.32f,py,lift-radius,.65f,2*radius,tint,4);
+      }
+      shinyFrames++;
    }
 
    /** Reads the existing validator's result; collision, costs and placement stay in DrawBuildTile. */
@@ -1214,6 +1367,7 @@ public final class JohtoRenderer {
 
    private void tree(Tile tile, float x, float y, String name) {
       if (name.contains("nosprite")) return; // Additional collision cell of a multi-tile tree.
+      if(WorldReadability.largeTree(tile)){x+=8;y+=8;}
       String key = treeKey(tile, name);
       TextureRegion sprite = assets.named(key);
       HeadbuttTreeAnim shake = shakingTrees.get(tile);
@@ -1234,6 +1388,12 @@ public final class JohtoRenderer {
          if(leafy)canopyShadow(tile,sprite,x,y,width,height);
          upright(sprite,x-width/2,y,.2f,width,height,WHITE,5f);
       } finally {crownBend=0;}
+      int tier=WorldReadability.cutTier(tile);
+      // Mature CUT trees have two deep bark bands at the trunk; ordinary trees
+      // have one pale band. The distinction survives regional crown colours.
+      if(tier>0)for(int band=0;band<tier;band++)
+         upright(white,x-(tier==2?3.2f:2.1f),y-.05f,2.5f+band*2.1f,tier==2?6.4f:4.2f,1.15f,
+            tier==2?color(.48f,.27f,.10f):color(.76f,.61f,.35f));
    }
 
    private String treeKey(Tile tile, String name) { return WorldMaterials.treeKey(tile); }
@@ -1261,7 +1421,7 @@ public final class JohtoRenderer {
       String name = tile.name + " " + tile.nameUpper;
       TextureRegion art = isTree(tile, tile.name, tile.nameUpper) ? assets.named(treeKey(tile, name)) : assets.object(tile, seconds);
       if (art == null) art = assets.named("bush");
-      float height = assets.worldHeight(art, Math.min(42, art.getRegionHeight()));
+      float height = assets.worldHeight(art, WorldReadability.largeTree(tile)?62:Math.min(42, art.getRegionHeight()));
       float width = assets.worldWidth(art, height * art.getRegionWidth() / art.getRegionHeight());
       surfaceLift = elevation.height(tile.position.x + 8, tile.position.y + 8);
       int half = Math.max(1, art.getRegionWidth()/2);
@@ -1269,7 +1429,8 @@ public final class JohtoRenderer {
       cutRight.setRegion(art,half,0,art.getRegionWidth()-half,art.getRegionHeight());
       float spread = tick < 20 ? 0 : 2 + (tick >= 39 ? 2 : 0) + (tick >= 43 ? 2 : 0) + (tick >= 47 ? 2 : 0);
       float leftWidth = width * half / art.getRegionWidth();
-      float x = tile.position.x + 8 - width/2, y = tile.position.y + 8;
+      float x = tile.position.x + (WorldReadability.largeTree(tile)?16:8) - width/2;
+      float y = tile.position.y + (WorldReadability.largeTree(tile)?16:8);
       actorPlaneZ=-y;
       uprightRaw(cutLeft,x-spread,y,.2f,leftWidth,height,WHITE,5);
       uprightRaw(cutRight,x+leftWidth+spread,y,.2f,width-leftWidth,height,WHITE,5);

@@ -51,6 +51,11 @@ NATIVE = [
     ["tools/trainer_style_test.py"],
     ["tools/cinematic_opening_test.py"],
     ["tools/wardrobe_style_test.py"],
+    ["tools/world_readability_test.py"],
+    ["tools/creative_mode_test.py"],
+    ["tools/user_sprite_assets_test.py"],
+    ["tools/inventory_presentation_test.py"],
+    ["tools/battle_capture_orbit_test.py"],
 ]
 
 

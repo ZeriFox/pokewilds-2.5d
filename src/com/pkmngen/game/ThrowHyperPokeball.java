@@ -102,7 +102,7 @@ class ThrowHyperPokeball extends Action {
          this.sprite = this.sprites.get(0);
          if (this.sprite != null) {
             this.sprite.setPosition(this.position.x, this.position.y);
-            this.sprite.draw(game.uiBatch);
+            CaptureBallVisual.draw(game, this.sprite);
          }
 
          if (this.repeats.get(0) > 0) {

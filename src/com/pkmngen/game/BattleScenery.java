@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector3;
 import java.util.Locale;
 
 /** Continuous illustrated floor with a shared CPU/GPU camera projection.
- * A bounded 2.5D orbit avoids exposing absent backs of the painted scenery. */
+ * A continuous cylindrical panorama surrounds a projected floor through 360 degrees. */
 final class BattleScenery {
    private ShaderProgram shader;
    static int kind(String biome) {
@@ -24,14 +24,22 @@ final class BattleScenery {
       return switch(kind(biome)){case 1,2->"beach";case 4->"snow";case 5->"desert";
          case 6->"cave";case 7->"volcano";case 8->"graveyard";default->"forest";};
    }
-   static float orbit(float time){return -.18f*(1-MathUtils.cos(time*.16f))+.20f*MathUtils.sin(time*.16f);}
-   /** z returns apparent size. The source gameplay Sprite is never changed. */
+   static final float ORBIT_PERIOD=48f;
+   static float orbit(float time){return time*MathUtils.PI2/ORBIT_PERIOD;}
+   /** Legacy coordinates are read-only inputs; z is the billboard perspective scale. */
    static Vector3 project(float x,float y,float yaw,Vector3 out) {
-      if(yaw==0)return out.set(x,y,1);
-      float z=(y-70f)/(.55f-(y-70f)/260f),depth=1+z/260f;
-      float wx=(x-80f)*depth,c=MathUtils.cos(yaw),s=MathUtils.sin(yaw);
-      float rx=c*wx-s*z,rz=s*wx+c*z,scale=1/(1+rz/260f);
-      return out.set(80+rx*scale,70+.55f*rz*scale,scale*depth);
+      float legacyZ=(y-70f)/(.55f-(y-70f)/260f),legacyDepth=1+legacyZ/260f;
+      float wx=(x-80f)*legacyDepth*.82f,wz=legacyZ*.82f;
+      float c=MathUtils.cos(yaw),s=MathUtils.sin(yaw);
+      float rx=c*wx-s*wz,rz=s*wx+c*wz,scale=1/(1+rz/300f);
+      return out.set(80+rx*scale,74+.32f*rz*scale,scale);
+   }
+   /** Particles remain vertical billboards above the same diagonal actor baseline. */
+   static Vector3 projectEffect(float x,float y,float yaw,Vector3 out) {
+      float t=MathUtils.clamp((x-40)/84,0,1),ground=48+40*t;
+      project(x,ground,yaw,out);
+      out.y+=(y-ground)*out.z*.68f;
+      return out;
    }
    static String facing(boolean friendly,float yaw) {
       float angle=45f+yaw*MathUtils.radiansToDegrees+(friendly?0:180);
@@ -68,46 +76,36 @@ final class BattleScenery {
       uniform float u_time,u_kind,u_yaw;
       float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
-      float clearFloor(vec2 p){
-         float halfWidth=mix(.13,.30,smoothstep(.29,.50,p.y));
-         return smoothstep(.29,.38,p.y)*(1.0-smoothstep(halfWidth-.035,halfWidth,abs(p.x-.5)))
-            *(1.0-smoothstep(.86,.96,p.y));
-      }
-      vec2 inverseFloor(vec2 p){
-         // Portrait canvases extend above the floor horizon; only the lower
-         // part is projected. Keep the unused upper coordinates finite too.
-         p.y=min(p.y,145.0);
-         float z=(p.y-70.0)/(.55-(p.y-70.0)/260.0),depth=1.0+z/260.0;
-         float wx=(p.x-80.0)*depth,c=cos(u_yaw),s=sin(u_yaw);
-         float rx=c*wx+s*z,rz=-s*wx+c*z;
-         return vec2(80.0+rx/(1.0+rz/260.0),70.0+.55*rz/(1.0+rz/260.0));
+      // A mirrored wrap closes the illustrated panorama without clamping its
+      // edges. Every azimuth is visible; no stationary outer frame or disk mask.
+      float mirror(float x){return 1.0-abs(fract(x*.5)*2.0-1.0);}
+      vec2 floorWorld(vec2 p){
+         float dy=min(p.y,155.0)-74.0;
+         float rz=dy/(.32-dy/300.0),rx=(p.x-80.0)*(1.0+rz/300.0);
+         float c=cos(u_yaw),s=sin(u_yaw);
+         return vec2(c*rx+s*rz,-s*rx+c*rz);
       }
       void main(){
          vec2 uv=v_texCoords;
          vec2 point=vec2(u_canvas.x+uv.x*u_canvas.z,u_canvas.y+(1.0-uv.y)*u_canvas.w);
-         vec2 floorPoint=inverseFloor(point);
-         vec2 floorUv=vec2((floorPoint.x-u_canvas.x)/u_canvas.z,1.0-(floorPoint.y-u_canvas.y)/u_canvas.w);
-         float aspect=u_canvas.z/u_canvas.w,artAspect=u_size.x/u_size.y;
-         vec2 cover=vec2(min(1.0,aspect/artAspect),min(1.0,artAspect/aspect));
-         vec2 artworkUv=(uv-.5)*cover*.91+.5;
-         float edge=smoothstep(.63,.94,abs(artworkUv.x-.5)*2.0);
-         // The perimeter contains upright trunks and rocks. Treat it as a
-         // separate depth layer rather than rotating those pixels as a floor.
-         float floorMask=clearFloor(artworkUv);
-         // Separate depths for distant vista, middle trunks and near framing foliage.
-         vec2 vista=uv;vista.x+=sin(u_yaw)*(.018+edge*.072);vista.y+=sin(u_yaw)*sin(u_yaw)*.016;
-         vec2 sampleUv=(vista-.5)*cover*.91+.5;
-         floorUv=(floorUv-.5)*cover*.91+.5;
-         // A rotated ray must not pull a perimeter trunk into the clearing.
-         // The unprojected perimeter remains an upright parallax layer.
-         floorMask*=clearFloor(floorUv);
-         vec4 base=texture2D(u_texture,clamp(sampleUv,.5/u_size,1.0-.5/u_size));
-         float vegetation=smoothstep(.035,.15,base.g-base.r)*smoothstep(.025,.12,base.g-base.b);
+         vec2 world=floorWorld(point);
+         float azimuth=atan((point.x-80.0)/145.0)+u_yaw;
+         float panoX=mirror(.5+azimuth/3.14159265);
+         vec2 sampleUv=vec2(.015+.97*panoX,clamp((144.0-point.y)/86.0,0.0,.62));
+         vec4 panorama=texture2D(u_texture,sampleUv);
+         float vegetation=smoothstep(.035,.15,panorama.g-panorama.r)*smoothstep(.025,.12,panorama.g-panorama.b);
          if(u_kind>2.5&&u_kind<4.5){
-            sampleUv.x+=sin(u_time*1.3+sampleUv.y*31.0+sampleUv.x*13.0)*.0018*vegetation*(.25+edge);
-            base=texture2D(u_texture,clamp(sampleUv,.5/u_size,1.0-.5/u_size));
+            sampleUv.x+=sin(u_time*1.3+sampleUv.y*31.0+sampleUv.x*13.0)*.0018*vegetation;
+            panorama=texture2D(u_texture,clamp(sampleUv,.5/u_size,1.0-.5/u_size));
          }
-         base=mix(base,texture2D(u_texture,clamp(floorUv,.5/u_size,1.0-.5/u_size)),floorMask);
+         // Only the empty clearing is sampled for the full ground plane. Upright
+         // painted trunks and rocks belong to the surrounding cylindrical vista.
+         vec2 groundUv=vec2(.35+.30*mirror(world.x/110.0),.52+.27*mirror(world.y/110.0));
+         vec4 ground=texture2D(u_texture,groundUv);
+         float horizon=smoothstep(95.0,116.0,point.y);
+         vec4 base=mix(ground,panorama,horizon);
+         sampleUv=mix(groundUv,sampleUv,horizon);
+         float edge=smoothstep(.65,1.0,abs(uv.x-.5)*2.0);
          vec3 color=base.rgb;
          float clouds=noise(sampleUv*vec2(5.0,7.0)+vec2(-u_time*.023,u_time*.004));
          color*=.93+.10*smoothstep(.18,.8,clouds);

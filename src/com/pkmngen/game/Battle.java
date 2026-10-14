@@ -3464,6 +3464,7 @@ public class Battle {
             com.pkmngen.game.Network.BattleTurnData turnData = game.battle.network.turnData;
             String itemName = turnData.itemName.toLowerCase(Locale.ROOT);
             if (itemName.contains("ball")) {
+               CaptureBallVisual.select(game, itemName);
                int numWobbles;
                if (game.type != Game.Type.CLIENT) {
                   numWobbles = Battle.gen2CalcIfCaught(game, game.battle.oppPokemon, itemName);

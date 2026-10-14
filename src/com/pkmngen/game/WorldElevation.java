@@ -190,12 +190,14 @@ public final class WorldElevation {
    private static long key(float x,float y){return((long)MathUtils.floor(x/16)<<32)^(MathUtils.floor(y/16)&0xffffffffL);}
    private static int signature(Tile tile) {
       boolean ramp=ModernWorldGenerator.isRamp(tile);
-      float rise=BiomeProfiles.forTile(tile).number("height",ramp?"rampRise":"cliffHeight",8);
+      float rise=WorldReadability.smallJumpLedge(tile)?6f:BiomeProfiles.forTile(tile).number("height",ramp?"rampRise":"cliffHeight",8);
       // Texture names, time-of-day and tidalwater/tidaloff do not alter the surface.
       // Rebuild only when a real constraint or a ramp-side solid boundary changes.
       return java.util.Objects.hash(edges(tile),tile.nameUpper!=null && tile.nameUpper.contains("_inner"),ramp,rise,tile.isSolid,tile.isWater,tile.isLava);
    }
    private static int edges(Tile tile) {
+      if(WorldReadability.smallJumpLedge(tile))
+         return "down".equals(tile.ledgeDir)?1:"up".equals(tile.ledgeDir)?2:"left".equals(tile.ledgeDir)?4:8;
       String name=tile.nameUpper==null?"":tile.nameUpper;
       if(!name.contains("ledges3"))return 0;
       String[] parts=name.split("_");if(parts.length<2)return 0;
@@ -213,6 +215,6 @@ public final class WorldElevation {
       Cell parent,diagonal;int edges,id,size=1,distance=1000000,direction=-1;float offset,height;boolean exterior;
       Cell(Tile tile){this.tile=tile;x=MathUtils.floor(tile.position.x/16);y=MathUtils.floor(tile.position.y/16);signature=signature(tile);
          ramp=ModernWorldGenerator.isRamp(tile);edges=edges(tile);rawEdges=edges;
-         rise=BiomeProfiles.forTile(tile).number("height",ramp?"rampRise":"cliffHeight",8);}
+         rise=WorldReadability.smallJumpLedge(tile)?6f:BiomeProfiles.forTile(tile).number("height",ramp?"rampRise":"cliffHeight",8);}
    }
 }

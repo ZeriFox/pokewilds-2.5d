@@ -22,7 +22,7 @@ class ThrowPokeball extends Action {
       super();
       this.nextAction = nextAction;
       Texture text = TextureCache.get(Gdx.files.internal("pokeball1_color.png"));
-      this.pokeballSprite = new Sprite(text, 0, 0, 12, 12);
+      this.pokeballSprite = CaptureBallVisual.create(game, text, 0, 0, 12, 12);
       this.position = new Vector2(34.0F, 56.0F);
       this.positions = new ArrayList<>();
       this.positions.add(new Vector2(8.0F, 8.0F));
@@ -104,7 +104,7 @@ class ThrowPokeball extends Action {
          this.sprite = this.sprites.get(0);
          if (this.sprite != null) {
             this.sprite.setPosition(this.position.x, this.position.y);
-            this.sprite.draw(game.uiBatch);
+            CaptureBallVisual.draw(game, this.sprite);
          }
 
          if (this.repeats.get(0) > 0) {

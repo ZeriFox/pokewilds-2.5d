@@ -1377,8 +1377,11 @@ public class PkmnMap {
          Save.saveData(new Network.PlayerSpawnLocationData(game.player), this.id + ".sav/spawn" + game.player.network.id + this.currMapId + "");
          System.out.println("Writing minimap data...");
          Save.saveMinimap(this, this.id + ".sav/map" + this.currMapId + ".png");
+         CreativeMode.save(game);
       } catch (Save.SaveFailure e) {
          Game.saveErrorLogAndNotifyUser("An issue occurred while saving:\n\n", e);
+      } catch (IOException e) {
+         Game.saveErrorLogAndNotifyUser("Could not save Creative mode settings:\n\n", e);
       }
 
       System.out.println("Done.");

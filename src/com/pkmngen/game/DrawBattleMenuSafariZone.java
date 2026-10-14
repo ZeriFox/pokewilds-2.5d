@@ -113,6 +113,7 @@ class DrawBattleMenuSafariZone extends Action {
 
       if (InputProcessor.aJustPressed) {
          if (this.curr.equals("tl")) {
+            CaptureBallVisual.select(game, "safari ball");
             Action catchAction = this.calcIfCaught(game);
             String textString = game.player.name + " used SAFARI BALL!";
             if (game.player.adrenaline < 5) {

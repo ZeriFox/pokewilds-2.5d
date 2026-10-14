@@ -24,6 +24,8 @@ public final class MoveEffectPresentation {
    private ShaderProgram colors;
    private boolean captured;
    private int captureCount, rowFrames, screenFrames, localFrames, colorFrames, shrinkFrames;
+   private final float[] orbitVertices=new float[20*20];
+   private final com.badlogic.gdx.math.Vector3 projected=new com.badlogic.gdx.math.Vector3();
 
    public MoveEffectPresentation(String animationName) { scope=scopeFor(animationName); }
 
@@ -49,10 +51,10 @@ public final class MoveEffectPresentation {
       boolean recolor=has(properties,"inverse_colors")||has(properties,"darken_effect1")
          ||has(properties,"darken_effect2")||has(properties,"darken_effect3")
          ||has(properties,"lighten_effect1")||has(properties,"lighten_effect2");
-      if(properties.contains("screenshot:")) capture(game);
-      if(!rows&&!recolor)return true;
-      if(!captured || snapshot.getWidth()!=Gdx.graphics.getBackBufferWidth()
-         ||snapshot.getHeight()!=Gdx.graphics.getBackBufferHeight() || !rows)capture(game);
+      if(!rows&&!recolor){if(properties.contains("screenshot:"))capture(game);return true;}
+      // Each distorted frame samples the current camera. Keeping the first turn
+      // screenshot would freeze the orbit behind Water Gun / Teleport / weather.
+      capture(game);
       SpriteBatch batch=game.uiBatch;
       ShaderProgram oldShader=batch.getShader();Color oldColor=new Color(batch.getColor());
       boolean untargetedDistortion=properties.contains("row_displace:")&&!properties.contains("displace_target:");
@@ -79,7 +81,8 @@ public final class MoveEffectPresentation {
                int targetY=144-Integer.parseInt(pair[0]),sourceY=144-Integer.parseInt(pair[1]);
                float x0=ignorePlayer&&targetY<112?86:scope==Scope.SCREEN?left():0;
                float x1=ignoreEnemy&&targetY>=88?96:scope==Scope.SCREEN?left()+width():160;
-               strip(batch,x0,targetY,x1-x0,1,x0,sourceY,x1-x0,1);
+               if(scope==Scope.LOCAL)orbitStrip(game,x0,targetY,x1-x0,1,x0,sourceY,x1-x0,1);
+               else strip(batch,x0,targetY,x1-x0,1,x0,sourceY,x1-x0,1);
             }
             if(properties.contains("row_displace:")) {
                double speed=Double.parseDouble(value(properties,"row_displace:"));
@@ -92,7 +95,7 @@ public final class MoveEffectPresentation {
                for(int y=48;y<Math.ceil(bottom()+height());y++)
                   if((!ignorePlayer||y>=88)&&(!ignoreEnemy||y<92)) {
                      int shift=(int)(5.0*Math.sin((Math.PI/6)*(y+action.dispProgress)));
-                     displacedRow(batch,y,shift,ignorePlayer,ignoreEnemy);
+                     displacedRow(game,y,shift,ignorePlayer,ignoreEnemy);
                   }
             }
             if(properties.contains("row_split:")) {
@@ -100,7 +103,7 @@ public final class MoveEffectPresentation {
                ignorePlayer=action.name.contains("enemy");ignoreEnemy=action.name.contains("player");
                for(int y=48;y<Math.ceil(bottom()+height());y++)
                   if((!ignorePlayer||y>=88)&&(!ignoreEnemy||y<92))
-                     displacedRow(batch,y,progress*(y%2==0?-1:1),ignorePlayer,ignoreEnemy);
+                     displacedRow(game,y,progress*(y%2==0?-1:1),ignorePlayer,ignoreEnemy);
             }
          }
       } finally {
@@ -109,10 +112,25 @@ public final class MoveEffectPresentation {
       return true;
    }
 
-   private void displacedRow(SpriteBatch batch,int y,int shift,boolean ignorePlayer,boolean ignoreEnemy) {
+   private void displacedRow(Game game,int y,int shift,boolean ignorePlayer,boolean ignoreEnemy) {
       float x0=ignorePlayer?86:ignoreEnemy?0:left(),x1=ignoreEnemy?96:ignorePlayer?160:left()+width();
       // Keep the source band, shift its copied pixels, and clip only at viewport/UI.
-      strip(batch,x0+shift,y,x1-x0,1,x0,y,x1-x0,1);
+      if(scope==Scope.LOCAL&&(ignorePlayer||ignoreEnemy))orbitStrip(game,x0+shift,y,x1-x0,1,x0,y,x1-x0,1);
+      else strip(game.uiBatch,x0+shift,y,x1-x0,1,x0,y,x1-x0,1);
+   }
+
+   /** Targeted raster distortion follows the same orbit as its target, including
+    * reversed sides after half a revolution. UVs sample the current projected FBO. */
+   private void orbitStrip(Game game,float x,float y,float w,float h,float sx,float sy,float sw,float sh){
+      float packed=Color.WHITE.toFloatBits();int at=0;
+      for(int column=0;column<20;column++)for(int corner=0;corner<4;corner++){
+         float tx=(column+(corner>=2?1:0))/20f,ty=corner==1||corner==2?1:0;
+         game.johtoBattleRenderer.projectScenePoint(game,x+w*tx,y+h*ty,projected);
+         orbitVertices[at++]=projected.x;orbitVertices[at++]=projected.y;orbitVertices[at++]=packed;
+         game.johtoBattleRenderer.projectScenePoint(game,sx+sw*tx,sy+sh*ty,projected);
+         orbitVertices[at++]=(projected.x-left())/width();orbitVertices[at++]=(projected.y-bottom())/height();
+      }
+      game.uiBatch.draw(snapshot.getColorBufferTexture(),orbitVertices,0,at);
    }
 
    private void strip(SpriteBatch batch,float x,float y,float w,float h,float sx,float sy,float sw,float sh) {
@@ -150,7 +168,28 @@ public final class MoveEffectPresentation {
          try {game.uiBatch.draw(frame.getTexture(),left(),bottom(),width(),height(),
             frame.getU(),frame.getV2(),frame.getU2(),frame.getV());screenFrames++;}
          finally {clip.close(game.uiBatch);}
-      } else {frame.draw(game.uiBatch);localFrames++;}
+      } else {
+         // A continuous ruled mesh carries the authored particles between the
+         // same actor anchors. Original PNGs, move clocks and source Sprite stay
+         // read-only; the arena no longer jumps back to their old coordinates.
+         float packed=frame.getColor().toFloatBits();int at=0;
+         float x=frame.getX(),y=frame.getY(),w=frame.getWidth(),h=frame.getHeight();
+         for(int column=0;column<20;column++){
+            float f0=column/20f,f1=(column+1)/20f;
+            for(int corner=0;corner<4;corner++){
+               float px=x+w*(corner<2?f0:f1),py=(corner==1||corner==2)?y+h:y;
+               game.johtoBattleRenderer.projectScenePoint(game,px,py,projected);
+               orbitVertices[at++]=projected.x;orbitVertices[at++]=projected.y;
+               orbitVertices[at++]=packed;
+               float f=corner<2?f0:f1;
+               orbitVertices[at++]=frame.getU()+(frame.getU2()-frame.getU())*f;
+               orbitVertices[at++]=(corner==0||corner==3)?frame.getV2():frame.getV();
+            }
+         }
+         Clip clip=new Clip(game.uiBatch,bottom(),height());
+         try{game.uiBatch.draw(frame.getTexture(),orbitVertices,0,at);localFrames++;}
+         finally{clip.close(game.uiBatch);}
+      }
       // Health is drawn once more after composites, never sampled or distorted.
       DrawBattle draw=game.battle.drawAction;
       if(draw!=null) {
@@ -171,7 +210,7 @@ public final class MoveEffectPresentation {
          int w=Gdx.graphics.getBackBufferWidth(),h=Gdx.graphics.getBackBufferHeight();
          if(snapshot==null||snapshot.getWidth()!=w||snapshot.getHeight()!=h) {
             if(snapshot!=null)snapshot.dispose();
-            snapshot=new FrameBuffer(Pixmap.Format.RGBA8888,w,h,false);
+            snapshot=new FrameBuffer(Pixmap.Format.RGBA8888,w,h,true);
             snapshot.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest,Texture.TextureFilter.Nearest);
          }
          snapshot.begin();Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);

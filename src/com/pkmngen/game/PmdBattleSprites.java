@@ -2,6 +2,9 @@ package com.pkmngen.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
@@ -44,16 +47,21 @@ public final class PmdBattleSprites {
       boolean clipped=game.johtoBattleRenderer!=null&&game.johtoBattleRenderer.beginActorClip(batch);
       try {
       if (game.player != null && source == game.player.battleSprite) {
-         TextureRegion trainer = BwAssets.get().trainer(game.player,"up",seconds,false);
+         if(source.getX()>=160||source.getX()+source.getWidth()<=0)return true;
+         String direction=game.johtoBattleRenderer==null?"up":game.johtoBattleRenderer.actorFacing(game,true);
+         TextureRegion trainer = BwAssets.get().trainer(game.player,direction,seconds,false);
          if (trainer == null) return false;
          trainer = trimTrainer(trainer);
          Sprite draw = new Sprite(trainer);
-         float scale = Math.min(source.getWidth()/trainer.getRegionWidth(), source.getHeight()/trainer.getRegionHeight());
-         float width=trainer.getRegionWidth()*scale, height=trainer.getRegionHeight()*scale;
          float groundY=source.getY()-(game.battle.drawAction instanceof SpecialBattleMegaGengar.DrawBattle1?13:0);
-         draw.setBounds(source.getX()+(source.getWidth()-width)*.5f, groundY, width,height);
-         draw.setColor(source.getColor()); draw.setOrigin(width*.5f,0); draw.setScale(source.getScaleX(),source.getScaleY());
-         draw.setRotation(source.getRotation()); draw.draw(game.uiBatch);
+         Vector3 anchor=game.johtoBattleRenderer==null?new Vector3(source.getX()+source.getWidth()*.5f,groundY,1):
+            game.johtoBattleRenderer.projectActor(game,source.getX()+source.getWidth()*.5f,groundY,new Vector3());
+         float scale=Math.min(source.getWidth()/trainer.getRegionWidth(),30f/trainer.getRegionHeight())*anchor.z;
+         float width=trainer.getRegionWidth()*scale,height=trainer.getRegionHeight()*scale;
+         draw.setBounds(anchor.x-width*.5f,anchor.y,width,height);
+         draw.setColor(source.getColor());draw.setOrigin(width*.5f,0);draw.setScale(source.getScaleX(),source.getScaleY());
+         draw.setRotation(source.getRotation());
+         try(ActorDepth depth=new ActorDepth(game,anchor.y,false)){draw.draw(game.uiBatch);}
          return true;
       }
       if (own != null && source == own.backSprite) return draw(game, own, source, true, animation(game, own));
@@ -133,18 +141,19 @@ public final class PmdBattleSprites {
             game.johtoBattleRenderer.projectActor(game,cx,ground,new Vector3());
          float ghostTime=ModernUi.get(game).reducedMotion()?0:seconds;
          TextureRegion spirit=GhostVisualAssets.get().frame(ghostTime);
-         Sprite ghost=new Sprite(spirit);float scale=38*ratio*anchor.z/Math.max(spirit.getRegionWidth(),spirit.getRegionHeight());
+         Sprite ghost=new Sprite(spirit);float scale=27*ratio*anchor.z/Math.max(spirit.getRegionWidth(),spirit.getRegionHeight());
          float width=spirit.getRegionWidth()*scale,height=spirit.getRegionHeight()*scale;
          ghost.setBounds(anchor.x-width*.5f,anchor.y,width,height);
          ghost.setColor(source.getColor());ghost.setOrigin(width*.5f,0);
-         ghost.setScale(source.getScaleX(),source.getScaleY());ghost.setRotation(source.getRotation());ghost.draw(game.uiBatch);
+         ghost.setScale(source.getScaleX(),source.getScaleY());ghost.setRotation(source.getRotation());
+         try(ActorDepth depth=new ActorDepth(game,anchor.y,false)){ghost.draw(game.uiBatch);}
          return true;
       }
       // The arena slots are diagonal. North/south frames made both actors look
       // past each other. Use real NE/SW art for idle, attacks, hurt and sleep.
       String facing = game.johtoBattleRenderer==null?VisualGeometry.battleFacing(back):game.johtoBattleRenderer.actorFacing(game,back);
       PmdPokemonSprites.Frame frame = PmdPokemonSprites.get().frame(pokemon, facing, animation, seconds);
-      if (frame == null) return false;
+      if (frame == null) return drawFallback(game,pokemon,source,back);
       float originalHeight = back ? 48f : pokemon.specie.sprite.getWidth();
       float widthRatio = source.getWidth() / (back ? 48f : pokemon.specie.sprite.getWidth());
       float fraction = Math.max(0, Math.min(1, source.getHeight() / Math.max(1, originalHeight * widthRatio)));
@@ -170,13 +179,14 @@ public final class PmdBattleSprites {
          // Keep one size for every direction. Fit even the widest pose against
          // the complete orbit, rather than cropping large species at its edge.
          for(int step=0;step<=128;step++) {
-            float yaw=BattleScenery.orbit(step*(40f/128f));
+            float yaw=step*MathUtils.PI2/128f;
             Vector3 limit=BattleScenery.project(back?40:124,back?48:88,yaw,new Vector3());
             float ratio=limit.z*(back?1f:.9f);
             baseScale=Math.min(baseScale,(limit.x-2)/(Math.max(1,-minX)*ratio));
             baseScale=Math.min(baseScale,(158-limit.x)/(Math.max(1,maxX)*ratio));
-            baseScale=Math.min(baseScale,((back?110:142)-limit.y)/(Math.max(1,maxY-minY)*ratio));
+            baseScale=Math.min(baseScale,(121-limit.y)/(Math.max(1,maxY-minY)*ratio));
          }
+         baseScale=Math.max(.05f,baseScale);
          scales.put(key, baseScale);
       }
       float scale = baseScale * source.getWidth() / (back ? 48f : pokemon.specie.sprite.getWidth()) * (back ? 1f : .90f);
@@ -201,10 +211,11 @@ public final class PmdBattleSprites {
          ModernUi ui=ModernUi.get(game);
          float radius=Math.min(back?13:10,Math.max(4,width*.32f));
          Color shade=new Color(.08f,.12f,.13f,.22f*source.getColor().a);
+         try(ActorDepth depth=new ActorDepth(game,groundY+.8f,false)){
          for(int row=0;row<5;row++){
             float dy=(row-2)/2.5f,half=radius*(float)Math.sqrt(Math.max(0,1-dy*dy));
             ui.rect(game,camera.x-half,groundY-.7f+row*.4f,half*2,.4f,shade);
-         }
+         }}
       }
       draw.setBounds(camera.x - frame.anchorX*scale,
          groundY + contactLift - frame.anchorY*scale*fraction, width, height);
@@ -218,26 +229,64 @@ public final class PmdBattleSprites {
       if (SpriteProxy.inverseColors || SpriteProxy.confuseRayColors1 || SpriteProxy.confuseRayColors2) tint.mul(.75f,.6f,1f,1f);
       boolean flash = SpriteProxy.lightenAllColors1 || SpriteProxy.lightenAllColors2
          || source instanceof SpriteProxy && (((SpriteProxy)source).lightenColors1 || ((SpriteProxy)source).lightenColors2);
-      ShaderProgram previous = game.uiBatch.getShader();
-      if (flash) {
-         if (flashShader == null) {
-            flashShader = new ShaderProgram(
-               "attribute vec4 a_position; attribute vec4 a_color; attribute vec2 a_texCoord0; uniform mat4 u_projTrans; varying vec4 v_color; varying vec2 v_uv; void main(){v_color=a_color;v_color.a*=255.0/254.0;v_uv=a_texCoord0;gl_Position=u_projTrans*a_position;}",
-               "#ifdef GL_ES\nprecision mediump float;\n#endif\nuniform sampler2D u_texture; varying vec4 v_color; varying vec2 v_uv; void main(){vec4 c=texture2D(u_texture,v_uv);c.rgb=mix(c.rgb,vec3(1.0),0.65);gl_FragColor=c*v_color;}");
-            if (!flashShader.isCompiled()) throw new IllegalStateException(flashShader.getLog());
-         }
-         game.uiBatch.setShader(flashShader);
+      draw.setColor(tint);
+      try(ActorDepth depth=new ActorDepth(game,groundY,flash)){
+         draw.draw(game.uiBatch);
+         if(fraction>=.99f&&source.getColor().a>0)
+            ShinyVisuals.drawBattle(game,pokemon,camera.x,groundY,width,height,seconds);
       }
-      draw.setColor(tint); draw.draw(game.uiBatch);
-      if (flash) game.uiBatch.setShader(previous);
       actorDraws++;
       return true;
+   }
+
+   /** Preserve the genuine legacy shiny art if PMD has no exact shiny sheet. */
+   private static boolean drawFallback(Game game,Pokemon pokemon,Sprite source,boolean back){
+      float baseGround=source.getY()-(back&&game.battle.drawAction instanceof SpecialBattleMegaGengar.DrawBattle1?14:0);
+      Vector3 anchor=game.johtoBattleRenderer==null?new Vector3(source.getX()+source.getWidth()*.5f,baseGround,1):
+         game.johtoBattleRenderer.projectActor(game,source.getX()+source.getWidth()*.5f,baseGround,new Vector3());
+      float factor=.62f*anchor.z,width=source.getWidth()*factor,height=source.getHeight()*factor;
+      Sprite fallback=new Sprite(source);fallback.setBounds(anchor.x-width*.5f,anchor.y,width,height);
+      fallback.setOrigin(width*.5f,0);
+      try(ActorDepth depth=new ActorDepth(game,anchor.y,false)){
+         fallback.draw(game.uiBatch);
+         float original=back?48:pokemon.specie.sprite.getWidth();
+         if(source.getHeight()>=original*.99f&&source.getColor().a>0)
+            ShinyVisuals.drawBattle(game,pokemon,anchor.x,anchor.y,width,height,seconds);
+      }
+      actorDraws++;return true;
+   }
+
+   /** Recognized actors already project themselves; plain poofs share the effect camera. */
+   public static void drawSendOutFragment(Game game,Sprite fragment){
+      if(fragment instanceof SpriteProxy){fragment.draw(game.uiBatch);return;}
+      if(game.johtoBattleRenderer==null||!game.johtoBattleRenderer.drawSceneEffect(fragment,game.uiBatch))fragment.draw(game.uiBatch);
+   }
+
+   /** Pixel-art billboards sort by their ground depth, even across legacy GUI layers.
+    * Transparent texels never occlude a nearer actor; all caller GL state is restored. */
+   private static final class ActorDepth implements AutoCloseable {
+      final Game game;final ShaderProgram previous;final boolean enabled,mask;final int function;
+      ActorDepth(Game game,float groundY,boolean flash){
+         this.game=game;game.uiBatch.flush();previous=game.uiBatch.getShader();
+         enabled=Gdx.gl.glIsEnabled(GL20.GL_DEPTH_TEST);
+         java.nio.IntBuffer value=BufferUtils.newIntBuffer(1);Gdx.gl.glGetIntegerv(GL20.GL_DEPTH_WRITEMASK,value);mask=value.get(0)!=0;
+         value.clear();Gdx.gl.glGetIntegerv(GL20.GL_DEPTH_FUNC,value);function=value.get(0);
+         if(flashShader==null){
+            flashShader=new ShaderProgram(
+               "attribute vec4 a_position;attribute vec4 a_color;attribute vec2 a_texCoord0;uniform mat4 u_projTrans;uniform float u_depth;varying vec4 v_color;varying vec2 v_uv;void main(){v_color=a_color;v_color.a*=255.0/254.0;v_uv=a_texCoord0;gl_Position=u_projTrans*a_position;gl_Position.z=(u_depth*2.0-1.0)*gl_Position.w;}",
+               "#ifdef GL_ES\nprecision mediump float;\n#endif\nuniform sampler2D u_texture;uniform float u_flash;varying vec4 v_color;varying vec2 v_uv;void main(){vec4 c=texture2D(u_texture,v_uv)*v_color;if(c.a<0.01)discard;c.rgb=mix(c.rgb,vec3(1.0),u_flash);gl_FragColor=c;}");
+            if(!flashShader.isCompiled())throw new IllegalStateException(flashShader.getLog());
+         }
+         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);Gdx.gl.glDepthMask(true);
+         game.uiBatch.setShader(flashShader);flashShader.setUniformf("u_depth",MathUtils.clamp(.15f+groundY/250f,.02f,.98f));
+         flashShader.setUniformf("u_flash",flash?.65f:0);
+      }
+      @Override public void close(){game.uiBatch.flush();game.uiBatch.setShader(previous);Gdx.gl.glDepthMask(mask);Gdx.gl.glDepthFunc(function);if(!enabled)Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);}
    }
 
    public static boolean sendOut(Game game, float x, float y, int remaining) {
       if (game.modernUi == null || game.player.currPokemon == null) return false;
       Pokemon pokemon = game.player.currPokemon;
-      if (PmdPokemonSprites.get().frame(pokemon,VisualGeometry.battleFacing(true),"Idle",seconds) == null) return false;
       // Keep the original ball/poof schedule, replacing only its sliced actor art.
       if (remaining <= 7) {
          Sprite proxy = new Sprite(pokemon.backSprite);

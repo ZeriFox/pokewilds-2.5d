@@ -23,6 +23,9 @@ public final class WorldMaterials {
    public static String terrainName(Tile tile) {
       if (tile == null) return "grass_light";
       String name = lower(tile.name);
+      // Interior construction can store its actual floor in the upper layer.
+      // Resolve that surface before biome fallback; furniture keeps the base floor.
+      if(WorldReadability.plainFloor(tile.nameUpper))name=lower(tile.nameUpper);
       BiomeProfiles.Profile profile = BiomeProfiles.visualForTile(tile);
       if (name.contains("bridge")) return "wood_floor";
       if (tile.isLava || name.contains("lava")) return profile.string("fluid", "lava", "lava_bright");
@@ -45,6 +48,7 @@ public final class WorldMaterials {
          return profile.terrain(Math.floorMod(patch, 5) == 0 ? "path" : "ground");
       }
       if (name.startsWith("cave") || name.equals("black1") || name.equals("blank1")) return "cave_floor";
+      if(WorldReadability.smallJumpLedge(tile))return profile.terrain("ground");
       if (name.startsWith("ledge_grass")) return profile.terrain("ground");
       if (name.startsWith("mountain") || name.startsWith("rock") || name.startsWith("ledge")) return profile.terrain("rock");
       if (name.startsWith("path") || name.startsWith("ground")) return profile.terrain("path");
@@ -73,7 +77,7 @@ public final class WorldMaterials {
       if (name.contains("waterfall")) return profile.string("fluid", "water", "water");
       if (name.contains("kiln")) return "kiln";
       if (name.contains("chimney")) return "chimney";
-      if (name.contains("machine") || name.contains("fossilreviver") || name.contains("pokecenter")) return name.contains("__off") ? "machine" : "machine_active";
+      if (name.contains("machine") || name.contains("fossilreviver") || name.contains("pokecenter") || name.contains("building1_pc")) return name.contains("__off") ? "machine" : "machine_active";
       if (name.contains("cables")) return "wall";
       if (name.contains("warp")) return "warp";
       if (name.contains("onpress") || name.contains("switch")) return "pressure_plate";
@@ -108,6 +112,7 @@ public final class WorldMaterials {
       if (name.contains("roof")) return "roof";
       if (name.contains("floor") || name.contains("carpet") || name.contains("rug") || name.contains("bridge") || name.contains("ledge")) return null;
       if (name.contains("wall") || name.contains("pkmnmansion") || name.contains("house") || name.contains("building") || name.contains("pillar")) return "wall";
+      if(tile.isSolid&&name.matches("ruins[0-9]+_[nesw]+(?:_inner)?"))return "wall";
       // Script markers and missing texture identities must not become visible
       // placeholder ghosts, stones or plates, especially during night effects.
       if (!upper.isEmpty()) return null;
@@ -132,7 +137,7 @@ public final class WorldMaterials {
             case "warp": case "pressure_plate": case "cracked": case "volcanic_cracked":
             case "hole": case "steps": return Kind.GROUND_DETAIL;
             case "window": return tile.isSolid ? Kind.WINDOW : Kind.PROP;
-            case "wall": return tile.isSolid ? Kind.WALL : Kind.PROP;
+            case "wall": return tile.isSolid||VisualGeometry.buildingWall(lower,upper,true)?Kind.WALL:Kind.PROP;
             case "door": case "door_locked": case "door_open": return Kind.DOOR;
             case "roof": return Kind.ROOF;
             case "fence_wood": case "ruin_gate": return Kind.FENCE;
@@ -162,8 +167,14 @@ public final class WorldMaterials {
    public static String treeKey(Tile tile) {
       String name = lower(tile.name) + " " + lower(tile.nameUpper);
       BiomeProfiles.Profile profile = BiomeProfiles.visualForTile(tile);
+      int tier=WorldReadability.cutTier(tile);
+      if(tier==2)return name.contains("savanna")?"tree_dry":"tree_oak";
       if (profile.id.equals("volcano") || profile.id.equals("graveyard") || profile.id.equals("desert")) return profile.decor("tree");
       if (name.contains("tree4") || name.contains("snow") || profile.id.equals("snow")) return "tree_snow";
+      if(WorldReadability.largeTree(tile))return "tree_oak";
+      // Ordinary CUT trees keep a slender silhouette even inside deep forests.
+      // Mature trees above use a broad oak crown and a visibly wider root system.
+      if(tier==1)return name.contains("tree2")?"tree_pine":"tree_small";
       // Regional trees belong to the material catalogue too. Previously the
       // ordinary-tree fallback ignored wetland/oasis/deep-forest presentation.
       String regional = profile.decor("tree");
