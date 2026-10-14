@@ -975,7 +975,7 @@ public final class JohtoRenderer {
          // The cap can cover the actor even when the visible front face is far
          // below them on screen. Fade the complete intervening wall segment;
          // retain its geometry and neighbour culling, so corners never gain holes.
-         float alpha=interiorWallOccludesPlayer(game,x,y,height)?.42f:1f;
+         float alpha=interiorWallOccludesPlayer(game,x,y,height)?.12f:1f;
          WorldMeshBatch groups=alpha<1f?translucent:geometry;
          float wallTint=Color.toFloatBits(1,1,1,alpha);
          Buffer mesh=groups.buffer(face.getTexture());

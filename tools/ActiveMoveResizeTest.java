@@ -47,6 +47,7 @@ public final class ActiveMoveResizeTest {
       boolean complete,starting=true,pendingResize,completing;
       Battle.LoadAndPlayAnimation animation,originalAction;
       MoveEffectPresentation originalPresentation;
+      int[] projectedPixels;boolean[] stablePixels;
       Pokemon own,enemy;
       Next next;
       Sample(){super(new String[0],4);}
@@ -111,7 +112,9 @@ public final class ActiveMoveResizeTest {
          ShaderProgram shader=uiBatch.getShader();Matrix4 transform=new Matrix4(uiBatch.getTransformMatrix());
          int frame=animation.frameNum;String path="attacks/"+animation.name+"/output/frame-"+String.format(Locale.ROOT,"%03d",frame)+".png";
          boolean exists=Gdx.files.internal(path).exists();float ownW=own.backSprite.getWidth(),enemyW=enemy.sprite.getWidth();
+         float activeYaw=johtoBattleRenderer.cameraYaw(this);
          animation.step(this);stepsThisRender++;uiBatch.flush();
+         require(activeYaw==johtoBattleRenderer.cameraYaw(this),"Move step reset the active arena camera");
          require(stepsThisRender==1&&animation.frameNum==frame+(exists?1:0),"Original move clock advanced more/less than once: "+frame);
          require(Arrays.equals(viewport,gl(GL20.GL_VIEWPORT,4))&&Arrays.equals(fbo,gl(GL20.GL_FRAMEBUFFER_BINDING,1)),"Viewport/FBO leaked");
          require(Gdx.gl.glIsEnabled(GL20.GL_SCISSOR_TEST)&&Arrays.equals(box,gl(GL20.GL_SCISSOR_BOX,4)),"Scissor leaked");
@@ -144,7 +147,7 @@ public final class ActiveMoveResizeTest {
             }else if(moveIndex==1){
                require(changedOutside==0,"Tackle leaked into expanded field after resize");
                if(changedInside>0){
-                  int matched=verifyTarget(before,after,path,scale,left,bottom);
+                  int matched=verifyTarget(before,after,path,scale,left,bottom,activeYaw);
                   targetPixels[sizeIndex]+=matched;
                   if(matched>0){useful[sizeIndex]++;if(useful[sizeIndex]==1)save(after,"tackle-resize-"+sizeIndex+"-frame-"+frame+"-"+w+"x"+h+".png");}
                }
@@ -171,30 +174,79 @@ public final class ActiveMoveResizeTest {
          System.out.println("RESIZED MOVE "+moves[moveIndex]+" frames="+frames+" callbacks="+resizeCallbacks+" useful="+Arrays.toString(useful)+" captures="+presentation.getCaptureCount()+" targetPixels="+Arrays.toString(targetPixels)+" disposed=true next=queued-once");
          completing=true;
       }
-      int verifyTarget(Pixmap before,Pixmap after,String path,float scale,float left,float bottom){
-         Pixmap png=new Pixmap(Gdx.files.internal(path));int minX=160,minY=144,maxX=-1,maxY=-1,matched=0;
+      /** Independent CPU oracle: original PNG texels rasterized through the documented
+       * 2.5D camera, then compared with the real GPU action after each window resize.
+       * It deliberately never calls projectScenePoint/projectEffect/drawFrame. */
+      int verifyTarget(Pixmap before,Pixmap after,String path,float scale,float left,float bottom,float yaw){
+         Pixmap png=new Pixmap(Gdx.files.internal(path));int minX=160,maxX=-1,matched=0;
+         int width=after.getWidth(),height=after.getHeight();
+         if(projectedPixels==null||projectedPixels.length!=width*height){projectedPixels=new int[width*height];stablePixels=new boolean[width*height];}
+         Arrays.fill(projectedPixels,0);Arrays.fill(stablePixels,false);
          try{
-            for(int y=0;y<png.getHeight();y++)for(int x=0;x<png.getWidth();x++)if((png.getPixel(x,y)&255)>0){minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);}
+            for(int y=0;y<png.getHeight();y++)for(int x=0;x<png.getWidth();x++)if((png.getPixel(x,y)&255)>0){minX=Math.min(minX,x);maxX=Math.max(maxX,x);}
             if(maxX>=minX)require(Math.min(maxX+1,enemy.sprite.getX()+enemy.sprite.getWidth())-Math.max(minX,enemy.sprite.getX())>10,
                "Authored effect does not overlap the actual enemy target");
-            int x0=(int)Math.floor(left+minX*scale)-1,x1=(int)Math.ceil(left+(maxX+1)*scale)+1;
-            int y0=(int)Math.floor(bottom+(143-maxY)*scale)-1,y1=(int)Math.ceil(bottom+(144-minY)*scale)+1;
-            for(int y=(int)Math.ceil(bottom+49*scale);y<after.getHeight()-2;y+=3)for(int x=2;x<after.getWidth()-2;x+=3)
-               if(before.getPixel(x,y)!=after.getPixel(x,y)){
-                  float worldX=(x+.5f-left)/scale,worldY=(y+.5f-bottom)/scale;
-                  // MoveEffectPresentation intentionally redraws health panels;
-                  // their translucent shadows are not authored attack pixels.
-                  boolean health=worldX>=3&&worldX<=88&&worldY>=111&&worldY<=140
-                     ||worldX>=81&&worldX<=159&&worldY>=45&&worldY<=83;
-                  if(!health)require(maxX>=minX&&x>=x0&&x<=x1&&y>=y0&&y<=y1,"Tackle effect outside actual PNG target bounds: "+path+" "+x+","+y);
+            // The presentation contract uses twenty vertical strips on the original
+            // 160x144 canvas; a software barycentric raster oracle checks actual PNG
+            // registration, including triangle interpolation and nearest sampling.
+            for(int column=0;column<20;column++){
+               double x0=column*8,x1=x0+8;
+               double[][] p={cameraPoint(x0,0,yaw,scale,left,bottom),cameraPoint(x0,144,yaw,scale,left,bottom),
+                  cameraPoint(x1,144,yaw,scale,left,bottom),cameraPoint(x1,0,yaw,scale,left,bottom)};
+               raster(png,p[0],p[1],p[2],x0,144,x0,0,x1,0,width,height,bottom+48*scale);
+               raster(png,p[2],p[3],p[0],x1,0,x1,144,x0,144,width,height,bottom+48*scale);
+            }
+            for(int y=(int)Math.ceil(bottom+49*scale);y<height-2;y++)for(int x=2;x<width-2;x++){
+               float worldX=(x+.5f-left)/scale,worldY=(y+.5f-bottom)/scale;
+               // Only the two fixed top cards/shadows are redrawn by presentation.
+               // Their opaque interiors are checked separately rather than exempted.
+               boolean health=(worldX>=3&&worldX<=78||worldX>=83&&worldX<=158)&&worldY>=121&&worldY<=142;
+               if(health){
+                  if((worldX>=5&&worldX<=75||worldX>=85&&worldX<=155)&&worldY>=124&&worldY<=139)
+                     require(before.getPixel(x,y)==after.getPixel(x,y),"Move changed opaque health HUD at "+x+","+y);
+                  continue;
                }
-            for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++){
-               int rgba=png.getPixel(x,y);if((rgba&255)!=255)continue;
-               int sx=(int)(left+(x+.5f)*scale),sy=(int)(bottom+(143-y+.5f)*scale);
-               if(before.getPixel(sx,sy)!=rgba){require(after.getPixel(sx,sy)==rgba,"Tackle PNG no longer registered to enemy after resize");matched++;}
+               if(before.getPixel(x,y)!=after.getPixel(x,y)){
+                  // One framebuffer pixel covers GPU edge rules and libGDX's
+                  // trigonometric lookup-table rounding, never an expanded arena.
+                  boolean supported=false;
+                  for(int dy=-1;dy<=1&&!supported;dy++)for(int dx=-1;dx<=1;dx++)
+                     if((projectedPixels[(y+dy)*width+x+dx]&255)>0){supported=true;break;}
+                  require(supported,"Tackle effect outside projected PNG alpha mask: "+path+" "+x+","+y+" yaw="+yaw);
+               }
+               int index=y*width+x,rgba=projectedPixels[index];
+               if(stablePixels[index]&&(rgba&255)==255&&before.getPixel(x,y)!=rgba){
+                  require(after.getPixel(x,y)==rgba,"Projected Tackle PNG texel missed target after resize: "+path+" "+x+","+y+" yaw="+yaw);
+                  matched++;
+               }
             }
          }finally{png.dispose();}
          return matched;
+      }
+      static double[] cameraPoint(double x,double y,double yaw,double scale,double left,double bottom){
+         double ground=48+40*Math.max(0,Math.min(1,(x-40)/84));
+         double depth=(ground-70)/(.55-(ground-70)/260),wx=(x-80)*(1+depth/260)*.82,wz=depth*.82;
+         double rx=Math.cos(yaw)*wx-Math.sin(yaw)*wz,rz=Math.sin(yaw)*wx+Math.cos(yaw)*wz;
+         double perspective=300/(300+rz);
+         return new double[]{left+(80+rx*perspective)*scale,bottom+(74+.32*rz*perspective+(y-ground)*perspective*.68)*scale};
+      }
+      void raster(Pixmap png,double[] a,double[] b,double[] c,double au,double av,double bu,double bv,double cu,double cv,int width,int height,double clipBottom){
+         double denominator=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);
+         if(Math.abs(denominator)<1e-9)return;
+         int x0=Math.max(0,(int)Math.floor(Math.min(a[0],Math.min(b[0],c[0])))),x1=Math.min(width-1,(int)Math.ceil(Math.max(a[0],Math.max(b[0],c[0]))));
+         int y0=Math.max((int)Math.ceil(clipBottom),(int)Math.floor(Math.min(a[1],Math.min(b[1],c[1])))),y1=Math.min(height-1,(int)Math.ceil(Math.max(a[1],Math.max(b[1],c[1]))));
+         for(int y=y0;y<=y1;y++)for(int x=x0;x<=x1;x++){
+            double alpha=((b[1]-c[1])*(x+.5-c[0])+(c[0]-b[0])*(y+.5-c[1]))/denominator;
+            double beta=((c[1]-a[1])*(x+.5-c[0])+(a[0]-c[0])*(y+.5-c[1]))/denominator,gamma=1-alpha-beta;
+            if(alpha<0||beta<0||gamma<0)continue;
+            double u=alpha*au+beta*bu+gamma*cu,v=alpha*av+beta*bv+gamma*cv;
+            int px=Math.max(0,Math.min(159,(int)Math.floor(u))),py=Math.max(0,Math.min(143,(int)Math.floor(v))),rgba=png.getPixel(px,py);
+            if((rgba&255)==0)continue;
+            int index=y*width+x;projectedPixels[index]=rgba;
+            // Exact-color checks are for texel interiors, away from nearest-sample
+            // boundaries. The alpha-mask containment check still covers all edges.
+            stablePixels[index]=u-Math.floor(u)>.2&&u-Math.floor(u)<.8&&v-Math.floor(v)>.2&&v-Math.floor(v)<.8;
+         }
       }
       void save(Pixmap image,String filename){PixmapIO.PNG png=new PixmapIO.PNG();png.setFlipY(true);try{png.write(Gdx.files.local(filename),image);}catch(java.io.IOException ex){throw new RuntimeException(ex);}finally{png.dispose();}}
    }

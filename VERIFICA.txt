@@ -8,11 +8,11 @@ La precedente ricevuta e archiviata in baseline/before-playtest-2026-10-14/.
 
 ARTEFATTO COMPILATO
 dist/pokewilds-rebuilt.jar
-SHA-256: 05b15b1d8edd6ae882d9e7e9fe46d7dc022db14200eb4ff0c050468d9252669f
+SHA-256: 070cf7d68c601920244e97edf3375bd9f222be7d1187e88f124f6f9d6aef5eb6
 Dimensione: 330105834 byte; 109075 voci ZIP.
 Java 17; 241 sorgenti; 507 classi compilate.
 Modelli GLB esclusi; zero classi di gioco recuperate dal runtime upstream.
-Digest sorgenti: 4e7f54c4afc8caebf88dfeefd3823c6bd78484c57e7ba78b060d68522e9fa60c
+Digest sorgenti: 61b4a92c73a9dde3b48e1f925c13259226581864481b55e42282c14178200f6a
 Build report: build/build-report.json (hash di ogni sorgente e risorsa).
 
 CONTROLLI
